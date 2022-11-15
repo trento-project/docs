@@ -36,6 +36,9 @@ Repositories that don't publish a package to Hex, should publish the generated d
 
 Testing guidelines:
 
+- Read [Testing Elixir](https://pragprog.com/titles/lmelixir/testing-elixir/).
+- Prefer [factories](https://github.com/thoughtbot/ex_machina) over fixtures to create test data.
+
 - [Mocks and explicit contracts](https://dashbit.co/blog/mocks-and-explicit-contracts)
 
 - [Controller tests as integration tests](https://groups.google.com/g/elixir-ecto/c/BKpLf092dWs/m/VaCvfZpEBQAJ) (_pre-Phoenix Context_ but still relevant)
