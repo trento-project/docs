@@ -1,7 +1,7 @@
 # ADR
 
 Trento's ADR repository contains the Architecture Decision Records (ADR) for the project.
-Please refer to the ADR GitHub page and  this article for more info about Architecture Decision Records.
+Please refer to the ADR GitHub page and this article for more info about Architecture Decision Records.
 
 ## How to contribute
 
@@ -32,4 +32,3 @@ adr new -s 9 new "Tonio is the best rabbit pet"
 
 - [Architecture Decision Records](https://adr.github.io/)
 - [Spotify Blog post about ADR](https://engineering.atspotify.com/2020/04/when-should-i-write-an-architecture-decision-record/)
-  
