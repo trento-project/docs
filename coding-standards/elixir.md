@@ -20,6 +20,10 @@ Use the [.credo.exs template](../templates/.credo.exs) as a starting point for y
 
 Please write specs `@spec` tags for all public functions and typespecs for defined types, to help Dialyzer doings its job.
 
+
+## Code smells
+
+The [Catalog of Elixir-specific Code Smells](https://github.com/lucasvegi/Elixir-Code-Smells) is a good reference for common code smells in Elixir.
 ## CI
 
 Please use the [elixir.yml template](../templates/elixir.yml) as a starting point for your project.
