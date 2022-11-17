@@ -24,6 +24,8 @@ automatically but please make sure you are not sharing any sensitive data of you
 
 ## Submitting changes
 
+Always refer to the [docs repository](https://github.com/trento-project/docs) for coding standards and general guidelines.
+
 ### Pull Requests guideline
 
 Reviews are hard. These few points will help us to reduce the time and effort required and allow us to merge your changes faster.
