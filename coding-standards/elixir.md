@@ -43,6 +43,46 @@ Testing guidelines:
 
 - [Controller tests as integration tests](https://groups.google.com/g/elixir-ecto/c/BKpLf092dWs/m/VaCvfZpEBQAJ) (_pre-Phoenix Context_ but still relevant)
 
+### Test coverage
+
+Test coverage is enforced by [coveralls.io](https://coveralls.io/). Please add [excoveralls](https://github.com/parroty/excoveralls) to the list of dependencies and setup `mix.exs` file as shown here:
+
+```elixir
+def project do
+  [
+    app: :yourapp,
+    version: "1.0.0",
+    elixir: "~> 1.0.0",
+    deps: deps(),
+    test_coverage: [tool: ExCoveralls],
+    preferred_cli_env: [
+      coveralls: :test,
+      "coveralls.github": :test
+    ]
+  ]
+end
+
+defp deps do
+  [
+    {:excoveralls, "~> 0.10", only: :test}
+  ]
+end
+
+# If you have a custom mix task you can override the coveralls.github task
+defp aliases do
+  [
+    "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+    "ecto.reset": ["ecto.drop", "ecto.setup"],
+    test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+    "coveralls.github": ["ecto.create --quiet", "ecto.migrate --quiet", "coveralls.github"]
+  ]
+end
+```
+
+The [CI template](../templates/elixir-ci.yaml#131) includes a step to upload the coverage report to coveralls.io.
+
+Please refer to the [coveralls notification documentation](https://docs.coveralls.io/coveralls-notifications) to allow coveralls to post comments with the coverage report in the PR.
+
 ## Phoenix
 
 Guidelines for applications using Phoenix:
