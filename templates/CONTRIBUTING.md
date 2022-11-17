@@ -59,6 +59,6 @@ Reviews are hard. These few points will help us to reduce the time and effort re
 
 1. Opinionated comments are welcome but don't expect them always to be
    addressed. Be ready for discussion but also open to conceding.
-2. To avoid scope-creep, consider proposing subsequent PRs
+   To avoid scope creep, consider proposing subsequent PRs
    rather than requesting changes for the current PR you are reviewing.
-3. Short, concise comments with examples are the most valuable.
+2. Short, concise comments with examples are the most valuable.
