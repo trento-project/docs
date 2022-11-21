@@ -17,4 +17,4 @@ Please refer to Google's [Code Review Developer Guide](https://google.github.io/
 
 - [Elixir](./elixir.md)
 - [Go](./go.md)
-- [JS](./js.md)
+- [JS](./javascript.md)
