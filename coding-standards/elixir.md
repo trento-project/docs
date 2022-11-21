@@ -20,10 +20,10 @@ Use the [.credo.exs template](../templates/.credo.exs) as a starting point for y
 
 Please write specs `@spec` tags for all public functions and typespecs for defined types, to help Dialyzer doings its job.
 
-
 ## Code smells
 
 The [Catalog of Elixir-specific Code Smells](https://github.com/lucasvegi/Elixir-Code-Smells) is a good reference for common code smells in Elixir.
+
 ## CI
 
 Please use the [elixir.yml template](../templates/elixir.yml) as a starting point for your project.
@@ -97,3 +97,4 @@ Guidelines for applications using Phoenix:
 - Use [realworld example app](https://github.com/gothinkster/elixir-phoenix-realworld-example-app) as a reference for the directory structure, naming and code organization in general.
 - Instead of [Router Path helpers](https://hexdocs.pm/phoenix/routing.html#path-helpers), prefer using the full path in the tests (e.g. `/api/rabbits`) to test that the route is correct.
 - Document APIs using [OpenAPI](https://github.com/open-api-spex/open_api_spex), cast and validate operations in controllers using the provided [plug](https://github.com/open-api-spex/open_api_spex#validating-and-casting-params), and test controllers using [OpenAPISpex.TestAssertions](https://github.com/open-api-spex/open_api_spex#validate-responses).
+- The [CI template](../templates/elixir-ci.yaml) includes a step to generate the Swagger UI and publish it to GitHub pages. Please refer to [this pr](https://github.com/open-api-spex/open_api_spex/pull/489) to configure the `ApiSpec` module so that it does not depend on a running `Endpoint` when generating the `openapi.json` file.
