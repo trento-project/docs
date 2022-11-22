@@ -14,7 +14,7 @@ We want to use a format that allows us to generate code from the contracts, avoi
 
 ## Decision
 
-Protocol Buffers is a good candidate for this task, as it is a language-neutral, platform-neutral, extensible mechanism for serializing structured data.
+Protocol Buffers (Protobuf) is a good candidate for this task, as it is a language-neutral, platform-neutral, extensible mechanism for serializing structured data.
 A new repository will be created to host the Protocol Buffers contracts, and the generated code will be published as a Go and Elixir package to be used by the components.
 
 ## Consequences
