@@ -42,6 +42,7 @@ Testing guidelines:
 
 - Read [Testing Elixir](https://pragprog.com/titles/lmelixir/testing-elixir/).
 - Prefer [factories](https://github.com/thoughtbot/ex_machina) over fixtures to create test data.
+- Hook to [Telemetry](https://hexdocs.pm/telemetry/readme.html) events of 3rd party packages to synchronize the test code. Find [here](https://elixirforum.com/t/testing-and-telemetry-events-how-to-test-if-they-are-sent/28273/5) a generic example and [here](https://github.com/trento-project/wanda/pull/180) another example based on AMQP connections.
 
 - [Mocks and explicit contracts](https://dashbit.co/blog/mocks-and-explicit-contracts)
 
