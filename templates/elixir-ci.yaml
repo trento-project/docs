@@ -14,6 +14,8 @@ env:
   ELIXIR_VERSION: 1.13.4
   OTP_VERSION: 24
   MIX_ENV: test
+  ELIXIR_VERSION_OBS: 1.13.4
+  OTP_VERSION_OBS: 22
 
 jobs:
   elixir-deps:
@@ -85,9 +87,16 @@ jobs:
         run: mix dialyzer
 
   test:
-    name: Test
+    name: Test (Elixir ${{ matrix.elixir }}, OTP ${{ matrix.otp }})
     needs: elixir-deps
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        include:
+          - elixir: ${{ env.ELIXIR_VERSION }}
+            otp: ${{ env.OTP_VERSION }}
+          - elixir: ${{ env.ELIXIR_VERSION_OBS }}
+            otp: ${{ env.OTP_VERSION_OBS }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -96,8 +105,8 @@ jobs:
       - name: Setup
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: ${{ env.ELIXIR_VERSION }}
-          otp-version: ${{ env.OTP_VERSION }}
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
       - name: Retrieve Cached Dependencies
         uses: actions/cache@v3
         id: mix-cache
@@ -106,7 +115,7 @@ jobs:
             deps
             _build/test
             priv/plts
-          key: ${{ runner.os }}-${{ env.OTP_VERSION }}-${{ env.ELIXIR_VERSION }}-${{ hashFiles('mix.lock') }}
+          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('mix.lock') }}
       - name: Run test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
