@@ -57,28 +57,8 @@ This component is responsible of:
 - Publishing the evaluated results
 - Storing and exposing the executed executions
 
-## Not only discovery
-Notice how this document started with **Discovery** triggering actions and subsequent events in the system.
+## General Considerations
+[CQRS with Commanded](https://github.com/commanded/commanded) supports complex domain modeling, however, whenever possible we use simpler implementations for non-critical aspects (_Tagging_ for instance, is a basic CRUD operation).
 
-That's not the only case indeed.
-
-The user can trigger actions via the Reactive web UI and so the _Scenario-Business Rules-Events-Reaction_ flow is the same, clearly without the Discovery.
-Actions (or commands) may also be triggered via API integration, cli integration, Messaging or any other means.
-
-This is possible thanks to an [hexagonal](https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)) approach to the architecture.
-
----
-
-## Bonus point
-We referred to Event Sourcing and you may have noticed some parallelisms with [CQRS](https://www.martinfowler.com/bliki/CQRS.html).
-
-That's it. 
-
-We approached architecture and development with **Agile** mindset and **Domain Driven Design** approach to properly understand the problem space and provide good solutions by leveraging **ES**, **CQRS** and **Reactivity**.
-
-In order to **avoid accidental complexity** we don't use ES+CQRS _everywhere by default_.
-Whenever possible we use simpler implementations for non-critical aspects. (_Tagging_ for instance, is a basic CRUD operation)
-
-There's a lot of literature out there, here's just a perspective of the thing.
-
+Find here a simple diagram to understand how CQRS works:
 ![ES+CQRS](../assets/event-sourcing-cqrs.png)
