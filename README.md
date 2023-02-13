@@ -5,3 +5,4 @@ This repository contains the Trento project documentation that does not interest
 - [Coding standards](./coding-standards)
 - [Architecture Decision Records (ADR)](./adr)
 - [Templates](./templates)
+- [Guides](./guides)
