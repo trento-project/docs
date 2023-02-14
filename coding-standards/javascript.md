@@ -29,7 +29,7 @@ Use the [.prettierrc.js template](../templates/.prettierrc.js) as a starting poi
 
 End-to-end tests in production-like environments are performed using [Cypress](https://www.cypress.io/).
 
-Unit testing of JavaScript code and React components is performed using [Jest](https://jestjs.io/) and [React Testing Library](https://testing-library.com/docs/react-testing-library).
+Unit testing of JavaScript code and React components is performed using [Jest](https://jestjs.io/) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro).
 
 ### Testing guidelines
 
