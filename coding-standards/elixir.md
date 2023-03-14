@@ -99,3 +99,72 @@ Guidelines for applications using Phoenix:
 - Instead of [Router Path helpers](https://hexdocs.pm/phoenix/routing.html#path-helpers), prefer using the full path in the tests (e.g. `/api/rabbits`) to test that the route is correct.
 - Document APIs using [OpenAPI](https://github.com/open-api-spex/open_api_spex), cast and validate operations in controllers using the provided [plug](https://github.com/open-api-spex/open_api_spex#validating-and-casting-params), and test controllers using [OpenAPISpex.TestAssertions](https://github.com/open-api-spex/open_api_spex#validate-responses).
 - The [CI template](../templates/elixir-ci.yaml) includes a step to generate the Swagger UI and publish it to GitHub pages. Please refer to [this pr](https://github.com/open-api-spex/open_api_spex/pull/489) to configure the `ApiSpec` module so that it does not depend on a running `Endpoint` when generating the `openapi.json` file.
+
+## Step-by-step debugging with pry
+
+Elixir's interactive shell has `pry` built-in, which allows us to introduce breakpoints in our code. In order to use, add:
+
+```
+require IEx; IEx.pry
+```
+
+and then start Phoenix with the interactive shell:
+
+```
+iex -S mix phx.server
+```
+
+For example, if we wanted to add a breakpoint to the handler of this event:
+
+```
+  def handle(%DeregistrationProcessManager{}, %HostDeregistrationRequested{
+        host_id: host_id,
+        requested_at: requested_at
+      }) do
+    %DeregisterHost{host_id: host_id, deregistered_at: requested_at}
+  end
+```
+
+we would add the breakpoint as explained above:
+
+```
+  def handle(%DeregistrationProcessManager{}, %HostDeregistrationRequested{
+        host_id: host_id,
+        requested_at: requested_at
+      }) do
+    require IEx
+    IEx.pry()
+    %DeregisterHost{host_id: host_id, deregistered_at: requested_at}
+  end
+```
+
+once we trigger any action that causes the breakpoint to be reached, you should see something like:
+
+```
+Request to pry #PID<0.1007.0> at Trento.DeregistrationProcessManager.handle/2 (lib/trento/application/process_managers/deregistration_process_manager.ex:56)
+
+   53:         requested_at: requested_at
+   54:       }) do
+   55:     require IEx
+   56:     IEx.pry()
+   57:     %DeregisterHost{host_id: host_id, deregistered_at: requested_at}
+   58:   end
+   59:
+
+Allow? [Yn]
+y
+```
+
+This will stop the execution at the breakpoint and allow us to inspect variables. In this particular example, once we allow with `y`, we could inspect the content of `requested_at`:
+
+```
+pry(1)> requested_at
+~U[2023-03-14 14:05:45.440992Z]
+```
+
+After this, you can use `continue` to resume the execution.
+
+### Further details:
+
+- https://elixir-lang.org/getting-started/debugging.html
+- https://til.hashrocket.com/posts/3ab413d696-pry-in-elixir-phoenix
