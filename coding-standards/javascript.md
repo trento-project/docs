@@ -36,6 +36,12 @@ Unit testing of JavaScript code and React components is performed using [Jest](h
 - Prefer factories created with [Fishery](https://github.com/thoughtbot/fishery) and [Faker](https://fakerjs.dev/) over fixtures to craft test data.
 - As a rule of thumb one should avoid mocking and creating spies wherever possible.
 
+### Storybook
+
+[Storybook](https://storybook.js.org/) is used to develop UI components in isolation.
+
+When writing UI components, every PR should have new Storybook stories attached or have existing ones updated. 
+
 ## Books and guides
 
 - [MDN's JavaScript documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript) _is_ the only reliable source of truth about JavaScript on the web.
