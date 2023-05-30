@@ -10,8 +10,7 @@ Accepted
 
 With the growing complexity of our services, we need to stabilize and version our external rest API.
 We need a standard, easy and maintainable way to deal with versioning and this guideline will affect all the present and future rest API.
-This decision affects only the purely technical side, involving the HTTP rest API, without defining when an API should be upgraded.
-That topic will be covered in another part of the documentation.
+This decision affects the purely technical side, involving the HTTP rest API and the policy about when API should be upgraded.
 
 We want a clear API versioning strategy for the API consumer and also a way to express unambiguously the "latest" version of our API.
 
@@ -30,9 +29,12 @@ You can read [here](https://elixirforum.com/t/how-do-you-handle-api-versioning/1
 
 We will have a "special" route, without any prefix, only `/api`. This route will perform a temporary redirect to the latest API version of our services.
 
+For API upgrade policy we refer to [LinkedIn API Breaking Change Policy](https://learn.microsoft.com/en-us/linkedin/shared/breaking-change-policy).
 
 ## Consequences
 
 The rest API will have a /vX prefix, where X is the API version number.
 Our OpenAPI specs will be updated to benefit from this type of API versioning.
 The rest API will have the special `/api` prefix, with a temporary redirect to the latest API version.
+
+API version bump policy can be found [here](https://learn.microsoft.com/en-us/linkedin/shared/breaking-change-policy).
