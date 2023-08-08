@@ -165,3 +165,82 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./doc
+  api-bc-check:
+    name: API bc check
+    needs: [elixir-deps]
+    runs-on: ubuntu-20.04
+    strategy:
+      # Strategy matrix might not be strictly necessary if there is only one API version
+      matrix:
+        include:
+          - version: V1
+          - version: V2
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          access_token: ${{ github.token }}
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{ env.ELIXIR_VERSION }}
+          otp-version: ${{ env.OTP_VERSION }}
+      # Generate spec for the current branch
+      # - checkout code
+      # - get deps for the branch
+      # - generate openapi spec
+      - name: Checkout current branch
+        uses: actions/checkout@v3
+      - name: Retrieve Cached Dependencies - current branch
+        uses: actions/cache@v3
+        id: mix-cache-current
+        with:
+          path: |
+            deps
+            _build/test
+            priv/plts
+          key: ${{ runner.os }}-${{ env.OTP_VERSION }}-${{ env.ELIXIR_VERSION }}-${{ hashFiles('mix.lock') }}
+      - name: Generate current openapi.json
+        run: |
+          mix openapi.spec.json --start-app=false --spec TrentoWeb.OpenApi.${{ matrix.version }}.ApiSpec /tmp/specs/current-spec.json
+      
+      # Generate spec for the main branch to compare against
+      # - checkout code
+      # - get deps for the branch
+      # - generate openapi spec
+      - name: Checkout main branch
+        uses: actions/checkout@v3
+        with:
+          ref: main
+      - name: Retrieve Cached Dependencies - main branch
+        uses: actions/cache@v3
+        id: mix-cache-main
+        with:
+          path: |
+            deps
+            _build/test
+            priv/plts
+          key: ${{ runner.os }}-${{ env.OTP_VERSION }}-${{ env.ELIXIR_VERSION }}-${{ hashFiles('mix.lock') }}
+      - name: Generate main openapi.json
+        run: |
+          mix openapi.spec.json --start-app=false --spec TrentoWeb.OpenApi.${{ matrix.version }}.ApiSpec /tmp/specs/main-spec.json
+      # Locate generated specs and diff them with openapitools/openapi-diff
+      - name: Locate generated specs
+        run: mv /tmp/specs .
+      - name: Find difference between OpenAPI specifications
+        run: |
+          docker run -v "$(pwd)/specs:/specs" --rm openapitools/openapi-diff:2.0.1 \
+            /specs/main-spec.json \
+            /specs/current-spec.json \
+            --fail-on-incompatible \
+            --markdown /specs/changes.md \
+            --json /specs/changes.json \
+            --text /specs/changes.txt \
+            --html /specs/changes.html
+      # On failure publish report artifacts
+      - name: Upload OpenAPI diff report
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: openapi-diff-report-${{ matrix.version }}
+          path: specs/
