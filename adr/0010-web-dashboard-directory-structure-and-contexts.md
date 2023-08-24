@@ -47,7 +47,8 @@ lib
             queries // custom queries
             services // like the health service
             sap_system.ex // the aggregate
-            // all other domain entities + what we call now "usecases"
+            // all other domain entities
+        sap_system.ex // the context "entrypoint" the "usecase"
 ```
 
 **Example of integration context**
