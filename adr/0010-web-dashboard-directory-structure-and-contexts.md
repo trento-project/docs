@@ -14,7 +14,9 @@ With the increasing complexity of the project and the codebase, we need to switc
 The current directory structure is too complex in a lot of aspects, given the fact that it's really difficult to follow where the moving parts are and deciding where to put what is becoming more difficult with the increasing codebase complexity.
 
 The web project is also a `commanded` application, `commanded` has examples and guidelines on how to structure the projects, the directories and the modules, this documentation with the official  `phoenix` guide will be the base principles for this refactoring.
-As software engineers, we propose a new structure/architecture to increase developers' productivity and confidence and obtain adherence to framework/language standards.
+As software engineers, we propose a new structure/architecture to increase developers' productivity, confidence, and obtain adherence to framework/language standards.
+
+As a side effect, we will align Wanda and Web to the same standard, decreasing onboarding length.
 
 REF
 
