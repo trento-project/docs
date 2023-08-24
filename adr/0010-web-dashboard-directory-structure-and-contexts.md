@@ -1,4 +1,4 @@
-# 10. Web dashboard directory structure and contexts
+# 10. Web repository directory structure and contexts
 
 Date: 2023-08-24
 
@@ -8,12 +8,12 @@ Proposal
 
 ## Context
 
-The web dashboard repository, is a `phoenix` application, right now the directory structure and the overall `phoenix` framework convention regarding modules and code organization are not respected.
+The web dashboard repository, is a `phoenix` application. Right now the directory structure and the overall `phoenix` framework convention regarding modules and code organization are not respected.
 With the increasing complexity of the project and the codebase, we need to switch to the `phoenix` framework standards, to be compatible with code generators and framework conventions in general.
 
-The current directory structure is too complex in a lot of aspects, given the fact that it's really difficult to follow where the moving parts are and deciding where to put what is becoming more difficult with the increasing codebase complexity.
+The current directory structure is too complex in a lot of aspects, given the fact that it's really difficult to follow where the moving parts are and deciding where to put them, which is becoming even more difficult with the increasing codebase complexity.
 
-The web project is also a `commanded` application, `commanded` has examples and guidelines on how to structure the projects, the directories and the modules, this documentation with the official  `phoenix` guide will be the base principles for this refactoring.
+The web project is also a `commanded` application. `commanded` has examples and guidelines on how to structure the projects, the directories and the modules. This documentation with the official  `phoenix` guide will be the base principles for this refactoring.
 As software engineers, we propose a new structure/architecture to increase developers' productivity, confidence, and obtain adherence to framework/language standards.
 
 As a side effect, we will align Wanda and Web to the same standard, decreasing onboarding length.
@@ -30,9 +30,9 @@ REF
 
 We propose a directory structure with these characteristics
 
-- One context for each "domain entity" of our application (cluster, sap_systems, hosts, tags etc..)
-- Everything that is tailored to the context in the same directory, (policies, "services", etc..)
-- "integration"/"infrastructure" context, containing all the interaction outside the domain like rabbitmq, checks engine etc.. (what we have now in application directory) and commanded cross-aggregate interactions
+- One context for each "domain entity" of our application (clusters, sap_systems, hosts, tags etc..)
+- Everything that is tailored to the context in the same directory, (policies, services, etc..)
+- "integration"/"infrastructure" context, containing all the interaction outside the domain like rabbitmq, checks engines etc.. (what we have now in application directory) and commanded cross-aggregate interactions
 
 
 **Example with sap_system context**
@@ -71,7 +71,7 @@ lib
 
 The `trento_web` directory should contain all the files and contexts dictated by the `phoenix` guide, including mailer and mail templates. 
 
-The module names should be refactored to reflect the directory structure, this means that we will need an ecto migration, to change module names in the commanded persistence, to maintain compatibility between old/new installations
+The module names should be refactored to reflect the directory structure. This means that we will need an ecto migration, to change module names in the commanded persistence, to maintain compatibility between old/new installations
 
 ## Consequences
 
