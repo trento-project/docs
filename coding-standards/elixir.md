@@ -26,7 +26,7 @@ The [Catalog of Elixir-specific Code Smells](https://github.com/lucasvegi/Elixir
 
 ## CI
 
-Please use the [elixir.yml template](../templates/elixir.yml) as a starting point for your project.
+Please use the [CI template](../templates/elixir-ci.yaml) as a starting point for your project.
 
 ## Documentation
 
