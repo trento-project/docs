@@ -66,10 +66,10 @@ Search for the current version in every project file and perform a version bump.
 
 Previous Release Examples:
 
-- [Agent](https://github.com/trento-project/agent/commit/df9bce2692ee46d3faa548494ec7ba40a22d1873)
-- [Helm-Chart](https://github.com/trento-project/helm-charts/commit/1a1d638ee8409a3c5b91609b18ac901c7b7a9fe7)
-- [Wanda](https://github.com/trento-project/wanda/commit/57d4a64980f75c0e687d424fe5554feb9c0545d5)
-- [Web](https://github.com/trento-project/web/commit/05dca928b43c203a43839c40df9de419f4d9e1b4)
+- [Agent](https://github.com/trento-project/agent/pull/296)
+- [Helm-Chart](https://github.com/trento-project/helm-charts/pull/82)
+- [Wanda](https://github.com/trento-project/wanda/pull/341)
+- [Web](https://github.com/trento-project/web/pull/1996)
 
 ### Create Pull Request
 
