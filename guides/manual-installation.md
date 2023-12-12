@@ -5,8 +5,9 @@ available version of SUSE Linux Enterprise Server for SAP Applications is used a
 
 ## List of dependencies
 
-- prometheus
+- prometheus (optional)
 - postgresql
+- grafana (optional)
 - rabbitmq
 - docker runtime
 
@@ -111,6 +112,8 @@ systemctl enable --now postgresql
 
 Initialize the postgresql databases (be sure to update the passwords accordingly):
 
+//FIXME: we should probably use `createuser`: https://www.postgresql.org/docs/current/app-createuser.html
+
 ```bash
 su postgres
 psql
@@ -126,14 +129,14 @@ GRANT ALL PRIVILEGES ON DATABASE trento_event_store TO trento_user;
 ```
 
 Allow wandadb to be accessible by the docker containers,
-by adding the following line to `pg_hba.conf`:
+by adding the following line to `/var/lib/pgsql/data/pg_hba.conf`:
 
 ```bash
 host    wanda         postgres          172.17.0.0/16           md5
 host    trento        postgres          172.17.0.0/16           md5
 ```
 
-Restart postgres to apply the changes to `pg_hba.conf`:
+Restart postgres to apply the changes:
 
 ```bash
 systemctl reload postgresql
@@ -241,7 +244,7 @@ docker run -d --name wanda \
     -e SECRET_KEY_BASE=$WANDA_SECRET_KEY_BASE \
     -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
     -e AMQP_URL=amqp://guest:guest@host.docker.internal \
-    -e DATABASE_URL=ecto://postgres:postgres@host.docker.internal/postgres \
+    -e DATABASE_URL=ecto://wanda_user:wanda-password@host.docker.internal/wanda \
     --entrypoint /bin/sh \
     registry.suse.com/trento/trento-wanda:1.2.0 \
     -c "/app/bin/wanda eval 'Wanda.Release.init()' && /app/bin/wanda start"
@@ -253,7 +256,7 @@ docker run -d --name wanda \
 
 > Note: Be sure to change the `GRAFANA_PASSWORD` (and potentially `GRAFANA_USER` if you changed it) environment variable to the password you set for the grafana admin user in the grafana installation step.
 
-```
+```bash
 docker run -d \
     -p 4000:4000 \
     --name trento-web \
@@ -276,4 +279,48 @@ docker run -d \
     --entrypoint /bin/sh \
     registry.suse.com/trento/trento-web:2.2.0 \
     -c "/app/bin/trento eval 'Trento.Release.init()' && /app/bin/trento start"
+```
+
+### Setup nginx as reverse proxy
+
+Install nginx:
+
+```bash
+    zypper install nginx
+```
+
+Start and enable nginx:
+
+```bash
+    systemctl enable --now nginx
+```
+
+Create a new configuration file for trento
+
+```bash
+    vim /etc/nginx/conf.d/trento.conf
+```
+
+Add the following configuration
+
+```bash
+server {
+    listen 80;
+    server_name myapp.example.com;
+
+    location / {
+        proxy_pass http://localhost:4000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+Reload nginx:
+
+```bash
+    systemctl reload nginx
 ```
