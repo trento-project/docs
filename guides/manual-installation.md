@@ -283,10 +283,128 @@ docker run -d \
 
 ### Setup nginx as reverse proxy
 
+#### Create a self-signed certificate (Option 1)
+
+> Note: The following is a minimal suggestion on how to create a self-signed certificate for use with trento. You can use your own certificate if you have one. If you take the suggestions, please make sure to check openSSL documentation for more details.
+> Note: If you take the suggestions below, be sure to replace `example.com` with your own domain name.
+
+Generate a private key:
+
+```bash
+openssl genrsa -des3 -out trento.key 2048
+```
+
+Generate a CSR (Certificate Signing Request)
+
+```bash
+openssl req -new -key trento.key -out trento.csr
+```
+
+```
+Enter pass phrase for trento.key:
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:
+State or Province Name (full name) [Some-State]:
+Locality Name (eg, city) []:
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:
+Organizational Unit Name (eg, section) []:
+Common Name (e.g. server FQDN or YOUR name) []:example.com
+Email Address []:
+
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []:
+
+```
+
+Remove passphrase from the key
+
+```bash
+cp trento.key trento.key.org
+openssl rsa -in trento.key.org -out trento.key
+```
+
+Create config file for SAN
+
+```bash
+touch v3.ext
+```
+
+File content
+
+```
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always,issuer:always
+basicConstraints       = CA:TRUE
+keyUsage               = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment, keyAgreement, keyCertSign
+subjectAltName         = DNS:example.com, DNS:*.example.com
+issuerAltName          = issuer:copy
+```
+
+Generate and sign the certificate to be used for trento
+
+```shell
+openssl x509 -req -in trento.csr -signkey trento.key -out trento.crt -days 3650 -sha256 -extfile v3.ext
+```
+
+Install the `server.key` and `server.crt` in a location accessible by `nginx`:
+
+```bash
+    mv server.key /etc/ssl/private/trento.key
+```
+
+```bash
+    mv server.crt /etc/ssl/certs/trento.crt
+```
+
+#### Use Let's encrypt to get a signed certificate (Option 2)
+
+If you haven't added PackageHub yet, do so now:
+
+```bash
+    SUSEConnect --product PackageHub/15.5/x86_64
+    zypper refresh
+```
+
+After adding the repository, install Certbot and its Nginx plugin:
+
+```bash
+    zypper install certbot python3-certbot-nginx
+```
+
+Use Certbot to automatically obtain a certificate and configure Nginx. This should adjust your nginx configuration to use the certificate:
+
+> Note: Replace example.com with your own domain name.
+> Note: Please check the certbot documentation for more details: https://certbot.eff.org/instructions?ws=nginx&os=leap
+
+```bash
+    certbot --nginx -d example.com -d www.example.com
+```
+
+Certbot certificates last for 90 days. Refer to the above link for details on how to renew periodically.
+
+#### Install nginx
+
+````bash
 Install nginx:
 
 ```bash
     zypper install nginx
+````
+
+Add firewalld exception for nginx. We need to allow both http and https (http is used for the redirect):
+
+```bash
+   firewall-cmd --zone=public --add-service=https --permanent
+   firewall-cmd --zone=public --add-service=http --permanent
+   firewall-cmd --reload
 ```
 
 Start and enable nginx:
@@ -305,9 +423,26 @@ Add the following configuration
 
 ```bash
 server {
+    # Redirect HTTP to HTTPS
     listen 80;
-    server_name myapp.example.com;
+    server_name trento.example.com;
+    return 301 https://$host$request_uri;
+}
 
+server {
+    # SSL configuration
+    listen 443 ssl;
+    ser ver_name trento.example.com;
+
+    ssl_certificate /etc/ssl/certs/trento.crt;
+    ssl_certificate_key /etc/ssl/private/trento.key;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384';
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
+
+    # Proxy settings
     location / {
         proxy_pass http://localhost:4000;
         proxy_http_version 1.1;
@@ -324,3 +459,21 @@ Reload nginx:
 ```bash
     systemctl reload nginx
 ```
+
+### Test the setup
+
+Deploy an agent using the available `trento-agent` package. This package is already available in SLES 15 SP5, so we can install it using zypper:
+
+```bash
+    zypper install trento-agent
+```
+
+#### Copy the self-created CA certificate to the agent
+
+Copy the previously created `trento.crt` securely using `scp` to the agent machine and place it in `/etc/pki/trust/anchors/`. Once it's there, from the agent machine, ru:
+
+```bash
+    update-ca-certificates
+```
+
+Configure trento using the `/etc/trento/agent.yaml` file and make sure to use `https` for the `server-url` parameter. Refer to https://documentation.suse.com/sles-sap/trento/html/SLES-SAP-trento/index.html#sec-trento-installing-trentoagent for more details.
