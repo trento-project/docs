@@ -442,14 +442,36 @@ server {
     ssl_prefer_server_ciphers on;
     ssl_session_cache shared:SSL:10m;
 
-    # Proxy settings
+    # Wanda rule
+    location ~ ^/(api/checks|api/v1/checks|api/v2/checks)/  {
+        allow all;
+
+        # Proxy Headers
+        proxy_http_version 1.1;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Cluster-Client-Ip $remote_addr;
+
+        # The Important Websocket Bits!
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_pass http://localhost:4001;
+    }
+
+    # Web rule
     location / {
-        proxy_pass http://localhost:4000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
         proxy_cache_bypass $http_upgrade;
+
+        # The Important Websocket Bits!
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_pass http://localhost:4000;
     }
 }
 ```
