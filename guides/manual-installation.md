@@ -65,7 +65,7 @@ systemctl enable --now prometheus
 Allow prometheus to be accessible from docker. Add an exception on firewalld:
 
 ```bash
-firewall-cmd --zone=public --add-port=9090/tcp --permanent
+firewall-cmd --zone=public --add-port=9090/tcp --permanent;
 firewall-cmd --reload
 ```
 
@@ -92,7 +92,7 @@ systemctl enable --now grafana-server
 Allow grafana to be accessible from docker. Add an exception on firewalld:
 
 ```bash
-firewall-cmd --zone=public --add-port=3000/tcp --permanent
+firewall-cmd --zone=public --add-port=3000/tcp --permanent;
 firewall-cmd --reload
 ```
 
@@ -125,6 +125,11 @@ CREATE USER trento_user WITH PASSWORD 'web-password';
 GRANT ALL PRIVILEGES ON DATABASE trento TO trento_user;
 CREATE DATABASE trento_event_store;
 GRANT ALL PRIVILEGES ON DATABASE trento_event_store TO trento_user;
+
+ALTER DATABASE wanda OWNER TO wanda_user;
+ALTER DATABASE trento OWNER TO trento_user;
+ALTER DATABASE trento_event_store OWNER TO trento_user;
+\l
 \q
 ```
 
@@ -132,9 +137,16 @@ Allow wandadb to be accessible by the docker containers,
 by adding the following line to `/var/lib/pgsql/data/pg_hba.conf`:
 
 ```bash
-host    wanda         postgres          172.17.0.0/16           md5
-host    trento        postgres          172.17.0.0/16           md5
+host    all             all             0.0.0.0/0            md5
 ```
+
+Add this line to `/var/lib/pgsql/data/postgresql.conf` to access postgres database
+
+```bash
+listen_addresses = 'localhost, 172.17.0.1, 127.0.0.1'
+```
+
+listen_addresses = 'localhost,172.17.0.1,127.0.0.1'
 
 Restart postgres to apply the changes:
 
@@ -148,51 +160,110 @@ systemctl reload postgresql
 zypper install rabbitmq-server
 ```
 
-Enable and start the rabbitmq service:
+Enable and start the rabbitmq service.
 
 ```bash
 systemctl enable --now rabbitmq-server
 ```
 
-As the agent will need to be able to reach rabbitmq, we need to allow it to connect from external hosts. Modify `/etc/rabbitmq/rabbitmq.conf` and ensure the following lines are present:
+As the agent will need to be able to reach rabbitmq, allow connections from external hosts.
+Modify `/etc/rabbitmq/rabbitmq.conf` and ensure the following lines are present:
 
 ```bash
 listeners.tcp.default = 5672
-...
-management.tcp.ip = 0.0.0.0
 ```
 
 In addition to this, we need to allow the port to be accessible from external hosts. Add an exception on firewalld:
 
 ```bash
-firewall-cmd --zone=public --add-port=5432/tcp --permanent
+firewall-cmd --zone=public --add-port=5432/tcp --permanent;
 firewall-cmd --reload
+```
+
+```bash
+systemctl restart rabbitmq-server
+```
+
+### Configure rabbitmq
+
+#### Create rabbitmq user
+
+RabbitMQ will create per default a guest admin user.A good practice is to create a new user with correct permissions.
+Change rabbitmq_user, rabbitmq_user_password and vhost name in the upcoming commands:
+
+```bash
+rabbitmqctl add_user trento_user trento_user_password
+```
+
+#### Set role for new user
+
+```bash
+rabbitmqctl set_user_tags trento_user administrator
+```
+
+#### Verify that the user and the user role is correct
+
+```bash
+rabbitmqctl list_users
+```
+
+#### Create a virtual host
+
+```bash
+rabbitmqctl add_vhost vhost
+```
+
+# Set permissions for the user on the virtual host
+
+```bash
+rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
 ```
 
 #### Optional: Enable rabbitmq management console
 
-If you want to be able to access rabbitmq management console, the relevant plugin needs to be enabled:
+To be able to access the rabbitmq management console, the relevant plugin needs to be enabled:
 
 ```bash
 rabbitmq-plugins enable rabbitmq_management
-systemctl restart rabbitmq-server
 ```
 
-If you are login in from an external host, allow connecting from external hosts (config tweak):
-
-Modify `/etc/rabbitmq/rabbitmq.conf`:
+#### Set permissions for user to acess the managment ui
 
 ```bash
+rabbitmqctl set_user_tags trento_user management administrator management
+```
 
-management.tcp.port = 15672
+#### Verify the User's New Role
 
+```bash
+rabbitmqctl rabbitmqctl list_users
 ```
 
 If you are connecting from an external host, add an exception on firewalld:
+Modify `/etc/rabbitmq/rabbitmq.conf` add the follow line:
 
 ```bash
-firewall-cmd --zone=public --add-port=15672/tcp --permanent
+
+
+management.tcp.port = 15672
+management.tcp.ip = 0.0.0.0
+
+
+```
+
+```bash
+firewall-cmd --zone=public --add-port=15672/tcp --permanent;
 firewall-cmd --reload
+```
+
+```bash
+systemctl restart rabbitmq-server
+```
+
+#### Access the rabbitmqctl management and login with your newly created user
+
+```bash
+http://««HOST-IP»»:15672
 ```
 
 ### Install container runtime
@@ -243,7 +314,7 @@ docker run -d --name wanda \
     -e CORS_ORIGIN=localhost \
     -e SECRET_KEY_BASE=$WANDA_SECRET_KEY_BASE \
     -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
-    -e AMQP_URL=amqp://guest:guest@host.docker.internal \
+    -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal \
     -e DATABASE_URL=ecto://wanda_user:wanda-password@host.docker.internal/wanda \
     --entrypoint /bin/sh \
     registry.suse.com/trento/trento-wanda:1.2.0 \
@@ -258,27 +329,28 @@ docker run -d --name wanda \
 
 ```bash
 docker run -d \
-    -p 4000:4000 \
-    --name trento-web \
-    --network trento-net \
-    --add-host "host.docker.internal:host-gateway" \
-    -e AMQP_URL=amqp://guest:guest@host.docker.internal \
-    -e DATABASE_URL=ecto://postgres:postgres@host.docker.internal/trento \
-    -e EVENTSTORE_URL=ecto://postgres:postgres@host.docker.internal/trento_event_store \
-    -e ENABLE_ALERTING=false \
-    -e GRAFANA_PUBLIC_URL='http://host.docker.internal:3000' \
-    -e GRAFANA_API_URL='http://host.docker.internal:3000/api' \
-    -e PROMETHEUS_URL='http://host.docker.internal' \
-    -e SECRET_KEY_BASE=$TRENTO_SECRET_KEY_BASE \
-    -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
-    -e REFRESH_TOKEN_ENC_SECRET=$REFRESH_TOKEN_ENC_SECRET \
-    -e ADMIN_USERNAME='admin' \
-    -e ADMIN_PASSWORD='test1234' \
-    -e GRAFANA_PASSWORD='trento' \
-    -e ENABLE_API_KEY='true' \
-    --entrypoint /bin/sh \
-    registry.suse.com/trento/trento-web:2.2.0 \
-    -c "/app/bin/trento eval 'Trento.Release.init()' && /app/bin/trento start"
+ -p 4000:4000 \
+ --name trento-web \
+ --network trento-net \
+ --add-host "host.docker.internal:host-gateway" \
+ -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal \
+ -e DATABASE_URL=ecto://trento_user:web-password@host.docker.internal/trento \
+ -e EVENTSTORE_URL=ecto://trento_user:web-password@host.docker.internal/trento_event_store \
+ -e ENABLE_ALERTING=false \
+ -e GRAFANA_PUBLIC_URL='http://host.docker.internal:3000' \
+ -e GRAFANA_API_URL='http://host.docker.internal:3000/api' \
+ -e PROMETHEUS_URL='http://host.docker.internal' \
+ -e SECRET_KEY_BASE=$TRENTO_SECRET_KEY_BASE \
+ -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
+ -e REFRESH_TOKEN_ENC_SECRET=$REFRESH_TOKEN_ENC_SECRET \
+ -e ADMIN_USERNAME='admin' \
+ -e ADMIN_PASSWORD='test1234' \
+ -e GRAFANA_PASSWORD='trento' \
+ -e ENABLE_API_KEY='true' \
+ --entrypoint /bin/sh \
+ registry.suse.com/trento/trento-web:2.2.0 \
+ -c "/app/bin/trento eval 'Trento.Release.init()' && /app/bin/trento start"
+
 ```
 
 ### Setup nginx as reverse proxy
