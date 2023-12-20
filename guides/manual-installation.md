@@ -327,14 +327,14 @@ issuerAltName = issuer:copy' > v3.ext
 openssl x509 -req -in trento.csr -signkey trento.key -out trento.crt -days 3650 -sha256 -extfile v3.ext
 ```
 
-**Step 6**: Install the `server.key` and `server.crt` in a location accessible by `nginx`:
+**Step 6**: Install the `trento.key` and `trento.crt` in a location accessible by `nginx`:
 
 ```bash
-mv server.key /etc/ssl/private/trento.key
+mv trento.key /etc/ssl/private/trento.key
 ```
 
 ```bash
-mv server.crt /etc/ssl/certs/trento.crt
+mv trento.crt /etc/ssl/certs/trento.crt
 ```
 
 #### Option 2: Using Let's Encrypt for a Signed Certificate
@@ -403,7 +403,7 @@ server {
 server {
     # SSL configuration
     listen 443 ssl;
-    ser ver_name trento.example.com;
+    server_name trento.example.com;
 
     ssl_certificate /etc/ssl/certs/trento.crt;
     ssl_certificate_key /etc/ssl/private/trento.key;
