@@ -174,7 +174,7 @@ listeners.tcp.default = 5672
 In addition to this, we need to allow the port to be accessible from external hosts. Add an exception on firewalld:
 
 ```bash
-firewall-cmd --zone=public --add-port=5432/tcp --permanent;
+firewall-cmd --zone=public --add-port=5672/tcp --permanent;
 firewall-cmd --reload
 ```
 
