@@ -143,10 +143,8 @@ host    all             all             0.0.0.0/0            md5
 Add this line to `/var/lib/pgsql/data/postgresql.conf` to access postgres database
 
 ```bash
-listen_addresses = 'localhost, 172.17.0.1, 127.0.0.1'
+listen_addresses = '127.0.0.1, 172.17.0.1'
 ```
-
-listen_addresses = 'localhost,172.17.0.1,127.0.0.1'
 
 Restart postgres to apply the changes:
 
@@ -314,7 +312,7 @@ docker run -d --name wanda \
     -e CORS_ORIGIN=localhost \
     -e SECRET_KEY_BASE=$WANDA_SECRET_KEY_BASE \
     -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
-    -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal \
+    -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost\
     -e DATABASE_URL=ecto://wanda_user:wanda-password@host.docker.internal/wanda \
     --entrypoint /bin/sh \
     registry.suse.com/trento/trento-wanda:1.2.0 \
@@ -333,7 +331,7 @@ docker run -d \
  --name trento-web \
  --network trento-net \
  --add-host "host.docker.internal:host-gateway" \
- -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal \
+ -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost\
  -e DATABASE_URL=ecto://trento_user:web-password@host.docker.internal/trento \
  -e EVENTSTORE_URL=ecto://trento_user:web-password@host.docker.internal/trento_event_store \
  -e ENABLE_ALERTING=false \
