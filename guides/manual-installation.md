@@ -109,52 +109,62 @@ Check grafana web UI on port 3000 and set a new password for the user `admin` (w
 zypper in postgresql-server
 ```
 
-Enable and start the postgresql service:
+#### Configure postgresql
 
-```bash
-systemctl enable --now postgresql
-```
-
-Initialize the postgresql databases (be sure to update the passwords accordingly):
-
-//FIXME: we should probably use `createuser`: https://www.postgresql.org/docs/current/app-createuser.html
+**Step 1:** Start `psql` to open a connection to the database:
 
 ```bash
 su postgres
 psql
-CREATE DATABASE wanda;
-CREATE USER wanda_user WITH PASSWORD 'wanda-password';
-GRANT ALL PRIVILEGES ON DATABASE wanda TO wanda_user;
-CREATE DATABASE trento;
-CREATE USER trento_user WITH PASSWORD 'web-password';
-GRANT ALL PRIVILEGES ON DATABASE trento TO trento_user;
-CREATE DATABASE trento_event_store;
-GRANT ALL PRIVILEGES ON DATABASE trento_event_store TO trento_user;
+```
 
-ALTER DATABASE wanda OWNER TO wanda_user;
-ALTER DATABASE trento OWNER TO trento_user;
-ALTER DATABASE trento_event_store OWNER TO trento_user;
-\l
+**Step 2:** Initialize the databases:
+
+```sql
+CREATE DATABASE wanda;
+CREATE DATABASE trento;
+CREATE DATABASE trento_event_store;
+```
+
+**Step 3:** Create the users:
+
+```sql
+CREATE USER wanda_user WITH PASSWORD 'wanda-password';
+CREATE USER trento_user WITH PASSWORD 'web-password';
+```
+
+**Step 4:** Grant required privileges to the users and close the connection:
+
+```sql
+\c wanda
+GRANT ALL ON SCHEMA public TO wanda_user;
+\c trento
+GRANT ALL ON SCHEMA public TO trento_user;
+\c trento_event_store;
+GRANT ALL ON SCHEMA public TO trento_user;
 \q
 ```
 
-Allow wandadb to be accessible by the docker containers,
-by adding the following line to `/var/lib/pgsql/data/pg_hba.conf`:
+**Step 5:** Allow the docker containers to connect to their respective databases by adding the following in `/var/lib/pgsql/data/pg_hba.conf`:
 
 ```bash
-host    all             all             0.0.0.0/0            md5
+host    wanda           wanda_user      0.0.0.0/0               md5
+host    trento          trento_user     0.0.0.0/0               md5
+host    trento_event_store      trento_user     0.0.0.0/0       md5
 ```
 
-Add this line to `/var/lib/pgsql/data/postgresql.conf` to access postgres database
+**Step 6:** Allow PostgreSQL to bind on all interfaces `/var/lib/pgsql/data/postgresql.conf` by changing the following line:
+
+> Note: for a more granular approach, you can specify the IP address of the docker host instead: `172.17.0.1/32` is a common default for docker.
 
 ```bash
-listen_addresses = '127.0.0.1, 172.17.0.1'
+listen_addresses = '*'
 ```
 
-Restart postgres to apply the changes:
+**Step 7:** Restart postgres to apply the changes:
 
 ```bash
-systemctl reload postgresql
+systemctl restart postgresql
 ```
 
 ### Install RabbitMQ
