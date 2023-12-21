@@ -24,7 +24,10 @@ If you already have a prometheus server running, you can skip this step. , you c
 If you don't have a Prometheus instance running and you don't want to install one, you can continue without doing so. The downside is that trento will
 not be able to collect metrics from prometheus and the integrated graphs will not work.
 
-#### Option 3: Install prometheus using the unsupported PackageHub repository
+#### Option 3: Install prometheus using the **unsupported** PackageHub repository
+
+> Note: PackageHub packages are tested by SUSE, but they do not come with the same level of support as the core SLES packages.
+> Users should assess the suitability of these packages based on their own risk tolerance and support needs.
 
 Enable PackageHub repository:
 
@@ -40,7 +43,6 @@ useradd -s /sbin/nologin --system -g prometheus prometheus
 ```
 
 After a successful registration, you can install prometheus using zypper:
-NOTE: some of these steps will trigger messages aboute additional support contract being required.
 
 ```bash
 zypper in golang-github-prometheus-prometheus
@@ -69,7 +71,10 @@ firewall-cmd --zone=public --add-port=9090/tcp --permanent
 firewall-cmd --reload
 ```
 
-### Install grafana (Optional)
+### Install grafana using the **unsupported** PackageHub repository (Optional)
+
+> Note: PackageHub packages are tested by SUSE, but they do not come with the same level of support as the core SLES packages.
+> Users should assess the suitability of these packages based on their own risk tolerance and support needs.
 
 Enable PackageHub if you didn't enable it in the previous step:
 
@@ -360,7 +365,10 @@ mv trento.key /etc/ssl/private/trento.key
 mv trento.crt /etc/ssl/certs/trento.crt
 ```
 
-#### Option 2: Using Let's Encrypt for a Signed Certificate
+#### Option 2: Using Let's Encrypt for a Signed Certificate using PackageHub repository
+
+> Note: PackageHub packages are tested by SUSE, but they do not come with the same level of support as the core SLES packages.
+> Users should assess the suitability of these packages based on their own risk tolerance and support needs.
 
 **Step 1**: Add PackageHub if not already added:
 
