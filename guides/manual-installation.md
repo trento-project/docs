@@ -265,6 +265,7 @@ docker run -d --name wanda \
     -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
     -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost \
     -e DATABASE_URL=ecto://wanda_user:wanda-password@host.docker.internal/wanda \
+    --restart always \
     --entrypoint /bin/sh \
     registry.suse.com/trento/trento-wanda:1.2.0 \
     -c "/app/bin/wanda eval 'Wanda.Release.init()' && /app/bin/wanda start"
@@ -296,6 +297,7 @@ docker run -d \
  -e ADMIN_PASSWORD='test1234' \
  -e GRAFANA_PASSWORD='trento' \
  -e ENABLE_API_KEY='true' \
+ --restart always \
  --entrypoint /bin/sh \
  registry.suse.com/trento/trento-web:2.2.0 \
  -c "/app/bin/trento eval 'Trento.Release.init()' && /app/bin/trento start"
