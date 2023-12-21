@@ -538,3 +538,8 @@ update-ca-certificates
 ```
 
 Configure trento using the `/etc/trento/agent.yaml` file and make sure to use `https` for the `server-url` parameter. Refer to https://documentation.suse.com/sles-sap/trento/html/SLES-SAP-trento/index.html#sec-trento-installing-trentoagent for more details.
+
+Additionally providing the correct RabbitMMQ user data and the correct vhost for facts-service-url is essential.
+
+Example: `facts-service-url: amqp://trento_user:trento_user_password@trento.example.com:5672/vhost
+`
