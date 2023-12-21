@@ -165,7 +165,7 @@ Modify `/etc/rabbitmq/rabbitmq.conf` and ensure the following lines are present:
 listeners.tcp.default = 5672
 ```
 
-Add an exception on firewalld.
+Add an exception on firewalld:
 
 ```bash
 firewall-cmd --zone=public --add-port=5672/tcp --permanent;
@@ -184,7 +184,7 @@ Create a new RabbitMQ user and change the following credentials:
 
 - rabbitmq_user
 - rabbitmq_user_password
-- vhost.
+- vhost
 
 ```bash
 rabbitmqctl add_user trento_user trento_user_password
@@ -196,7 +196,7 @@ Set role for new user:
 rabbitmqctl set_user_tags trento_user administrator
 ```
 
-Verify that the user and the role is correct:
+Verify that the user and the role are correct:
 
 ```bash
 rabbitmqctl list_users
@@ -231,7 +231,7 @@ rabbitmqctl set_user_tags trento_user management administrator management
 Verify RabbitMQ users roles:
 
 ```bash
-rabbitmqctl rabbitmqctl list_users
+rabbitmqctl list_users
 ```
 
 If you are connecting from an external host, add an exception on firewalld:
