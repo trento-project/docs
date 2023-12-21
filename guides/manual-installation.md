@@ -152,86 +152,83 @@ Restart postgres to apply the changes:
 systemctl reload postgresql
 ```
 
-### Install rabbitmq
+### Install RabbitMQ
 
 ```bash
 zypper install rabbitmq-server
 ```
 
-Enable and start the rabbitmq service.
-
-```bash
-systemctl enable --now rabbitmq-server
-```
-
-As the agent will need to be able to reach rabbitmq, allow connections from external hosts.
+As the agent needs to reach RabbitMQ, allow connections from external hosts.
 Modify `/etc/rabbitmq/rabbitmq.conf` and ensure the following lines are present:
 
 ```bash
 listeners.tcp.default = 5672
 ```
 
-In addition to this, we need to allow the port to be accessible from external hosts. Add an exception on firewalld:
+Add an exception on firewalld.
 
 ```bash
 firewall-cmd --zone=public --add-port=5672/tcp --permanent;
 firewall-cmd --reload
 ```
 
+Enable and start the RabbitMQ service
+
 ```bash
-systemctl restart rabbitmq-server
+systemctl enable --now rabbitmq-server
 ```
 
-### Configure rabbitmq
+### Configure RabbitMQ
 
-#### Create rabbitmq user
+Create a new RabbitMQ user and change the following credentials:
 
-RabbitMQ will create per default a guest admin user.A good practice is to create a new user with correct permissions.
-Change rabbitmq_user, rabbitmq_user_password and vhost name in the upcoming commands:
+- rabbitmq_user
+- rabbitmq_user_password
+- vhost.
 
 ```bash
 rabbitmqctl add_user trento_user trento_user_password
 ```
 
-#### Set role for new user
+Set role for new user:
 
 ```bash
 rabbitmqctl set_user_tags trento_user administrator
 ```
 
-#### Verify that the user and the user role is correct
+Verify that the user and the role is correct:
 
 ```bash
 rabbitmqctl list_users
 ```
 
-#### Create a virtual host
+Create a virtual host:
 
 ```bash
 rabbitmqctl add_vhost vhost
 ```
 
-# Set permissions for the user on the virtual host
+Set permissions for the user on the virtual host:
 
 ```bash
 rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
 ```
 
-#### Optional: Enable rabbitmq management console
+### Optional: Enable RabbitMQ management console
 
-To be able to access the rabbitmq management console, the relevant plugin needs to be enabled:
+Enable the RabbitMQ management plugin:
 
 ```bash
 rabbitmq-plugins enable rabbitmq_management
 ```
 
-#### Set permissions for user to acess the managment ui
+Set permissions for RabbitMQ user to access the management web ui
 
 ```bash
 rabbitmqctl set_user_tags trento_user management administrator management
 ```
 
-#### Verify the User's New Role
+Verify RabbitMQ users roles:
 
 ```bash
 rabbitmqctl rabbitmqctl list_users
@@ -241,24 +238,24 @@ If you are connecting from an external host, add an exception on firewalld:
 Modify `/etc/rabbitmq/rabbitmq.conf` add the follow line:
 
 ```bash
-
-
 management.tcp.port = 15672
 management.tcp.ip = 0.0.0.0
-
-
 ```
+
+Apply new configuration by restarting RabbitMQ:
+
+```bash
+systemctl restart rabbitmq-server
+```
+
+Add an exception on firewalld:
 
 ```bash
 firewall-cmd --zone=public --add-port=15672/tcp --permanent;
 firewall-cmd --reload
 ```
 
-```bash
-systemctl restart rabbitmq-server
-```
-
-#### Access the rabbitmqctl management and login with your newly created user
+Access the RabbitMQ management ui:
 
 ```bash
 http://««HOST-IP»»:15672
@@ -293,7 +290,6 @@ WANDA_SECRET_KEY_BASE=$(openssl rand -out /dev/stdout 48 | base64)
 TRENTO_SECRET_KEY_BASE=$(openssl rand -out /dev/stdout 48 | base64)
 ACCESS_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
 REFRESH_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
-
 ```
 
 #### Create a dedicated docker network for trento
