@@ -180,6 +180,8 @@ systemctl enable --now rabbitmq-server
 
 ### Configure RabbitMQ
 
+> Note: In order to configurate RabbitMQ for a production system, follow the official suggestions [RabbitMQ guide](https://www.rabbitmq.com/production-checklist.html)
+
 Create a new RabbitMQ user and change the following credentials:
 
 - rabbitmq_user
@@ -212,53 +214,6 @@ Set permissions for the user on the virtual host:
 
 ```bash
 rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
-```
-
-### Optional: Enable RabbitMQ management console
-
-Enable the RabbitMQ management plugin:
-
-```bash
-rabbitmq-plugins enable rabbitmq_management
-```
-
-Set permissions for RabbitMQ user to access the management web ui
-
-```bash
-rabbitmqctl set_user_tags trento_user management administrator management
-```
-
-Verify RabbitMQ users roles:
-
-```bash
-rabbitmqctl list_users
-```
-
-If you are connecting from an external host, add an exception on firewalld:
-Modify `/etc/rabbitmq/rabbitmq.conf` add the follow line:
-
-```bash
-management.tcp.port = 15672
-management.tcp.ip = 0.0.0.0
-```
-
-Apply new configuration by restarting RabbitMQ:
-
-```bash
-systemctl restart rabbitmq-server
-```
-
-Add an exception on firewalld:
-
-```bash
-firewall-cmd --zone=public --add-port=15672/tcp --permanent
-firewall-cmd --reload
-```
-
-Access the RabbitMQ management ui:
-
-```bash
-http://««HOST-IP»»:15672
 ```
 
 ### Install container runtime
