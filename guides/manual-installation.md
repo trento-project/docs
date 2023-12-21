@@ -65,7 +65,7 @@ systemctl enable --now prometheus
 Allow prometheus to be accessible from docker. Add an exception on firewalld:
 
 ```bash
-firewall-cmd --zone=public --add-port=9090/tcp --permanent;
+firewall-cmd --zone=public --add-port=9090/tcp --permanent
 firewall-cmd --reload
 ```
 
@@ -92,7 +92,7 @@ systemctl enable --now grafana-server
 Allow grafana to be accessible from docker. Add an exception on firewalld:
 
 ```bash
-firewall-cmd --zone=public --add-port=3000/tcp --permanent;
+firewall-cmd --zone=public --add-port=3000/tcp --permanent
 firewall-cmd --reload
 ```
 
@@ -172,7 +172,7 @@ firewall-cmd --zone=public --add-port=5672/tcp --permanent;
 firewall-cmd --reload
 ```
 
-Enable and start the RabbitMQ service
+As the agent needs to reach RabbitMQ, allow connections from external hosts:
 
 ```bash
 systemctl enable --now rabbitmq-server
@@ -251,7 +251,7 @@ systemctl restart rabbitmq-server
 Add an exception on firewalld:
 
 ```bash
-firewall-cmd --zone=public --add-port=15672/tcp --permanent;
+firewall-cmd --zone=public --add-port=15672/tcp --permanent
 firewall-cmd --reload
 ```
 
@@ -308,7 +308,7 @@ docker run -d --name wanda \
     -e CORS_ORIGIN=localhost \
     -e SECRET_KEY_BASE=$WANDA_SECRET_KEY_BASE \
     -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
-    -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost\
+    -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost \
     -e DATABASE_URL=ecto://wanda_user:wanda-password@host.docker.internal/wanda \
     --entrypoint /bin/sh \
     registry.suse.com/trento/trento-wanda:1.2.0 \
@@ -327,7 +327,7 @@ docker run -d \
  --name trento-web \
  --network trento-net \
  --add-host "host.docker.internal:host-gateway" \
- -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost\
+ -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost \
  -e DATABASE_URL=ecto://trento_user:web-password@host.docker.internal/trento \
  -e EVENTSTORE_URL=ecto://trento_user:web-password@host.docker.internal/trento_event_store \
  -e ENABLE_ALERTING=false \
@@ -539,7 +539,7 @@ update-ca-certificates
 
 Configure trento using the `/etc/trento/agent.yaml` file and make sure to use `https` for the `server-url` parameter. Refer to https://documentation.suse.com/sles-sap/trento/html/SLES-SAP-trento/index.html#sec-trento-installing-trentoagent for more details.
 
-Additionally providing the correct RabbitMMQ user data and the correct vhost for facts-service-url is essential.
+Additionally providing the correct RabbitMQ user data and the correct vhost for facts-service-url is essential.
 
 Example: `facts-service-url: amqp://trento_user:trento_user_password@trento.example.com:5672/vhost
 `
