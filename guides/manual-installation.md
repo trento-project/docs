@@ -185,12 +185,6 @@ Create a new RabbitMQ user and change the following credentials:
 rabbitmqctl add_user trento_user trento_user_password
 ```
 
-Set role for new user:
-
-```bash
-rabbitmqctl set_user_tags trento_user administrator
-```
-
 Verify that the user and the role are correct:
 
 ```bash
