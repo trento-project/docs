@@ -231,7 +231,7 @@ systemctl enable --now docker
 
 ### Deploy trento-wanda and trento-web components on docker:
 
-#### Create the secrets
+#### Create the remaining required environment variables
 
 ```bash
 WANDA_SECRET_KEY_BASE=$(openssl rand -out /dev/stdout 48 | base64)
@@ -247,6 +247,8 @@ docker network create trento-net
 ```
 
 #### Install trento-wanda on docker:
+
+> Note: Many of the environment variables provided here are just examples values. They should be updated following your organization's security best practices, specially those containing sensible secrets. Be sure to store them in a secure location.
 
 ```bash
 docker run -d --name wanda \
@@ -266,7 +268,7 @@ docker run -d --name wanda \
 
 #### Install trento-web on docker:
 
-> Note: Be sure to change the `ADMIN_USERNAME` and `ADMIN_PASSWORD` environment variables to your desired values.
+> Note: Be sure to change the `ADMIN_USERNAME` and `ADMIN_PASSWORD`, these are the credentials that will be required to login to the trento-web UI.
 
 ```bash
 docker run -d \
