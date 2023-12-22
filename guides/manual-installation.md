@@ -71,7 +71,7 @@ systemctl enable --now prometheus
 Allow prometheus to be accessible from docker. Add an exception on firewalld:
 
 ```bash
-firewall-cmd --zone=public --add-port=9090/tcp --permanent
+firewall-cmd --zone=docker --add-port=9090/tcp --permanent
 firewall-cmd --reload
 ```
 
