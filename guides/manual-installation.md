@@ -7,7 +7,6 @@ available version of SUSE Linux Enterprise Server for SAP Applications is used a
 
 - prometheus (optional)
 - postgresql
-- grafana (optional)
 - rabbitmq
 - docker runtime
 
@@ -70,38 +69,6 @@ Allow prometheus to be accessible from docker. Add an exception on firewalld:
 firewall-cmd --zone=public --add-port=9090/tcp --permanent
 firewall-cmd --reload
 ```
-
-### Install grafana using the **unsupported** PackageHub repository (Optional)
-
-> Note: PackageHub packages are tested by SUSE, but they do not come with the same level of support as the core SLES packages.
-> Users should assess the suitability of these packages based on their own risk tolerance and support needs.
-
-Enable PackageHub if you didn't enable it in the previous step:
-
-```bash
-SUSEConnect --product PackageHub/15.5/x86_64
-```
-
-Install grafana:
-
-```bash
-zypper install grafana
-```
-
-Enable and start the service:
-
-```bash
-systemctl enable --now grafana-server
-```
-
-Allow grafana to be accessible from docker. Add an exception on firewalld:
-
-```bash
-firewall-cmd --zone=public --add-port=3000/tcp --permanent
-firewall-cmd --reload
-```
-
-Check grafana web UI on port 3000 and set a new password for the user `admin` (we set it to `trento` for this example)
 
 ### Install postgresql
 
@@ -290,8 +257,6 @@ docker run -d --name wanda \
 
 > Note: Be sure to change the `ADMIN_USERNAME` and `ADMIN_PASSWORD` environment variables to your desired values.
 
-> Note: Be sure to change the `GRAFANA_PASSWORD` (and potentially `GRAFANA_USER` if you changed it) environment variable to the password you set for the grafana admin user in the grafana installation step.
-
 ```bash
 docker run -d \
  -p 4000:4000 \
@@ -302,15 +267,12 @@ docker run -d \
  -e DATABASE_URL=ecto://trento_user:web-password@host.docker.internal/trento \
  -e EVENTSTORE_URL=ecto://trento_user:web-password@host.docker.internal/trento_event_store \
  -e ENABLE_ALERTING=false \
- -e GRAFANA_PUBLIC_URL='http://host.docker.internal:3000' \
- -e GRAFANA_API_URL='http://host.docker.internal:3000/api' \
  -e PROMETHEUS_URL='http://host.docker.internal' \
  -e SECRET_KEY_BASE=$TRENTO_SECRET_KEY_BASE \
  -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
  -e REFRESH_TOKEN_ENC_SECRET=$REFRESH_TOKEN_ENC_SECRET \
  -e ADMIN_USERNAME='admin' \
  -e ADMIN_PASSWORD='test1234' \
- -e GRAFANA_PASSWORD='trento' \
  -e ENABLE_API_KEY='true' \
  --restart always \
  --entrypoint /bin/sh \
