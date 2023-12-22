@@ -126,14 +126,14 @@ GRANT ALL ON SCHEMA public TO trento_user;
 **Step 5:** Allow the docker containers to connect to their respective databases by adding the following in `/var/lib/pgsql/data/pg_hba.conf`:
 
 ```bash
-host    wanda           wanda_user      0.0.0.0/0               md5
-host    trento          trento_user     0.0.0.0/0               md5
-host    trento_event_store      trento_user     0.0.0.0/0       md5
+host    wanda           wanda_user      172.17.0.0/16               md5
+host    trento          trento_user     172.17.0.0/16               md5
+host    trento_event_store      trento_user     172.17.0.0/16       md5
 ```
 
 **Step 6:** Allow PostgreSQL to bind on all interfaces `/var/lib/pgsql/data/postgresql.conf` by changing the following line:
 
-> Note: for a more granular approach, you can specify the IP address of the docker host instead: `172.17.0.1/32` is a common default for docker.
+> Note: the `172.17.0.0/16` network is the default that docker creates for its containers. If a different network is being used instead, change this accordingly.
 
 ```bash
 listen_addresses = '*'
