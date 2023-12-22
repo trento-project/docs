@@ -3,6 +3,11 @@
 This documents covers the step to manually install trento server without relying on the trento helm chart or kubernetes all together. The lastest
 available version of SUSE Linux Enterprise Server for SAP Applications is used as the base operating system, which is 15 SP5 at the time of writing.
 
+For other installation options, check:
+
+- https://github.com/trento-project/helm-charts/
+- https://github.com/trento-project/ansible (WIP)
+
 ## List of dependencies
 
 - prometheus (optional)
@@ -74,6 +79,12 @@ firewall-cmd --reload
 
 ```bash
 zypper in postgresql-server
+```
+
+Enable and start postgresql:
+
+```bash
+systemctl enable --now postgresql
 ```
 
 #### Configure postgresql
@@ -281,6 +292,14 @@ docker run -d \
 
 ```
 
+To check that everything is running as expected, you can run the following command:
+
+```bash
+docker ps
+```
+
+Both containers should be running and listening on the specified ports.
+
 ### Setup nginx as reverse proxy
 
 #### Option 1: Creating a Self-Signed Certificate
@@ -480,3 +499,7 @@ Additionally providing the correct RabbitMQ user data and the correct vhost for 
 
 Example: `facts-service-url: amqp://trento_user:trento_user_password@trento.example.com:5672/vhost
 `
+
+### Accessing the trento-web UI
+
+Open a browser and navigate to `https://trento.example.com`. You should be able to login using the credentials you provided in the `ADMIN_USERNAME` and `ADMIN_PASSWORD` environment variables.
