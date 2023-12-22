@@ -89,7 +89,7 @@ systemctl enable --now postgresql
 
 #### Configure postgresql
 
-**Step 1:** Start `psql` to open a connection to the database:
+**Step 1:** Start `psql` with the `postgres` user to open a connection to the database:
 
 ```bash
 su postgres
