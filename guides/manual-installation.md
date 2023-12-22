@@ -15,16 +15,16 @@ available version of SUSE Linux Enterprise Server for SAP Applications is used a
 
 ### Install prometheus (Optional)
 
+[Prometheus](https://prometheus.io/) allows trento to collect metrics from the monitored hosts. It is not required to run trento, but it is
+recommended. At the time of this writing, there is no officially supported Prometheus package in SLES 15 SP5. However, there are a few options to
+install it:
+
 #### Option 1: Use existing installation
 
-If you already have a prometheus server running, you can skip this step. , you can skip the inst
+If you already have a prometheus server running, you can reuse your existing installation. You will need to provide the URL to the prometheus server
+in the `PROMETHEUS_URL` environment variable when running the trento-web container.
 
-#### Option 2: Do not use prometheus
-
-If you don't have a Prometheus instance running and you don't want to install one, you can continue without doing so. The downside is that trento will
-not be able to collect metrics from prometheus and the integrated graphs will not work.
-
-#### Option 3: Install prometheus using the **unsupported** PackageHub repository
+#### Option 2: Install prometheus using the **unsupported** PackageHub repository
 
 > Note: PackageHub packages are tested by SUSE, but they do not come with the same level of support as the core SLES packages.
 > Users should assess the suitability of these packages based on their own risk tolerance and support needs.
