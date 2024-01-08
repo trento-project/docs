@@ -1,3 +1,5 @@
+# Manual Installation of Trento
+
 ## Scope
 
 This documents covers the step to manually install trento server without relying on the trento helm chart or kubernetes all together. The lastest
@@ -5,15 +7,15 @@ available version of SUSE Linux Enterprise Server for SAP Applications is used a
 
 For other installation options, check:
 
-- https://github.com/trento-project/helm-charts/
-- https://github.com/trento-project/ansible (WIP)
+- [Trento Ansible](https://github.com/trento-project/ansible) (WIP)
+- [Trento Helm-Charts](https://github.com/trento-project/helm-charts/)
 
 ## List of dependencies
 
-- prometheus (optional)
-- postgresql
-- rabbitmq
-- docker runtime
+- [Prometheus](https://prometheus.io/) (optional)
+- [PostgreSQL](https://www.postgresql.org/)
+- [RabbitMQ](https://rabbitmq.com/)
+- [Docker](https://www.docker.com/)
 
 ## Installation
 
@@ -77,6 +79,8 @@ firewall-cmd --reload
 
 ### Install postgresql
 
+> Note: This guide was tested with the PostgreSQL server package version **_16-150500.10.3.2_** from the repository SLE-Module-Packagehub-Subpackages15-SP5-Updates. Using a different version of the postgresql-server package may require different steps or configurations, specially when changing the major number. Refer to the official [postgress documentation](https://www.postgresql.org/docs/) for further guidance
+
 ```bash
 zypper in postgresql-server
 ```
@@ -107,8 +111,8 @@ CREATE DATABASE trento_event_store;
 **Step 3:** Create the users:
 
 ```sql
-CREATE USER wanda_user WITH PASSWORD 'wanda-password';
-CREATE USER trento_user WITH PASSWORD 'web-password';
+CREATE USER wanda_user WITH PASSWORD 'wanda_password';
+CREATE USER trento_user WITH PASSWORD 'web_password';
 ```
 
 **Step 4:** Grant required privileges to the users and close the connection:
@@ -126,9 +130,9 @@ GRANT ALL ON SCHEMA public TO trento_user;
 **Step 5:** Allow the docker containers to connect to their respective databases by adding the following in `/var/lib/pgsql/data/pg_hba.conf`:
 
 ```bash
-host    wanda           wanda_user      172.17.0.0/16               md5
-host    trento          trento_user     172.17.0.0/16               md5
-host    trento_event_store      trento_user     172.17.0.0/16       md5
+host   wanda                wanda_user    172.17.0.0/16   md5
+host   trento               trento_user   172.17.0.0/16   md5
+host   trento_event_store   trento_user   172.17.0.0/16   md5
 ```
 
 **Step 6:** Allow PostgreSQL to bind on all interfaces `/var/lib/pgsql/data/postgresql.conf` by changing the following line:
@@ -203,15 +207,15 @@ Set permissions for the user on the virtual host:
 rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
 ```
 
-### Install container runtime
+### Install Docker container runtime
 
-First we need to enable the containers module:
+Enable the containers module:
 
 ```bash
 SUSEConnect --product sle-module-containers/15.5/x86_64
 ```
 
-Then we can install docker:
+Install docker:
 
 ```bash
 zypper install docker
@@ -240,9 +244,11 @@ REFRESH_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
 docker network create trento-net
 ```
 
-#### Install trento-wanda on docker:
+#### Install trento on docker:
 
-> Note: Many of the environment variables provided here are just examples values. They should be updated following your organization's security best practices, specially those containing sensible secrets. Be sure to store them in a secure location.
+> Note: The environment variables listed here are examples and should be considered as placeholders. Instead of specifying environment variables directly in the docker run command, it is recommended to use an environment variable file. Store your environment variables in a file and use the --env-file option with the docker run command. Find detailed instructions on how to use an environment variable file with Docker on [official Docker documentation](https://docs.docker.com/engine/reference/commandline/run/#env).
+
+##### Install trento-wanda on docker:
 
 ```bash
 docker run -d --name wanda \
@@ -253,14 +259,14 @@ docker run -d --name wanda \
     -e SECRET_KEY_BASE=$WANDA_SECRET_KEY_BASE \
     -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
     -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost \
-    -e DATABASE_URL=ecto://wanda_user:wanda-password@host.docker.internal/wanda \
+    -e DATABASE_URL=ecto://wanda_user:wanda_password@host.docker.internal/wanda \
     --restart always \
     --entrypoint /bin/sh \
     registry.suse.com/trento/trento-wanda:1.2.0 \
     -c "/app/bin/wanda eval 'Wanda.Release.init()' && /app/bin/wanda start"
 ```
 
-#### Install trento-web on docker:
+##### Install trento-web on docker:
 
 > Note: Be sure to change the `ADMIN_USERNAME` and `ADMIN_PASSWORD`, these are the credentials that will be required to login to the trento-web UI.
 
@@ -271,8 +277,8 @@ docker run -d \
  --network trento-net \
  --add-host "host.docker.internal:host-gateway" \
  -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost \
- -e DATABASE_URL=ecto://trento_user:web-password@host.docker.internal/trento \
- -e EVENTSTORE_URL=ecto://trento_user:web-password@host.docker.internal/trento_event_store \
+ -e DATABASE_URL=ecto://trento_user:web_password@host.docker.internal/trento \
+ -e EVENTSTORE_URL=ecto://trento_user:web_password@host.docker.internal/trento_event_store \
  -e ENABLE_ALERTING=false \
  -e PROMETHEUS_URL='http://host.docker.internal' \
  -e SECRET_KEY_BASE=$TRENTO_SECRET_KEY_BASE \
