@@ -130,14 +130,12 @@ GRANT ALL ON SCHEMA public TO trento_user;
 **Step 5:** Allow the docker containers to connect to their respective databases by adding the following in `/var/lib/pgsql/data/pg_hba.conf`:
 
 ```bash
-host   wanda                wanda_user    172.17.0.0/16   md5
-host   trento               trento_user   172.17.0.0/16   md5
-host   trento_event_store   trento_user   172.17.0.0/16   md5
+host   wanda                wanda_user    0.0.0.0/0   md5
+host   trento               trento_user   0.0.0.0/0   md5
+host   trento_event_store   trento_user   0.0.0.0/0   md5
 ```
 
 **Step 6:** Allow PostgreSQL to bind on all interfaces `/var/lib/pgsql/data/postgresql.conf` by changing the following line:
-
-> Note: the `172.17.0.0/16` network is the default that docker creates for its containers. If a different network is being used instead, change this accordingly.
 
 ```bash
 listen_addresses = '*'
@@ -244,11 +242,11 @@ REFRESH_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
 docker network create trento-net
 ```
 
-#### Install trento on docker:
+#### Install trento on docker
 
 > Note: The environment variables listed here are examples and should be considered as placeholders. Instead of specifying environment variables directly in the docker run command, it is recommended to use an environment variable file. Store your environment variables in a file and use the --env-file option with the docker run command. Find detailed instructions on how to use an environment variable file with Docker on [official Docker documentation](https://docs.docker.com/engine/reference/commandline/run/#env).
 
-##### Install trento-wanda on docker:
+##### Install trento-wanda on docker
 
 ```bash
 docker run -d --name wanda \
@@ -266,7 +264,7 @@ docker run -d --name wanda \
     -c "/app/bin/wanda eval 'Wanda.Release.init()' && /app/bin/wanda start"
 ```
 
-##### Install trento-web on docker:
+##### Install trento-web on docker
 
 > Note: Be sure to change the `ADMIN_USERNAME` and `ADMIN_PASSWORD`, these are the credentials that will be required to login to the trento-web UI.
 
@@ -408,7 +406,7 @@ firewall-cmd --reload
 systemctl enable --now nginx
 ```
 
-**Step 4**: Create a configuration file for trento
+**Step 4**: Create a configuration file for trento:
 
 ```bash
 vim /etc/nginx/conf.d/trento.conf
