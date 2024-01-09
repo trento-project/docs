@@ -2,8 +2,7 @@
 
 ## Scope
 
-This documents covers the step to manually install trento server without relying on the trento helm chart or kubernetes all together. The lastest
-available version of SUSE Linux Enterprise Server for SAP Applications is used as the base operating system, which is 15 SP5 at the time of writing.
+This document covers the steps to manually install trento server without relying on the trento helm chart or kubernetes all together. The latest available version of SUSE Linux Enterprise Server for SAP Applications is used as the base operating system, which is 15 SP5 at the time of writing.
 
 For other installation options, check:
 
@@ -130,9 +129,9 @@ GRANT ALL ON SCHEMA public TO trento_user;
 **Step 5:** Allow the docker containers to connect to their respective databases by adding the following in `/var/lib/pgsql/data/pg_hba.conf`:
 
 ```bash
-host   wanda                wanda_user    0.0.0.0/0   md5
-host   trento               trento_user   0.0.0.0/0   md5
-host   trento_event_store   trento_user   0.0.0.0/0   md5
+host   wanda                wanda_user    172.17.0.0/16   md5
+host   trento               trento_user   172.17.0.0/16   md5
+host   trento_event_store   trento_user   172.17.0.0/16   md5
 ```
 
 **Step 6:** Allow PostgreSQL to bind on all interfaces `/var/lib/pgsql/data/postgresql.conf` by changing the following line:
@@ -207,7 +206,7 @@ rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
 
 ### Install Docker container runtime
 
-Enable the containers module:
+Enable the container`s module:
 
 ```bash
 SUSEConnect --product sle-module-containers/15.5/x86_64
@@ -241,6 +240,20 @@ REFRESH_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
 ```bash
 docker network create trento-net
 ```
+
+Verifying the Subnet of trento-net:
+
+```bash
+docker network inspect trento-net  --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}'
+```
+
+Expected output:
+
+```
+172.17.0.0/16
+```
+
+> Note on Subnet Configuration: When creating the trento-net network, Docker typically assigns a default subnet, per default 172.17.0.0/16. Ensure that this subnet matches the one specified in your PostgreSQL configuration file `/var/lib/pgsql/data/pg_hba.conf` to allow proper network communication. If the subnet of trento-net differs from 172.17.0.0/16 then adjust the `pg_hba.conf` and restart postgresql
 
 #### Install Trento on docker
 
@@ -296,6 +309,14 @@ To check that everything is running as expected, you can run the following comma
 
 ```bash
 docker ps
+```
+
+Expected output:
+
+```bash
+CONTAINER ID   IMAGE                                         COMMAND                  CREATED          STATUS          PORTS                                       NAMES
+c3d391d2d733   registry.suse.com/trento/trento-web:2.2.0     "/bin/sh -c '/app/bi…"   10 seconds ago   Up 10 seconds   0.0.0.0:4000->4000/tcp, :::4000->4000/tcp   trento-web
+babbae9174b5   registry.suse.com/trento/trento-wanda:1.2.0   "/bin/sh -c '/app/bi…"   16 seconds ago   Up 15 seconds   0.0.0.0:4001->4000/tcp, :::4001->4000/tcp   wanda
 ```
 
 Both containers should be running and listening on the specified ports.
@@ -495,7 +516,7 @@ update-ca-certificates
 
 Configure trento using the `/etc/trento/agent.yaml` file and make sure to use `https` for the `server-url` parameter. Refer to https://documentation.suse.com/sles-sap/trento/html/SLES-SAP-trento/index.html#sec-trento-installing-trentoagent for more details.
 
-Additionally providing the correct RabbitMQ user data and the correct vhost for facts-service-url is essential.
+Additionally, providing the correct RabbitMQ user data and the correct vhost for facts-service-url is essential.
 
 Example: `facts-service-url: amqp://trento_user:trento_user_password@trento.example.com:5672/vhost
 `
