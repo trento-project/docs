@@ -78,7 +78,8 @@ firewall-cmd --reload
 
 ### Install postgresql
 
-> Note: This guide was tested with the PostgreSQL server package version **_16-150500.10.3.2_** from the repository SLE-Module-Packagehub-Subpackages15-SP5-Updates. Using a different version of the postgresql-server package may require different steps or configurations, specially when changing the major number. Refer to the official [postgress documentation](https://www.postgresql.org/docs/) for further guidance
+> Note: This guide was tested with the PostgreSQL version **15.5**
+> . Using a different version of postgres may require different steps or configurations, specially when changing the major number. Refer to the official [postgress documentation](https://www.postgresql.org/docs/) for further guidance
 
 ```bash
 zypper in postgresql-server
@@ -241,7 +242,9 @@ REFRESH_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
 docker network create trento-net
 ```
 
-Verifying the Subnet of trento-net:
+> Note: When creating the trento-net network, Docker typically assigns a default subnet: `172.17.0.0/16`. Ensure that this subnet matches the one specified in your PostgreSQL configuration file, which can be found at `/var/lib/pgsql/data/pg_hba.conf`. If the subnet of `trento-net` differs from `172.17.0.0/16` then adjust `pg_hba.conf` and restart postgresql.
+
+Verifying the subnet of trento-net:
 
 ```bash
 docker network inspect trento-net  --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}'
@@ -252,8 +255,6 @@ Expected output:
 ```
 172.17.0.0/16
 ```
-
-> Note on Subnet Configuration: When creating the trento-net network, Docker typically assigns a default subnet, per default 172.17.0.0/16. Ensure that this subnet matches the one specified in your PostgreSQL configuration file `/var/lib/pgsql/data/pg_hba.conf` to allow proper network communication. If the subnet of trento-net differs from 172.17.0.0/16 then adjust the `pg_hba.conf` and restart postgresql
 
 #### Install Trento on docker
 
