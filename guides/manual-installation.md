@@ -1,4 +1,4 @@
-# Manual Installation of Trento
+# Installation of Trento
 
 ## Scope
 
@@ -8,14 +8,14 @@ available version of SUSE Linux Enterprise Server for SAP Applications is used a
 For other installation options, check:
 
 - [Trento Ansible](https://github.com/trento-project/ansible) (WIP)
-- [Trento Helm-Charts](https://github.com/trento-project/helm-charts/)
+- [Trento Helm Charts](https://github.com/trento-project/helm-charts/)
 
 ## List of dependencies
 
-- [Prometheus](https://prometheus.io/) (optional)
+- [Docker](https://www.docker.com/)
 - [PostgreSQL](https://www.postgresql.org/)
 - [RabbitMQ](https://rabbitmq.com/)
-- [Docker](https://www.docker.com/)
+- [Prometheus](https://prometheus.io/) (optional)
 
 ## Installation
 
@@ -242,7 +242,7 @@ REFRESH_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
 docker network create trento-net
 ```
 
-#### Install trento on docker
+#### Install Trento on docker
 
 > Note: The environment variables listed here are examples and should be considered as placeholders. Instead of specifying environment variables directly in the docker run command, it is recommended to use an environment variable file. Store your environment variables in a file and use the --env-file option with the docker run command. Find detailed instructions on how to use an environment variable file with Docker on [official Docker documentation](https://docs.docker.com/engine/reference/commandline/run/#env).
 
