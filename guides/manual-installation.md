@@ -2,7 +2,7 @@
 
 ## Scope
 
-This document covers the steps to manually install trento server without relying on the trento helm chart or kubernetes all together. The latest available version of SUSE Linux Enterprise Server for SAP Applications is used as the base operating system, which is 15 SP5 at the time of writing.
+This document covers the steps to manually install trento server. The latest available version of SUSE Linux Enterprise Server for SAP Applications is used as the base operating system, which is 15 SP5 at the time of writing.
 
 For other installation options, check:
 
