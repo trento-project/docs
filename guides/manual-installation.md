@@ -507,7 +507,13 @@ zypper install trento-agent
 
 #### Configuring the Agent host with the Self-Signed Certificate
 
-**Step 1**: Copy the `trento.crt` to the agent machine. Use `scp` to transfer the certificate to `/etc/pki/trust/anchors/`.
+**Step 1**: Copy the self signed certificate `trento.crt` from the trento-server to the agent machine. Use `scp` to transfer the certificate to `/etc/pki/trust/anchors/`.
+
+Example:
+
+```bash
+scp <<TRENTO_SERVER_MACHINE_USER>>@<<TRENTO_SERVER_MACHINE_IP>>:/etc/ssl/certs/trento.crt /etc/pki/trust/anchors/
+```
 
 **Step 2**: Update the certificate store:
 
@@ -517,10 +523,22 @@ update-ca-certificates
 
 Configure trento using the `/etc/trento/agent.yaml` file and make sure to use `https` for the `server-url` parameter. Refer to https://documentation.suse.com/sles-sap/trento/html/SLES-SAP-trento/index.html#sec-trento-installing-trentoagent for more details.
 
-Additionally, providing the correct RabbitMQ user data and the correct vhost for facts-service-url is essential.
+Example agent.yaml content:
 
-Example: `facts-service-url: amqp://trento_user:trento_user_password@trento.example.com:5672/vhost
-`
+```bash
+server-url: https://trento.example.com
+facts-service-url: amqp://trento_user:trento_user_password@trento.example.com:5672/vhost
+api-key: <<TRENTO_API_KEY>>
+```
+
+> Note: Depending on your setup, adjust the configuration of `/etc/hosts` in order to point the server url https://trento.example.com.
+
+Example of etc/hosts:
+
+```bash
+127.0.0.1	                   localhost
+<<IP_ADDRESS_TRENTO_SERVER>>   trento.example.com
+```
 
 ### Accessing the trento-web UI
 
