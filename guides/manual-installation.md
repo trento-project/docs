@@ -292,7 +292,7 @@ docker run -d \
  -e DATABASE_URL=ecto://trento_user:web_password@host.docker.internal/trento \
  -e EVENTSTORE_URL=ecto://trento_user:web_password@host.docker.internal/trento_event_store \
  -e ENABLE_ALERTING=false \
- -e PROMETHEUS_URL='http://host.docker.internal' \
+ -e PROMETHEUS_URL='http://host.docker.internal:9090' \
  -e SECRET_KEY_BASE=$TRENTO_SECRET_KEY_BASE \
  -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
  -e REFRESH_TOKEN_ENC_SECRET=$REFRESH_TOKEN_ENC_SECRET \
@@ -301,7 +301,7 @@ docker run -d \
  -e ENABLE_API_KEY='true' \
  --restart always \
  --entrypoint /bin/sh \
- registry.suse.com/trento/trento-web:2.2.0 \
+ registry.suse.com/trento/trento-web:latest \
  -c "/app/bin/trento eval 'Trento.Release.init()' && /app/bin/trento start"
 
 ```
