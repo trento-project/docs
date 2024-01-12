@@ -2,10 +2,10 @@
 
 ## Scope
 
-This document covers the steps to manually install trento server. The latest available version of SUSE Linux Enterprise Server for SAP Applications is used as the base operating system, which is [SLE 15 SP5](https://www.suse.com/download/sles/) at the time of writing.
-Installing Trento on another Service Pack than SP5, requires the user to change the repository address.
+This document covers the steps to manually install Trento server. The latest available version of SUSE Linux Enterprise Server for SAP Applications is used as the base operating system, which is [SLE 15 SP5](https://www.suse.com/download/sles/) at the time of writing.
+For installations on Service Packs other than SP5, ensure to update the repository address as indicated in the respective notes provided throughout this guide.
 
-Suported Service Packs:
+**Suported Service Packs**:
 
 - SP3
 - SP4
@@ -27,7 +27,7 @@ Other installation options:
 
 ### Install prometheus (Optional)
 
-[Prometheus](https://prometheus.io/) allows trento to collect metrics from the monitored hosts. It is not required to run trento, but it is recommended.
+[Prometheus](https://prometheus.io/) is not required to run Trento, but it is recommended as it allows Trento to collect metrics from the monitored hosts.
 
 #### Option 1: Use existing installation
 
@@ -39,17 +39,15 @@ in the `PROMETHEUS_URL` environment variable when running the trento-web contain
 > Note: PackageHub packages are tested by SUSE, but they do not come with the same level of support as the core SLES packages.
 > Users should assess the suitability of these packages based on their own risk tolerance and support needs.
 
-> Note: Using a different Service Pack then SP5 requires changing repository.
-
 Enable PackageHub repository:
 
 ```bash
 SUSEConnect --product PackageHub/15.5/x86_64
 ```
 
-> Note: Using a different Service Pack then SP5 requires to change repository: [SLE15 SP3: SUSEConnect --product `PackageHub/15.3/x86_64`, SLE15 SP4: `SUSEConnect --product PackageHub/15.4/x86_64`]
+> Note: Using a different Service Pack then SP5 requires to change repository: [SLE15 SP3: `SUSEConnect --product PackageHub/15.3/x86_64`, SLE15 SP4: `SUSEConnect --product PackageHub/15.4/x86_64`]
 
-**ONLY FOR SLE15 SP5: Add the prometheus user/group**
+Add the prometheus user/group **(ONLY FOR SLE15 SP5)**:
 
 ```bash
 groupadd --system prometheus
@@ -62,11 +60,15 @@ Install prometheus using zypper:
 zypper in golang-github-prometheus-prometheus
 ```
 
-**ONLY FOR SLE15 SP5: Missing dependency can't be satisfied**
+Missing dependency can't be satisfied **(ONLY FOR SLE15 SP5)**:
 
-> Note: As we have added the prometheus user/group, we can safely ignore this warning and proceed with the installation `Problem: nothing provides 'group(prometheus)' needed by the to be installed golang-github-prometheus-prometheus-2.37.6-150100.4.17.1.x86_64
+As we have added the prometheus user/group, we can safely ignore this warning and proceed with the installation by choosing Solution 2
+
+```bash
+Problem: nothing provides 'group(prometheus)' needed by the to be installed golang-github-prometheus-prometheus-2.37.6-150100.4.17.1.x86_64
  Solution 1: do not install golang-github-prometheus-prometheus-2.37.6-150100.4.17.1.x86_64
- Solution 2: break golang-github-prometheus-prometheus-2.37.6-150100.4.17.1.x86_64 by ignoring some of its dependencies`
+ Solution 2: break golang-github-prometheus-prometheus-2.37.6-150100.4.17.1.x86_64 by ignoring some of its dependencies
+```
 
 Enable and start the prometheus service:
 
@@ -84,8 +86,7 @@ firewall-cmd --reload
 ### Install postgresql
 
 > Note: This guide was tested with the PostgreSQL version **13.9 for SP3 , 14.10 for SP4 and 15.5 for SP5**
-
-> . Using a different version of postgres may require different steps or configurations, specially when changing the major number. Refer to the official [postgress documentation](https://www.postgresql.org/docs/) for further guidance
+> Using a different version of postgres may require different steps or configurations, specially when changing the major number. Refer to the official [postgress documentation](https://www.postgresql.org/docs/) for further guidance
 
 ```bash
 zypper in postgresql-server
@@ -213,7 +214,7 @@ Enable the container`s module:
 SUSEConnect --product sle-module-containers/15.5/x86_64
 ```
 
-> Note: Using a different Service Pack than SP5 requires to change repository: [SLE15 SP3: `sle-module-containers/15.3/x86_64`,SLE15 SP4: `sle-module-containers/15.4/x86_64`]
+> Note: Using a different Service Pack than SP5 requires to change repository: [SLE15 SP3: `SUSEConnect --product sle-module-containers/15.3/x86_64`,SLE15 SP4: ` SUSEConnect --product sle-module-containers/15.4/x86_64`]
 
 Install docker:
 
@@ -238,7 +239,7 @@ ACCESS_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
 REFRESH_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
 ```
 
-#### Create a dedicated docker network for trento
+#### Create a dedicated docker network for Trento
 
 ```bash
 docker network create trento-net
@@ -382,7 +383,7 @@ mv trento.crt /etc/ssl/certs/trento.crt
 
 #### Option 2: Using Let's Encrypt for a Signed Certificate using PackageHub repository
 
-> Note: Using a different Service Pack then SP5 requires changing repository.
+> Note: Using a different Service Pack then SP5 requires to change repository: [SLE15 SP3: `SUSEConnect --product PackageHub/15.3/x86_64`,SLE15 SP4: `SUSEConnect --product PackageHub/15.4/x86_64`].
 > Users should assess the suitability of these packages based on their own risk tolerance and support needs.
 
 **Step 1**: Add PackageHub if not already added:
@@ -391,8 +392,6 @@ mv trento.crt /etc/ssl/certs/trento.crt
 SUSEConnect --product PackageHub/15.5/x86_64
 zypper refresh
 ```
-
-> Note: Using a different Service Pack then SP5 requires to change repository: [SLE15 SP3: `PackageHub/15.3/x86_64`,SLE15 SP4: `PackageHub/15.4/x86_64`]
 
 **Step 2**: Install Certbot and its Nginx plugin:
 
@@ -432,7 +431,7 @@ firewall-cmd --reload
 systemctl enable --now nginx
 ```
 
-**Step 4**: Create a configuration file for trento:
+**Step 4**: Create a configuration file for Trento:
 
 ```bash
 vim /etc/nginx/conf.d/trento.conf
@@ -525,7 +524,7 @@ scp <<TRENTO_SERVER_MACHINE_USER>>@<<TRENTO_SERVER_MACHINE_IP>>:/etc/ssl/certs/t
 update-ca-certificates
 ```
 
-Configure trento using the `/etc/trento/agent.yaml` file, and make sure to use `https` for the `server-url` parameter. Refer to https://documentation.suse.com/sles-sap/trento/html/SLES-SAP-trento/index.html#sec-trento-installing-trentoagent for more details.
+Configure Trento using the `/etc/trento/agent.yaml` file, and make sure to use `https` for the `server-url` parameter. Refer to https://documentation.suse.com/sles-sap/trento/html/SLES-SAP-trento/index.html#sec-trento-installing-trentoagent for more details.
 
 Example agent.yaml content:
 
