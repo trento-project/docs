@@ -27,7 +27,7 @@ Other installation options:
 
 ### Install prometheus (Optional)
 
-[Prometheus](https://prometheus.io/) is not required to run Trento, but it is recommended as it allows Trento to collect metrics from the monitored hosts.
+[Prometheus](https://prometheus.io/) is not required to run Trento, but it is recommended as it allows Trento to display a series of charts for each host with useful information about the it's CPU load, memory and other important metrics.
 
 #### Option 1: Use existing installation
 
@@ -47,7 +47,7 @@ SUSEConnect --product PackageHub/15.5/x86_64
 
 > Note: Using a different Service Pack then SP5 requires to change repository: [SLE15 SP3: `SUSEConnect --product PackageHub/15.3/x86_64`, SLE15 SP4: `SUSEConnect --product PackageHub/15.4/x86_64`]
 
-Add the prometheus user/group **(ONLY FOR SLE15 SP5)**:
+Add the prometheus user/group **(ONLY FOR SLE15 SP4 and SP5)**:
 
 ```bash
 groupadd --system prometheus
@@ -60,7 +60,7 @@ Install prometheus using zypper:
 zypper in golang-github-prometheus-prometheus
 ```
 
-Missing dependency can't be satisfied **(ONLY FOR SLE15 SP5)**:
+Missing dependency can't be satisfied **(ONLY FOR SLE15 SP4 and SP5)**:
 
 As we have added the prometheus user/group, we can safely ignore this warning and proceed with the installation by choosing Solution 2
 
@@ -76,7 +76,7 @@ Enable and start the prometheus service:
 systemctl enable --now prometheus
 ```
 
-Allow prometheus to be accessible from docker. Add an exception on firewalld:
+Allow prometheus to be accessible from docker and add an exception on firewalld:
 
 ```bash
 firewall-cmd --zone=docker --add-port=9090/tcp --permanent
@@ -284,6 +284,8 @@ docker run -d --name wanda \
 ##### Install trento-web on docker
 
 > Note: Be sure to change the `ADMIN_USERNAME` and `ADMIN_PASSWORD`, these are the credentials that will be required to login to the trento-web UI.
+
+> Note: Add `CHARS_ENABLED=false` if prometheus is not installed or you don't want to use the charts feature of Trento.
 
 ```bash
 docker run -d \
