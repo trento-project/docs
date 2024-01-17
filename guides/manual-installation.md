@@ -76,7 +76,7 @@ Enable and start the prometheus service:
 systemctl enable --now prometheus
 ```
 
-Allow prometheus to be accessible from docker and add an exception on firewalld:
+Allow prometheus to be accessible from docker and add an exception on firewalld **(ONLY if firewalld is enabled)**:
 
 ```bash
 firewall-cmd --zone=docker --add-port=9090/tcp --permanent
@@ -167,7 +167,7 @@ Modify `/etc/rabbitmq/rabbitmq.conf` and ensure the following lines are present:
 listeners.tcp.default = 5672
 ```
 
-Add an exception on firewalld:
+Add an exception on firewalld **(ONLY if firewalld is enabled)**:
 
 ```bash
 firewall-cmd --zone=public --add-port=5672/tcp --permanent;
@@ -285,7 +285,7 @@ docker run -d --name wanda \
 
 > Note: Be sure to change the `ADMIN_USERNAME` and `ADMIN_PASSWORD`, these are the credentials that will be required to login to the trento-web UI.
 
-> Note: Add `CHARS_ENABLED=false` if prometheus is not installed or you don't want to use the charts feature of Trento.
+> Note: Add `CHARTS_ENABLED=false` if prometheus is not installed or you don't want to use the charts feature of Trento.
 
 ```bash
 docker run -d \
