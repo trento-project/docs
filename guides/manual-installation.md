@@ -70,6 +70,26 @@ Problem: nothing provides 'group(prometheus)' needed by the to be installed gola
  Solution 2: break golang-github-prometheus-prometheus-2.37.6-150100.4.17.1.x86_64 by ignoring some of its dependencies
 ```
 
+Change prometheus configuration by replacing the configuration at `/etc/prometheus/prometheus.yml` with:
+
+```bash
+global:
+  scrape_interval: 30s
+  evaluation_interval: 10s
+
+scrape_configs:
+  - job_name: "http_sd_hosts"
+    honor_timestamps: true
+    scrape_interval: 30s
+    scrape_timeout: 30s
+    scheme: http
+    follow_redirects: true
+    http_sd_configs:
+      - follow_redirects: true
+        refresh_interval: 1m
+        url: http://localhost:4000/api/prometheus/targets
+```
+
 Enable and start the prometheus service:
 
 ```bash
@@ -297,7 +317,7 @@ docker run -d \
  -e DATABASE_URL=ecto://trento_user:web_password@host.docker.internal/trento \
  -e EVENTSTORE_URL=ecto://trento_user:web_password@host.docker.internal/trento_event_store \
  -e ENABLE_ALERTING=false \
- -e PROMETHEUS_URL='http://host.docker.internal:9090' \
+ -e PROMETHEUS_URL='localhost:9090' \
  -e SECRET_KEY_BASE=$TRENTO_SECRET_KEY_BASE \
  -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
  -e REFRESH_TOKEN_ENC_SECRET=$REFRESH_TOKEN_ENC_SECRET \
@@ -419,7 +439,7 @@ certbot --nginx -d example.com -d www.example.com
 zypper install nginx
 ```
 
-**Step 2**: Add firewall exceptions for HTTP and HTTPS:
+**Step 2**: Add firewalld exceptions for HTTP and HTTPS **(ONLY if firewalld is enabled)**:
 
 ```bash
 firewall-cmd --zone=public --add-service=https --permanent
