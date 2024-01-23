@@ -90,6 +90,8 @@ scrape_configs:
         url: http://localhost:4000/api/prometheus/targets
 ```
 
+> Note: **localhost:4000** in **url: http://localhost:4000/api/prometheus/targets** refers to the location where Trento web docker container is running.
+
 Enable and start the prometheus service:
 
 ```bash
@@ -317,7 +319,7 @@ docker run -d \
  -e DATABASE_URL=ecto://trento_user:web_password@host.docker.internal/trento \
  -e EVENTSTORE_URL=ecto://trento_user:web_password@host.docker.internal/trento_event_store \
  -e ENABLE_ALERTING=false \
- -e PROMETHEUS_URL='localhost:9090' \
+ -e PROMETHEUS_URL='http://host.docker.internal:9090' \
  -e SECRET_KEY_BASE=$TRENTO_SECRET_KEY_BASE \
  -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
  -e REFRESH_TOKEN_ENC_SECRET=$REFRESH_TOKEN_ENC_SECRET \
