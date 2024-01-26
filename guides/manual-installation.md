@@ -29,10 +29,14 @@ Other installation options:
 
 [Prometheus](https://prometheus.io/) is not required to run Trento, but it is recommended as it allows Trento to display a series of charts for each host with useful information about the it's CPU load, memory and other important metrics.
 
-#### Option 1: Use existing installation
+#### <a id="prometheus_install_option_1"></a>Option 1: Use existing installation
 
-If you already have a prometheus server running, you can reuse your existing installation. You will need to provide the URL to the prometheus server
+If you already have a prometheus server running, you can reuse your existing installation. Provide the URL to the prometheus server
 in the `PROMETHEUS_URL` environment variable when running the trento-web container.
+
+> Note: Minimal required prometheus version is **2.28.0**
+
+> Note: Use [Trento's Prometheus configuration](#prometheus_trento_configuration) as reference to adjust prometheus configuration.
 
 #### Option 2: Install prometheus using the **unsupported** PackageHub repository
 
@@ -45,9 +49,12 @@ Enable PackageHub repository:
 SUSEConnect --product PackageHub/15.5/x86_64
 ```
 
-> Note: Using a different Service Pack then SP5 requires to change repository: [SLE15 SP3: `SUSEConnect --product PackageHub/15.3/x86_64`, SLE15 SP4: `SUSEConnect --product PackageHub/15.4/x86_64`]
+> Note: SLE15 SP3 requires a provided prometheus server. The version available through **SUSEConnect --product PackageHub/15.3/x86_64** is outdated and is not compatible with Trento's prometheus configuration.
+> Refer to [Option 1: Use existing installation option](#prometheus_install_option_1) for SLE 15 SP3.
 
-Add the prometheus user/group **(ONLY FOR SLE15 SP4 and SP5)**:
+> Note: Using a different Service Pack then SP5 requires to change repository: SLE15 SP4: `SUSEConnect --product PackageHub/15.4/x86_64`
+
+Add the prometheus user/group:
 
 ```bash
 groupadd --system prometheus
@@ -60,7 +67,7 @@ Install prometheus using zypper:
 zypper in golang-github-prometheus-prometheus
 ```
 
-Missing dependency can't be satisfied **(ONLY FOR SLE15 SP4 and SP5)**:
+Missing dependency can't be satisfied:
 
 As we have added the prometheus user/group, we can safely ignore this warning and proceed with the installation by choosing Solution 2
 
@@ -70,7 +77,7 @@ Problem: nothing provides 'group(prometheus)' needed by the to be installed gola
  Solution 2: break golang-github-prometheus-prometheus-2.37.6-150100.4.17.1.x86_64 by ignoring some of its dependencies
 ```
 
-Change prometheus configuration by replacing the configuration at `/etc/prometheus/prometheus.yml` with:
+<a id="prometheus_trento_configuration"></a>Change prometheus configuration by replacing the configuration at `/etc/prometheus/prometheus.yml` with:
 
 ```bash
 global:
