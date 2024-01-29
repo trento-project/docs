@@ -322,13 +322,13 @@ docker run -d \
  --network trento-net \
  --add-host "host.docker.internal:host-gateway" \
  -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost \
- -e ENABLE_ALERTING=true
- -e ALERT_SENDER=sender@yourmail.com
- -e ALERT_RECIPIENT=recipient@yourmail.com
- -e SMTP_SERVER=your.smtp-server.com
- -e SMTP_PORT=2525
- -e SMTP_USER=user
- -e SMTP_PASSWORD=password
+ -e ENABLE_ALERTING=true \
+ -e ALERT_SENDER=sender@yourmail.com \
+ -e ALERT_RECIPIENT=recipient@yourmail.com \
+ -e SMTP_SERVER=your.smtp-server.com \
+ -e SMTP_PORT=2525 \
+ -e SMTP_USER=user \
+ -e SMTP_PASSWORD=password \
  -e DATABASE_URL=ecto://trento_user:web_password@host.docker.internal/trento \
  -e EVENTSTORE_URL=ecto://trento_user:web_password@host.docker.internal/trento_event_store \
  -e ENABLE_ALERTING=false \
