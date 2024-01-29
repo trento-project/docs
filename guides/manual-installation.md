@@ -31,8 +31,7 @@ Other installation options:
 
 #### <a id="prometheus_install_option_1"></a>Option 1: Use existing installation
 
-If you already have a prometheus server running, you can reuse your existing installation. Provide the URL to the prometheus server
-in the `PROMETHEUS_URL` environment variable when running the trento-web container.
+If you are planning to [install Prometheus](https://prometheus.io/docs/prometheus/latest/installation/) or have an existing Prometheus server, ensure to set the PROMETHEUS_URL environment variable with your Prometheus server's URL as part of the Docker command when creating the trento-web container.
 
 > Note: Minimal required prometheus version is **2.28.0**
 
@@ -52,7 +51,7 @@ SUSEConnect --product PackageHub/15.5/x86_64
 > Note: SLE15 SP3 requires a provided prometheus server. The version available through **SUSEConnect --product PackageHub/15.3/x86_64** is outdated and is not compatible with Trento's prometheus configuration.
 > Refer to [Option 1: Use existing installation option](#prometheus_install_option_1) for SLE 15 SP3.
 
-> Note: Using a different Service Pack then SP5 requires to change repository: SLE15 SP4: `SUSEConnect --product PackageHub/15.4/x86_64`
+> Note: Using a different Service Pack than SP5 requires to change repository: SLE15 SP4: `SUSEConnect --product PackageHub/15.4/x86_64`
 
 Add the prometheus user/group:
 
@@ -414,7 +413,7 @@ mv trento.crt /etc/ssl/certs/trento.crt
 
 #### Option 2: Using Let's Encrypt for a Signed Certificate using PackageHub repository
 
-> Note: Using a different Service Pack then SP5 requires to change repository: [SLE15 SP3: `SUSEConnect --product PackageHub/15.3/x86_64`,SLE15 SP4: `SUSEConnect --product PackageHub/15.4/x86_64`].
+> Note: Using a different Service Pack than SP5 requires to change repository: [SLE15 SP3: `SUSEConnect --product PackageHub/15.3/x86_64`,SLE15 SP4: `SUSEConnect --product PackageHub/15.4/x86_64`].
 > Users should assess the suitability of these packages based on their own risk tolerance and support needs.
 
 **Step 1**: Add PackageHub if not already added:
