@@ -31,7 +31,7 @@ Other installation options:
 
 #### <a id="prometheus_install_option_1"></a>Option 1: Use existing installation
 
-If you are planning to [install Prometheus](https://prometheus.io/docs/prometheus/latest/installation/) or have an existing Prometheus server, ensure to set the PROMETHEUS_URL environment variable with your Prometheus server's URL as part of the Docker command when creating the trento-web container.
+If you have an [existing Prometheus server](https://prometheus.io/docs/prometheus/latest/installation/), ensure to set the PROMETHEUS_URL environment variable with your Prometheus server's URL as part of the Docker command when creating the trento-web container.
 
 > Note: Minimal required prometheus version is **2.28.0**
 
@@ -51,7 +51,7 @@ SUSEConnect --product PackageHub/15.5/x86_64
 > Note: SLE15 SP3 requires a provided prometheus server. The version available through **SUSEConnect --product PackageHub/15.3/x86_64** is outdated and is not compatible with Trento's prometheus configuration.
 > Refer to [Option 1: Use existing installation option](#prometheus_install_option_1) for SLE 15 SP3.
 
-> Note: Using a different Service Pack than SP5 requires to change repository: SLE15 SP4: `SUSEConnect --product PackageHub/15.4/x86_64`
+> Note: Using SLE15 SP4 requires changing the repository `SUSEConnect --product PackageHub/15.4/x86_64`
 
 Add the prometheus user/group:
 
@@ -104,7 +104,7 @@ Enable and start the prometheus service:
 systemctl enable --now prometheus
 ```
 
-Allow prometheus to be accessible from docker and add an exception on firewalld **(ONLY if firewalld is enabled)**:
+Allow prometheus to be accessible from docker and add an exception on firewalld **(ONLY if firewalld is running)**:
 
 ```bash
 firewall-cmd --zone=docker --add-port=9090/tcp --permanent
@@ -195,7 +195,7 @@ Modify `/etc/rabbitmq/rabbitmq.conf` and ensure the following lines are present:
 listeners.tcp.default = 5672
 ```
 
-Add an exception on firewalld **(ONLY if firewalld is enabled)**:
+Add an exception on firewalld **(ONLY if firewalld is running)**:
 
 ```bash
 firewall-cmd --zone=public --add-port=5672/tcp --permanent;
@@ -349,7 +349,7 @@ Expected output:
 
 ```bash
 CONTAINER ID   IMAGE                                         COMMAND                  CREATED          STATUS          PORTS                                       NAMES
-8b44333aec39   registry.suse.com/trento/trento-web:latest    "/bin/sh -c '/app/bi…"   6 seconds ago    Up 5 seconds    0.0.0.0:4000->4000/tcp, :::4000->4000/tcp   trento-web
+8b44333aec39   registry.suse.com/trento/trento-web:2.2.0    "/bin/sh -c '/app/bi…"   6 seconds ago    Up 5 seconds    0.0.0.0:4000->4000/tcp, :::4000->4000/tcp   trento-web
 e859c07888ca   registry.suse.com/trento/trento-wanda:1.2.0   "/bin/sh -c '/app/bi…"   18 seconds ago   Up 16 seconds   0.0.0.0:4001->4000/tcp, :::4001->4000/tcp   wanda
 ```
 
@@ -447,7 +447,7 @@ certbot --nginx -d example.com -d www.example.com
 zypper install nginx
 ```
 
-**Step 2**: Add firewalld exceptions for HTTP and HTTPS **(ONLY if firewalld is enabled)**:
+**Step 2**: Add firewalld exceptions for HTTP and HTTPS **(ONLY if firewalld is running)**:
 
 ```bash
 firewall-cmd --zone=public --add-service=https --permanent
