@@ -325,13 +325,12 @@ docker run -d \
  -e ENABLE_ALERTING=true \
  -e ALERT_SENDER=sender@yourmail.com \
  -e ALERT_RECIPIENT=recipient@yourmail.com \
- -e SMTP_SERVER=your.smtp-server.com \
- -e SMTP_PORT=2525 \
- -e SMTP_USER=user \
- -e SMTP_PASSWORD=password \
+ -e SMTP_SERVER=192.168.122.170 \
+ -e SMTP_PORT=1025 \
  -e DATABASE_URL=ecto://trento_user:web_password@host.docker.internal/trento \
+ -e SMTP_USER="MailHog"\
+ -e SMTP_PASSWORD="your_password_here" \
  -e EVENTSTORE_URL=ecto://trento_user:web_password@host.docker.internal/trento_event_store \
- -e ENABLE_ALERTING=false \
  -e PROMETHEUS_URL='http://host.docker.internal:9090' \
  -e SECRET_KEY_BASE=$TRENTO_SECRET_KEY_BASE \
  -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
