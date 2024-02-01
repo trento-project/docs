@@ -29,10 +29,13 @@ Other installation options:
 
 [Prometheus](https://prometheus.io/) is not required to run Trento, but it is recommended as it allows Trento to display a series of charts for each host with useful information about the it's CPU load, memory and other important metrics.
 
-#### Option 1: Use existing installation
+#### <a id="prometheus_install_option_1"></a>Option 1: Use existing installation
 
-If you already have a prometheus server running, you can reuse your existing installation. You will need to provide the URL to the prometheus server
-in the `PROMETHEUS_URL` environment variable when running the trento-web container.
+If you have an [existing Prometheus server](https://prometheus.io/docs/prometheus/latest/installation/), ensure to set the PROMETHEUS_URL environment variable with your Prometheus server's URL as part of the Docker command when creating the trento-web container.
+
+> Note: Minimal required prometheus version is **2.28.0**
+
+> Note: Use [Trento's Prometheus configuration](#prometheus_trento_configuration) as reference to adjust prometheus configuration.
 
 #### Option 2: Install prometheus using the **unsupported** PackageHub repository
 
@@ -45,9 +48,12 @@ Enable PackageHub repository:
 SUSEConnect --product PackageHub/15.5/x86_64
 ```
 
-> Note: Using a different Service Pack then SP5 requires to change repository: [SLE15 SP3: `SUSEConnect --product PackageHub/15.3/x86_64`, SLE15 SP4: `SUSEConnect --product PackageHub/15.4/x86_64`]
+> Note: SLE15 SP3 requires a provided prometheus server. The version available through **SUSEConnect --product PackageHub/15.3/x86_64** is outdated and is not compatible with Trento's prometheus configuration.
+> Refer to [Option 1: Use existing installation option](#prometheus_install_option_1) for SLE 15 SP3.
 
-Add the prometheus user/group **(ONLY FOR SLE15 SP4 and SP5)**:
+> Note: Using SLE15 SP4 requires changing the repository `SUSEConnect --product PackageHub/15.4/x86_64`
+
+Add the prometheus user/group:
 
 ```bash
 groupadd --system prometheus
@@ -60,7 +66,7 @@ Install prometheus using zypper:
 zypper in golang-github-prometheus-prometheus
 ```
 
-Missing dependency can't be satisfied **(ONLY FOR SLE15 SP4 and SP5)**:
+Missing dependency can't be satisfied:
 
 As we have added the prometheus user/group, we can safely ignore this warning and proceed with the installation by choosing Solution 2
 
@@ -70,13 +76,35 @@ Problem: nothing provides 'group(prometheus)' needed by the to be installed gola
  Solution 2: break golang-github-prometheus-prometheus-2.37.6-150100.4.17.1.x86_64 by ignoring some of its dependencies
 ```
 
+<a id="prometheus_trento_configuration"></a>Change prometheus configuration by replacing the configuration at `/etc/prometheus/prometheus.yml` with:
+
+```bash
+global:
+  scrape_interval: 30s
+  evaluation_interval: 10s
+
+scrape_configs:
+  - job_name: "http_sd_hosts"
+    honor_timestamps: true
+    scrape_interval: 30s
+    scrape_timeout: 30s
+    scheme: http
+    follow_redirects: true
+    http_sd_configs:
+      - follow_redirects: true
+        refresh_interval: 1m
+        url: http://localhost:4000/api/prometheus/targets
+```
+
+> Note: **localhost:4000** in **url: http://localhost:4000/api/prometheus/targets** refers to the location where Trento web docker container is running.
+
 Enable and start the prometheus service:
 
 ```bash
 systemctl enable --now prometheus
 ```
 
-Allow prometheus to be accessible from docker and add an exception on firewalld **(ONLY if firewalld is enabled)**:
+Allow prometheus to be accessible from docker and add an exception on firewalld **(ONLY if firewalld is running)**:
 
 ```bash
 firewall-cmd --zone=docker --add-port=9090/tcp --permanent
@@ -167,7 +195,7 @@ Modify `/etc/rabbitmq/rabbitmq.conf` and ensure the following lines are present:
 listeners.tcp.default = 5672
 ```
 
-Add an exception on firewalld **(ONLY if firewalld is enabled)**:
+Add an exception on firewalld **(ONLY if firewalld is running)**:
 
 ```bash
 firewall-cmd --zone=public --add-port=5672/tcp --permanent;
@@ -306,7 +334,7 @@ docker run -d \
  -e ENABLE_API_KEY='true' \
  --restart always \
  --entrypoint /bin/sh \
- registry.suse.com/trento/trento-web:latest \
+ registry.suse.com/trento/trento-web:2.2.0 \
  -c "/app/bin/trento eval 'Trento.Release.init()' && /app/bin/trento start"
 
 ```
@@ -321,7 +349,7 @@ Expected output:
 
 ```bash
 CONTAINER ID   IMAGE                                         COMMAND                  CREATED          STATUS          PORTS                                       NAMES
-8b44333aec39   registry.suse.com/trento/trento-web:latest    "/bin/sh -c '/app/bi…"   6 seconds ago    Up 5 seconds    0.0.0.0:4000->4000/tcp, :::4000->4000/tcp   trento-web
+8b44333aec39   registry.suse.com/trento/trento-web:2.2.0    "/bin/sh -c '/app/bi…"   6 seconds ago    Up 5 seconds    0.0.0.0:4000->4000/tcp, :::4000->4000/tcp   trento-web
 e859c07888ca   registry.suse.com/trento/trento-wanda:1.2.0   "/bin/sh -c '/app/bi…"   18 seconds ago   Up 16 seconds   0.0.0.0:4001->4000/tcp, :::4001->4000/tcp   wanda
 ```
 
@@ -385,7 +413,7 @@ mv trento.crt /etc/ssl/certs/trento.crt
 
 #### Option 2: Using Let's Encrypt for a Signed Certificate using PackageHub repository
 
-> Note: Using a different Service Pack then SP5 requires to change repository: [SLE15 SP3: `SUSEConnect --product PackageHub/15.3/x86_64`,SLE15 SP4: `SUSEConnect --product PackageHub/15.4/x86_64`].
+> Note: Using a different Service Pack than SP5 requires to change repository: [SLE15 SP3: `SUSEConnect --product PackageHub/15.3/x86_64`,SLE15 SP4: `SUSEConnect --product PackageHub/15.4/x86_64`].
 > Users should assess the suitability of these packages based on their own risk tolerance and support needs.
 
 **Step 1**: Add PackageHub if not already added:
@@ -419,7 +447,7 @@ certbot --nginx -d example.com -d www.example.com
 zypper install nginx
 ```
 
-**Step 2**: Add firewall exceptions for HTTP and HTTPS:
+**Step 2**: Add firewalld exceptions for HTTP and HTTPS **(ONLY if firewalld is running)**:
 
 ```bash
 firewall-cmd --zone=public --add-service=https --permanent
@@ -490,6 +518,7 @@ server {
         # The Important Websocket Bits!
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
+        proxy_set_header Origin "";
 
         proxy_pass http://localhost:4000;
     }
