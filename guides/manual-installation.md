@@ -334,7 +334,7 @@ docker run -d \
  -e ENABLE_API_KEY='true' \
  --restart always \
  --entrypoint /bin/sh \
- registry.suse.com/trento/trento-web:latest \
+ registry.suse.com/trento/trento-web:2.2.0 \
  -c "/app/bin/trento eval 'Trento.Release.init()' && /app/bin/trento start"
 
 ```
