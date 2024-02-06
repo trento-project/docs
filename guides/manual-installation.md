@@ -322,9 +322,9 @@ docker run -d \
  --network trento-net \
  --add-host "host.docker.internal:host-gateway" \
  -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost \
+ -e ENABLE_ALERTING=false \
  -e DATABASE_URL=ecto://trento_user:web_password@host.docker.internal/trento \
  -e EVENTSTORE_URL=ecto://trento_user:web_password@host.docker.internal/trento_event_store \
- -e ENABLE_ALERTING=false \
  -e PROMETHEUS_URL='http://host.docker.internal:9090' \
  -e SECRET_KEY_BASE=$TRENTO_SECRET_KEY_BASE \
  -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
@@ -336,6 +336,28 @@ docker run -d \
  --entrypoint /bin/sh \
  registry.suse.com/trento/trento-web:2.2.0 \
  -c "/app/bin/trento eval 'Trento.Release.init()' && /app/bin/trento start"
+
+```
+
+> Note: Mail alerting is disabled by default, as described in [enabling alerting](https://github.com/trento-project/web/blob/main/guides/alerting/alerting.md#enabling-alerting) guide. Enable alerting by setting `ENABLE_ALERTING` env to `true`. Additional required variables are: `[ALERT_SENDER,ALERT_RECIPIENT,SMTP_SERVER,SMTP_PORT,SMTP_USER,SMTP_PASSWORD]`
+> All other settings should remain as they are.
+
+Example:
+
+```bash
+docker run -d \
+
+...[other settings]...
+
+ -e ENABLE_ALERTING=true \
+ -e ALERT_SENDER=<<SENDER_EMAIL_ADDRESS>> \
+ -e ALERT_RECIPIENT=<<RECIPIENT_EMAIL_ADDRESS>> \
+ -e SMTP_SERVER=<<SMTP_SERVER_ADDRESS>> \
+ -e SMTP_PORT=<<SMTP_PORT>> \
+ -e SMTP_USER=<<SMTP_USER>> \
+ -e SMTP_PASSWORD=<<SMTP_PASSWORD>> \
+
+ ...[other settings]...
 
 ```
 
