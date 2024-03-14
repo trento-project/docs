@@ -18,9 +18,9 @@ Other installation options:
 
 ## List of dependencies
 
-- [Docker](https://www.docker.com/)
 - [PostgreSQL](https://www.postgresql.org/)
 - [RabbitMQ](https://rabbitmq.com/)
+- [Docker](https://www.docker.com/) (optional)
 - [Prometheus](https://prometheus.io/) (optional)
 
 ## Installation
@@ -234,7 +234,101 @@ Set permissions for the user on the virtual host:
 rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
 ```
 
-### Install Docker container runtime
+### Install Trento server components
+
+Trento server components are available in 2 different installation formats: RPM packages and Docker images.
+Each of them have a different installation process, but the end result is the same. To choose between any of them
+depends on a usage preference between RPM packages and Docker images.
+
+### Install Trento using RPM packages
+
+#### Install the RPM packages
+
+The `trento-web` and `trento-wanda` packages come in the supported SLES4SAP distributions by default.
+
+```bash
+zypper install trento-web trento-wanda
+```
+
+#### Create the configuration files
+
+Both services depend on respective configuration files that tune the usage of them. They must be placed in
+`/etc/trento/trento-web` and `/etc/trento/trento-wanda` respectively, and examples of how to fill them are 
+available at `/etc/trento/trento-web.example` and `/etc/trento/trento-wanda.example`.
+
+The content of each of them looks like this:
+
+##### trento-web
+
+```
+# /etc/trento/trento-web
+AMQP_URL=amqp://trento_user:trento_user_password@localhost:5672/vhost
+DATABASE_URL=ecto://trento_user:web_password@localhost/trento
+EVENTSTORE_URL=ecto://trento_user:web_password@localhost/trento_event_store
+ENABLE_ALERTING=false
+PROMETHEUS_URL=http://localhost:9090
+SECRET_KEY_BASE=some-secret
+ACCESS_TOKEN_ENC_SECRET=some-secret
+REFRESH_TOKEN_ENC_SECRET=some-secret
+ADMIN_USER=admin
+ADMIN_PASSWORD=test1234
+ENABLE_API_KEY=true
+CHARTS_ENABLED=true
+PORT=4000
+```
+
+Optionally, the alerting system to receive email notifications can be enabled adding these additional entries:
+
+```
+# /etc/trento/trento-web
+ENABLE_ALERTING=true
+ALERT_SENDER=<<SENDER_EMAIL_ADDRESS>>
+ALERT_RECIPIENT=<<RECIPIENT_EMAIL_ADDRESS>>
+SMTP_SERVER=<<SMTP_SERVER_ADDRESS>>
+SMTP_PORT=<<SMTP_PORT>>
+SMTP_USER=<<SMTP_USER>>
+SMTP_PASSWORD=<<SMTP_PASSWORD>>
+```
+
+##### trento-wanda
+
+```
+# /etc/trento/trento-wanda
+CORS_ORIGIN=http://localhost
+SECRET_KEY_BASE=some-secret
+ACCESS_TOKEN_ENC_SECRET=some-secret
+AMQP_URL=amqp://trento_user:trento_user_password@localhost:5672/vhost
+DATABASE_URL=ecto://wanda_user:wanda_password@localhost/wanda
+PORT=4001
+```
+
+> Important: The content of `SECRET_KEY_BASE` and `ACCESS_TOKEN_ENC_SECRET` in both `trento-web` and `trento-wanda` must be the same.
+
+> Note: You can create the content of the secret variables like `SECRET_KEY_BASE`, `ACCESS_TOKEN_ENC_SECRET` and `REFRESH_TOKEN_ENC_SECRET` 
+with `openssl` running `openssl rand -out /dev/stdout 48 | base64`
+
+
+#### Start the services
+
+Enable and start the services:
+
+```bash
+systemctl enable --now trento-web trento-wanda
+```
+
+#### Monitor the services
+
+In order to check if the services are up and running properly, `journalctl` can be used.
+
+For example:
+
+```bash
+journalctl -fu trento-web
+```
+
+### Install Trento using Docker
+
+#### Install Docker container runtime
 
 Enable the container`s module:
 
@@ -254,17 +348,6 @@ Enable and start Docker:
 
 ```bash
 systemctl enable --now docker
-```
-
-### Deploy trento-wanda and trento-web components on docker:
-
-#### Create the remaining required environment variables
-
-```bash
-WANDA_SECRET_KEY_BASE=$(openssl rand -out /dev/stdout 48 | base64)
-TRENTO_SECRET_KEY_BASE=$(openssl rand -out /dev/stdout 48 | base64)
-ACCESS_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
-REFRESH_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
 ```
 
 #### Create a dedicated docker network for Trento
@@ -290,6 +373,15 @@ Expected output:
 #### Install Trento on docker
 
 > Note: The environment variables listed here are examples and should be considered as placeholders. Instead of specifying environment variables directly in the docker run command, it is recommended to use an environment variable file. Store your environment variables in a file and use the --env-file option with the docker run command. Find detailed instructions on how to use an environment variable file with Docker on [official Docker documentation](https://docs.docker.com/engine/reference/commandline/run/#env).
+
+##### Create the secret environment variables
+
+```bash
+WANDA_SECRET_KEY_BASE=$(openssl rand -out /dev/stdout 48 | base64)
+TRENTO_SECRET_KEY_BASE=$(openssl rand -out /dev/stdout 48 | base64)
+ACCESS_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
+REFRESH_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
+```
 
 ##### Install trento-wanda on docker
 
