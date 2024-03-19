@@ -96,7 +96,7 @@ scrape_configs:
         url: http://localhost:4000/api/prometheus/targets
 ```
 
-> Note: **localhost:4000** in **url: http://localhost:4000/api/prometheus/targets** refers to the location where Trento web docker container is running.
+> Note: **localhost:4000** in **url: http://localhost:4000/api/prometheus/targets** refers to the location where Trento web service is running.
 
 Enable and start the prometheus service:
 
@@ -131,11 +131,13 @@ systemctl enable --now postgresql
 **Step 1:** Start `psql` with the `postgres` user to open a connection to the database:
 
 ```bash
-su postgres
+su - postgres
 psql
 ```
 
-**Step 2:** Initialize the databases:
+Now proceed with the database configuration following the next steps in the `psql` console:
+
+Initialize the databases:
 
 ```sql
 CREATE DATABASE wanda;
@@ -143,14 +145,14 @@ CREATE DATABASE trento;
 CREATE DATABASE trento_event_store;
 ```
 
-**Step 3:** Create the users:
+Create the users:
 
 ```sql
 CREATE USER wanda_user WITH PASSWORD 'wanda_password';
 CREATE USER trento_user WITH PASSWORD 'web_password';
 ```
 
-**Step 4:** Grant required privileges to the users and close the connection:
+Grant required privileges to the users and close the connection:
 
 ```sql
 \c wanda
@@ -162,21 +164,25 @@ GRANT ALL ON SCHEMA public TO trento_user;
 \q
 ```
 
-**Step 5:** Allow the docker containers to connect to their respective databases by adding the following in `/var/lib/pgsql/data/pg_hba.conf`:
+You can exit from the `psql` console and `postgres` user.
+
+**Step 2:** Allow the postgres database to receive connections for the respective databases and users adding the following in `/var/lib/pgsql/data/pg_hba.conf`:
 
 ```bash
-host   wanda                wanda_user    172.17.0.0/16   md5
-host   trento               trento_user   172.17.0.0/16   md5
-host   trento_event_store   trento_user   172.17.0.0/16   md5
+host   wanda                      wanda_user    0.0.0.0/0   md5
+host   trento,trento_event_store  trento_user   0.0.0.0/0   md5
 ```
 
-**Step 6:** Allow PostgreSQL to bind on all interfaces `/var/lib/pgsql/data/postgresql.conf` by changing the following line:
+> Note: The `pg_hba.conf` file works in an sequential fashion. This means, that the rules positioned on the top have preference over the ones coming next. This examples shows a pretty permissive address range, so in order to work, they entries must be written in the top of the `host` entries. Find additional information in the [pg_hba.conf](https://www.postgresql.org/docs/current/auth-pg-hba-conf.html) documentation.
+
+
+**Step 3:** Allow PostgreSQL to bind on all interfaces `/var/lib/pgsql/data/postgresql.conf` by changing the following line:
 
 ```bash
 listen_addresses = '*'
 ```
 
-**Step 7:** Restart postgres to apply the changes:
+**Step 4:** Restart postgres to apply the changes:
 
 ```bash
 systemctl restart postgresql
@@ -237,7 +243,7 @@ rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
 ### Install Trento server components
 
 Trento server components are available in 2 different installation formats: RPM packages and Docker images.
-Each of them have a different installation process, but the end result is the same. To choose between any of them
+Each of them has a different installation process, but the end result is the same. To choose between any of them
 depends on a usage preference between RPM packages and Docker images.
 
 ### Install Trento using RPM packages
@@ -318,7 +324,7 @@ systemctl enable --now trento-web trento-wanda
 
 #### Monitor the services
 
-In order to check if the services are up and running properly, `journalctl` can be used.
+Check if the services are up and running properly by using `journalctl`.
 
 For example:
 
@@ -645,6 +651,10 @@ server {
 systemctl reload nginx
 ```
 
+### Accessing the trento-web UI
+
+Open a browser and navigate to `https://trento.example.com`. You should be able to login using the credentials you provided in the `ADMIN_USERNAME` and `ADMIN_PASSWORD` environment variables.
+
 ### Testing the setup
 
 Deploy an agent using the available `trento-agent` package. This package is already available in SLES 15 SP5, so we can install it using zypper:
@@ -687,7 +697,3 @@ Example of etc/hosts:
 127.0.0.1	                   localhost
 <<IP_ADDRESS_TRENTO_SERVER>>   trento.example.com
 ```
-
-### Accessing the trento-web UI
-
-Open a browser and navigate to `https://trento.example.com`. You should be able to login using the credentials you provided in the `ADMIN_USERNAME` and `ADMIN_PASSWORD` environment variables.
