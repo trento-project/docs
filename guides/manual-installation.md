@@ -18,9 +18,9 @@ Other installation options:
 
 ## List of dependencies
 
-- [Docker](https://www.docker.com/)
 - [PostgreSQL](https://www.postgresql.org/)
 - [RabbitMQ](https://rabbitmq.com/)
+- [Docker](https://www.docker.com/) (optional)
 - [Prometheus](https://prometheus.io/) (optional)
 
 ## Installation
@@ -96,7 +96,7 @@ scrape_configs:
         url: http://localhost:4000/api/prometheus/targets
 ```
 
-> Note: **localhost:4000** in **url: http://localhost:4000/api/prometheus/targets** refers to the location where Trento web docker container is running.
+> Note: **localhost:4000** in **url: http://localhost:4000/api/prometheus/targets** refers to the location where Trento web service is running.
 
 Enable and start the prometheus service:
 
@@ -131,11 +131,13 @@ systemctl enable --now postgresql
 **Step 1:** Start `psql` with the `postgres` user to open a connection to the database:
 
 ```bash
-su postgres
+su - postgres
 psql
 ```
 
-**Step 2:** Initialize the databases:
+Now proceed with the database configuration following the next steps in the `psql` console:
+
+Initialize the databases:
 
 ```sql
 CREATE DATABASE wanda;
@@ -143,14 +145,14 @@ CREATE DATABASE trento;
 CREATE DATABASE trento_event_store;
 ```
 
-**Step 3:** Create the users:
+Create the users:
 
 ```sql
 CREATE USER wanda_user WITH PASSWORD 'wanda_password';
 CREATE USER trento_user WITH PASSWORD 'web_password';
 ```
 
-**Step 4:** Grant required privileges to the users and close the connection:
+Grant required privileges to the users and close the connection:
 
 ```sql
 \c wanda
@@ -162,21 +164,25 @@ GRANT ALL ON SCHEMA public TO trento_user;
 \q
 ```
 
-**Step 5:** Allow the docker containers to connect to their respective databases by adding the following in `/var/lib/pgsql/data/pg_hba.conf`:
+You can exit from the `psql` console and `postgres` user.
+
+**Step 2:** Allow the postgres database to receive connections for the respective databases and users adding the following in `/var/lib/pgsql/data/pg_hba.conf`:
 
 ```bash
-host   wanda                wanda_user    172.17.0.0/16   md5
-host   trento               trento_user   172.17.0.0/16   md5
-host   trento_event_store   trento_user   172.17.0.0/16   md5
+host   wanda                      wanda_user    0.0.0.0/0   md5
+host   trento,trento_event_store  trento_user   0.0.0.0/0   md5
 ```
 
-**Step 6:** Allow PostgreSQL to bind on all interfaces `/var/lib/pgsql/data/postgresql.conf` by changing the following line:
+> Note: The `pg_hba.conf` file works in an sequential fashion. This means, that the rules positioned on the top have preference over the ones coming next. This examples shows a pretty permissive address range, so in order to work, they entries must be written in the top of the `host` entries. Find additional information in the [pg_hba.conf](https://www.postgresql.org/docs/current/auth-pg-hba-conf.html) documentation.
+
+
+**Step 3:** Allow PostgreSQL to bind on all interfaces `/var/lib/pgsql/data/postgresql.conf` by changing the following line:
 
 ```bash
 listen_addresses = '*'
 ```
 
-**Step 7:** Restart postgres to apply the changes:
+**Step 4:** Restart postgres to apply the changes:
 
 ```bash
 systemctl restart postgresql
@@ -234,7 +240,101 @@ Set permissions for the user on the virtual host:
 rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
 ```
 
-### Install Docker container runtime
+### Install Trento server components
+
+Trento server components are available in 2 different installation formats: RPM packages and Docker images.
+Each of them has a different installation process, but the end result is the same. To choose between any of them
+depends on a usage preference between RPM packages and Docker images.
+
+### Install Trento using RPM packages
+
+#### Install the RPM packages
+
+The `trento-web` and `trento-wanda` packages come in the supported SLES4SAP distributions by default.
+
+```bash
+zypper install trento-web trento-wanda
+```
+
+#### Create the configuration files
+
+Both services depend on respective configuration files that tune the usage of them. They must be placed in
+`/etc/trento/trento-web` and `/etc/trento/trento-wanda` respectively, and examples of how to fill them are 
+available at `/etc/trento/trento-web.example` and `/etc/trento/trento-wanda.example`.
+
+The content of each of them looks like this:
+
+##### trento-web
+
+```
+# /etc/trento/trento-web
+AMQP_URL=amqp://trento_user:trento_user_password@localhost:5672/vhost
+DATABASE_URL=ecto://trento_user:web_password@localhost/trento
+EVENTSTORE_URL=ecto://trento_user:web_password@localhost/trento_event_store
+ENABLE_ALERTING=false
+PROMETHEUS_URL=http://localhost:9090
+SECRET_KEY_BASE=some-secret
+ACCESS_TOKEN_ENC_SECRET=some-secret
+REFRESH_TOKEN_ENC_SECRET=some-secret
+ADMIN_USER=admin
+ADMIN_PASSWORD=test1234
+ENABLE_API_KEY=true
+CHARTS_ENABLED=true
+PORT=4000
+```
+
+Optionally, the alerting system to receive email notifications can be enabled adding these additional entries:
+
+```
+# /etc/trento/trento-web
+ENABLE_ALERTING=true
+ALERT_SENDER=<<SENDER_EMAIL_ADDRESS>>
+ALERT_RECIPIENT=<<RECIPIENT_EMAIL_ADDRESS>>
+SMTP_SERVER=<<SMTP_SERVER_ADDRESS>>
+SMTP_PORT=<<SMTP_PORT>>
+SMTP_USER=<<SMTP_USER>>
+SMTP_PASSWORD=<<SMTP_PASSWORD>>
+```
+
+##### trento-wanda
+
+```
+# /etc/trento/trento-wanda
+CORS_ORIGIN=http://localhost
+SECRET_KEY_BASE=some-secret
+ACCESS_TOKEN_ENC_SECRET=some-secret
+AMQP_URL=amqp://trento_user:trento_user_password@localhost:5672/vhost
+DATABASE_URL=ecto://wanda_user:wanda_password@localhost/wanda
+PORT=4001
+```
+
+> Important: The content of `SECRET_KEY_BASE` and `ACCESS_TOKEN_ENC_SECRET` in both `trento-web` and `trento-wanda` must be the same.
+
+> Note: You can create the content of the secret variables like `SECRET_KEY_BASE`, `ACCESS_TOKEN_ENC_SECRET` and `REFRESH_TOKEN_ENC_SECRET` 
+with `openssl` running `openssl rand -out /dev/stdout 48 | base64`
+
+
+#### Start the services
+
+Enable and start the services:
+
+```bash
+systemctl enable --now trento-web trento-wanda
+```
+
+#### Monitor the services
+
+Check if the services are up and running properly by using `journalctl`.
+
+For example:
+
+```bash
+journalctl -fu trento-web
+```
+
+### Install Trento using Docker
+
+#### Install Docker container runtime
 
 Enable the container`s module:
 
@@ -254,17 +354,6 @@ Enable and start Docker:
 
 ```bash
 systemctl enable --now docker
-```
-
-### Deploy trento-wanda and trento-web components on docker:
-
-#### Create the remaining required environment variables
-
-```bash
-WANDA_SECRET_KEY_BASE=$(openssl rand -out /dev/stdout 48 | base64)
-TRENTO_SECRET_KEY_BASE=$(openssl rand -out /dev/stdout 48 | base64)
-ACCESS_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
-REFRESH_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
 ```
 
 #### Create a dedicated docker network for Trento
@@ -290,6 +379,15 @@ Expected output:
 #### Install Trento on docker
 
 > Note: The environment variables listed here are examples and should be considered as placeholders. Instead of specifying environment variables directly in the docker run command, it is recommended to use an environment variable file. Store your environment variables in a file and use the --env-file option with the docker run command. Find detailed instructions on how to use an environment variable file with Docker on [official Docker documentation](https://docs.docker.com/engine/reference/commandline/run/#env).
+
+##### Create the secret environment variables
+
+```bash
+WANDA_SECRET_KEY_BASE=$(openssl rand -out /dev/stdout 48 | base64)
+TRENTO_SECRET_KEY_BASE=$(openssl rand -out /dev/stdout 48 | base64)
+ACCESS_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
+REFRESH_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
+```
 
 ##### Install trento-wanda on docker
 
@@ -553,6 +651,10 @@ server {
 systemctl reload nginx
 ```
 
+### Accessing the trento-web UI
+
+Open a browser and navigate to `https://trento.example.com`. You should be able to login using the credentials you provided in the `ADMIN_USERNAME` and `ADMIN_PASSWORD` environment variables.
+
 ### Testing the setup
 
 Deploy an agent using the available `trento-agent` package. This package is already available in SLES 15 SP5, so we can install it using zypper:
@@ -595,7 +697,3 @@ Example of etc/hosts:
 127.0.0.1	                   localhost
 <<IP_ADDRESS_TRENTO_SERVER>>   trento.example.com
 ```
-
-### Accessing the trento-web UI
-
-Open a browser and navigate to `https://trento.example.com`. You should be able to login using the credentials you provided in the `ADMIN_USERNAME` and `ADMIN_PASSWORD` environment variables.
