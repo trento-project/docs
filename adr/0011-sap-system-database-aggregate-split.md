@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-In the initial implementation of Trento, the SAP system and database states are stored in the same `sap_system.ex` aggregate. This makes the assumption that the relationship between a SAP system and a database is of 1 to 1, meaning that a database is only used by one SAP system. This is not an accurate description of the reality, as a database can handle multiple SAP systems in a multi-tenant environment.
+In the initial implementation of Trento, the SAP system and database states are stored in the same `sap_system.ex` aggregate. This makes the assumption that the relationship between a SAP system and a database is 1 to 1, meaning that a database is only used by one SAP system. This is not an accurate description of the reality, as a database can handle multiple SAP systems in a multi-tenant environment.
 
 In this scenario, when a multi-tenant database is discovered, it only can manage a unique SAP system and its application instances. Therefore, a multi-tenant scenario is not supported.
 
