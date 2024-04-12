@@ -13,7 +13,7 @@ For installations on Service Packs other than SP5, ensure to update the reposito
 
 Other installation options:
 
-- [Trento Ansible](https://github.com/trento-project/ansible) (WIP)
+- [Trento Ansible](https://github.com/trento-project/ansible)
 - [Trento Helm Charts](https://github.com/trento-project/helm-charts/)
 
 ## List of dependencies
