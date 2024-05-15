@@ -48,7 +48,7 @@ github_changelog_generator --since-tag= <<CURRENT_TAG>> --future-release= <<RELE
 | ------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | CURRENT_TAG         | Changelog will start after specified tag.                                  | 2.1.0                                                                                                                                     |
 | RELEASE_VERSION_TAG | Release version                                                            | 2.2.0                                                                                                                                     |
-| PROJECT_NAME        | Name of project on GitHub                                                  | agent, helm-charts, wanda or web                                                                                                          |
+| PROJECT_NAME        | Name of project on GitHub                                                  | agent, helm-charts, wanda, web, ansible                                                                                                          |
 | GITHUB_TOKEN        | Your personal Github Token                                                 | https://docs.github.com/en/enterprise-server@3.6/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens |
 | PROJECT_GROUP       | Username of the GitHub repository OR namespace of target Github repository | trento-project                                                                                                                            |
 
@@ -57,6 +57,8 @@ CLI Example:
 ```bash
 github_changelog_generator --since-tag=2.1.0 --future-release=2.2.0 -p agent -t <<GITHUB_TOKEN>> -u trento-project --base CHANGELOG.md
 ```
+
+> If having issues with APIs rate limits, try adding `--max-issues 500` to the previous command
 
 ## Version Bump
 
@@ -70,6 +72,7 @@ Previous Release Examples:
 - [Helm-Chart](https://github.com/trento-project/helm-charts/pull/82)
 - [Wanda](https://github.com/trento-project/wanda/pull/341)
 - [Web](https://github.com/trento-project/web/pull/1996)
+- [Ansible Playbook](https://github.com/trento-project/ansible/pull/35)
 
 ### Create Pull Request
 
