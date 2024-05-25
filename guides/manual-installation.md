@@ -41,7 +41,7 @@ If you have an [existing Prometheus server](https://prometheus.io/docs/prometheu
 
 #### Option 2: Install prometheus using the **unsupported** PackageHub repository
 
-> Note: PackageHub packages are tested by SUSE, but they do not come with the same level of support as the core SLES packages.
+> Note: [PackageHub](https://packagehub.suse.com/) packages are tested by SUSE, but they do not come with the same level of support as the core SLES packages.
 > Users should assess the suitability of these packages based on their own risk tolerance and support needs.
 
 Enable PackageHub repository:
@@ -68,15 +68,7 @@ Install prometheus using zypper:
 zypper in golang-github-prometheus-prometheus
 ```
 
-Missing dependency can't be satisfied:
-
-As we have added the prometheus user/group, we can safely ignore this warning and proceed with the installation by choosing Solution 2
-
-```bash
-Problem: nothing provides 'group(prometheus)' needed by the to be installed golang-github-prometheus-prometheus-2.37.6-150100.4.17.1.x86_64
- Solution 1: do not install golang-github-prometheus-prometheus-2.37.6-150100.4.17.1.x86_64
- Solution 2: break golang-github-prometheus-prometheus-2.37.6-150100.4.17.1.x86_64 by ignoring some of its dependencies
-```
+> Note: In case that missing dependency can't be satisfied: As we have added the prometheus user/group, we can safely ignore this warning and proceed with the installation by choosing Solution 2: break golang-github-prometheus-prometheus
 
 <a id="prometheus_trento_configuration"></a>Change prometheus configuration by replacing the configuration at `/etc/prometheus/prometheus.yml` with:
 
@@ -109,14 +101,14 @@ systemctl enable --now prometheus
 Allow prometheus to be accessible from docker and add an exception on firewalld **(ONLY if firewalld is running)**:
 
 ```bash
-firewall-cmd --zone=docker --add-port=9090/tcp --permanent
+firewall-cmd --zone=public --add-port=9090/tcp --permanent
 firewall-cmd --reload
 ```
 
 ### Install postgresql
 
 > Note: This guide was tested with the PostgreSQL version **13.9 for SP3 , 14.10 for SP4 and 15.5 for SP5**
-> Using a different version of postgres may require different steps or configurations, specially when changing the major number. Refer to the official [postgress documentation](https://www.postgresql.org/docs/) for further guidance
+> Using a different version of postgres may require different steps or configurations, especially when changing the major number. For more details, refer to the official [PostgreSQL documentation](https://www.postgresql.org/docs/).
 
 ```bash
 zypper in postgresql-server
@@ -623,7 +615,7 @@ server {
     ssl_session_cache shared:SSL:10m;
 
     # Wanda rule
-    location ~ ^/(api/checks|api/v1/checks|api/v2/checks)/  {
+    location ~ ^/(api/checks|api/v1/checks|api/v2/checks|api/v3/checks)/  {
         allow all;
 
         # Proxy Headers
@@ -657,7 +649,20 @@ server {
 }
 ```
 
-**Step 5**: Reload Nginx to apply changes:
+**Step 5**: Check Nginx Configuration:
+
+```bash
+nginx -t
+```
+
+If the configuration is correct, you should see something like:
+```bash
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+```
+Otherwise the output will indicate what needs to be corrected.
+
+**Step 6**: Reload Nginx to apply changes:
 
 ```bash
 systemctl reload nginx
