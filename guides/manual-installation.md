@@ -256,6 +256,17 @@ Both services depend on respective configuration files that tune the usage of th
 `/etc/trento/trento-web` and `/etc/trento/trento-wanda` respectively, and examples of how to fill them are 
 available at `/etc/trento/trento-web.example` and `/etc/trento/trento-wanda.example`.
 
+> Important: The content of `SECRET_KEY_BASE` and `ACCESS_TOKEN_ENC_SECRET` in both `trento-web` and `trento-wanda` must be the same.
+
+
+> Note: You can create the content of the secret variables like `SECRET_KEY_BASE`, `ACCESS_TOKEN_ENC_SECRET` and `REFRESH_TOKEN_ENC_SECRET` 
+with `openssl` running `openssl rand -out /dev/stdout 48 | base64`
+
+> Note: Depending on how you intent to connect to the console, a
+> working hostname, FQDN, or an IP is required in `TRENTO_WEB_ORIGIN` for HTTPS; otherwise, websockets will fail to connect, causing no real-time updates on the UI.
+
+> Note: Add `CHARTS_ENABLED=false` in Trento web configuration file if prometheus is not installed or you don't want to use the charts feature of Trento.
+
 The content of each of them looks like this:
 
 ##### trento-web
@@ -302,17 +313,6 @@ AMQP_URL=amqp://trento_user:trento_user_password@localhost:5672/vhost
 DATABASE_URL=ecto://wanda_user:wanda_password@localhost/wanda
 PORT=4001
 ```
-
-> Important: The content of `SECRET_KEY_BASE` and `ACCESS_TOKEN_ENC_SECRET` in both `trento-web` and `trento-wanda` must be the same.
-
-> Note: Add `CHARTS_ENABLED=false` in Trento web configuration file if prometheus is not installed or you don't want to use the charts feature of Trento.
-
-> Note: Depending on how you intent to connect to the console, a
-> working hostname, FQDN, or an IP is required in `TRENTO_WEB_ORIGIN` for HTTPS; otherwise, websockets will fail to connect, causing no real-time updates on the UI.
-
-> Note: You can create the content of the secret variables like `SECRET_KEY_BASE`, `ACCESS_TOKEN_ENC_SECRET` and `REFRESH_TOKEN_ENC_SECRET` 
-with `openssl` running `openssl rand -out /dev/stdout 48 | base64`
-
 
 #### Start the services
 
