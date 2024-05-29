@@ -259,7 +259,6 @@ available at `/etc/trento/trento-web.example` and `/etc/trento/trento-wanda.exam
 
 > Important: The content of `SECRET_KEY_BASE` and `ACCESS_TOKEN_ENC_SECRET` in both `trento-web` and `trento-wanda` must be the same.
 
-
 > Note: You can create the content of the secret variables like `SECRET_KEY_BASE`, `ACCESS_TOKEN_ENC_SECRET` and `REFRESH_TOKEN_ENC_SECRET` 
 with `openssl` running `openssl rand -out /dev/stdout 48 | base64`
 
@@ -480,95 +479,45 @@ e859c07888ca   registry.suse.com/trento/trento-wanda:1.2.0   "/bin/sh -c '/app/b
 
 Both containers should be running and listening on the specified ports.
 
-##### Validate the health status of trento web and wanda
-Validate the health status of the Trento web and wanda services locally by accessing the ```healthzs``` api.
+### Validate the health status of trento web and wanda
+Validate the health status of the Trento web and wanda services locally by accessing the ```healthz``` and ```readyz``` api.
 
 Test Trento web health status with curl:
 
 ```
+curl http://localhost:4000/api/readyz; 
 curl http://localhost:4000/api/healthz
 ```
 
 Test Trento wanda health status with curl:
 ```
+curl http://localhost:4001/api/readyz; 
 curl http://localhost:4001/api/healthz
 ```
 
-Expected output if trento web/wanda was installed correctly:
+Expected output if Trento web/wanda is ready and the database connection is setup correct:
 ```
-{"database":"pass"}
+{"ready":true}{"database":"pass"}
 ```
 
-### Setup nginx as reverse proxy
+### Prepare SSL certificate and install Nginx
+
+Create or provide a certificate for [nginx](https://nginx.org/en/) to enable SSL for Trento.
 
 #### Option 1: Creating a Self-Signed Certificate
 
-> Note: This is a basic guide for creating a self-signed certificate for use with Trento. You may use your own certificate. For detailed instructions, consult the OpenSSL documentation. Remember to replace example.com with your domain.
-> 
-Follow these steps to create a self-signed certificate using the provided script:
+> Note: This is a basic guide for creating a self-signed certificate for use with Trento. You may use your own certificate. For detailed instructions, consult the OpenSSL documentation.
 
-**Step 1**: Save the Script to a File
+Step 1: Generate a self signed certificate:
+>Note: Remember to adjust ```subjectAltName = DNS:trento.example.com``` by replacing ```trento.example.com``` with your own domain.
+
+>Note: You are about to be asked to enter information that will be incorporated. There are many fields but you can leave them blank.
 
 ```bash
-#!/bin/bash
-
-# Default domain
-DEFAULT_DOMAIN="trento-example.com"
-
-# Check if domain is provided
-if [ -z "$1" ]; then
-  DOMAIN=$DEFAULT_DOMAIN
-  echo "No domain provided. Using default domain: $DOMAIN"
-else
-  DOMAIN=$1
-  echo "Using provided domain: $DOMAIN"
-fi
-
-# Step 1: Generate a private key with a passphrase
-echo "Generating private key for $DOMAIN..."
-openssl genrsa -des3 -out trento.key 2048
-
-# Step 2: Generate a CSR (Certificate Signing Request)
-echo "Generating CSR for $DOMAIN..."
-openssl req -new -key trento.key -out trento.csr
-
-# Step 3: Remove passphrase from the key
-echo "Removing passphrase from key..."
-cp trento.key trento.key.org
-openssl rsa -in trento.key.org -out trento.key
-
-# Step 4: Create config file for SAN
-echo "Creating config file for SAN..."
-cat > v3.ext <<EOL
-subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid:always,issuer:always
-basicConstraints = CA:TRUE
-keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment, keyAgreement, keyCertSign
-subjectAltName = DNS:example.com, DNS:*.example.com
-issuerAltName = issuer:copy
-EOL
-
-# Step 5: Generate and sign the certificate
-echo "Generating and signing the certificate..."
-openssl x509 -req -in trento.csr -signkey trento.key -out trento.crt -days 3650 -sha256 -extfile v3.ext
-
-echo "Certificate creation for $DOMAIN completed."
+openssl req -newkey rsa:2048 --nodes -keyout trento.key -x509 -days 5 -out trento.crt -addext "subjectAltName = DNS:trento.example.com"
 ```
 
-Step 2: Make the script executable:
-```bash
-chmod +x create_self_signed_cert.sh
-```
-Run the script with or without a domain argument:
-```
-./create_self_signed_cert.sh
-```
-or 
-```
-./create_self_signed_cert.sh yourdomain.com
-```
-
-Step 3: Install the trento.key and trento.crt in a location accessible by nginx:
+Step 2: Move the generated trento.key and trento.crt in a location accessible by nginx:
 ```bash
 mv trento.key /etc/ssl/private/trento.key
 ```
@@ -697,12 +646,12 @@ server {
 nginx -t
 ```
 
-If the configuration is correct, you should see something like:
+If the configuration is correct, the output should be like this:
 ```bash
 nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
 nginx: configuration file /etc/nginx/nginx.conf test is successful
 ```
-Otherwise the output will indicate what needs to be corrected.
+Otherwise the output will indicate what needs to be adjusted.
 
 **Step 6**: Reload Nginx to apply changes:
 
