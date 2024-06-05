@@ -11,242 +11,217 @@ For installations on Service Packs other than SP5, ensure to update the reposito
 - SP4
 - SP5
 
-Other installation options:
-
-- [Trento Ansible](https://github.com/trento-project/ansible)
-- [Trento Helm Charts](https://github.com/trento-project/helm-charts/)
-
 ## List of dependencies
 
 - [PostgreSQL](https://www.postgresql.org/)
 - [RabbitMQ](https://rabbitmq.com/)
+- [NGINX](https://nginx.org/en/)
 - [Docker](https://www.docker.com/) (optional)
 - [Prometheus](https://prometheus.io/) (optional)
 
-## Installation
+## Install Trento dependencies
 
-### Install prometheus (Optional)
+### Install Prometheus (Optional)
 
-[Prometheus](https://prometheus.io/) is not required to run Trento, but it is recommended as it allows Trento to display a series of charts for each host with useful information about the it's CPU load, memory and other important metrics.
+[Prometheus](https://prometheus.io/) is not required to run Trento, but it is recommended as it allows Trento to display a series of charts for each host with useful information about the CPU load, memory and other important metrics.
 
 > **Note:** If you choose not to install Prometheus or to provide an existing installation, ensure that `CHARTS_ENABLED` is set to false in the Trento web RPM configuration file or when it is provided to the Trento web container. Refer to [Install Trento server components](#install-trento-server-components).
 
 #### <a id="prometheus_install_option_1"></a>Option 1: Use existing installation
 
-If you have an [existing Prometheus server](https://prometheus.io/docs/prometheus/latest/installation/), ensure to set the PROMETHEUS_URL environment variable with your Prometheus server's URL as part of the Docker command when creating the trento-web container.
+Minimal required Prometheus version is **2.28.0**.
 
-> **Note:** Minimal required prometheus version is **2.28.0**
+If you have an [existing Prometheus server](https://prometheus.io/docs/prometheus/latest/installation/), ensure to set the PROMETHEUS_URL environment variable with your Prometheus server's URL as part of the Docker command when creating the trento-web container or configuring the rpm's. Use [Trento's Prometheus configuration](#prometheus_trento_configuration) as a reference to adjust the Prometheus configuration.
 
-> **Note:** Use [Trento's Prometheus configuration](#prometheus_trento_configuration) as reference to adjust prometheus configuration.
+#### Option 2: Install Prometheus using the **unsupported** PackageHub repository
 
-#### Option 2: Install prometheus using the **unsupported** PackageHub repository
+[PackageHub](https://packagehub.suse.com/) packages are tested by SUSE, but they do not come with the same level of support as the core SLES packages. Users should assess the suitability of these packages based on their own risk tolerance and support needs.
 
-> **Note:** [PackageHub](https://packagehub.suse.com/) packages are tested by SUSE, but they do not come with the same level of support as the core SLES packages.
-> Users should assess the suitability of these packages based on their own risk tolerance and support needs.
+1.  Enable PackageHub repository:
 
-Enable PackageHub repository:
+    ```bash
+    SUSEConnect --product PackageHub/15.5/x86_64
+    ```
 
-```bash
-SUSEConnect --product PackageHub/15.5/x86_64
-```
+    > **Note:** SLE15 SP3 requires a provided Prometheus server. The version available through **SUSEConnect --product PackageHub/15.3/x86_64** is outdated and is not compatible with Trento's Prometheus configuration.
+    > Refer to [Option 1: Use existing installation option](#prometheus_install_option_1) for SLE 15 SP3.
 
-> **Note:** SLE15 SP3 requires a provided prometheus server. The version available through **SUSEConnect --product PackageHub/15.3/x86_64** is outdated and is not compatible with Trento's prometheus configuration.
-> Refer to [Option 1: Use existing installation option](#prometheus_install_option_1) for SLE 15 SP3.
+    > **Note:** Using SLE15 SP4 requires changing the repository `SUSEConnect --product PackageHub/15.4/x86_64`
 
-> **Note:** Using SLE15 SP4 requires changing the repository `SUSEConnect --product PackageHub/15.4/x86_64`
+1.  Add the Prometheus user/group:
 
-Add the prometheus user/group:
+    ```bash
+    groupadd --system prometheus
+    useradd -s /sbin/nologin --system -g prometheus prometheus
+    ```
 
-```bash
-groupadd --system prometheus
-useradd -s /sbin/nologin --system -g prometheus prometheus
-```
+1.  Install Prometheus using zypper:
+    ```bash
+    zypper in golang-github-prometheus-prometheus
+    ```
+    > **Note:** In case the missing dependency can't be satisfied we have already added the Prometheus user/group. With this, it is safe to proceed with the installation by choosing Solution 2: break golang-github-prometheus-prometheus
 
-Install prometheus using zypper:
+1.  <a id="prometheus_trento_configuration"></a>Change Prometheus configuration by replacing the configuration at `/etc/prometheus/prometheus.yml` with: 
+    ```bash
+    global:
+      scrape_interval: 30s
+      evaluation_interval: 10s
 
-```bash
-zypper in golang-github-prometheus-prometheus
-```
+    scrape_configs:
+      - job_name: "http_sd_hosts"
+        honor_timestamps: true
+        scrape_interval: 30s
+        scrape_timeout: 30s
+        scheme: http
+        follow_redirects: true
+        http_sd_configs:
+          - follow_redirects: true
+            refresh_interval: 1m
+            url: http://localhost:4000/api/prometheus/targets
+    ```
 
-> **Note:** In case the missing dependency can't be satisfied we have already added the prometheus user/group. With this, it is safe to proceed with the installation by choosing Solution 2: break golang-github-prometheus-prometheus
+    > **Note:** **localhost:4000** in **url: http://localhost:4000/api/prometheus/targets** refers to the location where Trento web service is running.
 
-<a id="prometheus_trento_configuration"></a>Change prometheus configuration by replacing the configuration at `/etc/prometheus/prometheus.yml` with:
+1.  Enable and start the Prometheus service:
 
-```bash
-global:
-  scrape_interval: 30s
-  evaluation_interval: 10s
+    ```bash
+    systemctl enable --now prometheus
+    ```
 
-scrape_configs:
-  - job_name: "http_sd_hosts"
-    honor_timestamps: true
-    scrape_interval: 30s
-    scrape_timeout: 30s
-    scheme: http
-    follow_redirects: true
-    http_sd_configs:
-      - follow_redirects: true
-        refresh_interval: 1m
-        url: http://localhost:4000/api/prometheus/targets
-```
+1.  Allow Prometheus to be accessible from docker and add an exception on firewalld **(ONLY if firewalld is running)**: 
 
-> **Note:** **localhost:4000** in **url: http://localhost:4000/api/prometheus/targets** refers to the location where Trento web service is running.
+    ```bash
+    firewall-cmd --zone=public --add-port=9090/tcp --permanent
+    firewall-cmd --reload
+    ```
 
-Enable and start the prometheus service:
+### Install PostgreSQL
+This guide was tested with the following PostgreSQL version:
 
-```bash
-systemctl enable --now prometheus
-```
+- **13.9 for SP3**
+- **14.10 for SP4**
+- **15.5 for SP5**
+ 
+Using a different version of PostgreSQL may require different steps or configurations, especially when changing the major number. For more details, refer to the official [PostgreSQL documentation](https://www.postgresql.org/docs/).
 
-Allow prometheus to be accessible from docker and add an exception on firewalld **(ONLY if firewalld is running)**:
+1. Install PostgreSQL server:
+    ```bash
+    zypper in postgresql-server
+    ```
 
-```bash
-firewall-cmd --zone=public --add-port=9090/tcp --permanent
-firewall-cmd --reload
-```
+1. Enable and start PostgreSQL server:
 
-### Install postgresql
+    ```bash
+    systemctl enable --now postgresql
+    ```
 
-> **Note:** This guide was tested with the PostgreSQL version **13.9 for SP3 , 14.10 for SP4 and 15.5 for SP5**
-> Using a different version of postgres may require different steps or configurations, especially when changing the major number. For more details, refer to the official [PostgreSQL documentation](https://www.postgresql.org/docs/).
+#### Configure PostgreSQL
 
-```bash
-zypper in postgresql-server
-```
+1. Start `psql` with the `postgres` user to open a connection to the database:
+    ```bash
+    su - postgres
+    psql
+    ```
+1. Initialize the databases in `psql` console:
+      ```sql
+      CREATE DATABASE wanda;
+      CREATE DATABASE trento;
+      CREATE DATABASE trento_event_store;
+      ```
+1.  Create the users:
+      ```sql
+      CREATE USER wanda_user WITH PASSWORD 'wanda_password';
+      CREATE USER trento_user WITH PASSWORD 'web_password';
+      ```
+1. Grant required privileges to the users and close the connection:
+      ```sql
+      \c wanda
+      GRANT ALL ON SCHEMA public TO wanda_user;
+      \c trento
+      GRANT ALL ON SCHEMA public TO trento_user;
+      \c trento_event_store;
+      GRANT ALL ON SCHEMA public TO trento_user;
+      \q
+      ```
+    You can exit from the `psql` console and `postgres` user.
 
-Enable and start postgresql:
+1.  Allow the PostgreSQL database to receive connections for the respective databases and users adding the following in `/var/lib/pgsql/data/pg_hba.conf`:
 
-```bash
-systemctl enable --now postgresql
-```
+    ```bash
+    host   wanda                      wanda_user    0.0.0.0/0   md5
+    host   trento,trento_event_store  trento_user   0.0.0.0/0   md5
+    ```
 
-#### Configure postgresql
-
-**Step 1:** Start `psql` with the `postgres` user to open a connection to the database:
-
-```bash
-su - postgres
-psql
-```
-
-Now proceed with the database configuration following the next steps in the `psql` console:
-
-Initialize the databases:
-
-```sql
-CREATE DATABASE wanda;
-CREATE DATABASE trento;
-CREATE DATABASE trento_event_store;
-```
-
-Create the users:
-
-```sql
-CREATE USER wanda_user WITH PASSWORD 'wanda_password';
-CREATE USER trento_user WITH PASSWORD 'web_password';
-```
-
-Grant required privileges to the users and close the connection:
-
-```sql
-\c wanda
-GRANT ALL ON SCHEMA public TO wanda_user;
-\c trento
-GRANT ALL ON SCHEMA public TO trento_user;
-\c trento_event_store;
-GRANT ALL ON SCHEMA public TO trento_user;
-\q
-```
-
-You can exit from the `psql` console and `postgres` user.
-
-**Step 2:** Allow the postgres database to receive connections for the respective databases and users adding the following in `/var/lib/pgsql/data/pg_hba.conf`:
-
-```bash
-host   wanda                      wanda_user    0.0.0.0/0   md5
-host   trento,trento_event_store  trento_user   0.0.0.0/0   md5
-```
-
-> **Note:** The `pg_hba.conf` file works in a sequential fashion. This means, that the rules positioned on the top have preference over the ones coming next. This examples shows a pretty permissive address range, so in order to work, they entries must be written in the top of the `host` entries. Find additional information in the [pg_hba.conf](https://www.postgresql.org/docs/current/auth-pg-hba-conf.html) documentation.
+    > **Note:** The `pg_hba.conf` file works in a sequential fashion. This means, that the rules positioned on the top have preference over the ones coming next. This examples shows a pretty permissive address range, so in order to work, they entries must be written in the top of the `host` entries. Find additional information in the [pg_hba.conf](https://www.postgresql.org/docs/current/auth-pg-hba-conf.html) documentation.
 
 
-**Step 3:** Allow PostgreSQL to bind on all network
- interfaces in `/var/lib/pgsql/data/postgresql.conf` by changing the following line:
+1.  Allow PostgreSQL to bind on all network
+    interfaces in `/var/lib/pgsql/data/postgresql.conf` by changing the following line:
 
-```bash
-listen_addresses = '*'
-```
+    ```bash
+    listen_addresses = '*'
+    ```
 
-**Step 4:** Restart postgres to apply the changes:
+1.  Restart PostgreSQL to apply the changes:
 
-```bash
-systemctl restart postgresql
-```
+    ```bash
+    systemctl restart postgresql
+    ```
 
 ### Install RabbitMQ
 
-```bash
-zypper install rabbitmq-server
-```
+1.  Install RabbitMQ server:
+    ```bash
+    zypper install rabbitmq-server
+    ```
 
-Since the agent needs to reach RabbitMQ, allow connections from external hosts.
-Modify `/etc/rabbitmq/rabbitmq.conf` and ensure the following lines are present:
+1.  The agent needs to reach RabbitMQ, allow connections from external hosts by modifying `/etc/rabbitmq/rabbitmq.conf`:
+    ```bash
+    listeners.tcp.default = 5672
+    ```
 
-```bash
-listeners.tcp.default = 5672
-```
+1.  Add an exception on firewalld **(ONLY if firewalld is running)**:
 
-Add an exception on firewalld **(ONLY if firewalld is running)**:
+    ```bash
+    firewall-cmd --zone=public --add-port=5672/tcp --permanent;
+    firewall-cmd --reload
+    ```
 
-```bash
-firewall-cmd --zone=public --add-port=5672/tcp --permanent;
-firewall-cmd --reload
-```
+1.  Enable RabbitMQ service:
 
-As the agent needs to reach RabbitMQ, allow connections from external hosts:
+    ```bash
+    systemctl enable --now rabbitmq-server
+    ```
 
-```bash
-systemctl enable --now rabbitmq-server
-```
+#### Configure RabbitMQ
 
-### Configure RabbitMQ
+In order to configure RabbitMQ for a production system, follow the official suggestions [RabbitMQ guide](https://www.rabbitmq.com/production-checklist.html)
 
-> **Note:** In order to configure RabbitMQ for a production system, follow the official suggestions [RabbitMQ guide](https://www.rabbitmq.com/production-checklist.html)
+1.  Create a new RabbitMQ user:
+    ```bash
+    rabbitmqctl add_user trento_user trento_user_password
+    ```
 
-Create a new RabbitMQ user and change the following credentials:
+1.  Create a virtual host:
+    ```bash
+    rabbitmqctl add_vhost vhost
+    ```
 
-- rabbitmq_user
-- rabbitmq_user_password
-- vhost
+1. Set permissions for the user on the virtual host:
+    ```bash
+    rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
+    ```
 
-```bash
-rabbitmqctl add_user trento_user trento_user_password
-```
-
-Create a virtual host:
-
-```bash
-rabbitmqctl add_vhost vhost
-```
-
-Set permissions for the user on the virtual host:
-
-```bash
-rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
-```
-
-### Install Trento server components
+## Install Trento server components
 
 Trento server components are available in 2 different installation formats: RPM packages and Docker images.
-Each of them has a different installation process, but the end result is the same. To choose between any of them
-depends on a usage preference between RPM packages and Docker images.
+Each of them has a different installation process, but the end result is the same. To choose between any of them depends on a usage preference between RPM packages and Docker images.
 
 ### Install Trento using RPM packages
 
-#### Install the RPM packages
-
 The `trento-web` and `trento-wanda` packages come in the supported SLES4SAP distributions by default.
 
+Install Trento web and wanda:
 ```bash
 zypper install trento-web trento-wanda
 ```
@@ -265,7 +240,10 @@ with `openssl` running `openssl rand -out /dev/stdout 48 | base64`
 > Note: Depending on how you intent to connect to the console, a
 > working hostname, FQDN, or an IP is required in `TRENTO_WEB_ORIGIN` for HTTPS; otherwise, websockets will fail to connect, causing no real-time updates on the UI.
 
-##### trento-web configuration
+> Note: Depending on how you intent to connect to the console, a
+> working hostname, FQDN, or an IP is required in `TRENTO_WEB_ORIGIN` for HTTPS; otherwise, websockets will fail to connect, causing no real-time updates on the UI.
+
+#### trento-web configuration
 
 ```
 # /etc/trento/trento-web
@@ -284,7 +262,7 @@ CHARTS_ENABLED=true
 PORT=4000
 TRENTO_WEB_ORIGIN=trento.example.com
 ```
-> **Note:** Add `CHARTS_ENABLED=false` in Trento web configuration file if prometheus is not installed or you don't want to use the charts feature of Trento.
+> **Note:** Add `CHARTS_ENABLED=false` in Trento web configuration file if Prometheus is not installed or you don't want to use the charts feature of Trento.
 
 Optionally, the [alerting system to receive email notifications](https://github.com/trento-project/web/blob/main/guides/alerting/alerting.md) can be enabled by setting `ENABLE_ALERTING` to `true` and adding these additional entries:
 
@@ -299,7 +277,7 @@ SMTP_USER=<<SMTP_USER>>
 SMTP_PASSWORD=<<SMTP_PASSWORD>>
 ```
 
-##### trento-wanda configuration
+#### trento-wanda configuration
 
 ```
 # /etc/trento/trento-wanda
@@ -333,370 +311,323 @@ journalctl -fu trento-web
 
 #### Install Docker container runtime
 
-Enable the container`s module:
+1. Enable the container`s module:
 
-```bash
-SUSEConnect --product sle-module-containers/15.5/x86_64
-```
+    ```bash
+    SUSEConnect --product sle-module-containers/15.5/x86_64
+    ```
+    > **Note:** Using a different Service Pack than SP5 requires to change repository: [SLE15 SP3: `SUSEConnect --product sle-module-containers/15.3/x86_64`,SLE15 SP4: ` SUSEConnect --product sle-module-containers/15.4/x86_64`]
 
-> **Note:** Using a different Service Pack than SP5 requires to change repository: [SLE15 SP3: `SUSEConnect --product sle-module-containers/15.3/x86_64`,SLE15 SP4: ` SUSEConnect --product sle-module-containers/15.4/x86_64`]
+1. Install docker:
 
-Install docker:
+    ```bash
+    zypper install docker
+    ```
 
-```bash
-zypper install docker
-```
+1. Enable and start Docker:
 
-Enable and start Docker:
-
-```bash
-systemctl enable --now docker
-```
+    ```bash
+    systemctl enable --now docker
+    ```
 
 #### Create a dedicated docker network for Trento
 
-```bash
-docker network create trento-net
-```
+1. Create trento docker network:
+    ```bash
+    docker network create trento-net
+    ```
 
-> **Note:** When creating the trento-net network, Docker typically assigns a default subnet: `172.17.0.0/16`. Ensure that this subnet matches the one specified in your PostgreSQL configuration file, which can be found at `/var/lib/pgsql/data/pg_hba.conf`. If the subnet of `trento-net` differs from `172.17.0.0/16` then adjust `pg_hba.conf` and restart postgresql.
+    > **Note:** When creating the trento-net network, Docker typically assigns a default subnet: `172.17.0.0/16`. Ensure that this subnet matches the one specified in your PostgreSQL configuration file, which can be found at `/var/lib/pgsql/data/pg_hba.conf`. If the subnet of `trento-net` differs from `172.17.0.0/16` then adjust `pg_hba.conf` and restart postgresql.
 
-Verifying the subnet of trento-net:
+1. Verifying the subnet of trento-net:
 
-```bash
-docker network inspect trento-net  --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}'
-```
+    ```bash
+    docker network inspect trento-net  --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}'
+    ```
 
-Expected output:
+    Expected output:
 
-```
-172.17.0.0/16
-```
+    ```bash
+    172.17.0.0/16
+    ```
 
 #### Install Trento on docker
 
-> **Note:** The environment variables listed here are examples and should be considered as placeholders. Instead of specifying environment variables directly in the docker run command, it is recommended to use an environment variable file. Store your environment variables in a file and use the --env-file option with the docker run command. Find detailed instructions on how to use an environment variable file with Docker on [official Docker documentation](https://docs.docker.com/engine/reference/commandline/run/#env).
+The environment variables listed here are examples and should be considered as placeholders. Instead of specifying environment variables directly in the docker run command, it is recommended to use an environment variable file. Store your environment variables in a file and use the --env-file option with the docker run command. Find detailed instructions on how to use an environment variable file with Docker on [official Docker documentation](https://docs.docker.com/engine/reference/commandline/run/#env).
 
-##### Create the secret environment variables
+1. Create the secret environment variables:
 
-```bash
-WANDA_SECRET_KEY_BASE=$(openssl rand -out /dev/stdout 48 | base64)
-TRENTO_SECRET_KEY_BASE=$(openssl rand -out /dev/stdout 48 | base64)
-ACCESS_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
-REFRESH_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
-```
+    ```bash
+    WANDA_SECRET_KEY_BASE=$(openssl rand -out /dev/stdout 48 | base64)
+    TRENTO_SECRET_KEY_BASE=$(openssl rand -out /dev/stdout 48 | base64)
+    ACCESS_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
+    REFRESH_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
+    ```
 
-##### Install trento-wanda on docker
+1.  Install trento-wanda on docker:
 
-```bash
-docker run -d --name wanda \
-    -p 4001:4000 \
+    ```bash
+    docker run -d --name wanda \
+        -p 4001:4000 \
+        --network trento-net \
+        --add-host "host.docker.internal:host-gateway" \
+        -e CORS_ORIGIN=localhost \
+        -e SECRET_KEY_BASE=$WANDA_SECRET_KEY_BASE \
+        -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
+        -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost \
+        -e DATABASE_URL=ecto://wanda_user:wanda_password@host.docker.internal/wanda \
+        --restart always \
+        --entrypoint /bin/sh \
+        registry.suse.com/trento/trento-wanda:1.2.0 \
+        -c "/app/bin/wanda eval 'Wanda.Release.init()' && /app/bin/wanda start"
+    ```
+
+1. Install trento-web on docker
+
+    > **Note:** Be sure to change the `ADMIN_USERNAME` and `ADMIN_PASSWORD`, these are the credentials that will be required to login to the trento-web UI.
+
+    > **Note:** Add `CHARTS_ENABLED=false` if Prometheus is not installed or you don't want to use the charts feature of Trento.
+
+    ```bash
+    docker run -d \
+    -p 4000:4000 \
+    --name trento-web \
     --network trento-net \
     --add-host "host.docker.internal:host-gateway" \
-    -e CORS_ORIGIN=localhost \
-    -e SECRET_KEY_BASE=$WANDA_SECRET_KEY_BASE \
-    -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
     -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost \
-    -e DATABASE_URL=ecto://wanda_user:wanda_password@host.docker.internal/wanda \
+    -e ENABLE_ALERTING=false \
+    -e DATABASE_URL=ecto://trento_user:web_password@host.docker.internal/trento \
+    -e EVENTSTORE_URL=ecto://trento_user:web_password@host.docker.internal/trento_event_store \
+    -e PROMETHEUS_URL='http://host.docker.internal:9090' \
+    -e SECRET_KEY_BASE=$TRENTO_SECRET_KEY_BASE \
+    -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
+    -e REFRESH_TOKEN_ENC_SECRET=$REFRESH_TOKEN_ENC_SECRET \
+    -e ADMIN_USERNAME='admin' \
+    -e ADMIN_PASSWORD='test1234' \
+    -e ENABLE_API_KEY='true' \
     --restart always \
     --entrypoint /bin/sh \
-    registry.suse.com/trento/trento-wanda:1.2.0 \
-    -c "/app/bin/wanda eval 'Wanda.Release.init()' && /app/bin/wanda start"
-```
+    registry.suse.com/trento/trento-web:2.2.0 \
+    -c "/app/bin/trento eval 'Trento.Release.init()' && /app/bin/trento start"
+    ```
 
-##### Install trento-web on docker
+    
+     Mail alerting is disabled by default, as described in [enabling alerting](https://github.com/trento-project/web/blob/main/guides/alerting/alerting.md#enabling-alerting) guide. Enable alerting by setting `ENABLE_ALERTING` env to `true`. Additional required variables are: `[ALERT_SENDER,ALERT_RECIPIENT,SMTP_SERVER,SMTP_PORT,SMTP_USER,SMTP_PASSWORD]`
+    > All other settings should remain as they are.
 
-> **Note:** Be sure to change the `ADMIN_USERNAME` and `ADMIN_PASSWORD`, these are the credentials that will be required to login to the trento-web UI.
+    Example:
 
-> **Note:** Add `CHARTS_ENABLED=false` if prometheus is not installed or you don't want to use the charts feature of Trento.
+    ```bash
+    docker run -d \
 
-> Note: Depending on how you intent to connect to the console, a
-> working hostname, FQDN, or an IP is required in `TRENTO_WEB_ORIGIN` for HTTPS; otherwise, websockets will fail to connect, causing no real-time updates on the UI.
+    ...[other settings]...
 
-```bash
-docker run -d \
- -p 4000:4000 \
- --name trento-web \
- --network trento-net \
- --add-host "host.docker.internal:host-gateway" \
- -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost \
- -e ENABLE_ALERTING=false \
- -e DATABASE_URL=ecto://trento_user:web_password@host.docker.internal/trento \
- -e EVENTSTORE_URL=ecto://trento_user:web_password@host.docker.internal/trento_event_store \
- -e PROMETHEUS_URL='http://host.docker.internal:9090' \
- -e SECRET_KEY_BASE=$TRENTO_SECRET_KEY_BASE \
- -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
- -e REFRESH_TOKEN_ENC_SECRET=$REFRESH_TOKEN_ENC_SECRET \
- -e ADMIN_USERNAME='admin' \
- -e ADMIN_PASSWORD='test1234' \
- -e ENABLE_API_KEY='true' \
- -e TRENTO_WEB_ORIGIN='trento.example.com' \
- --restart always \
- --entrypoint /bin/sh \
- registry.suse.com/trento/trento-web:2.2.0 \
- -c "/app/bin/trento eval 'Trento.Release.init()' && /app/bin/trento start"
+    -e ENABLE_ALERTING=true \
+    -e ALERT_SENDER=<<SENDER_EMAIL_ADDRESS>> \
+    -e ALERT_RECIPIENT=<<RECIPIENT_EMAIL_ADDRESS>> \
+    -e SMTP_SERVER=<<SMTP_SERVER_ADDRESS>> \
+    -e SMTP_PORT=<<SMTP_PORT>> \
+    -e SMTP_USER=<<SMTP_USER>> \
+    -e SMTP_PASSWORD=<<SMTP_PASSWORD>> \
+    
+    ...[other settings]...
+    ```
 
-```
+2. Check that everything is running as expected:
 
-> **Note:** Mail alerting is disabled by default, as described in [enabling alerting](https://github.com/trento-project/web/blob/main/guides/alerting/alerting.md#enabling-alerting) guide. Enable alerting by setting `ENABLE_ALERTING` env to `true`. Additional required variables are: `[ALERT_SENDER,ALERT_RECIPIENT,SMTP_SERVER,SMTP_PORT,SMTP_USER,SMTP_PASSWORD]`
-> All other settings should remain as they are.
+    ```bash
+    docker ps
+    ```
 
-Example:
+    Expected output:
 
-```bash
-docker run -d \
+    ```bash
+    CONTAINER ID   IMAGE                                         COMMAND                  CREATED          STATUS          PORTS                                       NAMES
+    8b44333aec39   registry.suse.com/trento/trento-web:2.2.0    "/bin/sh -c '/app/bi…"   6 seconds ago    Up 5 seconds    0.0.0.0:4000->4000/tcp, :::4000->4000/tcp   trento-web
+    e859c07888ca   registry.suse.com/trento/trento-wanda:1.2.0   "/bin/sh -c '/app/bi…"   18 seconds ago   Up 16 seconds   0.0.0.0:4001->4000/tcp, :::4001->4000/tcp   wanda
+    ```
 
-...[other settings]...
-
- -e ENABLE_ALERTING=true \
- -e ALERT_SENDER=<<SENDER_EMAIL_ADDRESS>> \
- -e ALERT_RECIPIENT=<<RECIPIENT_EMAIL_ADDRESS>> \
- -e SMTP_SERVER=<<SMTP_SERVER_ADDRESS>> \
- -e SMTP_PORT=<<SMTP_PORT>> \
- -e SMTP_USER=<<SMTP_USER>> \
- -e SMTP_PASSWORD=<<SMTP_PASSWORD>> \
-
- ...[other settings]...
-
-```
-
-To check that everything is running as expected, you can run the following command:
-
-```bash
-docker ps
-```
-
-Expected output:
-
-```bash
-CONTAINER ID   IMAGE                                         COMMAND                  CREATED          STATUS          PORTS                                       NAMES
-8b44333aec39   registry.suse.com/trento/trento-web:2.2.0    "/bin/sh -c '/app/bi…"   6 seconds ago    Up 5 seconds    0.0.0.0:4000->4000/tcp, :::4000->4000/tcp   trento-web
-e859c07888ca   registry.suse.com/trento/trento-wanda:1.2.0   "/bin/sh -c '/app/bi…"   18 seconds ago   Up 16 seconds   0.0.0.0:4001->4000/tcp, :::4001->4000/tcp   wanda
-```
-
-Both containers should be running and listening on the specified ports.
+    Both containers should be running and listening on the specified ports.
 
 ### Validate the health status of trento web and wanda
-Validate the health status of the Trento web and wanda services locally by accessing the ```healthz``` and ```readyz``` api.
+Trento web and wanda services correct functioning could be validated accessing the ```healthz``` and ```readyz``` api.
 
-Test Trento web health status with curl:
+1. Test Trento web health status with curl:
+    ```bash
+    curl http://localhost:4000/api/readyz;
+    ```
+    ```bash
+    curl http://localhost:4000/api/healthz;
+    ```
 
-```
-curl http://localhost:4000/api/readyz; curl http://localhost:4000/api/healthz; echo
-```
-
-Test Trento wanda health status with curl:
-```
-curl http://localhost:4001/api/readyz; curl http://localhost:4001/api/healthz; echo
-```
+2.  Test Trento wanda health status with curl:
+    ```bash
+    curl http://localhost:4001/api/readyz
+    ```
+    ```bash
+    curl http://localhost:4001/api/healthz
+    ```
+    
 
 Expected output if Trento web/wanda is ready and the database connection is setup correctly:
 ```
 {"ready":true}{"database":"pass"}
 ```
 
-### Prepare SSL certificate and install Nginx
+## Prepare SSL certificate for NGINX
 
-Create or provide a certificate for [nginx](https://nginx.org/en/) to enable SSL for Trento.
+Create or provide a certificate for [NGINX](https://nginx.org/en/) to enable SSL for Trento.
+This is a basic guide for creating a self-signed certificate for use with Trento. You may use your own certificate. For detailed instructions, consult the [OpenSSL documentation]((https://www.openssl.org/docs/man1.0.2/man5/x509v3_config.html)).
 
-#### Option 1: Creating a Self-Signed Certificate
+### Option 1: Creating a Self-Signed Certificate
 
-> **Note:** This is a basic guide for creating a self-signed certificate for use with Trento. You may use your own certificate. For detailed instructions, consult the [OpenSSL documentation]((https://www.openssl.org/docs/man1.0.2/man5/x509v3_config.html)).
+1.  Generate a self signed certificate:
+    >Note: Remember to adjust ```subjectAltName = DNS:trento.example.com``` by replacing ```trento.example.com``` with your own domain and change the value ```5``` to the number of days for which you need the certificate to be valid. For example, ```-days 365``` for one year.
 
-Step 1: Generate a self signed certificate:
-> **Note:** Remember to adjust ```subjectAltName = DNS:trento.example.com``` by replacing ```trento.example.com``` with your own domain.
+    ```bash
+    openssl req -newkey rsa:2048 --nodes -keyout trento.key -x509 -days 5 -out trento.crt -addext "subjectAltName = DNS:trento.example.com"
+    ```
 
-> **Note:** Remember to change change the value ```5``` to the number of days for which you need the certificate to be valid. For example, ```-days 365``` for one year.
+1.  Move the generated trento.key in a location accessible by nginx:
+    ```bash
+    mv trento.key /etc/ssl/private/trento.key
+    ```
+1. Move the generated  trento.crt in a location accessible by nginx:
+    ```bash
+    mv trento.crt /etc/ssl/certs/trento.crt
+    ```
 
-```bash
-openssl req -newkey rsa:2048 --nodes -keyout trento.key -x509 -days 5 -out trento.crt -addext "subjectAltName = DNS:trento.example.com"
-```
-
-Step 2: Move the generated trento.key and trento.crt in a location accessible by nginx:
-```bash
-mv trento.key /etc/ssl/private/trento.key
-```
-
-```bash
-mv trento.crt /etc/ssl/certs/trento.crt
-```
-
-#### Option 2: Using Let's Encrypt for a Signed Certificate using PackageHub repository
+### Option 2: Using Let's Encrypt for a Signed Certificate using PackageHub repository
 
 > **Note:** Using a different Service Pack than SP5 requires to change repository: [SLE15 SP3: `SUSEConnect --product PackageHub/15.3/x86_64`,SLE15 SP4: `SUSEConnect --product PackageHub/15.4/x86_64`].
 > Users should assess the suitability of these packages based on their own risk tolerance and support needs.
 
-**Step 1**: Add PackageHub if not already added:
+1.  Add PackageHub if not already added:
 
-```bash
-SUSEConnect --product PackageHub/15.5/x86_64
-zypper refresh
-```
+    ```bash
+    SUSEConnect --product PackageHub/15.5/x86_64
+    zypper refresh
+    ```
 
-**Step 2**: Install Certbot and its Nginx plugin:
+1.  Install Certbot and its Nginx plugin:
 
-```bash
-zypper install certbot python3-certbot-nginx
-```
+    ```bash
+    zypper install certbot python3-certbot-nginx
+    ```
 
-**Step 3**: Obtain a certificate and configure Nginx with Certbot:
+1. Obtain a certificate and configure Nginx with Certbot:
+    > **Note:** Replace `example.com` with your domain. For more information, visit [Certbot instructions for Nginx](https://certbot.eff.org/instructions?ws=nginx&os=leap)
 
-> **Note:** Replace `example.com` with your domain. For more information, visit [Certbot instructions for Nginx](https://certbot.eff.org/instructions?ws=nginx&os=leap)
+    ```bash
+    certbot --nginx -d example.com -d www.example.com
+    ```
 
-```bash
-certbot --nginx -d example.com -d www.example.com
-```
+    > **Note:** Certbot certificates last for 90 days. Refer to the above link for details on how to renew periodically.
 
-> **Note:** Certbot certificates last for 90 days. Refer to the above link for details on how to renew periodically.
+## Install and configure NGINX
 
-#### Install and configure nginx
+1. Install NGINX package:
 
-**Step 1**: Install nginx package:
+    ```bash
+    zypper install nginx
+    ```
 
-```bash
-zypper install nginx
-```
+1. Add firewalld exceptions for HTTP and HTTPS **(ONLY if firewalld is running)**:
 
-**Step 2**: Add firewalld exceptions for HTTP and HTTPS **(ONLY if firewalld is running)**:
+    ```bash
+    firewall-cmd --zone=public --add-service=https --permanent
+    firewall-cmd --zone=public --add-service=http --permanent
+    firewall-cmd --reload
+    ```
+1. Start and enable nginx:
 
-```bash
-firewall-cmd --zone=public --add-service=https --permanent
-firewall-cmd --zone=public --add-service=http --permanent
-firewall-cmd --reload
-```
+    ```bash
+    systemctl enable --now nginx
+    ```
 
-**Step 3**:Start and enable nginx:
+1. Create a configuration file for Trento:
 
-```bash
-systemctl enable --now nginx
-```
+    ```bash
+    vim /etc/nginx/conf.d/trento.conf
+    ```
 
-**Step 4**: Create a configuration file for Trento:
+1. Add the following configuration to `/etc/nginx/conf.d/trento.conf`:
 
-```bash
-vim /etc/nginx/conf.d/trento.conf
-```
-
-Add the following configuration
-
-```bash
-server {
-    # Redirect HTTP to HTTPS
-    listen 80;
-    server_name trento.example.com;
-    return 301 https://$host$request_uri;
-}
-
-server {
-    # SSL configuration
-    listen 443 ssl;
-    server_name trento.example.com;
-
-    ssl_certificate /etc/ssl/certs/trento.crt;
-    ssl_certificate_key /etc/ssl/private/trento.key;
-
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384';
-    ssl_prefer_server_ciphers on;
-    ssl_session_cache shared:SSL:10m;
-
-    # Wanda rule
-    location ~ ^/(api/checks|api/v1/checks|api/v2/checks|api/v3/checks)/  {
-        allow all;
-
-        # Proxy Headers
-        proxy_http_version 1.1;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Host $http_host;
-        proxy_set_header X-Cluster-Client-Ip $remote_addr;
-
-        # Important Websocket Bits!
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-
-        proxy_pass http://localhost:4001;
+    ```bash
+    server {
+        # Redirect HTTP to HTTPS
+        listen 80;
+        server_name trento.example.com;
+        return 301 https://$host$request_uri;
     }
 
-    # Web rule
-    location / {
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
+    server {
+        # SSL configuration
+        listen 443 ssl;
+        server_name trento.example.com;
 
-        # The Important Websocket Bits!
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Origin "";
+        ssl_certificate /etc/ssl/certs/trento.crt;
+        ssl_certificate_key /etc/ssl/private/trento.key;
 
-        proxy_pass http://localhost:4000;
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384';
+        ssl_prefer_server_ciphers on;
+        ssl_session_cache shared:SSL:10m;
+
+        # Wanda rule
+        location ~ ^/(api/checks|api/v1/checks|api/v2/checks|api/v3/checks)/  {
+            allow all;
+
+            # Proxy Headers
+            proxy_http_version 1.1;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Cluster-Client-Ip $remote_addr;
+
+            # Important Websocket Bits!
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+
+            proxy_pass http://localhost:4001;
+        }
+
+        # Web rule
+        location / {
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
+
+            # The Important Websocket Bits!
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Origin "";
+
+            proxy_pass http://localhost:4000;
+        }
     }
-}
-```
+    ```
 
-**Step 5**: Check Nginx Configuration:
+1. Check NGINX Configuration:
 
-```bash
-nginx -t
-```
+    ```bash
+    nginx -t
+    ```
 
-If the configuration is correct, the output should be like this:
-```bash
-nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
-nginx: configuration file /etc/nginx/nginx.conf test is successful
-```
-If there are issues with the configuration, the output will indicate what needs to be adjusted. 
+    If the configuration is correct, the output should be like this:
+    ```bash
+    nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+    nginx: configuration file /etc/nginx/nginx.conf test is successful
+    ```
+    If there are issues with the configuration, the output will indicate what needs to be adjusted. 
 
-**Step 6**: Reload Nginx to apply changes:
+1.  Reload Nginx to apply changes:
 
-```bash
-systemctl reload nginx
-```
+    ```bash
+    systemctl reload nginx
+    ```
 
-### Accessing the trento-web UI
+## Accessing the trento-web UI
 
 Open a browser and navigate to `https://trento.example.com`. You should be able to login using the credentials you provided in the `ADMIN_USERNAME` and `ADMIN_PASSWORD` environment variables.
-
-### Testing the setup
-
-Deploy an agent using the available `trento-agent` package. This package is already available in SLES 15 SP5, so we can install it using zypper:
-
-```bash
-zypper install trento-agent
-```
-
-#### Configuring the Agent host with the Self-Signed Certificate
-
-**Step 1**: Copy the self signed certificate `trento.crt` from the trento-server to the agent machine. Use `scp` to transfer the certificate to `/etc/pki/trust/anchors/`.
-
-Example:
-
-```bash
-scp <<TRENTO_SERVER_MACHINE_USER>>@<<TRENTO_SERVER_MACHINE_IP>>:/etc/ssl/certs/trento.crt /etc/pki/trust/anchors/
-```
-
-**Step 2**: Update the certificate store:
-
-```bash
-update-ca-certificates
-```
-
-Configure Trento using the `/etc/trento/agent.yaml` file, and make sure to use `https` for the `server-url` parameter. Refer to https://documentation.suse.com/sles-sap/trento/html/SLES-SAP-trento/index.html#sec-trento-installing-trentoagent for more details.
-
-Example agent.yaml content:
-
-```bash
-server-url: https://trento.example.com
-facts-service-url: amqp://trento_user:trento_user_password@trento.example.com:5672/vhost
-api-key: <<TRENTO_API_KEY>>
-```
-
-> **Note:** Depending on your setup, adjust the configuration of `/etc/hosts` in order to point the server url https://trento.example.com.
-
-Example of etc/hosts:
-
-```bash
-127.0.0.1	                   localhost
-<<IP_ADDRESS_TRENTO_SERVER>>   trento.example.com
-```
