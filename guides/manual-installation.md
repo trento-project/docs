@@ -23,15 +23,15 @@ For installations on Service Packs other than SP5, ensure to update the reposito
 
 ### Install Prometheus (Optional)
 
-[Prometheus](https://prometheus.io/) is not required to run Trento, but it is recommended as it allows Trento to display a series of charts for each host with useful information about the CPU load, memory and other important metrics.
+[Prometheus](https://prometheus.io/) is not required to run Trento, but it is recommended as it allows Trento to display a series of charts for each host with useful information about the CPU load, memory, and other important metrics.
 
-> **Note:** If you choose not to install Prometheus or to provide an existing installation, ensure that `CHARTS_ENABLED` is set to false in the Trento web RPM configuration file or when it is provided to the Trento web container. Refer to [Install Trento server components](#install-trento-server-components).
+> **Note:** If you choose not to install Prometheus or to provide an existing installation, ensure that `CHARTS_ENABLED` is set to false in the Trento web RPM configuration file,which is stored at `/etc/trento/trento-web`,  or when it is provided to the Trento web container. Refer to [Install Trento server components](#install-trento-server-components).
 
 #### <a id="prometheus_install_option_1"></a>Option 1: Use existing installation
 
 Minimal required Prometheus version is **2.28.0**.
 
-If you have an [existing Prometheus server](https://prometheus.io/docs/prometheus/latest/installation/), ensure to set the PROMETHEUS_URL environment variable with your Prometheus server's URL as part of the Docker command when creating the trento-web container or configuring the rpm's. Use [Trento's Prometheus configuration](#prometheus_trento_configuration) as a reference to adjust the Prometheus configuration.
+If you have an [existing Prometheus server](https://prometheus.io/docs/prometheus/latest/installation/), ensure to set the PROMETHEUS_URL environment variable with your Prometheus server's URL as part of the Docker command when creating the `trento-web` container or configuring the RPM packages. Use [Trento's Prometheus configuration](#prometheus_trento_configuration) as a reference to adjust the Prometheus configuration.
 
 #### Option 2: Install Prometheus using the **unsupported** PackageHub repository
 
@@ -43,7 +43,7 @@ If you have an [existing Prometheus server](https://prometheus.io/docs/prometheu
     SUSEConnect --product PackageHub/15.5/x86_64
     ```
 
-    > **Note:** SLE15 SP3 requires a provided Prometheus server. The version available through **SUSEConnect --product PackageHub/15.3/x86_64** is outdated and is not compatible with Trento's Prometheus configuration.
+    > **Note:** SLE15 SP3 requires a provided Prometheus server. The version available through `SUSEConnect --product PackageHub/15.3/x86_64` is outdated and is not compatible with Trento's Prometheus configuration.
     > Refer to [Option 1: Use existing installation option](#prometheus_install_option_1) for SLE 15 SP3.
 
     > **Note:** Using SLE15 SP4 requires changing the repository `SUSEConnect --product PackageHub/15.4/x86_64`
@@ -62,7 +62,7 @@ If you have an [existing Prometheus server](https://prometheus.io/docs/prometheu
     > **Note:** In case the missing dependency can't be satisfied we have already added the Prometheus user/group. With this, it is safe to proceed with the installation by choosing Solution 2: break golang-github-prometheus-prometheus
 
 1.  <a id="prometheus_trento_configuration"></a>Change Prometheus configuration by replacing the configuration at `/etc/prometheus/prometheus.yml` with: 
-    ```bash
+    ```yaml
     global:
       scrape_interval: 30s
       evaluation_interval: 10s
@@ -88,7 +88,7 @@ If you have an [existing Prometheus server](https://prometheus.io/docs/prometheu
     systemctl enable --now prometheus
     ```
 
-1.  Allow Prometheus to be accessible from docker and add an exception on firewalld **(ONLY if firewalld is running)**: 
+1.  If firewalld is running, allow Prometheus to be accessible from Docker and add an exception on firewalld:
 
     ```bash
     firewall-cmd --zone=public --add-port=9090/tcp --permanent
@@ -176,11 +176,11 @@ Using a different version of PostgreSQL may require different steps or configura
     ```
 
 1.  The agent needs to reach RabbitMQ, allow connections from external hosts by modifying `/etc/rabbitmq/rabbitmq.conf`:
-    ```bash
+    ```ini
     listeners.tcp.default = 5672
     ```
 
-1.  Add an exception on firewalld **(ONLY if firewalld is running)**:
+1.   If firewalld is running, add an exception on firewalld:
 
     ```bash
     firewall-cmd --zone=public --add-port=5672/tcp --permanent;
@@ -195,7 +195,7 @@ Using a different version of PostgreSQL may require different steps or configura
 
 #### Configure RabbitMQ
 
-In order to configure RabbitMQ for a production system, follow the official suggestions [RabbitMQ guide](https://www.rabbitmq.com/production-checklist.html)
+To configure RabbitMQ for a production system, follow the official suggestions [RabbitMQ guide](https://www.rabbitmq.com/production-checklist.html).
 
 1.  Create a new RabbitMQ user:
     ```bash
@@ -234,7 +234,7 @@ available at `/etc/trento/trento-web.example` and `/etc/trento/trento-wanda.exam
 
 **Important: The content of `SECRET_KEY_BASE` and `ACCESS_TOKEN_ENC_SECRET` in both `trento-web` and `trento-wanda` must be the same.**
 
-> **Note:** Create the content of the secret variables like `SECRET_KEY_BASE`, `ACCESS_TOKEN_ENC_SECRET` and `REFRESH_TOKEN_ENC_SECRET` 
+> **Note:** You can create the content of the secret variables like `SECRET_KEY_BASE`, `ACCESS_TOKEN_ENC_SECRET` and `REFRESH_TOKEN_ENC_SECRET` 
 with `openssl` running `openssl rand -out /dev/stdout 48 | base64`
 
 > Note: Depending on how you intent to connect to the console, a
@@ -318,7 +318,7 @@ journalctl -fu trento-web
     ```
     > **Note:** Using a different Service Pack than SP5 requires to change repository: [SLE15 SP3: `SUSEConnect --product sle-module-containers/15.3/x86_64`,SLE15 SP4: ` SUSEConnect --product sle-module-containers/15.4/x86_64`]
 
-1. Install docker:
+1. Install Docker:
 
     ```bash
     zypper install docker
@@ -330,16 +330,16 @@ journalctl -fu trento-web
     systemctl enable --now docker
     ```
 
-#### Create a dedicated docker network for Trento
+#### Create a dedicated Docker network for Trento
 
-1. Create trento docker network:
+1. Create the Trento Docker network:
     ```bash
     docker network create trento-net
     ```
 
-    > **Note:** When creating the trento-net network, Docker typically assigns a default subnet: `172.17.0.0/16`. Ensure that this subnet matches the one specified in your PostgreSQL configuration file, which can be found at `/var/lib/pgsql/data/pg_hba.conf`. If the subnet of `trento-net` differs from `172.17.0.0/16` then adjust `pg_hba.conf` and restart postgresql.
+    > **Note:** When creating the trento-net network, Docker typically assigns a default subnet: `172.17.0.0/16`. Ensure that this subnet matches the one specified in your PostgreSQL configuration file (refer to`/var/lib/pgsql/data/pg_hba.conf`). If the subnet of `trento-net` differs from `172.17.0.0/16` then adjust `pg_hba.conf` and restart PostgreSQL.
 
-1. Verifying the subnet of trento-net:
+1. Verify the subnet of trento-net:
 
     ```bash
     docker network inspect trento-net  --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}'
@@ -353,7 +353,7 @@ journalctl -fu trento-web
 
 #### Install Trento on docker
 
-The environment variables listed here are examples and should be considered as placeholders. Instead of specifying environment variables directly in the docker run command, it is recommended to use an environment variable file. Store your environment variables in a file and use the --env-file option with the docker run command. Find detailed instructions on how to use an environment variable file with Docker on [official Docker documentation](https://docs.docker.com/engine/reference/commandline/run/#env).
+The environment variables listed here are examples and should be considered as placeholders. Instead of specifying environment variables directly in the `docker run` command, it is recommended to use an environment variable file. Store your environment variables in a file and use the --env-file option with the `docker run` command. Find detailed instructions on how to use an environment variable file with Docker on [official Docker documentation](https://docs.docker.com/engine/reference/commandline/run/#env).
 
 1. Create the secret environment variables:
 
@@ -433,7 +433,7 @@ The environment variables listed here are examples and should be considered as p
     ...[other settings]...
     ```
 
-2. Check that everything is running as expected:
+1. Check that everything is running as expected:
 
     ```bash
     docker ps
@@ -452,15 +452,15 @@ The environment variables listed here are examples and should be considered as p
 ### Validate the health status of trento web and wanda
 Trento web and wanda services correct functioning could be validated accessing the ```healthz``` and ```readyz``` api.
 
-1. Test Trento web health status with curl:
+1. Test Trento web health status with `curl`:
     ```bash
-    curl http://localhost:4000/api/readyz;
+    curl http://localhost:4000/api/readyz
     ```
     ```bash
-    curl http://localhost:4000/api/healthz;
+    curl http://localhost:4000/api/healthz
     ```
 
-2.  Test Trento wanda health status with curl:
+1.  Test Trento wanda health status with `curl`:
     ```bash
     curl http://localhost:4001/api/readyz
     ```
@@ -477,7 +477,7 @@ Expected output if Trento web/wanda is ready and the database connection is setu
 ## Prepare SSL certificate for NGINX
 
 Create or provide a certificate for [NGINX](https://nginx.org/en/) to enable SSL for Trento.
-This is a basic guide for creating a self-signed certificate for use with Trento. You may use your own certificate. For detailed instructions, consult the [OpenSSL documentation]((https://www.openssl.org/docs/man1.0.2/man5/x509v3_config.html)).
+This is a basic guide for creating a self-signed certificate for use with Trento. You may use your own certificate. For detailed instructions, consult the [OpenSSL documentation](https://www.openssl.org/docs/man1.0.2/man5/x509v3_config.html).
 
 ### Option 1: Creating a Self-Signed Certificate
 
@@ -532,7 +532,7 @@ This is a basic guide for creating a self-signed certificate for use with Trento
     zypper install nginx
     ```
 
-1. Add firewalld exceptions for HTTP and HTTPS **(ONLY if firewalld is running)**:
+1. If firewalld is running, add firewalld exceptions for HTTP and HTTPS:
 
     ```bash
     firewall-cmd --zone=public --add-service=https --permanent
@@ -553,7 +553,7 @@ This is a basic guide for creating a self-signed certificate for use with Trento
 
 1. Add the following configuration to `/etc/nginx/conf.d/trento.conf`:
 
-    ```bash
+    ```
     server {
         # Redirect HTTP to HTTPS
         listen 80;
@@ -609,7 +609,7 @@ This is a basic guide for creating a self-signed certificate for use with Trento
     }
     ```
 
-1. Check NGINX Configuration:
+1. Check NGINX configuration:
 
     ```bash
     nginx -t

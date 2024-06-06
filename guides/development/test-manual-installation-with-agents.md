@@ -1,6 +1,6 @@
 # Testing the setup
 
-In order to test the [manual installation locally](https://github.com/trento-project/docs/blob/main/guides/manual-installation.md) deploy an agent using the available `trento-agent` package. This package is already available in SLES 15 SP5, so we can install it using zypper:
+To test the [manual installation locally](https://github.com/trento-project/docs/blob/main/guides/manual-installation.md) deploy an agent using the available `trento-agent` package. This package is already available in SLES 15 SP5, so we can install it using zypper:
 
 ```bash
 zypper install trento-agent
@@ -8,9 +8,7 @@ zypper install trento-agent
 
 ## Configuring the Agent host with the Self-Signed Certificate
 
-**Step 1**: Copy the self signed certificate `trento.crt` from the trento-server to the agent machine. Use `scp` to transfer the certificate to `/etc/pki/trust/anchors/`.
-
-Example:
+**Step 1**: On the Trento agent, copy the self-signed certificate `trento.crt` from the Trento erver to the agent machine with `scp` to transfer the certificate to `/etc/pki/trust/anchors/`.
 
 ```bash
 scp <<TRENTO_SERVER_MACHINE_USER>>@<<TRENTO_SERVER_MACHINE_IP>>:/etc/ssl/certs/trento.crt /etc/pki/trust/anchors/
@@ -22,7 +20,10 @@ scp <<TRENTO_SERVER_MACHINE_USER>>@<<TRENTO_SERVER_MACHINE_IP>>:/etc/ssl/certs/t
 update-ca-certificates
 ```
 
-Configure Trento using the `/etc/trento/agent.yaml` file, and make sure to use `https` for the `server-url` parameter. Refer to https://documentation.suse.com/sles-sap/trento/html/SLES-SAP-trento/index.html#sec-trento-installing-trentoagent for more details.
+**Step 3**: Configure the Trento agent using the `/etc/trento/agent.yaml` file.
+
+Make sure to use `https` for the `server-url` parameter.
+Refer to https://documentation.suse.com/sles-sap/trento/html/SLES-SAP-trento/index.html#sec-trento-installing-trentoagent for more details.
 
 Example agent.yaml content:
 
