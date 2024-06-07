@@ -315,7 +315,8 @@ PORT=4001
 
 > Note: Add `CHARTS_ENABLED=false` in Trento web configuration file if prometheus is not installed or you don't want to use the charts feature of Trento.
 
-> Note: A valid FQDN is required in `TRENTO_WEB_ORIGIN` for HTTPS; otherwise, websockets will fail to connect, causing no real-time updates on the UI.
+> Note: Depending on how you intent to connect to the console, a
+> working hostname, FQDN, or an IP is required in `TRENTO_WEB_ORIGIN` for HTTPS; otherwise, websockets will fail to connect, causing no real-time updates on the UI.
 
 > Note: You can create the content of the secret variables like `SECRET_KEY_BASE`, `ACCESS_TOKEN_ENC_SECRET` and `REFRESH_TOKEN_ENC_SECRET` 
 with `openssl` running `openssl rand -out /dev/stdout 48 | base64`
@@ -420,7 +421,8 @@ docker run -d --name wanda \
 
 > Note: Add `CHARTS_ENABLED=false` if prometheus is not installed or you don't want to use the charts feature of Trento.
 
-> Note: A valid FQDN is required in `TRENTO_WEB_ORIGIN` for HTTPS; otherwise, websockets will fail to connect, causing no real-time updates on the UI.
+> Note: Depending on how you intent to connect to the console, a
+> working hostname, FQDN, or an IP is required in `TRENTO_WEB_ORIGIN` for HTTPS; otherwise, websockets will fail to connect, causing no real-time updates on the UI.
 
 ```bash
 docker run -d \
