@@ -283,7 +283,7 @@ ADMIN_PASSWORD=test1234
 ENABLE_API_KEY=true
 CHARTS_ENABLED=true
 PORT=4000
-TRENTO_DOMAIN=trento.example.com
+TRENTO_WEB_ORIGIN=trento.example.com
 ```
 
 Optionally, the alerting system to receive email notifications can be enabled adding these additional entries:
@@ -315,7 +315,7 @@ PORT=4001
 
 > Note: Add `CHARTS_ENABLED=false` in Trento web configuration file if prometheus is not installed or you don't want to use the charts feature of Trento.
 
-> Note: A valid FQDN is required in `TRENTO_DOMAIN` for HTTPS; otherwise, websockets will fail to connect, causing no real-time updates on the UI.
+> Note: A valid FQDN is required in `TRENTO_WEB_ORIGIN` for HTTPS; otherwise, websockets will fail to connect, causing no real-time updates on the UI.
 
 > Note: You can create the content of the secret variables like `SECRET_KEY_BASE`, `ACCESS_TOKEN_ENC_SECRET` and `REFRESH_TOKEN_ENC_SECRET` 
 with `openssl` running `openssl rand -out /dev/stdout 48 | base64`
@@ -420,7 +420,7 @@ docker run -d --name wanda \
 
 > Note: Add `CHARTS_ENABLED=false` if prometheus is not installed or you don't want to use the charts feature of Trento.
 
-> Note: A valid FQDN is required in `TRENTO_DOMAIN` for HTTPS; otherwise, websockets will fail to connect, causing no real-time updates on the UI.
+> Note: A valid FQDN is required in `TRENTO_WEB_ORIGIN` for HTTPS; otherwise, websockets will fail to connect, causing no real-time updates on the UI.
 
 ```bash
 docker run -d \
@@ -439,7 +439,7 @@ docker run -d \
  -e ADMIN_USERNAME='admin' \
  -e ADMIN_PASSWORD='test1234' \
  -e ENABLE_API_KEY='true' \
- -e TRENTO_DOMAIN='trento.example.com' \
+ -e TRENTO_WEB_ORIGIN='trento.example.com' \
  --restart always \
  --entrypoint /bin/sh \
  registry.suse.com/trento/trento-web:2.2.0 \
