@@ -25,7 +25,7 @@ For installations on Service Packs other than SP5, ensure to update the reposito
 
 [Prometheus](https://prometheus.io/) is not required to run Trento, but it is recommended as it allows Trento to display a series of charts for each host with useful information about the CPU load, memory, and other important metrics.
 
-> **Note:** If you choose not to install Prometheus or to provide an existing installation, ensure that `CHARTS_ENABLED` is set to false in the Trento web RPM configuration file,which is stored at `/etc/trento/trento-web`,  or when it is provided to the Trento web container. Refer to [Install Trento server components](#install-trento-server-components).
+> **Note:** If you choose not to install Prometheus or to provide an existing installation, ensure that `CHARTS_ENABLED` is set to false in the Trento web RPM configuration file, which is stored at `/etc/trento/trento-web`,  or when it is provided to the Trento web container. Refer to [Install Trento server components](#install-trento-server-components).
 
 #### <a id="prometheus_install_option_1"></a>Option 1: Use existing installation
 
@@ -46,7 +46,7 @@ If you have an [existing Prometheus server](https://prometheus.io/docs/prometheu
     > **Note:** SLE15 SP3 requires a provided Prometheus server. The version available through `SUSEConnect --product PackageHub/15.3/x86_64` is outdated and is not compatible with Trento's Prometheus configuration.
     > Refer to [Option 1: Use existing installation option](#prometheus_install_option_1) for SLE 15 SP3.
 
-    > **Note:** Using SLE15 SP4 requires changing the repository `SUSEConnect --product PackageHub/15.4/x86_64`
+    > **Note:** For SLE15 SP4 change the repository to `SUSEConnect --product PackageHub/15.4/x86_64`
 
 1.  Add the Prometheus user/group:
 
@@ -597,7 +597,6 @@ This is a basic guide for creating a self-signed certificate for use with Trento
             # The Important Websocket Bits!
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";
-            proxy_set_header Origin "";
 
             proxy_pass http://localhost:4000;
         }
