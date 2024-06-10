@@ -8,7 +8,7 @@ zypper install trento-agent
 
 ## Configuring the Agent host with the Self-Signed Certificate
 
-**Step 1**: On the Trento agent, copy the self-signed certificate `trento.crt` from the Trento erver to the agent machine with `scp` to transfer the certificate to `/etc/pki/trust/anchors/`.
+**Step 1**: On the Trento agent, copy the self-signed certificate `trento.crt` from the Trento server to the agent machine with `scp` to transfer the certificate to `/etc/pki/trust/anchors/`.
 
 ```bash
 scp <<TRENTO_SERVER_MACHINE_USER>>@<<TRENTO_SERVER_MACHINE_IP>>:/etc/ssl/certs/trento.crt /etc/pki/trust/anchors/
@@ -33,9 +33,9 @@ facts-service-url: amqp://trento_user:trento_user_password@trento.example.com:56
 api-key: <<TRENTO_API_KEY>>
 ```
 
-> **Note:** Depending on your setup, adjust the configuration of `/etc/hosts` in order to point the server url https://trento.example.com.
+> **Note:** Depending on your setup, adjust the configuration of `/etc/hosts` to point the server url https://trento.example.com.
 
-Example of etc/hosts:
+Example of `/etc/hosts`:
 
 ```bash
 127.0.0.1	                   localhost
