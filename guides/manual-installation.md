@@ -175,17 +175,17 @@ Using a different version of PostgreSQL may require different steps or configura
     zypper install rabbitmq-server
     ```
 
-1.  The agent needs to reach RabbitMQ, allow connections from external hosts by modifying `/etc/rabbitmq/rabbitmq.conf`:
+1.  Allow connections from external hosts by modifying `/etc/rabbitmq/rabbitmq.conf`, so the Trento-agent can reach RabbitMQ:
     ```ini
     listeners.tcp.default = 5672
     ```
 
 1.   If firewalld is running, add an exception on firewalld:
 
-    ```bash
-    firewall-cmd --zone=public --add-port=5672/tcp --permanent;
-    firewall-cmd --reload
-    ```
+        ```bash
+        firewall-cmd --zone=public --add-port=5672/tcp --permanent;
+        firewall-cmd --reload
+        ```
 
 1.  Enable RabbitMQ service:
 
@@ -237,11 +237,7 @@ available at `/etc/trento/trento-web.example` and `/etc/trento/trento-wanda.exam
 > **Note:** You can create the content of the secret variables like `SECRET_KEY_BASE`, `ACCESS_TOKEN_ENC_SECRET` and `REFRESH_TOKEN_ENC_SECRET` 
 with `openssl` running `openssl rand -out /dev/stdout 48 | base64`
 
-> Note: Depending on how you intent to connect to the console, a
-> working hostname, FQDN, or an IP is required in `TRENTO_WEB_ORIGIN` for HTTPS; otherwise, websockets will fail to connect, causing no real-time updates on the UI.
-
-> Note: Depending on how you intent to connect to the console, a
-> working hostname, FQDN, or an IP is required in `TRENTO_WEB_ORIGIN` for HTTPS; otherwise, websockets will fail to connect, causing no real-time updates on the UI.
+> Note: Depending on how you intend to connect to the console, a working hostname, FQDN, or an IP is required in `TRENTO_WEB_ORIGIN` for HTTPS; otherwise, websockets will fail to connect, causing no real-time updates on the UI.
 
 #### trento-web configuration
 
@@ -252,15 +248,15 @@ DATABASE_URL=ecto://trento_user:web_password@localhost/trento
 EVENTSTORE_URL=ecto://trento_user:web_password@localhost/trento_event_store
 ENABLE_ALERTING=false
 PROMETHEUS_URL=http://localhost:9090
-SECRET_KEY_BASE=some-secret
-ACCESS_TOKEN_ENC_SECRET=some-secret
-REFRESH_TOKEN_ENC_SECRET=some-secret
 ADMIN_USER=admin
 ADMIN_PASSWORD=test1234
 ENABLE_API_KEY=true
 CHARTS_ENABLED=true
 PORT=4000
 TRENTO_WEB_ORIGIN=trento.example.com
+SECRET_KEY_BASE=some-secret
+ACCESS_TOKEN_ENC_SECRET=some-secret
+REFRESH_TOKEN_ENC_SECRET=some-secret
 ```
 > **Note:** Add `CHARTS_ENABLED=false` in Trento web configuration file if Prometheus is not installed or you don't want to use the charts feature of Trento.
 
@@ -282,11 +278,11 @@ SMTP_PASSWORD=<<SMTP_PASSWORD>>
 ```
 # /etc/trento/trento-wanda
 CORS_ORIGIN=http://localhost
-SECRET_KEY_BASE=some-secret
-ACCESS_TOKEN_ENC_SECRET=some-secret
 AMQP_URL=amqp://trento_user:trento_user_password@localhost:5672/vhost
 DATABASE_URL=ecto://wanda_user:wanda_password@localhost/wanda
 PORT=4001
+SECRET_KEY_BASE=some-secret
+ACCESS_TOKEN_ENC_SECRET=some-secret
 ```
 
 #### Start the services
@@ -353,10 +349,8 @@ journalctl -fu trento-web
 
 #### Install Trento on docker
 
-The environment variables listed here are examples and should be considered as placeholders. Instead of specifying environment variables directly in the `docker run` command, it is recommended to use an environment variable file. Store your environment variables in a file and use the --env-file option with the `docker run` command. Find detailed instructions on how to use an environment variable file with Docker on [official Docker documentation](https://docs.docker.com/engine/reference/commandline/run/#env).
-
 1. Create the secret environment variables:
-
+    >Note: Consider using an environment variable file, learn more about from [official Docker documentation](https://docs.docker.com/engine/reference/commandline/run/#env). Adjust upcoming commands for env file usage.
     ```bash
     WANDA_SECRET_KEY_BASE=$(openssl rand -out /dev/stdout 48 | base64)
     TRENTO_SECRET_KEY_BASE=$(openssl rand -out /dev/stdout 48 | base64)
@@ -384,7 +378,8 @@ The environment variables listed here are examples and should be considered as p
 
 1. Install trento-web on docker
 
-    > **Note:** Be sure to change the `ADMIN_USERNAME` and `ADMIN_PASSWORD`, these are the credentials that will be required to login to the trento-web UI.
+    Be sure to change the `ADMIN_USERNAME` and `ADMIN_PASSWORD`, these are the credentials that will be required to login to the trento-web UI.
+    Depending on how you intend to connect to the console, a working hostname, FQDN, or an IP is required in `TRENTO_WEB_ORIGIN` for HTTPS otherwise, websockets will fail to connect, causing no real-time updates on the UI.
 
     > **Note:** Add `CHARTS_ENABLED=false` if Prometheus is not installed or you don't want to use the charts feature of Trento.
 
@@ -405,15 +400,15 @@ The environment variables listed here are examples and should be considered as p
     -e ADMIN_USERNAME='admin' \
     -e ADMIN_PASSWORD='test1234' \
     -e ENABLE_API_KEY='true' \
+    -e TRENTO_WEB_ORIGIN='trento.example.com' \
     --restart always \
     --entrypoint /bin/sh \
     registry.suse.com/trento/trento-web:2.2.0 \
     -c "/app/bin/trento eval 'Trento.Release.init()' && /app/bin/trento start"
     ```
-
     
      Mail alerting is disabled by default, as described in [enabling alerting](https://github.com/trento-project/web/blob/main/guides/alerting/alerting.md#enabling-alerting) guide. Enable alerting by setting `ENABLE_ALERTING` env to `true`. Additional required variables are: `[ALERT_SENDER,ALERT_RECIPIENT,SMTP_SERVER,SMTP_PORT,SMTP_USER,SMTP_PASSWORD]`
-    > All other settings should remain as they are.
+     All other settings should remain as they are.
 
     Example:
 
