@@ -1,4 +1,6 @@
-# Installation of Trento
+# Installation of Trento 
+
+<!--Migration to official documentation (WIP)-->
 
 ## Scope
 
