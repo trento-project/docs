@@ -247,6 +247,7 @@ AMQP_URL=amqp://trento_user:trento_user_password@localhost:5672/vhost
 DATABASE_URL=ecto://trento_user:web_password@localhost/trento
 EVENTSTORE_URL=ecto://trento_user:web_password@localhost/trento_event_store
 ENABLE_ALERTING=false
+ENABLE_OIDC=false
 CHARTS_ENABLED=true
 PROMETHEUS_URL=http://localhost:9090
 ADMIN_USER=admin
@@ -391,6 +392,7 @@ journalctl -fu trento-web
     --add-host "host.docker.internal:host-gateway" \
     -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost \
     -e ENABLE_ALERTING=false \
+    -e ENABLE_OIDC=false  \
     -e DATABASE_URL=ecto://trento_user:web_password@host.docker.internal/trento \
     -e EVENTSTORE_URL=ecto://trento_user:web_password@host.docker.internal/trento_event_store \
     -e PROMETHEUS_URL='http://host.docker.internal:9090' \
@@ -468,6 +470,61 @@ Expected output if Trento web/wanda is ready and the database connection is setu
 ```
 {"ready":true}{"database":"pass"}
 ```
+
+## Integrations
+
+### OIDC
+
+Trento supports OpenID Connect (OIDC) protocol to authenticate users accessing the Trento web console. 
+
+#### Enabling OIDC
+
+The OIDC authentication is **disabled by default**.
+
+##### Enabling OIDC RPM
+
+Provide the following environment variables to trento-web configuration, which is stored at ```/etc/trento/trento-web```  and restart the application to enable OIDC integration.
+
+```
+# Required:
+ENABLE_OIDC=true
+OIDC_CLIENT_ID=<<OIDC_CLIENT_ID>>
+OIDC_CLIENT_SECRET=<<OIDC_CLIENT_SECRET>>
+OIDC_BASE_URL=<<OIDC_BASE_URL>>
+
+# Optional:
+OIDC_CALLBACK_URL=<<OIDC_CALLBACK_URL>>
+
+```
+##### Enabling OIDC Docker
+
+Provide the following environment variables to the docker container and restart the application to enable OIDC integration.
+
+```
+docker run -d \
+-p 4000:4000 \
+--name trento-web \
+--network trento-net \
+--add-host "host.docker.internal:host-gateway" \
+
+...[other settings]...
+
+# REQUIRED:
+-e ENABLE_OIDC=true  \
+-e OIDC_CLIENT_ID=<<OIDC_CLIENT_ID>> \
+-e OIDC_CLIENT_SECRET=<<OIDC_CLIENT_SECRET>> \
+-e OIDC_BASE_URL=<<OIDC_BASE_URL>> \
+
+# OPTIONAL:
+-e OIDC_CALLBACK_URL=<<OIDC_CALLBACK_URL>> \
+
+...[other settings]...
+```
+
+
+#### Trento OIDC super admin
+
+The super admin user association is done using the `ADMIN_USER` variable, so any user with that name in the provided IDP will be granted with that permissions.
 
 ## Prepare SSL certificate for NGINX
 
