@@ -473,13 +473,26 @@ Expected output if Trento web/wanda is ready and the database connection is setu
 
 ## Integrations
 
-### OIDC
+### OpenID Connect
 
-Trento supports OpenID Connect (OIDC) protocol to authenticate users accessing the Trento web console. 
+Trento integrates with an identity provider (IDP) that uses the OpenID Connect (OIDC) protocol to authenticate users accessing the Trento web console. Authorization for specific abilities/permissions is managed by Trento, which means that only basic user information is retrieved from the external IDP.
+
+
+#### User Roles and Authentication
+
+User authentication is entirely managed by the IDP, which is responsible for maintaining user accounts. 
+A user, who does not exist on the IDP, is unable to access the Trento web console.
+If the default admin user created during the installation process matches the authenticated user’s IDP username, that user is automatically granted `all:all` permissions within Trento.
+Create a new user on IDP and login to Trento to finalize the user creation on Trento.
+Set `all:users` permissions with the default admin user to the newly created admin user.
+
+All roles and permissions should be managed by the newly created admin user with the `all:users` permissions inside Trento, independent of the IDP.
+
+> **Note:** Multi-Factor Authentication cannot be enabled for the default admin user, keeping its password safe is essential
 
 #### Enabling OIDC
 
-The OIDC authentication is **disabled by default**.
+OIDC authentication is **disabled by default**.
 
 ##### Enabling OIDC RPM
 
@@ -520,11 +533,6 @@ docker run -d \
 
 ...[other settings]...
 ```
-
-
-#### Trento OIDC super admin
-
-The super admin user association is done using the `ADMIN_USER` variable, so any user with that name in the provided IDP will be granted with that permissions.
 
 ## Prepare SSL certificate for NGINX
 
