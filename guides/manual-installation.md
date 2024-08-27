@@ -218,17 +218,17 @@ Each of them has a different installation process, but the end result is the sam
 
 ### Install Trento using RPM packages
 
-The `trento-web` and `trento-wanda` packages come in the supported SLES4SAP distributions by default.
+The `trento-web`, `trento-wanda` and `trento-checks` packages come in the supported SLES4SAP distributions by default.
 
 Install Trento web and wanda:
 ```bash
-zypper install trento-web trento-wanda
+zypper install trento-web trento-wanda trento-checks
 ```
 
 #### Create the configuration files
 
-Both services depend on respective configuration files that tune the usage of them. They must be placed in
-`/etc/trento/trento-web` and `/etc/trento/trento-wanda` respectively, and examples of how to fill them are
+Both `trento-web` and `trento-wanda` depend on respective configuration files that tune the usage of them. They must be placed in
+`/etc/trento/trento-web` and `/etc/trento/trento-wanda` respectively, and examples of how to fill them are 
 available at `/etc/trento/trento-web.example` and `/etc/trento/trento-wanda.example`.
 
 **Important: The content of `SECRET_KEY_BASE` and `ACCESS_TOKEN_ENC_SECRET` in both `trento-web` and `trento-wanda` must be the same.**
