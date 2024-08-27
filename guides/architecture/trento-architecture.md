@@ -48,7 +48,7 @@ Some of possible _reactions_
 ---
 
 ## Checks Execution
-The Checks Execution is managed by the [Checks Engine](https://github.com/trento-project/wanda). It includes the Trento configuration checks catalog, which are written as `yaml` files. Each check includes a script written in [Rhai](https://rhai.rs/) which is what the check tries to evaluate with some facts coming from the targets.
+The Checks Execution is managed by the [Checks Engine](https://github.com/trento-project/wanda). It uses the [Trento configuration checks catalog](https://github.com/trento-project/checks), which consists of `yaml` files. Each check includes a script written in [Rhai](https://rhai.rs/) which is what the check tries to evaluate with some facts coming from the targets.
 
 This component is responsible of:
 - Listening for checks execution requests coming from the control plane (or any other external user)
