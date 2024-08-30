@@ -357,13 +357,22 @@ journalctl -fu trento-web
     REFRESH_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
     ```
 
-1. Install trento-wanda on docker:
+1.  Install the checks on the system in a shared volume
+
+    ```bash
+    docker run -it \
+    -v /usr/share/trento/checks:/usr/share/trento/checks \
+    registry.suse.com/trento/trento-checks:1.0.0
+    ```
+
+1.  Install trento-wanda on docker:
 
     ```bash
     docker run -d --name wanda \
         -p 4001:4000 \
         --network trento-net \
         --add-host "host.docker.internal:host-gateway" \
+        -v /usr/share/trento/checks:/usr/share/trento/checks \
         -e CORS_ORIGIN=localhost \
         -e SECRET_KEY_BASE=$WANDA_SECRET_KEY_BASE \
         -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
