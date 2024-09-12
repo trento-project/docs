@@ -247,7 +247,6 @@ AMQP_URL=amqp://trento_user:trento_user_password@localhost:5672/vhost
 DATABASE_URL=ecto://trento_user:web_password@localhost/trento
 EVENTSTORE_URL=ecto://trento_user:web_password@localhost/trento_event_store
 ENABLE_ALERTING=false
-ENABLE_OIDC=false
 CHARTS_ENABLED=true
 PROMETHEUS_URL=http://localhost:9090
 ADMIN_USER=admin
@@ -392,7 +391,6 @@ journalctl -fu trento-web
     --add-host "host.docker.internal:host-gateway" \
     -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost \
     -e ENABLE_ALERTING=false \
-    -e ENABLE_OIDC=false  \
     -e DATABASE_URL=ecto://trento_user:web_password@host.docker.internal/trento \
     -e EVENTSTORE_URL=ecto://trento_user:web_password@host.docker.internal/trento_event_store \
     -e PROMETHEUS_URL='http://host.docker.internal:9090' \
@@ -494,7 +492,7 @@ All roles and permissions should be managed by the newly created admin user with
 
 OIDC authentication is **disabled by default**.
 
-##### Enabling OIDC RPM
+##### Enabling OIDC when using RPM packages
 
 Provide the following environment variables to trento-web configuration, which is stored at ```/etc/trento/trento-web```  and restart the application to enable OIDC integration.
 
@@ -509,11 +507,11 @@ OIDC_BASE_URL=<<OIDC_BASE_URL>>
 OIDC_CALLBACK_URL=<<OIDC_CALLBACK_URL>>
 
 ```
-##### Enabling OIDC Docker
+##### Enabling OIDC when using Docker images
 
 Provide the following environment variables to the docker container and restart the application to enable OIDC integration.
 
-```
+```bash
 docker run -d \
 -p 4000:4000 \
 --name trento-web \
