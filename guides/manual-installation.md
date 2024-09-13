@@ -469,6 +469,63 @@ Expected output if Trento web/wanda is ready and the database connection is setu
 {"ready":true}{"database":"pass"}
 ```
 
+## Integrations
+
+### OpenID Connect
+
+Trento integrates with an identity provider (IDP) that uses the OpenID Connect (OIDC) protocol to authenticate users accessing the Trento web console. Authorization for specific abilities/permissions is managed by Trento, which means that only basic user information is retrieved from the external IDP.
+
+#### User Roles and Authentication
+
+User authentication is entirely managed by the IDP, which is responsible for maintaining user accounts. 
+A user, who does not exist on the IDP, is unable to access the Trento web console.
+During the installation process, a default admin user is defined using the `ADMIN_USER` variable, which defaults to `admin`. If the authenticated user’s IDP username matches this admin user's username, that user is automatically granted `all:all` permissions within Trento.
+User permissions are entirely managed by Trento, they are not imported from the IDP. The abilities must be granted by some user with `all:all` or `all:users` abilities (**admin user initially**).
+
+#### Enabling OIDC
+
+OIDC authentication is **disabled by default**.
+
+##### Enabling OIDC when using RPM packages
+
+Provide the following environment variables to trento-web configuration, which is stored at ```/etc/trento/trento-web```  and restart the application to enable OIDC integration.
+
+```
+# Required:
+ENABLE_OIDC=true
+OIDC_CLIENT_ID=<<OIDC_CLIENT_ID>>
+OIDC_CLIENT_SECRET=<<OIDC_CLIENT_SECRET>>
+OIDC_BASE_URL=<<OIDC_BASE_URL>>
+
+# Optional:
+OIDC_CALLBACK_URL=<<OIDC_CALLBACK_URL>>
+
+```
+##### Enabling OIDC when using Docker images
+
+Provide the following environment variables to the docker container and restart the application to enable OIDC integration.
+
+```bash
+docker run -d \
+-p 4000:4000 \
+--name trento-web \
+--network trento-net \
+--add-host "host.docker.internal:host-gateway" \
+
+...[other settings]...
+
+# REQUIRED:
+-e ENABLE_OIDC=true  \
+-e OIDC_CLIENT_ID=<<OIDC_CLIENT_ID>> \
+-e OIDC_CLIENT_SECRET=<<OIDC_CLIENT_SECRET>> \
+-e OIDC_BASE_URL=<<OIDC_BASE_URL>> \
+
+# OPTIONAL:
+-e OIDC_CALLBACK_URL=<<OIDC_CALLBACK_URL>> \
+
+...[other settings]...
+```
+
 ## Prepare SSL certificate for NGINX
 
 Create or provide a certificate for [NGINX](https://nginx.org/en/) to enable SSL for Trento.
