@@ -479,7 +479,7 @@ Trento integrates with an identity provider (IDP) that uses the OpenID Connect (
 
 User authentication is entirely managed by the IDP, which is responsible for maintaining user accounts. 
 A user, who does not exist on the IDP, is unable to access the Trento web console.
-During the installation process, a default admin user is defined using the `ADMIN_USER` variable, which defaults to `admin`. If the authenticated user’s IDP username matches this default admin user's username, that user is automatically granted `all:all` permissions within Trento.
+During the installation process, a default admin user is defined using the `ADMIN_USER` variable, which defaults to `admin`. If the authenticated user’s IDP username matches this admin user's username, that user is automatically granted `all:all` permissions within Trento.
 User permissions are entirely managed by Trento, they are not imported from the IDP. The abilities must be granted by some user with `all:all` or `all:users` abilities (**admin user initially**).
 
 #### Enabling OIDC
