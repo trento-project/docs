@@ -360,9 +360,10 @@ journalctl -fu trento-web
 1.  Install the checks on the system in a shared volume
 
     ```bash
-    docker run -it \
-    -v /usr/share/trento/checks:/usr/share/trento/checks \
-    registry.suse.com/trento/trento-checks:1.0.0
+    docker volume create trento-checks \
+      && docker run \
+      -v trento-checks:/usr/share/trento/checks \
+      registry.suse.com/trento/trento-checks:1.0.0
     ```
 
 1.  Install trento-wanda on docker:
@@ -372,7 +373,7 @@ journalctl -fu trento-web
         -p 4001:4000 \
         --network trento-net \
         --add-host "host.docker.internal:host-gateway" \
-        -v /usr/share/trento/checks:/usr/share/trento/checks \
+        -v trento-checks:/usr/share/trento/checks:ro \
         -e CORS_ORIGIN=localhost \
         -e SECRET_KEY_BASE=$WANDA_SECRET_KEY_BASE \
         -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
