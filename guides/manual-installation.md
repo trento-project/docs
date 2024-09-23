@@ -25,7 +25,7 @@ For installations on Service Packs other than SP5, ensure to update the reposito
 
 [Prometheus](https://prometheus.io/) is not required to run Trento, but it is recommended as it allows Trento to display a series of charts for each host with useful information about the CPU load, memory, and other important metrics.
 
-> **Note:** If you choose not to install Prometheus or to provide an existing installation, ensure that `CHARTS_ENABLED` is set to false in the Trento web RPM configuration file, which is stored at `/etc/trento/trento-web`,  or when it is provided to the Trento web container. Refer to [Install Trento server components](#install-trento-server-components).
+> **Note:** If you choose not to install Prometheus or to provide an existing installation, ensure that `CHARTS_ENABLED` is set to false in the Trento web RPM configuration file, which is stored at `/etc/trento/trento-web`, or when it is provided to the Trento web container. Refer to [Install Trento server components](#install-trento-server-components).
 
 #### <a id="prometheus_install_option_1"></a>Option 1: Use existing installation
 
@@ -61,7 +61,7 @@ If you have an [existing Prometheus server](https://prometheus.io/docs/prometheu
     ```
     > **Note:** In case the missing dependency can't be satisfied we have already added the Prometheus user/group. With this, it is safe to proceed with the installation by choosing Solution 2: break golang-github-prometheus-prometheus
 
-1.  <a id="prometheus_trento_configuration"></a>Change Prometheus configuration by replacing the configuration at `/etc/prometheus/prometheus.yml` with: 
+1.  <a id="prometheus_trento_configuration"></a>Change Prometheus configuration by replacing the configuration at `/etc/prometheus/prometheus.yml` with:
     ```yaml
     global:
       scrape_interval: 30s
@@ -101,7 +101,6 @@ This guide was tested with the following PostgreSQL version:
 - **13.9 for SP3**
 - **14.10 for SP4**
 - **15.5 for SP5**
- 
 Using a different version of PostgreSQL may require different steps or configurations, especially when changing the major number. For more details, refer to the official [PostgreSQL documentation](https://www.postgresql.org/docs/).
 
 1. Install PostgreSQL server:
@@ -128,7 +127,7 @@ Using a different version of PostgreSQL may require different steps or configura
       CREATE DATABASE trento;
       CREATE DATABASE trento_event_store;
       ```
-1.  Create the users:
+1. Create the users:
       ```sql
       CREATE USER wanda_user WITH PASSWORD 'wanda_password';
       CREATE USER trento_user WITH PASSWORD 'web_password';
@@ -145,7 +144,7 @@ Using a different version of PostgreSQL may require different steps or configura
       ```
     You can exit from the `psql` console and `postgres` user.
 
-1.  Allow the PostgreSQL database to receive connections for the respective databases and users adding the following in `/var/lib/pgsql/data/pg_hba.conf`:
+1. Allow the PostgreSQL database to receive connections for the respective databases and users adding the following in `/var/lib/pgsql/data/pg_hba.conf`:
 
     ```bash
     host   wanda                      wanda_user    0.0.0.0/0   md5
@@ -155,14 +154,14 @@ Using a different version of PostgreSQL may require different steps or configura
     > **Note:** The `pg_hba.conf` file works in a sequential fashion. This means, that the rules positioned on the top have preference over the ones coming next. This examples shows a pretty permissive address range, so in order to work, they entries must be written in the top of the `host` entries. Find additional information in the [pg_hba.conf](https://www.postgresql.org/docs/current/auth-pg-hba-conf.html) documentation.
 
 
-1.  Allow PostgreSQL to bind on all network
+1. Allow PostgreSQL to bind on all network
     interfaces in `/var/lib/pgsql/data/postgresql.conf` by changing the following line:
 
     ```bash
     listen_addresses = '*'
     ```
 
-1.  Restart PostgreSQL to apply the changes:
+1. Restart PostgreSQL to apply the changes:
 
     ```bash
     systemctl restart postgresql
@@ -180,7 +179,7 @@ Using a different version of PostgreSQL may require different steps or configura
     listeners.tcp.default = 5672
     ```
 
-1.   If firewalld is running, add an exception on firewalld:
+1.  If firewalld is running, add an exception on firewalld:
 
         ```bash
         firewall-cmd --zone=public --add-port=5672/tcp --permanent;
@@ -207,7 +206,7 @@ To configure RabbitMQ for a production system, follow the official suggestions [
     rabbitmqctl add_vhost vhost
     ```
 
-1. Set permissions for the user on the virtual host:
+1.  Set permissions for the user on the virtual host:
     ```bash
     rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
     ```
@@ -229,7 +228,7 @@ zypper install trento-web trento-wanda
 #### Create the configuration files
 
 Both services depend on respective configuration files that tune the usage of them. They must be placed in
-`/etc/trento/trento-web` and `/etc/trento/trento-wanda` respectively, and examples of how to fill them are 
+`/etc/trento/trento-web` and `/etc/trento/trento-wanda` respectively, and examples of how to fill them are
 available at `/etc/trento/trento-web.example` and `/etc/trento/trento-wanda.example`.
 
 **Important: The content of `SECRET_KEY_BASE` and `ACCESS_TOKEN_ENC_SECRET` in both `trento-web` and `trento-wanda` must be the same.**
@@ -358,7 +357,7 @@ journalctl -fu trento-web
     REFRESH_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
     ```
 
-1.  Install trento-wanda on docker:
+1. Install trento-wanda on docker:
 
     ```bash
     docker run -d --name wanda \
@@ -424,7 +423,7 @@ journalctl -fu trento-web
     -e SMTP_PORT=<<SMTP_PORT>> \
     -e SMTP_USER=<<SMTP_USER>> \
     -e SMTP_PASSWORD=<<SMTP_PASSWORD>> \
-    
+
     ...[other settings]...
     ```
 
@@ -445,7 +444,7 @@ journalctl -fu trento-web
     Both containers should be running and listening on the specified ports.
 
 ### Validate the health status of trento web and wanda
-Trento web and wanda services correct functioning could be validated accessing the ```healthz``` and ```readyz``` api.
+Trento web and wanda services correct functioning could be validated accessing the `healthz` and `readyz` api.
 
 1. Test Trento web health status with `curl`:
     ```bash
@@ -455,14 +454,13 @@ Trento web and wanda services correct functioning could be validated accessing t
     curl http://localhost:4000/api/healthz
     ```
 
-1.  Test Trento wanda health status with `curl`:
+1. Test Trento wanda health status with `curl`:
     ```bash
     curl http://localhost:4001/api/readyz
     ```
     ```bash
     curl http://localhost:4001/api/healthz
     ```
-    
 
 Expected output if Trento web/wanda is ready and the database connection is setup correctly:
 ```
@@ -471,20 +469,21 @@ Expected output if Trento web/wanda is ready and the database connection is setu
 
 ## Single Sign-on Integrations
 
-Trento can be integrated with an identity provider (IDP) that uses diffrent Single sign-on (SSO) protocols like OpenID Connect (OIDC) and Open Authorization 2.0 (OAuth 2).
+Trento can be integrated with an identity provider (IDP) that uses different Single sign-on (SSO) protocols like OpenID Connect (OIDC) and Open Authorization 2.0 (OAuth 2).
 
-  >Note: Trento cannot start with OIDC and OAuth 2 integrations both enabled!
+> [!NOTE]  
+> Trento cannot start with multiple SSO options together, so only one can be chosen.
+
+### User Roles and Authentication
+
+User authentication is entirely managed by the IDP, which is responsible for maintaining user accounts.
+A user, who does not exist on the IDP, is unable to access the Trento web console.
+During the installation process, a default admin user is defined using the `ADMIN_USER` variable, which defaults to `admin`. If the authenticated user’s IDP username matches this admin user's username, that user is automatically granted `all:all` permissions within Trento.
+User permissions are entirely managed by Trento, they are not imported from the IDP. The abilities must be granted by some user with `all:all` or `all:users` abilities (**admin user initially**).
 
 ### OpenID Connect
 
 Trento integrates with an IDP that uses the OIDC protocol to authenticate users accessing the Trento web console. Authorization for specific abilities/permissions is managed by Trento, which means that only basic user information is retrieved from the external IDP.
-
-#### User Roles and Authentication for OIDC
-
-User authentication is entirely managed by the IDP, which is responsible for maintaining user accounts. 
-A user, who does not exist on the IDP, is unable to access the Trento web console.
-During the installation process, a default admin user is defined using the `ADMIN_USER` variable, which defaults to `admin`. If the authenticated user’s IDP username matches this admin user's username, that user is automatically granted `all:all` permissions within Trento.
-User permissions are entirely managed by Trento, they are not imported from the IDP. The abilities must be granted by some user with `all:all` or `all:users` abilities (**admin user initially**).
 
 #### Enabling OIDC
 
@@ -492,7 +491,7 @@ OIDC authentication is **disabled by default**.
 
 ##### Enabling OIDC when using RPM packages
 
-Provide the following environment variables to trento-web configuration, which is stored at ```/etc/trento/trento-web```  and restart the application to enable OIDC integration.
+Provide the following environment variables to trento-web configuration, which is stored at `/etc/trento/trento-web` and restart the application to enable OIDC integration.
 
 ```
 # Required:
@@ -533,16 +532,13 @@ docker run -d \
 
 Trento integrates with an IDP that uses the OAuth 2 protocol to authenticate users accessing the Trento web console. Authorization for specific abilities/permissions is managed by Trento, which means that only basic user information is retrieved from the external IDP.
 
-#### User Roles and Authentication for Oauth 2.0
-The authentication process is the same as in [User Roles and Authentication for OIDC](#user-roles-and-authentication-for-oidc).
-
 #### Enabling OAuth 2.0
 
 OAuth 2.0 authentication is **disabled by default**.
 
 ##### Enabling OAuth 2.0 when using RPM packages
 
-Provide the following environment variables to trento-web configuration, which is stored at ```/etc/trento/trento-web```  and restart the application to enable OIDC integration.
+Provide the following environment variables to trento-web configuration, which is stored at `/etc/trento/trento-web` and restart the application to enable OIDC integration.
 
 ```
 # Required:
@@ -558,6 +554,9 @@ OAUTH2_USER_URL=<<OAUTH2_USER_URL>>
 OAUTH2_SCOPES=<<OAUTH2_SCOPES>>
 OAUTH2_CALLBACK_URL=<<OAUTH2_CALLBACK_URL>>
 ```
+
+> **Note:** OAUTH2_SCOPES is an optional variable with the default value `openid profile email`. OAUTH2_SCOPES must be adjusted depending on IDP provider requirements.
+
 ##### Enabling OAuth 2.0 when using Docker images
 
 Provide the following environment variables to the docker container and restart the application to enable OIDC integration.
@@ -586,6 +585,8 @@ docker run -d \
 ...[other settings]...
 ```
 
+> **Note:** OAUTH2_SCOPES is an optional variable with the default value `openid profile email`. OAUTH2_SCOPES must be adjusted depending on IDP provider requirements.
+
 ## Prepare SSL certificate for NGINX
 
 Create or provide a certificate for [NGINX](https://nginx.org/en/) to enable SSL for Trento.
@@ -594,7 +595,7 @@ This is a basic guide for creating a self-signed certificate for use with Trento
 ### Option 1: Creating a Self-Signed Certificate
 
 1.  Generate a self signed certificate:
-    >Note: Remember to adjust ```subjectAltName = DNS:trento.example.com``` by replacing ```trento.example.com``` with your own domain and change the value ```5``` to the number of days for which you need the certificate to be valid. For example, ```-days 365``` for one year.
+    > Note: Remember to adjust `subjectAltName = DNS:trento.example.com` by replacing `trento.example.com` with your own domain and change the value `5` to the number of days for which you need the certificate to be valid. For example, `-days 365` for one year.
 
     ```bash
     openssl req -newkey rsa:2048 --nodes -keyout trento.key -x509 -days 5 -out trento.crt -addext "subjectAltName = DNS:trento.example.com"
@@ -604,7 +605,7 @@ This is a basic guide for creating a self-signed certificate for use with Trento
     ```bash
     mv trento.key /etc/ssl/private/trento.key
     ```
-1. Move the generated  trento.crt in a location accessible by nginx:
+1.  Move the generated trento.crt in a location accessible by nginx:
     ```bash
     mv trento.crt /etc/ssl/certs/trento.crt
     ```
@@ -627,7 +628,7 @@ This is a basic guide for creating a self-signed certificate for use with Trento
     zypper install certbot python3-certbot-nginx
     ```
 
-1. Obtain a certificate and configure Nginx with Certbot:
+1.  Obtain a certificate and configure Nginx with Certbot:
     > **Note:** Replace `example.com` with your domain. For more information, visit [Certbot instructions for Nginx](https://certbot.eff.org/instructions?ws=nginx&os=leap)
 
     ```bash
@@ -731,9 +732,9 @@ This is a basic guide for creating a self-signed certificate for use with Trento
     nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
     nginx: configuration file /etc/nginx/nginx.conf test is successful
     ```
-    If there are issues with the configuration, the output will indicate what needs to be adjusted. 
+    If there are issues with the configuration, the output will indicate what needs to be adjusted.
 
-1.  Reload Nginx to apply changes:
+1. Reload Nginx to apply changes:
 
     ```bash
     systemctl reload nginx
