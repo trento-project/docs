@@ -703,6 +703,7 @@ docker run -d \
 Find in this table the SAML integration options and their default values:
 
 | Name                           | Description                                                                                                      | Default                                     |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
 | SAML_IDP_ID                    | SAML IDP id                                                                                                      |                                             |
 | SAML_SP_ID                     | SAML SP id                                                                                                       |                                             |
 | SAML_METADATA_URL              | URL to retrieve the SAML metadata xml file. One of `SAML_METADATA_URL` or `SAML_METADATA_CONTENT` is required    |                                             |
