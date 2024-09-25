@@ -611,11 +611,30 @@ So for example, if the IDP user profile username is defined as `attr:username`, 
 Commonly, SAML protocol messages are signed with SSL. This is optional using Trento, and the signing is not required (even though it is recommended).
 If the IDP signs the messages, and expect signed messages back, certificates used by the SP (Trento in this case) must be provided to the IDP, the Certificate file in this case.
 
-For this reason, Trento already provides a certificates set created during the installation. When Trento is installed the first time (does not matter the installation mode) the certificates are created, and the public certificate file content is available in the `http://localhost:4000/api/public_keys` route. Copy the content of the certificate from there, and provide it to the IDP. This way, the IDP will sign and verify the messages sent by both ends.
+For this reason, Trento already provides a certificates set created during the installation. When Trento is installed the first time (does not matter the installation mode) the certificates are created, and the public certificate file content is available in the `http://localhost:4000/api/public_keys` route. 
 
-When this certificate is used, once it is provided to the IDP, the IDP recreates its own `metadata.xml` file, which defines which certificate is used to sign the messages by both sides. At this point, Trento Web must be restarted to use the new `metadata.xml` content. If `SAML_METDATA_CONTENT` option is used, this variable content must be updated with the new content. In the other hand, if `SAML_METADATA_URL` is used, the new content is automatically obtained. Otherwise, the communication fails as they don't recognize the messages signature.
+```bash
+curl http://localhost:4000/api/public_keys
+```
+    
+Copy the content of the certificate from there, and provide it to the IDP. This way, the IDP will sign and verify the messages sent by both ends.
 
-**This restart must be done manually, by the admin. If the installation is done by a `rpm`, restarting the `systemd` daemon. If the installation is done using `docker`, the container must be restarted.**
+When this certificate is used, and provided to the IDP, the IDP recreates its own `metadata.xml` file. This file defines which certificate is used to sign the messages by both sides. At this point, Trento Web must be restarted to use the new `metadata.xml` content.
+
+If the `SAML_METDATA_CONTENT` option is being used, the content of this variable must be updated with the new metadata. In the other hand, if `SAML_METADATA_URL` is used, the new metadata is automatically fetched. If neither of these steps are completed, communication will fail because the message signatures will not be recognized
+
+**This restart must be done manually, by the admin. If the installation is done by a `RPM`, restarting the `systemd` daemon. If the installation is done using `Docker`, the container must be restarted.**
+
+```
+# RPM
+systemctl restart trento-web
+
+# Docker
+# Get container ID
+docker container ps
+# Restart
+docker restart container-id
+```
 
 ##### SAML redirect URI
 
@@ -634,7 +653,7 @@ Provide the following environment variables to trento-web configuration, which i
 ENABLE_SAML=true
 SAML_IDP_ID=<<SAML_IDP_ID>>
 SAML_SP_ID=<<SAML_SP_ID>>
-# One of SAML_METADATA_URL or SAML_METADATA_CONTENT
+# Only SAML_METADATA_URL or SAML_METADATA_CONTENT must by provided
 SAML_METADATA_URL=<<SAML_METADATA_URL>>
 SAML_METADATA_CONTENT=<<SAML_METADATA_CONTENT>>
 
@@ -673,7 +692,7 @@ docker run -d \
 -e ENABLE_SAML=true
 -e SAML_IDP_ID=<<SAML_IDP_ID>> \
 -e SAML_SP_ID=<<SAML_SP_ID>> \
-# One of SAML_METADATA_URL or SAML_METADATA_CONTENT
+# Only SAML_METADATA_URL or SAML_METADATA_CONTENT must by provided
 -e SAML_METADATA_URL=<<SAML_METADATA_URL>> \
 -e SAML_METADATA_CONTENT=<<SAML_METADATA_CONTENT>> \
 
