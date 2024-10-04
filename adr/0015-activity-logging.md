@@ -28,7 +28,7 @@ A CDC/WAL approach requires by definition that the relevant activities hit the d
 Integration of OTEL and its almost automatic instrumentation turned out to be quite convenient with regards to data collection, however it demands the introduction of a third party tool to enable searching capabilities on collected data.
 The overhead the introduction of this extra piece of software adds to the release process led us to deciding not to pursue this approach.
 
-For this reasons we decided to implement a bespoke yet nimble mechanism to log relevant activities into a dedicated table in the already present postgres instance.
+For these reasons we decided to implement a bespoke yet nimble mechanism to log relevant activities into a dedicated table in the already present postgres instance.
 
 Currently, interesting loggable activities are:
 - cartain http requests made to relevant trento's APIs
