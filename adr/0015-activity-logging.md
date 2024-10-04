@@ -8,13 +8,9 @@ Accepted
 
 ## Context
 
-Trento feature-set is growing and not limited to only reading operations but expanding to applying state changes of different natures:
-- tagging/untagging resources
-- applying trento settings (api key, SUMA, etc...)
-- user/profile management operations (creation, modification, deletion)
-- operate on the monitred infrastructure (apply patches/upgrade packages via SUMA integration, apply remediations for failing checks)
+Trento feature-set is growing and not limited to only reading operations but expanding to applying state changes of different natures.
 
-Such activities may be of huge impact and visibility on them is a great asset to troubleshooting incidents, determine root causes of issues and it improves transparency of the system in general.
+Such activities may be of huge impact and visibility on them is a great asset to troubleshooting incidents, determining root causes of issues and it improving transparency of the system in general.
 
 Additionally the possibility to correlate actions/events in order to build a history carrying cause-effects links, enhances visibility by supporting a sense making about chain of events and their outcomes.
 
