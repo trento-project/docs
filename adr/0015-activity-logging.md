@@ -48,3 +48,4 @@ The depicted decision has the following effects:
 Tradeoffs:
 - number of writes to the database are amplified for relevant activities because of insertions and reindexing
 - the size of the activity log table depends on the number of logged activities combined with the retention time set by the user
+- Activity log context references web related modules in order to match controller/action pairs
