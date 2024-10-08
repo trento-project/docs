@@ -46,5 +46,5 @@ The depicted decision has the following effects:
 - we can leverage postgres searching capabilities
 
 Tradeoffs:
-- writes to the database are doubled for relevant activities
+- number of writes to the database are amplified for relevant activities because of insertions and reindexing
 - the size of the activity log table depends on the number of logged activities combined with the retention time set by the user
