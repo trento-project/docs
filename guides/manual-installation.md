@@ -387,7 +387,7 @@ journalctl -fu trento-web
 
 1. Install trento-web on docker
 
-    Be sure to change the `ADMIN_USERNAME` and `ADMIN_PASSWORD`, these are the credentials that will be required to login to the trento-web UI.
+    Be sure to change the `ADMIN_USER` and `ADMIN_PASSWORD`, these are the credentials that will be required to login to the trento-web UI.
     Depending on how you intend to connect to the console, a working hostname, FQDN, or an IP is required in `TRENTO_WEB_ORIGIN` for HTTPS otherwise, websockets will fail to connect, causing no real-time updates on the UI.
 
     > **Note:** Add `CHARTS_ENABLED=false` if Prometheus is not installed or you don't want to use the charts feature of Trento.
@@ -406,7 +406,7 @@ journalctl -fu trento-web
     -e SECRET_KEY_BASE=$TRENTO_SECRET_KEY_BASE \
     -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
     -e REFRESH_TOKEN_ENC_SECRET=$REFRESH_TOKEN_ENC_SECRET \
-    -e ADMIN_USERNAME='admin' \
+    -e ADMIN_USER='admin' \
     -e ADMIN_PASSWORD='test1234' \
     -e ENABLE_API_KEY='true' \
     -e TRENTO_WEB_ORIGIN='trento.example.com' \
@@ -909,4 +909,4 @@ This is a basic guide for creating a self-signed certificate for use with Trento
 
 ## Accessing the trento-web UI
 
-Open a browser and navigate to `https://trento.example.com`. You should be able to login using the credentials you provided in the `ADMIN_USERNAME` and `ADMIN_PASSWORD` environment variables.
+Open a browser and navigate to `https://trento.example.com`. You should be able to login using the credentials you provided in the `ADMIN_USER` and `ADMIN_PASSWORD` environment variables.
