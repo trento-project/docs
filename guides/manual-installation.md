@@ -754,56 +754,6 @@ Find in this table the SAML integration options and their default values:
 | SAML_SIGNED_ASSERTION          | Require to receive SAML assertion signed from the IDP. Set to false if the IDP doesn't sign the assertion        | true                                        |
 | SAML_SIGNED_ENVELOPES          | Require to receive SAML envelopes signed from the IDP. Set to false if the IDP doesn't sign the envelopes        | true                                        |
 
-## Prepare SSL certificate for NGINX
-
-Create or provide a certificate for [NGINX](https://nginx.org/en/) to enable SSL for Trento.
-This is a basic guide for creating a self-signed certificate for use with Trento. You may use your own certificate. For detailed instructions, consult the [OpenSSL documentation](https://www.openssl.org/docs/man1.0.2/man5/x509v3_config.html).
-
-### Option 1: Creating a Self-Signed Certificate
-
-1.  Generate a self signed certificate:
-    > Note: Remember to adjust `subjectAltName = DNS:trento.example.com` by replacing `trento.example.com` with your own domain and change the value `5` to the number of days for which you need the certificate to be valid. For example, `-days 365` for one year.
-
-    ```bash
-    openssl req -newkey rsa:2048 --nodes -keyout trento.key -x509 -days 5 -out trento.crt -addext "subjectAltName = DNS:trento.example.com"
-    ```
-
-1.  Move the generated trento.key in a location accessible by nginx:
-    ```bash
-    mv trento.key /etc/ssl/private/trento.key
-    ```
-1.  Move the generated trento.crt in a location accessible by nginx:
-    ```bash
-    mv trento.crt /etc/ssl/certs/trento.crt
-    ```
-
-### Option 2: Using Let's Encrypt for a Signed Certificate using PackageHub repository
-
-> **Note:** Using a different Service Pack than SP5 requires to change repository: [SLE15 SP3: `SUSEConnect --product PackageHub/15.3/x86_64`,SLE15 SP4: `SUSEConnect --product PackageHub/15.4/x86_64`].
-> Users should assess the suitability of these packages based on their own risk tolerance and support needs.
-
-1.  Add PackageHub if not already added:
-
-    ```bash
-    SUSEConnect --product PackageHub/15.5/x86_64
-    zypper refresh
-    ```
-
-1.  Install Certbot and its Nginx plugin:
-
-    ```bash
-    zypper install certbot python3-certbot-nginx
-    ```
-
-1.  Obtain a certificate and configure Nginx with Certbot:
-    > **Note:** Replace `example.com` with your domain. For more information, visit [Certbot instructions for Nginx](https://certbot.eff.org/instructions?ws=nginx&os=leap)
-
-    ```bash
-    certbot --nginx -d example.com -d www.example.com
-    ```
-
-    > **Note:** Certbot certificates last for 90 days. Refer to the above link for details on how to renew periodically.
-
 ## Install and configure NGINX
 
 1. Install NGINX package:
@@ -833,79 +783,147 @@ This is a basic guide for creating a self-signed certificate for use with Trento
 
 1. Add the following configuration to `/etc/nginx/conf.d/trento.conf`:
 
-    ```
-    server {
-        # Redirect HTTP to HTTPS
-        listen 80;
-        server_name trento.example.com;
-        return 301 https://$host$request_uri;
-    }
+   ```
+   server {
+       # Redirect HTTP to HTTPS
+       listen 80;
+       server_name trento.example.com;
+       return 301 https://$host$request_uri;
+   }
 
-    server {
-        # SSL configuration
-        listen 443 ssl;
-        server_name trento.example.com;
+   server {
+       # SSL configuration
+       listen 443 ssl;
+       server_name trento.example.com;
 
-        ssl_certificate /etc/ssl/certs/trento.crt;
-        ssl_certificate_key /etc/ssl/private/trento.key;
+       ssl_certificate /etc/nginx/ssl/certs/trento.crt;
+       ssl_certificate_key /etc/ssl/private/trento.key;
 
-        ssl_protocols TLSv1.2 TLSv1.3;
-        ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384';
-        ssl_prefer_server_ciphers on;
-        ssl_session_cache shared:SSL:10m;
+       ssl_protocols TLSv1.2 TLSv1.3;
+       ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384';
+       ssl_prefer_server_ciphers on;
+       ssl_session_cache shared:SSL:10m;
 
-        # Wanda rule
-        location ~ ^/(api/checks|api/v1/checks|api/v2/checks|api/v3/checks)/  {
-            allow all;
+       # Wanda rule
+       location ~ ^/(api/checks|api/v1/checks|api/v2/checks|api/v3/checks)/  {
+           allow all;
 
-            # Proxy Headers
-            proxy_http_version 1.1;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header Host $http_host;
-            proxy_set_header X-Cluster-Client-Ip $remote_addr;
+           # Proxy Headers
+           proxy_http_version 1.1;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header Host $http_host;
+           proxy_set_header X-Cluster-Client-Ip $remote_addr;
 
-            # Important Websocket Bits!
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection "upgrade";
+           # Important Websocket Bits!
+           proxy_set_header Upgrade $http_upgrade;
+           proxy_set_header Connection "upgrade";
 
-            proxy_pass http://localhost:4001;
-        }
+           proxy_pass http://localhost:4001;
+       }
 
-        # Web rule
-        location / {
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection 'upgrade';
-            proxy_set_header Host $host;
-            proxy_cache_bypass $http_upgrade;
+       # Web rule
+       location / {
+           proxy_http_version 1.1;
+           proxy_set_header Upgrade $http_upgrade;
+           proxy_set_header Connection 'upgrade';
+           proxy_set_header Host $host;
+           proxy_cache_bypass $http_upgrade;
 
-            # The Important Websocket Bits!
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection "upgrade";
+           # The Important Websocket Bits!
+           proxy_set_header Upgrade $http_upgrade;
+           proxy_set_header Connection "upgrade";
 
-            proxy_pass http://localhost:4000;
-        }
-    }
-    ```
+           proxy_pass http://localhost:4000;
+       }
+   }
+   ```
 
 1. Check NGINX configuration:
 
+   ```bash
+   nginx -t
+   ```
+
+   If the configuration is correct, the output should be like this:
+
+   ```bash
+   nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+   nginx: configuration file /etc/nginx/nginx.conf test is successful
+   ```
+
+   If there are issues with the configuration, the output will indicate what needs to be adjusted.
+
+1. If SSL certificates were modified or added, reload NGINX to apply changes.
+
+   ```bash
+   systemctl reload nginx
+   ```
+
+## Prepare SSL certificate for NGINX
+
+Create or provide a certificate for [NGINX](https://nginx.org/en/) to enable SSL for Trento.
+This is a basic guide for creating a self-signed certificate for use with Trento. You may use your own certificate. For detailed instructions, consult the [OpenSSL documentation](https://www.openssl.org/docs/man1.0.2/man5/x509v3_config.html).
+
+### Option 1: Creating a Self-Signed Certificate
+
+1.  Generate a self signed certificate:
+
+    > Note: Remember to adjust `subjectAltName = DNS:trento.example.com` by replacing `trento.example.com` with your own domain and change the value `5` to the number of days for which you need the certificate to be valid. For example, `-days 365` for one year.
+
     ```bash
-    nginx -t
+    openssl req -newkey rsa:2048 --nodes -keyout trento.key -x509 -days 5 -out trento.crt -addext "subjectAltName = DNS:trento.example.com"
     ```
 
-    If the configuration is correct, the output should be like this:
+1.  Copy the generated trento.key to a location accessible by NGINX:
     ```bash
-    nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
-    nginx: configuration file /etc/nginx/nginx.conf test is successful
+    cp trento.key /etc/ssl/private/trento.key
     ```
-    If there are issues with the configuration, the output will indicate what needs to be adjusted.
 
-1. Reload Nginx to apply changes:
+1.  Create a directory for the generated trento.crt which is accessible by NGINX:
+   
+    ```bash
+    mkdir -p /etc/nginx/ssl/certs/
+    ```
+
+1.  Copy the generated trento.crt to the previously created folder:
+   
+    ```bash
+    cp trento.crt /etc/nginx/ssl/certs/trento.crt
+    ```
+
+1. Reload NGINX to apply changes:
+
+   ```bash
+   systemctl reload nginx
+   ``
+
+### Option 2: Create a signed certificate with Let's Encrypt using PackageHub repository
+
+> **Note:** Change repository if you use a Service Pack other than SP5. For example: [SLE15 SP3: `SUSEConnect --product PackageHub/15.3/x86_64`,SLE15 SP4: `SUSEConnect --product PackageHub/15.4/x86_64`].
+> Users should assess the suitability of these packages based on their own risk tolerance and support needs.
+
+1.  Add PackageHub if not already added:
 
     ```bash
-    systemctl reload nginx
+    SUSEConnect --product PackageHub/15.5/x86_64
+    zypper refresh
     ```
+
+1.  Install Certbot and its NGINX plugin:
+
+    ```bash
+    zypper install certbot python3-certbot-nginx
+    ```
+
+1.  Obtain a certificate and configure Nginx with Certbot:
+
+    > **Note:** Replace `example.com` with your domain. For more information, visit [Certbot instructions for Nginx](https://certbot.eff.org/instructions?ws=nginx&os=leap)
+
+    ```bash
+    certbot --nginx -d example.com -d www.example.com
+    ```
+
+    > **Note:** Certbot certificates last for 90 days. Refer to the above link for details on how to renew periodically.
 
 ## Accessing the trento-web UI
 
