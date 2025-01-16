@@ -162,6 +162,7 @@ Why do we need both `target_id` and `group_id` as input for the operations? See 
 A target's checks selection workflow gets extended with customization capabilities, hence the following extra information is needed:
 - whether a check is customizable
 - whether a value of a customizable check can be customized (ie a value which is a list cannot be customized, yet)
+- identify which is the value being used based on the context (requires evaluating `when` conditions) so that the user know what actually is going to be overridden
 - whether a check has been already customized
 - which are the custom values that have been applied
 
