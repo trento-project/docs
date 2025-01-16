@@ -302,11 +302,13 @@ The main alternative point is storing custom values in Web rather than in Wanda.
 
 Generally speaking all the considerations made previously keep their validity.
 
-Here's the main points considered:
+Here's the main points considered about storing custom values in web:
 - having web responsible for checks customization data and operations means leaking a responsibility where it does not naturally belong
+- in the context of a standalone Compliance Check Engine, Checks Customization feature would be missing
 - using the overriding values in a checks execution requires sending those from web to wanda via the `ExecutionRequested` message hence either:
   - we change the message contract
   - we inappropriately send the overriding values in `ExecutionRequested` env entry
+- also the start endpoint in Wanda needs to be changed
 - having checks and their customization in different places makes it harder to operate when checks change (meaning that if a check changes its spec we need to react to that and possibly invalidate a previously made customization for instance. We have a similar situation with selected checks stored in web and the possibility that a selected check is removed)
 
 # Unresolved questions
