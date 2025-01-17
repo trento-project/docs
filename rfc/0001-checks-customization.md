@@ -12,7 +12,7 @@ Certain checks in the Trento checks catalog should be customized by customers on
 
 - As a user, I want to override a Check's expected values on a target basis (host or cluster at the moment) so that it matches my specific environment needs
 - As a user, I want the overridden values to be used in a checks execution
-- As a user, I want to reset a cutomized check to default so that I can return to using SUSE's suggested best practices
+- As a user, I want to reset a customized check to default so that I can return to using SUSE's suggested best practices
 - As a user, I want check customization attempts to be tracked in the Activity Log
 
 # Motivation
