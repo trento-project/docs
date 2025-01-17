@@ -155,7 +155,7 @@ This operation clears any previously set custom value, effectively resulting in 
 }
 ```
 
-Why do we need both `target_id` and `group_id` as input for the operations? See [Custom values usage during checks execution](#custom-values-usage-during-checks-execution)
+Whether such operations require both `target_id` and `group_id` as input for the operations will be defined at due time.
 
 ### Reading customization
 
