@@ -313,7 +313,7 @@ Generally speaking all the considerations made previously keep their validity.
 
 Here's the main points considered about storing custom values in web:
 - having web responsible for checks customization data and operations means leaking a responsibility where it does not naturally belong
-- in the context of a standalone Compliance Check Engine, Checks Customization feature would be missing
+- in the context of a standalone Compliance Check Engine, Checks Customization feature would be clunky to use because custom values would not be organically part of the check engine, but would need to be provided every time even if they did not change
 - using the overriding values in a checks execution requires sending those from web to wanda via the `ExecutionRequested` message hence either:
   - we change the message contract
   - we inappropriately send the overriding values in `ExecutionRequested` env entry
