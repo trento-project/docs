@@ -269,17 +269,15 @@ Somewhat related to [this hackweek exploration](https://github.com/trento-projec
 
 ## Custom values usage during checks execution
 
-When custom values have been persisted for a check on a specific target, those need to be used instead of the built-in ones during a [checks execution](https://github.com/trento-project/wanda/blob/main/guides/specification.md#checks-execution).
+When there are custom values for a check on a specific target, those need to be used instead of the built-in ones during a [checks execution](https://github.com/trento-project/wanda/blob/main/guides/specification.md#checks-execution).
 
 By having the custom values available in its state, wanda can simply query and use them instead of the built-in ones.
 
-### Note on execution results
+### Notes on execution results
 
-To get a proper overview of a checks execution results, data from the catalog and from the checks execution results are aggregated together.
+Since custom values at a certain point in time might differ from custom values used during an execution it becomes necessary snapshotting the specific custom values used during a specific execution, that is storing the custom values along with the execution result they're being used in.
 
-Options here are:
-- keep the current aggregation simply swapping the catalog api with the new specific target catalog (available/selectable checks with customization data) operation
-- take the chance to evolve the `/checks/groups/:group_id/executions/last` operation to contain all needed data (actual checks results, relevent bits from the catalog, customization data)
+Then, to get a proper overview of a checks execution results, data from the catalog and from the extended checks execution results keep being aggregated together as we already do.
 
 ## Authorizing and Logging customization activities
 
