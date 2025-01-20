@@ -196,7 +196,7 @@ Sample response would be what the catalog currently exposes plus the extra infor
   // other checks
 ]
 
-// Note: customization related new fields could be grouped into their own entry, rathed than adding all of them at the root level
+// Note: customization related new fields could be grouped into their own entry, rather than adding all of them at the root level
 ```
 
 This option adds perhaps too much responsibilities to the catalog operation which is also used when non in a checks selection workflow.
