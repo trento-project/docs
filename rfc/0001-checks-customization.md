@@ -1,8 +1,9 @@
-|              |                                                      |
-| :----------- | :--------------------------------------------------- |
-| Feature Name | Checks Customization                                 |
-| Start Date   | Jan 15th, 2025                                       |
-| Category     | Architecture                                         |
+|              |                                                        |
+| :----------- | :------------------------------------------------------|
+| Feature Name | Checks Customization                                   |
+| Start Date   | Jan 15th, 2025                                         |
+| Category     | Architecture                                           |
+| PR           | [#62](https://github.com/trento-project/docs/pull/62)  |
 
 # Summary
 
