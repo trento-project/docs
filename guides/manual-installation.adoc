@@ -1,6 +1,6 @@
 == Installation of Trento
 
-A systemd installation of Trento Server, based on RPM packages, can be
+An installation of Trento Server, based on RPM packages or docker images, can be
 done manually. The latest available version of SUSE Linux Enterprise
 Server for SAP Applications is used as the base operating system, which
 is https://www.suse.com/download/sles/[SLE 15 SP5] at the time of
@@ -19,6 +19,7 @@ throughout this guide.
 * https://www.postgresql.org/[PostgreSQL]
 * https://rabbitmq.com/[RabbitMQ]
 * https://nginx.org/en/[NGINX]
+* https://www.docker.com/[Docker] (optional)
 * https://prometheus.io/[Prometheus] (optional)
 
 === Install Trento dependencies
@@ -439,6 +440,10 @@ correctly, the output should be as follows:
 ----
 {"ready":true}{"database":"pass"}
 ----
+
+// START OF THE DOCKER INSTALLATION ARTICLE
+include::./container-install.adoc[]
+// END OF THE DOCKER INSTALLATION ARTICLE
 
 === Install and configure NGINX
 
