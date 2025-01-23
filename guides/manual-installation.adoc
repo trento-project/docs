@@ -1,10 +1,17 @@
 = Installation of Trento
 
 ////
-We use the systemd-install.xml as a reference to keep the content aligned.
-Source https://github.com/SUSE/doc-unversioned/blob/main/trento/xml/systemd-install.xml
-Changed title from systemd deployment to Installation of Trento
-Added " based on RPM packages or containerized  deployment" as this document is combined.
+We use the systemd-install.xml as a base reference to keep the content aligned between developer documentation and official documentation at https://documentation.suse.com/en-us/sles-sap/trento/html/SLES-SAP-trento/.
+
+This document contains multiple articles from the doc-unversioned repository:
+ - container-install.xml  Source: https://github.com/SUSE/doc-unversioned/blob/main/trento/xml/container-install.xml
+ - systemd-install.xml    Source: https://github.com/SUSE/doc-unversioned/blob/main/trento/xml/systemd-install.xml
+ - sso-integration.xml    Source: https://github.com/SUSE/doc-unversioned/blob/main/trento/xml/sso-integration.xml
+////
+
+////
+Changed title from `systemd deployment` to `Installation of Trento` from systemd-install.xml 
+Added "based on RPM packages or containerized  deployment" as this document is combined with container-install.xml .
 ////
 A systemd installation of Trento Server, based on RPM packages or containerized deployment, can be
 done manually. The latest available version of SUSE Linux Enterprise
@@ -657,7 +664,7 @@ e859c07888ca   registry.suse.com/trento/trento-wanda:1.2.0   "/bin/sh -c '/app/b
 Both containers must run and listen on the specified ports
 
 ////
-End of the container-install.xml article
+End of the container-install.xml article which was inserted into systemd-install.xml
 Source: https://github.com/SUSE/doc-unversioned/blob/main/trento/xml/container-install.xml
 ////
 
@@ -1249,7 +1256,7 @@ SAML_SIGNED_ENVELOPES::
 
 
 ////
-End of sso-integration.xml article inside of systemd-install.xml
+End of sso-integration.xml article inserted into systemd-install.xml
 Source: https://github.com/SUSE/doc-unversioned/blob/main/trento/xml/sso-integration.xml
 ////
 
