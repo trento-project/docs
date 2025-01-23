@@ -1,6 +1,12 @@
-== Installation of Trento
+= Installation of Trento
 
-An installation of Trento Server, based on RPM packages or docker images, can be
+////
+We use the systemd-install.xml as a reference to keep the content aligned.
+Source https://github.com/SUSE/doc-unversioned/blob/main/trento/xml/systemd-install.xml
+Changed title from systemd deployment to Installation of Trento
+Added " based on RPM packages or containerized  deployment" as this document is combined.
+////
+A systemd installation of Trento Server, based on RPM packages or containerized deployment, can be
 done manually. The latest available version of SUSE Linux Enterprise
 Server for SAP Applications is used as the base operating system, which
 is https://www.suse.com/download/sles/[SLE 15 SP5] at the time of
@@ -14,17 +20,18 @@ throughout this guide.
 * SP4
 * SP5
 
-=== List of dependencies
+== List of dependencies
 
 * https://www.postgresql.org/[PostgreSQL]
 * https://rabbitmq.com/[RabbitMQ]
 * https://nginx.org/en/[NGINX]
+// Added docker reference as we combine systemd-install.xml with container-install.xml
 * https://www.docker.com/[Docker] (optional)
 * https://prometheus.io/[Prometheus] (optional)
 
-=== Install Trento dependencies
+== Install Trento dependencies
 
-==== Install Prometheus (Optional)
+=== Install Prometheus (Optional)
 
 https://prometheus.io/[Prometheus] is not required to run Trento, but it
 is recommended, as it allows Trento to display charts for each host with
@@ -40,7 +47,7 @@ existing installation, make sure that `+CHARTS_ENABLED+` is set to
 container.
 ====
 
-===== Option 1: Use existing installation
+==== Option 1: Use existing installation
 
 Minimal required Prometheus version is *2.28.0*.
 
@@ -48,10 +55,10 @@ If you have a https://prometheus.io/docs/prometheus/latest/installation/[existin
 Prometheus server], ensure to set the PROMETHEUS_URL environment
 variable to your Prometheus server's URL as part of the Docker command
 when creating the `+trento-web+` container or configuring the RPM
-packages. Use  `+Option 2: Install Prometheus using the PackageHub repository+` as a reference to
+packages. Use `+Option 2: Install Prometheus using the PackageHub repository+` as a reference to
 adjust the Prometheus configuration.
 
-===== Option 2: Install Prometheus using the *unsupported* PackageHub repository
+==== Option 2: Install Prometheus using the *unsupported* PackageHub repository
 
 https://packagehub.suse.com/[PackageHub] packages are tested by SUSE,
 but they do not come with the same level of support as the core SLES
@@ -97,8 +104,8 @@ zypper in golang-github-prometheus-prometheus
 ====
 In case the missing dependency cannot be satisfied, we have already
 added the Prometheus user/group. This makes it safe to proceed with the
-installation by choosing Solution 2: break
-golang-github-prometheus-prometheus
+installation by choosing *Solution 2: break
+golang-github-prometheus-prometheus'
 ====
 . Change Prometheus configuration by replacing the configuration at
 `+/etc/prometheus/prometheus.yml+` with:
@@ -142,7 +149,7 @@ firewall-cmd --zone=public --add-port=9090/tcp --permanent
 firewall-cmd --reload
 ----
 
-==== Install PostgreSQL
+=== Install PostgreSQL
 
 The current instructions are tested with the following PostgreSQL
 version:
@@ -169,7 +176,7 @@ zypper in postgresql-server
 systemctl enable --now postgresql
 ----
 
-===== Configure PostgreSQL
+==== Configure PostgreSQL
 
 . Start `+psql+` with the `+postgres+` user to open a connection to the
 database:
@@ -240,7 +247,7 @@ listen_addresses = '*'
 systemctl restart postgresql
 ----
 
-==== Install RabbitMQ
+=== Install RabbitMQ
 
 . Install RabbitMQ server:
 +
@@ -269,7 +276,7 @@ firewall-cmd --reload
 systemctl enable --now rabbitmq-server
 ----
 
-===== Configure RabbitMQ
+==== Configure RabbitMQ
 
 To configure RabbitMQ for a production system, follow the official
 suggestions in the
@@ -294,8 +301,8 @@ rabbitmqctl add_vhost vhost
 rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
 ----
 
+// Added a link, which differs from source
 [[systemd-deployment]]
-
 === Install Trento using RPM packages
 
 The `+trento-web+` and `+trento-wanda+` packages come in the supported
@@ -443,8 +450,10 @@ correctly, the output should be as follows:
 {"ready":true}{"database":"pass"}
 ----
 
-// START OF THE container-install ARTICLE from doc-unversioned
-// Check: https://github.com/SUSE/doc-unversioned/tree/main/trento/migration
+////
+Inserted container-install.xml article into systemd-install.xml
+Source: https://github.com/SUSE/doc-unversioned/blob/main/trento/xml/container-install.xml
+////
 == Containerized deployment
 
 A containerized deployment of Trento Server is identical to a systemd
@@ -454,7 +463,7 @@ Follow the steps in link:#systemd-deployment[systemd deployment section], but sk
 link:#install-trento-using-docker[Install Trento using Docker].
 
 === Install Trento using Docker
-=== Install Docker container runtime
+==== Install Docker container runtime
 
 . Enable the containers module:
 +
@@ -484,7 +493,7 @@ zypper install docker
 systemctl enable --now docker
 ----
 
-=== Create a dedicated Docker network for Trento
+==== Create a dedicated Docker network for Trento
 
 . Create the Trento Docker network:
 +
@@ -645,11 +654,17 @@ CONTAINER ID   IMAGE                                         COMMAND            
 e859c07888ca   registry.suse.com/trento/trento-wanda:1.2.0   "/bin/sh -c '/app/bi…"   18 seconds ago   Up 16 seconds   0.0.0.0:4001->4000/tcp, :::4001->4000/tcp   wanda
 ----
 +
-Both containers must run and listen on the specified ports.
+Both containers must run and listen on the specified ports
 
-// END OF THE DOCKER INSTALLATION ARTICLE
+////
+End of the container-install.xml article
+Source: https://github.com/SUSE/doc-unversioned/blob/main/trento/xml/container-install.xml
+////
 
-// Start of the Single Sign on Integration Article
+////
+Inserted sso-integration.xml article into systemd-install.xml
+Source: https://github.com/SUSE/doc-unversioned/blob/main/trento/xml/sso-integration.xml
+////
 
 [[integrating-single-sign-on]]
 == Single Sign-On integration
@@ -1233,9 +1248,12 @@ SAML_SIGNED_ENVELOPES::
   the IDP doesn't sign the envelopes (default value: `+true+`)
 
 
-// END OF SINGLE SIGN ON ARTICLE!!!!!!!!!!!!!!!!!!!!!
+////
+End of sso-integration.xml article inside of systemd-install.xml
+Source: https://github.com/SUSE/doc-unversioned/blob/main/trento/xml/sso-integration.xml
+////
 
-=== Install and configure NGINX
+== Install and configure NGINX
 
 . Install NGINX package:
 +
@@ -1427,7 +1445,7 @@ Certbot certificates are valid for 90 days. Refer to the above link for
 details on how to renew certificates.
 ====
 
-=== Accessing the trento-web UI
+== Accessing the trento-web UI
 
 Pin the browser to `+https://trento.example.com+`. You should be able to
 login using the credentials specified in the `+ADMIN_USER+` and
