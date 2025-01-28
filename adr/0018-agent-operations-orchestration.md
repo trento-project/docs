@@ -9,9 +9,9 @@ Accepted
 ## Context
 
 Follow up of ADR [17. Agent Operations Framework](https://github.com/trento-project/docs/blob/main/adr/0017-agent-operations-framework.md) which describes the actions to implement
-write operations in the Trento agents. In this case, this ADR describes the orchestration layer, which takes care of dispatching all the operation commands to the agents.
+write operations in Trento agents. In this case, this ADR describes the orchestration layer, which takes care of dispatching all the operation commands to the agents.
 
-The framework must be able to orchestrate multi-agent and multistep operations, as many operations are complex, including multiple clustered targets and actions that must be sequential in time.
+The framework must be able to orchestrate multi-agent and multi-step operations, as many operations are complex, including multiple clustered targets and actions that must be sequential in time.
 It must be able of sending the operator actions to the agents and wait for the report. Once the report is received, decide to move on with the next operation steps or stop the operation as failed.
 
 ## Decisions
@@ -21,9 +21,8 @@ The operations framework orchestrator will be implemented in Wanda, as it alread
 We have chosen to use Elixir [Dynamic Supervisors](https://hexdocs.pm/elixir/1.13/DynamicSupervisor.html) to start and handle the operation requests dynamically. This means that the operations are short-lived processes responsible for handling individual operation requests. We already do the same with check executions with a successful outcome.
 
 The process is able to:
-- Define and implement "coded" operations
 - Predicate if the operation should be executed in target agents
-- Dispatch the individual operator requests to the agents
+- Dispatch the individual operator requests to the target agents
 - Wait for the reports and compute the overall step result after receiving the feedback from all the targets
 - Move to the next operation step once the previous one is successfully completed
 - During all this time, the state of the operation is saved in the database in order to have intermediate states. This can be used to report progress to other components like Web or rehydrate and restart crashed operations (this is out of cope by now)
@@ -32,7 +31,7 @@ At the end, all the orchestration is defined as a state machine that moves the c
 
 ### Operation
 
-An operation is a multistep process, where each step defines the operation to be executed in the agents. The steps are executed sequentially, but the step execution is requested in parallel to all involved agents. Besides this, it includes some additional metadata to describe the operation itself. Find here a dummy example:
+An operation is a multi-step process, where each step defines the operation to be executed in the agents. The steps are executed sequentially, but the step execution is requested in parallel to all involved agents. Besides this, it includes some additional metadata to describe the operation itself. Find here a dummy example:
 
 ```
 %Wanda.Operations.Catalog.Operation{
@@ -81,7 +80,7 @@ The predicate will be a simple RHAI expression that returns a boolean. We will p
 
 ### Operations registry
 
-The operations to be executed will be stored in a registry. Unlike the checks executions, where the checks are implemented using YAML files and a specific DSL, in this case the operations will be hardcoded in the codebase, and there won't be any capability to upload them after releasing the code. We want to have control over want to implement, as the operations are really sensitive actions that could lead to malfunctions in the system if implemented incorrectly. The registry simply implements a basic map with some unique operation identifiers pointing to operations described in the [Operation](operation) chapter.
+The operations to be executed will be stored in a registry. Unlike the checks executions, where the checks are implemented using YAML files and a specific DSL, in this case the operations will be hardcoded in the codebase, and there won't be any capability to upload them after releasing the code. We want to have control over want to implement, as the operations are really sensitive actions that could lead to malfunctions in the system if implemented incorrectly. The registry simply implements a basic map with some unique operation identifiers pointing to operations described in the [Operation](#operation) chapter.
 
 ### Out of scope in the first implementation
 
@@ -93,9 +92,9 @@ To make the delivery of this feature easier and faster, we have decided to let o
 ## Consequences
 
 Implementing the agent operations framework with this design enables us the following, so we can...:
-- Implement multi-agent and multistep operations
+- Implement multi-agent and multi-step operations
 - Use a reliable self-implement Agent operators that we are sure they do exactly what we want and are tested
 - Decide if the operation step is executed only in certain targets using a deterministic predicate
 - Have a controlled and consistent operations registry
 - Save all the executed operations and have a historical record
-- In the future, rollback complex multistep operations to the initial state
+- In the future, rollback complex multi-step operations to the initial state
