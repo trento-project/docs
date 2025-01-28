@@ -59,15 +59,27 @@ An operation is a multi-step process, where each step defines the operation to b
 As commented, the steps define the operator to be executed in the agents. Check the [Agent related ADR](https://github.com/trento-project/docs/blob/main/adr/0017-agent-operations-framework.md) for more information.
 The `required_args` field defines the arguments that must be provided from the outside with a key/value format. For example: `saptune_solution=HANA`. They will be passed to the agent operators so they can be executed.
 
-### Orchestration state machine
+### Orchestration
 
-The orchestration state machine is pretty simple. It is composed only by 2 states:
-- Dispatch the step operations to agents
-- Wait until all the agents have reported back
+The operations orchestration is composed only by 2 states:
+- Dispatch the step operations to target agents
+- Wait until all the target agents have reported back
 
 This image represents the states and transitions:
 
-![state_machine](images/0018_orchestration_state_machine.png)
+```mermaid
+  graph TD;
+      A[Start operation]-->B{Steps left to run?};
+      B--Yes-->C[Start operation step]-->H[Select target agents with predicate]
+      H-->J[Dispatch step operation request to target agents];
+      B--No-->D[Evaluate reports and finish];
+      J-->K[Wait for target agent reports]-->E[Receive target agent report];
+      E-->F{All target agents reported?}
+      F--No-->K
+      F--Yes-->G{Some target agent operation failed in step?}
+      G--No-->B
+      G--Yes-->D
+```
 
 ### Predicate
 
