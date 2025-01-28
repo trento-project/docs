@@ -21,11 +21,11 @@ The operations framework orchestrator will be implemented in Wanda, as it alread
 We have chosen to use Elixir [Dynamic Supervisors](https://hexdocs.pm/elixir/1.13/DynamicSupervisor.html) to start and handle the operation requests dynamically. This means that the operations are short-lived processes responsible for handling individual operation requests. We already do the same with check executions with a successful outcome.
 
 The process is able to:
-- Predicate if the operation should be executed in target agents
+- Decide which agent will receive the operation (from now on: target agents)
 - Dispatch the individual operator requests to the target agents
 - Wait for the reports and compute the overall step result after receiving the feedback from all the targets
 - Move to the next operation step once the previous one is successfully completed
-- During all this time, the state of the operation is saved in the database in order to have intermediate states. This can be used to report progress to other components like Web or rehydrate and restart crashed operations (this is out of cope by now)
+- Save the intermediate and final state of the operation as an historic record
 
 At the end, all the orchestration is defined as a state machine that moves the current state through different stages.
 
@@ -71,22 +71,22 @@ This image represents the states and transitions:
 
 ### Predicate
 
-Deciding if a step operation must be executed in some targets or not is something really useful. This will let us define some multi-agent operations where some step operations are only executed in certain nodes. Some examples could be:
+Deciding if a step operation must be executed in some agents or not is something really useful. This will let us define some multi-agent operations where some step operations are only executed in certain agents. Some examples could be:
 - Run cluster operations only in DC nodes
 - Run SAP operations only in nodes with specific features, like ASCS or PAS nodes
 - Exclude running operations in nodes like majority makers
 
-The predicate will be a simple RHAI expression that returns a boolean. We will pass some target specific values in the requests, so each target has its own characteristics. With these values, we will run the RHAI evaluation and decide if the operation step must be executed in this target or not.
+The predicate will be a simple RHAI expression that returns a boolean. We will pass some agent specific values in the requests, so each agent has its own characteristics. With these values, we will run the RHAI evaluation in Wanda and decide if the operation step must be executed in this agent or not.
 
 ### Operations registry
 
-The operations to be executed will be stored in a registry. Unlike the checks executions, where the checks are implemented using YAML files and a specific DSL, in this case the operations will be hardcoded in the codebase, and there won't be any capability to upload them after releasing the code. We want to have control over want to implement, as the operations are really sensitive actions that could lead to malfunctions in the system if implemented incorrectly. The registry simply implements a basic map with some unique operation identifiers pointing to operations described in the [Operation](#operation) chapter.
+The operations to be executed will be stored in a registry, in Wanda codebase. Unlike the checks executions, where the checks are implemented using YAML files and a specific DSL, in this case the operations will be hardcoded in the codebase, and there won't be any capability to upload them after releasing the code. We want to have control over want to implement, as the operations are really sensitive actions that could lead to malfunctions in the system if implemented incorrectly. The registry simply implements a basic map with some unique operation identifiers pointing to operations described in the [Operation](#operation) chapter.
 
 ### Out of scope in the first implementation
 
 To make the delivery of this feature easier and faster, we have decided to let out some of the initial features we wanted to implement:
-- Complex rollback of operations. When the operation implements a lot of steps, returning to the original state in case of failure is pretty difficult
-- Restart of crashed operations. We will "let it fail" by now, as in the majority of the cases, the error will be caused for things that will hardly be fixed in a subsequent execution. These can be things like: database access error, error publishing or reading from RabbitMQ, agent reporting an incorrect payload, etc
+- Multi-step operations rollback. When the operation implements a lot of steps, returning to the original state in case of failure has some challenges as all intermediate steps must be rolled back in reverse other.
+- Restart of operations with abnormal or unknown exit due the code crashes. We will "let it fail" by now, as in the majority of the cases, the error will be caused for things that will hardly be fixed in a subsequent execution. These can be things like: database access error, error publishing or reading from RabbitMQ, agent reporting an incorrect payload, internal state got corrupted, etc
 
 
 ## Consequences
