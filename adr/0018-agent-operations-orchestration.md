@@ -99,7 +99,7 @@ The operations to be executed will be stored in a registry, in Wanda codebase. U
 To make the delivery of this feature easier and faster, we have decided to let out some of the initial features we wanted to implement:
 - Multi-step operations rollback. When the operation implements a lot of steps, returning to the original state in case of failure has some challenges as all intermediate steps must be rolled back in reverse other.
 - Restart of operations with abnormal or unknown exit due the code crashes. We will "let it fail" by now, as in the majority of the cases, the error will be caused for things that will hardly be fixed in a subsequent execution. These can be things like: database access error, error publishing or reading from RabbitMQ, agent reporting an incorrect payload, internal state got corrupted, etc
-
+Additional rationale about postponing this implementation is that the first few operations we will implement (saptune solution apply, cluster maintenance on/off, SAP application layer instance start/stop) won't harm the target agents if the operation is not resumed. If the operation request arrives to the agent, it will perform it in an atomic transactional change, so no matter what, the initial request done by the user will be effective. The worst thing that can happen is that the internal saved state of the operation might not match which what happened in the agent, but we are fine accepting this as an initial trade-off. As an effect, this makes the orchestrator not 100% reliable between what Wanda saved in its database and what happened in the target agents. Either way, once a we start implementing a multi-step rollback feature we will resume the task of implementing proper restarts.
 
 ## Consequences
 
