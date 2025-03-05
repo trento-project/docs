@@ -34,7 +34,7 @@ Test coverage is enforced by [coveralls.io](https://coveralls.io/). Please use [
 
 ```
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     ...
 
     steps:
