@@ -2,7 +2,7 @@
 
 This guide outlines the process for creating and setting up SSL certificates for pull request environments using Let's Encrypt and AWS Route 53.
 
-This also the process we currenly apply upon expiration in order to generate new valid ones.
+This also is the process we currently apply upon expiration in order to generate new valid ones.
 
 ## Generating the Certificate
 
