@@ -26,6 +26,24 @@ To overcome these challenges, we have decided to implement the following strateg
 - Adoption of the Page Object Model (POM): We will implement the POM to encapsulate all UI interaction logic and data within dedicated page object modules. Test files will then utilize concise, descriptive methods from these page objects, focusing solely on the test steps.
 This implementation will use JS modules (instead of classes) as distinct object instances are not required. Each module will represent a specific application page. Common utility methods will reside in a base page object module, accessible to all other page-specific modules through import/export.
 - Implementation of Custom Selectors: We will prioritize the development of custom, robust selectors over exclusive reliance on Cypress's built-in tools. This will lead to more resilient and readable test methods, often reducing the need for complex DOM traversal within the tests.
+
+Examples:
+    1. To get the number of subscriptions in the "About" page 
+    Instead of: `.leading-5` use `div:contains('SAP subscriptions') + div` In this case `+` works as cypress `.next()`. By using this the selector is more informative about what is going to be checked and removes the usage of cypress built it commands to navigate the DOM
+
+    2. To get the passing hosts in the "Hosts" page
+    Instead of: `[data-testid='health-box-passing-not-selected'] > .rounded > .flex > .font-semibold` use `p:contains('Passing') + p` The same happens in this case and also we avoid using data-testid, which is something agreed to stop using.
+
+    3. To get the first data row of a table.
+    Instead of `cy.get('td').eq(1)` use `cy.get('td:eq(1)')`
+
+    4. To get some cell based on some data in the row and its index
+    Use `tr:contains('hana_cluster_1') td:eq(1)` we could even create a function here to get the index of the header we want by its text and then use that index to get the data cell we want. That way if at some point that column is placed somewhere else the test would be resilient to that change and still would be testing what is needed.
+
+    5. To get SUSE Multilinux Manager Settings button in settings page.
+    We can use the title of the div section to use it as a reference for the element we want.
+    `div[class*='container max']:contains('SUSE Multi-Linux Manbager Config') button:contains('Edit Settings')`
+
 - Ensuring Test Isolation: Each test scenario will be provided with the necessary pre-conditions to ensure its independence. This will prevent failures in one test from affecting others, significantly simplifying the debugging process.
 
 - Utilizing Precise Assertions: We will favor specific assertions (when possible) like `have.text` over more general ones like `contains`. These precise assertions provide detailed feedback (expected vs. actual values) in failure logs, enabling faster and more accurate identification of the root cause.
