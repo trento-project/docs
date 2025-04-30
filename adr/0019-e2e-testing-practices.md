@@ -2,35 +2,39 @@
 
 Date: 2025-04-25
 
-## Status
+## Status: 
 
 Accepted
 
 ## Context
 
-Our current End-to-End (E2E) test suite, implemented using Cypress, has evolved organically over time. While it provides valuable coverage for critical user flows, we have identified several key areas that require improvement.
+This document outlines the identified challenges within our current Cypress End-to-End (E2E) test suite and the strategic decisions made to address these issues. The goal is to improve the maintainability, readability, robustness, and overall efficiency of our E2E testing efforts.
 
-Specifically, we are facing the following challenges:
+Our existing E2E test suite, while providing valuable coverage, suffers from several key limitations:
 
-- Significant Code Duplication: A considerable amount of code is repeated across different test files and scenarios. This makes the test suite harder to maintain, increases its overall size, and makes it more prone to inconsistencies.
-
-- Lack of a Dedicated Test Repository with Natural Language Readability: The current structure lacks a central repository or methodology for organizing tests in a way that clearly and intuitively describes the functionality being tested. This makes it difficult for team members (especially those less familiar with the codebase) to understand the scope and purpose of our test suite simply by reviewing the file structure and names.
-
-- Limited Code Reusability: We are not effectively reusing test logic, helper functions, or common interaction patterns across different tests. This contributes to the code duplication issue and increases the effort required to create new tests.
-
-- Suboptimal Element Interaction (Reliance on Cypress Utilities): Our current implementation heavily relies on Cypress's built-in utility functions for selecting and interacting with elements. While these utilities are powerful, they can sometimes lead to less resilient and harder-to-understand selectors compared to more explicit and targeted approaches.
-
-- Absence of the Page Object Model (POM): The test logic for interacting with specific parts of the application is often embedded directly within the test files. This tightly couples the tests to the UI structure, making them more susceptible to breaking changes and reducing their readability and maintainability. The lack of a Page Object Model makes it harder to isolate UI interactions and business logic.
-
-- Reduced Test Isolation: Tests are not truly independent, making it difficult to pinpoint the exact cause of a failure. A failure in one test can cascade and cause subsequent, unrelated tests to fail, leading to misleading results and increased debugging time.
-
-- Reduced Test Robustness: Using contain makes our tests less resilient to subtle changes in the application's UI or data. A test might pass even if the displayed value includes the expected substring but also contains unexpected or incorrect information. When a test using contain fails, the feedback provided is limited to a simple true or false. This makes it significantly harder to pinpoint the actual discrepancy between the expected and the current state. In contrast, more specific assertions like `have.text` often display both the expected and the actual value, drastically simplifying the debugging process and allowing developers to quickly identify the root cause of the failure.
+- Significant Code Duplication: Repetitive code across test files and scenarios complicates maintenance and increases the test suite size.
+- Lack of Test Organization and Readability: The absence of a clear organizational structure and natural language-based naming conventions makes it difficult for team members to understand the test suite's scope and purpose.
+Limited Code Reusability: Inefficient reuse of test logic, helper functions, and interaction patterns contributes to code duplication and increases test creation effort.
+- Suboptimal Element Interaction: Over-reliance on generic Cypress utilities for element selection can lead to less resilient and harder-to-understand selectors.
+- Absence of Page Object Model (POM): Embedding UI interaction logic directly within test files tightly couples tests to the UI, reducing maintainability and readability, and hindering the isolation of UI interactions and business logic.
+- Reduced Test Isolation: Lack of true test independence makes debugging challenging as failures can cascade and produce misleading results.
+- Reduced Test Robustness: Using `contains` assertions can lead to false positives and provides limited debugging information upon failure, making it harder to pinpoint the actual issue.
 
 ## Decisions
+To overcome these challenges, we have decided to implement the following strategies:
 
--
+- Adoption of the Page Object Model (POM): We will implement the POM to encapsulate all UI interaction logic and data within dedicated page object modules. Test files will then utilize concise, descriptive methods from these page objects, focusing solely on the test steps.
+This implementation will use Java modules (instead of classes) as distinct object instances are not required. Each module will represent a specific application page. Common utility methods will reside in a base page object module, accessible to all other page-specific modules through import/export.
+- Implementation of Custom Selectors: We will prioritize the development of custom, robust selectors over exclusive reliance on Cypress's built-in tools. This will lead to more resilient and readable test methods, often reducing the need for complex DOM traversal within the tests.
+- Ensuring Test Isolation: Each test scenario will be provided with the necessary pre-conditions to ensure its independence. This will prevent failures in one test from affecting others, significantly simplifying the debugging process.
 
+- Utilizing Precise Assertions: We will favor specific assertions (when possible) like `have.text` over more general ones like `contains`. These precise assertions provide detailed feedback (expected vs. actual values) in failure logs, enabling faster and more accurate identification of the root cause.
 
 ## Consequences
+The implementation of these decisions is expected to yield the following benefits:
 
--
+- Improved Maintainability: Reduced code duplication and a well-defined structure will make the test suite easier to update and manage.
+- Enhanced Readability: Clear separation of concerns and descriptive test methods will improve the understandability of the tests for all team members.
+- Increased Reusability: The POM and custom selectors will promote the reuse of code components, saving development time and effort.
+- Greater Robustness: More specific selectors and assertion strategies will make the tests less susceptible to minor UI changes and provide more accurate feedback.
+- Simplified Debugging: Test isolation will significantly streamline the process of identifying and resolving test failures.
