@@ -24,7 +24,7 @@ Limited Code Reusability: Inefficient reuse of test logic, helper functions, and
 To overcome these challenges, we have decided to implement the following strategies:
 
 - Adoption of the Page Object Model (POM): We will implement the POM to encapsulate all UI interaction logic and data within dedicated page object modules. Test files will then utilize concise, descriptive methods from these page objects, focusing solely on the test steps.
-This implementation will use Java modules (instead of classes) as distinct object instances are not required. Each module will represent a specific application page. Common utility methods will reside in a base page object module, accessible to all other page-specific modules through import/export.
+This implementation will use JS modules (instead of classes) as distinct object instances are not required. Each module will represent a specific application page. Common utility methods will reside in a base page object module, accessible to all other page-specific modules through import/export.
 - Implementation of Custom Selectors: We will prioritize the development of custom, robust selectors over exclusive reliance on Cypress's built-in tools. This will lead to more resilient and readable test methods, often reducing the need for complex DOM traversal within the tests.
 - Ensuring Test Isolation: Each test scenario will be provided with the necessary pre-conditions to ensure its independence. This will prevent failures in one test from affecting others, significantly simplifying the debugging process.
 
