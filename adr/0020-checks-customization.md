@@ -20,7 +20,7 @@ Therefore, a mechanism is needed to
 
 - **Storing Customizations in Web**
     *   places check-related data outside the Check Engine, making standalone engine usage clunky
-    *   requires passing custom values for every execution, complicating the execution request process (message contracts/API endpoints)
+    *   requires passing custom values for every execution, relieving wanda from customization state, yet complicating the execution request process (message contracts/API endpoints)
     *   managing consistency between check definitions (in Wanda) and customizations (in Web) becomes more complex, especially when check specifications change or checks are added/removed
     *   logging customizations is simple as the activity logging subsystem is embedded in web
 - **Storing Customizations in Wanda**
