@@ -43,7 +43,7 @@ A check is deemed "customizable" if its definition includes a non-empty `values`
 
 Checks using hardcoded expectation values will need refactoring to use the `values` structure to become customizable. 
 
-Certain checks may be explicitly excluded from customization as well as specific values within a generally customizable check. 
+For enhanced flexibility, certain checks may be explicitly excluded from customization as well as specific values within a generally customizable check. It can be because of a strong policy about some values or because the nature of the check itself does not allow for customization.
 
 This will be defined in the check specification via the following entry `customization_disabled: true`
 
