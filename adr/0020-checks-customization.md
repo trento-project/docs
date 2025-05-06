@@ -1,4 +1,4 @@
-# 19. Checks Customization
+# 20. Checks Customization
 
 Date: 2025-04-30
 
@@ -35,7 +35,7 @@ Additional APIs and work to ensure that custom values are correctly applied duri
 
 We will introduce the checks customization capabilities to Wanda in order to 
 - keep cohesive and consistent responsibility about check related actions and data
-- keep execuion process simple and straightforward also in a standalone engine usage
+- keep execution process simple and straightforward also in a standalone engine usage
 - allow for simpler management of check specifications changes and check additions/removals
 
 ### Checks Customizability
@@ -75,6 +75,6 @@ On the other hand the activity logging subsystem in web will be extended to supp
 The depicted decision has the following effects:
 - **Increased Flexibility:** users gain the ability to tailor check expectations to their specific environment needs, improving the relevance and accuracy of compliance results
 - **Consolidated Logic:** keeping customization logic and data within Wanda aligns with its responsibility as the Check Engine
-- **Simpler sync management**: check specifications changes and check additions/removals can reacted upon to keep the customization data in sync
+- **Simpler sync management**: check specifications changes and check additions/removals can be responded to in order to keep the customization data in sync
 - **Enhanced Activity Logging**: the activity logging subsystem supports cross components actions logging
 - **Enhanced Contracts**: messages will support the ability to carry the information about the user performing the operation, allowing for better tracking and auditing of actions taken within the system
