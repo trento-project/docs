@@ -1,7 +1,18 @@
-name: Validate/build docs
+name: Validate/build docs and push
 
 on:
   push:
+    paths:
+      - 'user-docs/DC-*'
+      - 'user-docs/xml/**'
+      - 'user-docs/adoc/**'
+      - 'user-docs/images/src/**'
+      - 'user-docs/**/DC-*'
+      - 'user-docs/**/xml/**'
+      - 'user-docs/**/adoc/**'
+      - 'user-docs/**/images/src/**'
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'user-docs/DC-*'
       - 'user-docs/xml/**'

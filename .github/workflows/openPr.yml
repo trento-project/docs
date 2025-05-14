@@ -1,0 +1,36 @@
+name: Trigger PR to doc-unversioned
+
+on:
+  workflow_run:
+    workflows: ["Validate/build docs and push"]
+    types:
+      - completed
+
+jobs:
+  open-pr-to-doc-unversioned:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'restructure_docs_directory' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone target repo
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/EMaksy/doc-unversioned.git
+          cd doc-unversioned
+          git checkout -b sync-docs-${{ github.run_id }}
+
+          echo "Synced from upstream" > synced.txt
+
+          git add .
+          git commit -m "Auto-sync after successful validation"
+          git push origin sync-docs-${{ github.run_id }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "Sync docs after CI success"
+          body: "Triggered by workflow run ${{ github.run_id }}"
+          base: main
+          branch: sync-docs-${{ github.run_id }}
