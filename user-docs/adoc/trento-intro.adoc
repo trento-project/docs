@@ -2,7 +2,7 @@ include::generic-attributes.adoc[]
 include::product-attributes.adoc[]
 
 [[sec-trento-what]]
-== What is {trento}?
+== What is {trento} a test for the WORKFLOW TOTALLY WIP?
 
 {trento} is the official version of the Trento community project. It is a comprehensive monitoring solution consisting of two main components: the {trserver} and the {tragent}. {trento} provides the following functionality and features:
 
