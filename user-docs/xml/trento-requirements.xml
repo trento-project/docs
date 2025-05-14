@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="file:/usr/share/xml/geekodoc/rng/geekodoc5-flat.rnc"
+   type="application/relax-ng-compact-syntax"?>
+<!DOCTYPE article
+[
+  <!ENTITY % entities SYSTEM "generic-entities.ent">
+  %entities;
+]>
+
+  <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="sec-trento-requirements">
+    <title>Requirements</title>
+    <para> This section describes requirements for the &t.server; and its
+      &t.agent;s. </para>
+    <section xml:id="sec-trento-server-requirements">
+      <title>&t.server; requirements</title>
+      <para> Running all the &t.server; components requires a minimum of
+      4&nbsp;GB of RAM, two CPU cores and 64&nbsp;GB of storage. When using K3s,
+      such storage should be provided under
+      <filename>/var/lib/rancher/k3s</filename>.
+      </para>
+     <para>
+      &trento; is based on an event-driven technology. Registered events are stored in a  &postgresql; database with a default retention
+      period of 10 days. For each host registered with &trento;, you need to allocate at least 1.5GB of space in the &postgresql; database.
+     </para>
+      <para> &t.server; supports different deployment scenarios: &k8s;, systemd, and containers. A &k8s;-based deployment of &t.server; is cloud-native and OS-agnostic. It can be performed on the following services: </para>
+      <itemizedlist>
+        <listitem>
+          <para>RKE1 (&rancher.k8s.engine; version 1)</para>
+        </listitem>
+        <listitem>
+          <para>RKE2</para>
+        </listitem>
+               <listitem>
+          <para>a &k8s; service in a cloud provider</para>
+        </listitem>
+        <listitem>
+          <para>any other CNCF-certified &k8s; running on x86_64 architecture</para>
+        </listitem>
+      </itemizedlist>
+     <para> A production-ready &k8s;-based deployment of &t.server; requires
+     &k8s; knowledge. The Helm chart is intended to be used by customers without
+     in-house &k8s; expertise, or as a way to try &trento; with a minimum of
+     effort. However, Helm chart delivers a basic deployment of the &t.server;
+     with all the components running on a single node of the cluster.</para>
+    </section>
+    <section xml:id="sec-trento-agent-requirements">
+      <title>&t.agent; requirements</title>
+      <para> The resource footprint of the &t.agent; is designed to not
+        impact the performance of the host it runs on. </para>
+      <para> The &t.agent; component needs to interact with several
+        low-level system components that are part of the &sles4sap; distribution. </para>
+           <para>The hosts must have unique machine identifiers (ids) in order to be registered in Trento. This means that if a host in your environment is built as a clone of another one,
+           make sure to change the machine's identifier as part of the cloning process before starting the &t.agent; on it. </para>
+                <para> Similarly, the clusters must have unique authkeys on the clusters in order to be registered in &trento;.</para>
+    </section>
+    <section xml:id="sec-trento-network-requirements">
+      <title>Network requirements</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            The Web component of the &t.server; must be reachable from any &t.agent; host via HTTP (port TCP/80) or via HTTPS (port TCP/443) if SSL is enabled.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+           The checks engine component of the &t.server; must be reachable from any &t.agent; host via Advanced Message Queuing Protocol or AMQP (port TCP/5672).
+          </para>
+        </listitem>
+         <listitem>
+          <para>
+            The Prometheus component of the &t.server; must be able to reach the Node Exporter in the &t.agent; hosts (port TCP/9100).
+          </para>
+        </listitem>
+        <listitem>
+          <para>The &sap; Basis administrator must access to the Web component of the &t.server; via HTTP (port TCP/80) or via HTTPS (port TCP/443) if SSL is enabled. </para>
+        </listitem>
+      </itemizedlist>
+    </section>
+    <section xml:id="sec-trento-installation-prerequisites">
+      <title>Installation prerequisites</title>
+      <itemizedlist>
+        <listitem>
+          <formalpara>
+            <title>&t.server;</title>
+            <para>For a &k8s;-based deployment, you must have access to &suse; public registry for the deployment of &t.server; containers.
+             For a systemd deployment, you must have a registered &sles4sap; 15 (SP3 or higher) distribution. The same applies to a containerized deployment.</para>
+          </formalpara>
+        </listitem>
+        <listitem>
+          <formalpara>
+            <title>&t.agent;s</title>
+            <para>A registered &sles4sap; 15 (SP3 or higher) distribution.</para>
+          </formalpara>
+        </listitem>
+      </itemizedlist>
+    </section>
+  </section>

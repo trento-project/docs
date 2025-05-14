@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="file:/usr/share/xml/geekodoc/rng/geekodoc5-flat.rnc"
+   type="application/relax-ng-compact-syntax"?>
+<!DOCTYPE article
+[
+  <!ENTITY % entities SYSTEM "generic-entities.ent">
+    %entities;
+]>
+
+<article xml:lang="en" xml:id="article-sap-trento" version="5.1"
+    xmlns="http://docbook.org/ns/docbook"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:its="http://www.w3.org/2005/11/its">
+  <title>Getting Started with &trento;</title>
+  <subtitle>&sles4sapreg;</subtitle>
+  <info>
+     <!-- History -->
+   <revhistory xml:id="rh-article-trento">
+    <revision><date>2021-12-10</date>
+      <revdescription>
+        <para>
+          Initial version
+        </para>
+      </revdescription>
+     </revision>
+    </revhistory>
+
+    <!-- Series -->
+    <meta name="series" its:translate="no">Products &amp; Solutions</meta>
+
+    <!-- Task -->
+    <meta name="task" its:translate="yes">
+      <phrase>Compliance</phrase>
+      <phrase>High Availability</phrase>
+      <phrase>Monitoring</phrase>
+    </meta>
+
+    <!-- Docmanager -->
+    <dm:docmanager xmlns:dm="urn:x-suse:ns:docmanager">
+      <dm:bugtracker>
+        <dm:url>https://bugzilla.suse.com/enter_bug.cgi</dm:url>
+        <dm:component>Trento</dm:component>
+        <dm:product>Documentation</dm:product>
+        <dm:assignee>thomas.schraitle@suse.com</dm:assignee>
+      </dm:bugtracker>
+      <dm:editurl>https://github.com/SUSE/doc-unversioned/edit/main/trento/xml/</dm:editurl>
+      <dm:translation>no</dm:translation>
+    </dm:docmanager>
+
+    <!-- Productname & Version -->
+    <!--
+    <meta name="productname" its:translate="no">
+     <productname version="trento">&sles4sap;</productname>
+    </meta>
+    -->
+
+    <!-- Social Media -->
+    <meta name="title" its:translate="yes">Getting Started with &trento;</meta>
+    <meta name="social-descr" its:translate="yes">Use &trento; for &sles4sapa;</meta>
+
+    <!-- Search -->
+    <meta name="description" its:translate="yes">How to use &trento; for &sles4sap;</meta>
+
+    <abstract>
+      <para>
+       &trento; is an open cloud native Web console that aims to help
+       &sap; Basis consultants and administrators to check the configuration, monitor and manage the entire OS stack of their
+       &sap; environments, including HA features.
+      </para>
+    </abstract>
+    <xi:include href="common_copyright_gfdl.xml" />
+    </info>
+
+<xi:include href="trento-intro.xml"/>
+<xi:include href="trento-lifecycle.xml"/>
+<xi:include href="trento-requirements.xml"/>
+<xi:include href="trento-install-server.xml"/>
+<xi:include href="trento-install-agents.xml"/>
+<xi:include href="trento-user-manage.xml"/>
+<xi:include href="sso-integration.xml"/>
+<xi:include href="trento-activity-log.xml"/>
+<xi:include href="trento-checks.xml"/>
+<xi:include href="trento-web-console.xml"/>
+<xi:include href="trento-housekeeping.xml"/>
+<xi:include href="trento-manage-tags.xml"/>
+<xi:include href="trento-smlm-integration.xml"/>
+<xi:include href="trento-rotate-api-keys.xml"/>
+<xi:include href="trento-update-trentoserver.xml"/>
+<xi:include href="trento-update-trentoagent.xml"/>
+<xi:include href="trento-update-trento-checks.xml"/>
+<xi:include href="trento-uninstall-trentoserver.xml"/>
+<xi:include href="trento-report-problem.xml"/>
+<xi:include href="trento-analyze-problems.xml"/>
+<xi:include href="trento-compatibility.xml"/>
+<xi:include href="trento-version-history.xml"/>
+<xi:include href="trento-more-info.xml"/>
+</article>

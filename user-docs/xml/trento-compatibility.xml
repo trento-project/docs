@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="file:/usr/share/xml/geekodoc/rng/geekodoc5-flat.rnc"
+   type="application/relax-ng-compact-syntax"?>
+<!DOCTYPE article
+[
+  <!ENTITY % entities SYSTEM "generic-entities.ent">
+  %entities;
+]>
+
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="sec-trento-compatibility-matrix">
+  <title>Compatibility matrix between {t.server} and {t.agent}s</title>
+  <para></para>
+  <table>
+    <title>Compatibility matrix between {t.server} and {t.agent}s</title>
+    <tgroup cols="10">
+      <colspec colname="agent-start" colnum="1"/>
+      <colspec colname="agent-end" colnum="2"/>
+      <colspec colname="server-start" colnum="3" align="center"/>
+      <colspec colnum="4" align="center"/>
+      <colspec colnum="5" align="center"/>
+      <colspec colnum="6" align="center"/>
+      <colspec colnum="7" align="center"/>
+      <colspec colnum="8" align="center"/>
+      <colspec colnum="9" align="center"/>
+      <colspec colnum="10" colname="server-end" align="center"/>
+      <spanspec spanname="tserver" namest="server-start" nameend="server-end"/>
+      <spanspec spanname="tagent" namest="agent-start" nameend="agent-end"/>
+      <thead>
+        <row>
+          <entry morerows="1" spanname="tagent">
+            <para>{t.agent}</para>
+            <para>Compatibility matrix</para>
+          </entry>
+          <entry spanname="tserver">{t.server} versions</entry>
+        </row>
+        <row>
+<!--            <entry></entry>-->
+          <entry>1.0</entry>
+          <entry>1.1</entry>
+          <entry>1.2</entry>
+          <entry>2.0</entry>
+          <entry>2.1</entry>
+          <entry>2.2</entry>
+          <entry>2.3</entry>
+          <entry>2.4</entry>
+        </row>
+      </thead>
+      <tbody>
+        <row>
+          <!-- TIP: If you add more rows, raise add +1 to the morerows attribute value -->
+          <entry morerows="7" align="center" valign="middle">
+            <para>{t.agent}</para>
+            <para>versions</para>
+          </entry>
+          <entry>1.0</entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+        </row>
+        <row>
+          <!-- <entry/> -->
+          <entry>1.1</entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+        </row>
+        <row>
+          <!-- <entry/> -->
+         <entry>1.2</entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+        </row>
+        <row>
+          <!-- <entry/> -->
+          <entry>2.0</entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+        </row>
+        <row>
+          <!-- <entry/> -->
+          <entry>2.1</entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+        </row>
+         <row>
+          <!-- <entry/> -->
+          <entry>2.2</entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry></entry>
+          <entry></entry>
+        </row>
+        <row>
+          <!-- <entry/> -->
+          <entry>2.3</entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry></entry>
+        </row>
+        <row>
+          <!-- <entry/> -->
+          <entry>2.4</entry>
+          <entry></entry>
+          <entry></entry>
+          <entry></entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+          <entry><phrase role="color:suse-jungle-green">✓</phrase></entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+</section>

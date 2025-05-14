@@ -1,0 +1,8 @@
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="automated-deployment-with-ansible">
+  <title>Automated deployment with Ansible</title>
+  <para>
+    An automated installation of Trento Server using on RPM packages or Docker images can be
+    performed with a Ansible playbook. For further information, refer to the official
+    <link xlink:href="https://github.com/trento-project/ansible">Trento Ansible project</link>.
+  </para>
+</section>

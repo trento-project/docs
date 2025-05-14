@@ -1,0 +1,65 @@
+include::generic-attributes.adoc[]
+include::product-attributes.adoc[]
+
+== Getting Started with {trento}
+{sles4sapreg}
+
+// History
+[[rh-article-trento]]
+*2021-12-10*::
+Initial version
+
+// Series
+:meta-series: Products & Solutions
+
+// Task
+:meta-task: Compliance
+:meta-task: High Availability
+:meta-task: Monitoring
+
+// Docmanager
+:dm-bugtracker-url: https://bugzilla.suse.com/enter_bug.cgi
+:dm-bugtracker-component: Trento
+:dm-bugtracker-product: Documentation
+:dm-bugtracker-assignee: thomas.schraitle@suse.com
+:dm-editurl: https://github.com/SUSE/doc-unversioned/edit/main/trento/xml/
+:dm-translation: no
+
+// Productname & Version
+//:meta-productname: {sles4sap}
+
+// Social Media
+:meta-title: Getting Started with {trento}
+:meta-social-descr: Use {trento} for {sles4sapa}
+
+// Search
+:meta-description: How to use {trento} for {sles4sap}
+
+{trento} is an open cloud native Web console that aims to help {sap} Basis consultants and administrators to check the configuration, monitor and manage the entire OS stack of their {sap} environments, including HA features.
+
+// include::common_copyright_gfdl.xml[]
+
+include::trento-intro.adoc[]
+include::trento-lifecycle.adoc[]
+include::trento-requirements.adoc[]
+include::trento-install-server.adoc[]
+include::trento-install-agents.adoc[]
+include::trento-user-manage.adoc[]
+include::trento-sso-integration.adoc[]
+include::trento-activity-log.adoc[]
+include::trento-checks.adoc[]
+include::trento-web-console.adoc[]
+include::trento-housekeeping.adoc[]
+include::trento-manage-tags.adoc[]
+include::trento-smlm-integration.adoc[]
+include::trento-rotate-api-keys.adoc[]
+include::trento-update-trento-server.adoc[]
+include::trento-update-trento-agent.adoc[]
+include::trento-update-trento-checks.adoc[]
+include::trento-uninstall-trento-server.adoc[]
+include::trento-uninstall-trento-agent.adoc[]
+include::trento-report-issue.adoc[]
+include::trento-analyze-problems.adoc[]
+include::trento-compatibility.adoc[]
+include::trento-version-history.adoc[]
+include::trento-more-info.adoc[]

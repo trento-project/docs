@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="file:/usr/share/xml/geekodoc/rng/geekodoc5-flat.rnc"
+   type="application/relax-ng-compact-syntax"?>
+<!DOCTYPE article
+[
+  <!ENTITY % entities SYSTEM "generic-entities.ent">
+  %entities;
+]>
+
+  <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="sec-trento-product-lifecycle-update-strategy">
+    <title>Product lifecycle and update strategy</title>
+
+    <para>Trento is available at no extra cost for &sles4sap;&nbsp;15 subscribers. Particularly, Trento's two main components have the following product lifecycles:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>&t.agent;</term>
+        <listitem>
+          <formalpara>
+            <title>Delivery mechanism:</title>
+            <para> RPM package for &sles4sap;&nbsp;15&nbsp;SP3 and
+              newer.</para>
+          </formalpara>
+          <formalpara>
+            <title>Supported runtime:</title>
+            <para> Supported in &sles4sap;&nbsp;15&nbsp;SP3 and newer on x86_64
+            and ppc64le architectures.
+            </para>
+          </formalpara>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>&t.server;</term>
+        <listitem>
+          <formalpara>
+            <title>Delivery mechanisms:</title>
+            <para> A set of container images from the &suse; public registry
+            together with a Helm chart that facilitates their installation or a
+            set of RPM packages for &sles4sap;&nbsp;15&nbsp;SP3 and
+            newer.</para>
+          </formalpara>
+          <formalpara>
+            <title>&k8s; deployment:</title>
+            <para> The &t.server; runs on any current Cloud Native Computing
+            Foundation (CNCF)-certified &k8s; distribution based on a x86_64
+            architecture. Depending on your scenario and needs, &suse; supports
+            several usage scenarios:
+            </para>
+          </formalpara>
+          <itemizedlist>
+            <listitem>
+              <para> If you already use a CNCF-certified &k8s; cluster,
+                you can run the &t.server; in it. </para>
+            </listitem>
+            <listitem>
+              <para> If you don't have a &k8s; cluster, and need enterprise
+              support, &suse; recommends &suse; &rancher.k8s.engine; (RKE)
+              version 1 or 2. </para>
+            </listitem>
+            <listitem>
+              <para> If you do not have a &k8s; enterprise solution but you
+              want to try &trento;, &suse; Rancher's K3s provides you with an
+              easy way to get started. But keep in mind that K3s default
+              installation process deploys a single node &k8s; cluster, which is
+              not a recommended setup for a stable Trento production instance.
+               </para>
+            </listitem>
+          </itemizedlist>
+          <formalpara>
+            <title>systemd and containerized deployments:</title>
+            <para> Supported in &sles4sap;&nbsp;15&nbsp;SP3 and newer.
+            </para>
+          </formalpara>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+
+  </section>

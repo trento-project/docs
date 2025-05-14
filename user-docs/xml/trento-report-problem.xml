@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="file:/usr/share/xml/geekodoc/rng/geekodoc5-flat.rnc"
+   type="application/relax-ng-compact-syntax"?>
+<!DOCTYPE article
+[
+  <!ENTITY % entities SYSTEM "generic-entities.ent">
+  %entities;
+]>
+
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="sec-trento-report-problem">
+  <title>Reporting an Issue</title>
+  <para>
+    {suse} customer with registered {sles4sap}{nbsp}15 (SP3 or higher) distributions can report {trento} issues either directly in the {scc}
+   or through the corresponding vendor, depending on their licensing model. Problems must be reported under {sles4sap}{nbsp}15 and component trento.
+  </para>
+    <para>
+    When opening a support case for {trento}, provide the relevant deployment option for {t.server}: {k8s}, systemd or containerized.</para>
+ <para>In case of a {k8s} deployment, provide the output of the {trento} support plugin and the scenario dump, as explained in section <xref linkend="sec-trento-problemanalysis" />.
+  </para>
+ <para>In case of a systemd deployment, provide the status and the journal of the trento-web and trento-wanda services.
+  </para>
+ <para>In case of a containerized deployment, provide the logs of the trento-web and trento-wanda containers. Use <command>docker ps</command> to retrieve
+  the IDs of both containers, then <command>docker logs <replaceable>CONTAINER_ID</replaceable></command> to retrieve the corresponding logs.
+  </para>
+ <para>
+    For issues with a particular {t.agent}, or a component discovered by a particular {t.agent}, also provide the following:
+  </para>
+          <itemizedlist>
+        <listitem>
+          <para>status of the {t.agent}</para>
+        </listitem>
+        <listitem>
+          <para>journal of the {t.agent}</para>
+        </listitem>
+        <listitem>
+          <para>output of the command <command>supportconfig</command> in the {t.agent} host. See
+          <link xlink:href="https://documentation.suse.com/sles/html/SLES-all/cha-adm-support.html#sec-admsupport-cli"/>
+           for information on how to run this command from command line.
+         </para>
+        </listitem>
+      </itemizedlist>
+</section>

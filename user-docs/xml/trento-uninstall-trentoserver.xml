@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="file:/usr/share/xml/geekodoc/rng/geekodoc5-flat.rnc"
+   type="application/relax-ng-compact-syntax"?>
+<!DOCTYPE article
+[
+  <!ENTITY % entities SYSTEM "generic-entities.ent">
+  %entities;
+]>
+
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="sec-trento-uninstall-trentoserver">
+  <title>Uninstalling {t.server}</title>
+  <para>The procedure to uninstall the {t.server} depends on the deployment type: {k8s}, systemd or containerized. The section covers {k8s} deployments.</para>
+  <para> If {t.server} was deployed manually, you need to uninstall it manually.
+   If  {t.server} was deployed using the Helm chart, you can also use Helm to uninstall it as follows:</para>
+   <screen>helm uninstall trento-server</screen>
+</section>

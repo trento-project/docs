@@ -1,0 +1,71 @@
+include::generic-attributes.adoc[]
+include::product-attributes.adoc[]
+
+[[sec-trento-checks]]
+== Performing configuration checks
+
+{trento} provides configuration checks that ensure your infrastructure
+setup adheres to our or other vendor's Best Practices, and it does not
+diverge with time. Configuration checks are available for HANA clusters,
+ASCS/ERS clusters and hosts. The following procedure is specific to a
+HANA cluster. The procedure for an ASCS/ERS cluster or a host would be
+exactly the same, except it starts from the corresponding *Details* view.
+
+[[checks-procedure, Performing configuration checks]]
+. Log in to {trento}
+. In the left panel, click *Cluster*.
+. In the list, search for a {hana} cluster.
+. Click the desired cluster name in the *Name* column. The *Details* view
+opens.
++
+.{pace} cluster details
+image::trento-web-pacemaker-cluster-details-view.png[trento-web-pacemaker-cluster-details-view,scaledwidth=80.0%]
+. [[step-5, Step 5]]Click the *Settings* button to change the cluster settings of the
+respective cluster. For checks to be executed, a checks selection must
+be made. Select the checks to be executed and click *Select Checks for
+Execution*.
++
+.{pace} Cluster Settings{mdash}Checks Selection
+[#fig-pacemaker-clustersettings-checks]
+image::trento-web-pacemaker-clustersettings-checks.png[trento-web-pacemaker-clustersettings-checks,scaledwidth=70.0%]
+. You can then either wait for {trento} to execute the selected checks
+or trigger an execution immediately by clicking the button  in the *Checks Selection* tab.
+. Investigate the result in the *Checks Results* view. Each row in the
+view displays a check ID, a short description of the check and the check
+execution result. Click on a row to open a section that provides
+information about the execution on each node of the cluster.
++
+.Check results for a cluster
+[#fig-pacemaker-checkresult]
+image::trento-web-checkresult.png[trento-web-checkresult,scaledwidth=70.0%]
++
+The result of a check execution can be passing, warning, critical:
++
+** _Passing_ means that the checked configuration meets the
+recommendation.
+** _Warning_ means that the recommendation is not met but the
+configuration is not critical for the proper running of the cluster.
+** _Critical_ means that either the execution itself failed (for
+example, a timeout) or the recommendation is not met and is critical for
+the well-being of the cluster.
++
+Use the filter to narrow the list to specific results (for example,
+critical).
+. Click a check's link to open a modal box with the check description.
+This displays an abstract and a possible solution to the problem. The
+*References* section contains links to the documentation from the
+different vendors for more context when necessary. Close the modal box
+by pressing the *Esc* key or click outside of the box.
++
+For each unmet expected result, there is a detailed view with
+information about it: what facts were gathered, what values were
+expected, and what was the result of the evaluation. This helps to
+understand why a certain configuration check is failing:
++
+.Unmet expected result detail view
+[#fig-non-met-expectation-detail]
+image::trento-web-nonmetexpectation.png[trento-web-nonmetexpectation,scaledwidth=70.0%]
+
+When checks for a given cluster have been selected, {trento} executes
+them automatically every five minutes, updating the results. A spinning
+check execution result icon means that an execution is running.

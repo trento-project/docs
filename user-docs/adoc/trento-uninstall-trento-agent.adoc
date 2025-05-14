@@ -1,0 +1,22 @@
+include::generic-attributes.adoc[]
+include::product-attributes.adoc[]
+
+[[sec-trento-uninstall-trentoagent]]
+== Uninstalling a {tragent}
+
+To uninstall a {tragent}, perform the following steps:
+
+* Log in to the {tragent} host.
+* Stop the {tragent}:
++
+====
+[source,bash,subs="attributes"]
+----
+{prompt_sudo}systemctl stop trento-agent
+----
+====
+* Remove the package:
++
+....
+sudo zypper remove trento-agent
+....

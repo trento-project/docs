@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="file:/usr/share/xml/geekodoc/rng/geekodoc5-flat.rnc"
+   type="application/relax-ng-compact-syntax"?>
+<!DOCTYPE article
+[
+  <!ENTITY % entities SYSTEM "generic-entities.ent">
+  %entities;
+]>
+
+  <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="sec-integration-with-SUSE-Manager">
+      <title>Integration with SUSE Multi-Linux Manager</title>
+      <para>{trento} can be inegrated with SUSE Multi-Linux Manager to provide the {sap} administrator with
+      information about relevant patches and upgradable packages for any host
+       that is registered with both applications.</para>
+      <para>The user must enter the connection settings for SUSE Multi-Linux Manager
+       in the <guimenu>Settings</guimenu> view:</para>
+     <figure>
+         <title>SUSE Multi-Linux Manager settings</title>
+        <mediaobject>
+          <imageobject>
+            <imagedata
+              fileref="trento-suse-manager-settings.png" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+   <para>
+   When the SUSE Multi-Linux Manager settings are configured, the {sap} Basis administrator can test the connection
+   by clicking the <guimenu>Test</guimenu> button.
+   If the connection is successful, the <guimenu>Host Details</guimenu> view of each host
+   managed by SUSE Multi-Linux Manager displays a summary
+   of available patches and upgradable packages:</para>
+        <figure>
+         <title><guimenu>Available software updates in the Host Details view</guimenu></title>
+        <mediaobject>
+          <imageobject>
+            <imagedata
+              fileref="trento-summary-of-available-software-updates.png" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+   <para>Click <guimenu>Relevant Patches</guimenu> to open the <guimenu>Relevant Patches</guimenu> overview containing a list of patches available for the host:</para>
+           <figure>
+         <title><guimenu>Available Patches overview</guimenu></title>
+        <mediaobject>
+          <imageobject>
+            <imagedata
+              fileref="trento-available-patches-overview.png" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+      <para>Click <guimenu>Upgradable Packages</guimenu> to open the <guimenu>Upgradable Packages</guimenu> overview containing a list of packages that can be upgraded on that particular host:</para>
+           <figure>
+         <title><guimenu>Upgradable Packages overview</guimenu></title>
+        <mediaobject>
+          <imageobject>
+            <imagedata
+              fileref="trento-upgradable-packages-overview.png" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+   <para>Click an advisory or patch link to access the corresponding details view
+    with relevant information, such us whether it requires a reboot or not, associated
+    vulnerabilities, or a list of affected hosts:</para>
+            <figure>
+         <title><guimenu>Advisory Details view</guimenu></title>
+        <mediaobject>
+          <imageobject>
+            <imagedata
+              fileref="trento-advisory-details-view.png" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+   <para>There are three types of patches or advisories: security advisories, bug fixes and feature
+   enhancements. Security advisories are considered critical. If an advisory is available,
+   the health of the host is set to critical. If there are available patches but none of them
+    is a security one, the health of the host switches to warning. When a host cannot be found in
+    SUSE Multi-Linux Manager, or there is a problem retrieving the data for it, its health is set to unknown.
+   </para>
+    <para>
+    You can clear the SUSE Multi-Linux Manager settings from the Settings view
+    at any time. When you do this, all information about available software
+    updates disappears from the console, and the status of the hosts is adjusted
+    accordingly.</para>
+    </section>

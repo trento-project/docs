@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="file:/usr/share/xml/geekodoc/rng/geekodoc5-flat.rnc"
+   type="application/relax-ng-compact-syntax"?>
+<!DOCTYPE article
+[
+  <!ENTITY % entities SYSTEM "generic-entities.ent">
+  %entities;
+]>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="sec-trento-installing-trentoserver">
+  <title>Installing &t.server;</title>
+  <section xml:id="sec-trento-k8s-deployment">
+    <title>&k8s; deployment</title>
+    <para>
+      The subsection uses the following placeholders:
+    </para>
+    <itemizedlist>
+      <listitem>
+        <para>
+          <replaceable>TRENTO_SERVER_HOSTNAME</replaceable>: the host name used by the end user to
+          access the console.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <replaceable>ADMIN_PASSWORD</replaceable>: the password of the default user created
+          during the installation process. It must have at least 8 characters.
+        </para>
+      </listitem>
+    </itemizedlist>
+    <!--  -->
+    <section xml:id="sec-trento-install-trentoserver-on-existing-k8s-cluster">
+      <title>Installing &t.server; on an existing &k8s; cluster</title>
+      <para>
+        &t.server; consists of a several components delivered as container images and intended for
+        deployment on a &k8s; cluster. A manual production-ready deployment of these components
+        requires &k8s; knowledge. Customers without in-house &k8s; expertise and who want to try
+        &trento; with a minimum of effort, can use the &trento; Helm chart. This approach automates
+        the deployment of all the required components on a single &k8s; cluster node. You can use
+        the &trento; Helm chart to install &t.server; on a existing &k8s; cluster as follows:
+      </para>
+      <procedure>
+        <step>
+          <para>
+            Install Helm:
+          </para>
+<screen>curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash</screen>
+        </step>
+        <step>
+          <para>
+            Connect Helm to an existing &k8s; cluster.
+          </para>
+        </step>
+        <step>
+          <para>
+            Use Helm to install &t.server; with the &trento; Helm chart:
+          </para>
+<screen>helm upgrade \
+   --install trento-server oci://registry.suse.com/trento/trento-server \
+   --set trento-web.trentoWebOrigin=<replaceable>TRENTO_SERVER_HOSTNAME</replaceable> \
+   --set trento-web.adminUser.password=<replaceable>ADMIN_PASSWORD</replaceable></screen>
+          <para>
+            When using a Helm version lower than 3.8.0, an experimental flag must be set as
+            follows:
+          </para>
+<screen>HELM_EXPERIMENTAL_OCI=1 helm upgrade \
+   --install trento-server oci://registry.suse.com/trento/trento-server \
+   --set trento-web.trentoWebOrigin=<replaceable>TRENTO_SERVER_HOSTNAME</replaceable> \
+   --set trento-web.adminUser.password=<replaceable>ADMIN_PASSWORD</replaceable></screen>
+        </step>
+        <step>
+          <para>
+            To verify that the &t.server; installation was successful, open the URL of the &t.web;
+            (<uri>http://<replaceable>TRENTO_SERVER_HOSTNAME</replaceable></uri>) from a
+            workstation on the &sap; administrator's LAN.
+          </para>
+        </step>
+      </procedure>
+    </section>
+    <section xml:id="sec-trento-install-trentoserver-on-k3s">
+      <title>Installing &t.server; on K3s</title>
+      <para>
+        If you do not have a &k8s; cluster, or have one but do not want to use it for &trento;,
+        &suse; Rancher's K3s provides an alternative. To deploy &t.server; on K3s, you need is a
+        small server or VM (see <xref
+          linkend="sec-trento-server-requirements" /> for
+        minimum requirements) and follow steps in
+        <xref linkend="pro-trento-manually-installing" />.
+      </para>
+      <important>
+        <title>Deploying Trento on K3s</title>
+        <para>
+          The following procedure deploys &t.server; on a single-node K3s cluster. Note that this
+          setup is not recommended for production use.
+        </para>
+      </important>
+      <procedure xml:id="pro-trento-manually-installing">
+        <title>Manually installing Trento on a &t.server; host</title>
+        <step>
+          <para>
+            Log in to the &t.server; host.
+          </para>
+        </step>
+        <step xml:id="st-install-k3s">
+          <para>
+            Install K3s:
+          </para>
+          <stepalternatives>
+            <step>
+              <para>
+                Installing as user &rootuser;
+              </para>
+<screen>&prompt.root;curl -sfL https://get.k3s.io | INSTALL_K3S_SKIP_SELINUX_RPM=true sh</screen>
+            </step>
+            <step>
+              <para>
+                Installing as non-&rootuser; user:
+              </para>
+<screen>&prompt.user;curl -sfL https://get.k3s.io | INSTALL_K3S_SKIP_SELINUX_RPM=true sh -s - --write-kubeconfig-mode 644</screen>
+            </step>
+          </stepalternatives>
+        </step>
+        <step xml:id="st-install-helm">
+          <para>
+            Install Helm as &rootuser;:
+          </para>
+<screen>&prompt.root;curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash</screen>
+        </step>
+        <step>
+          <para>
+            Set the <envar>KUBECONFIG</envar> environment variable for the same user that installed
+            K3s:
+          </para>
+<screen>export KUBECONFIG=/etc/rancher/k3s/k3s.yaml</screen>
+        </step>
+        <step xml:id="st-deploy-k3s">
+          <para>
+            With the same user that installed K3s, install &t.server; using the Helm chart:
+          </para>
+<screen>helm upgrade \
+   --install trento-server oci://registry.suse.com/trento/trento-server \
+   --set trento-web.trentoWebOrigin=<replaceable>TRENTO_SERVER_HOSTNAME</replaceable> \
+   --set trento-web.adminUser.password=<replaceable>ADMIN_PASSWORD</replaceable></screen>
+          <para>
+            When using a Helm version lower than 3.8.0, an experimental flag must be set as
+            follows:
+          </para>
+<screen>HELM_EXPERIMENTAL_OCI=1 helm upgrade \
+   --install trento-server oci://registry.suse.com/trento/trento-server \
+   --set trento-web.trentoWebOrigin=<replaceable>TRENTO_SERVER_HOSTNAME</replaceable> \
+   --set trento-web.adminUser.password=<replaceable>ADMIN_PASSWORD</replaceable></screen>
+        </step>
+        <step>
+          <para>
+            Monitor the creation and start-up of the &t.server; pods, and wait until they are ready
+            and running:
+          </para>
+<screen>watch kubectl get pods</screen>
+          <para>
+            All pods must be in the ready and running state.
+          </para>
+        </step>
+        <step>
+          <para>
+            Log out of the &t.server; host.
+          </para>
+        </step>
+        <step>
+          <para>
+            To verify that the &t.server; installation was successful, open the URL of the &t.web;
+            (<uri>http://<replaceable>TRENTO_SERVER_HOSTNAME</replaceable></uri>) from a
+            workstation on the &sap; administrator's LAN.
+          </para>
+        </step>
+      </procedure>
+    </section>
+    <section xml:id="sec-trento-deploying-trento-on-selected-nodes">
+      <title>Deploying &t.server; on selected nodes</title>
+      <para>
+        If you use a multi-node &k8s; cluster, it is possible to deploy &t.server; images on
+        selected nodes by specifying the field <parameter>nodeSelector</parameter> in the helm
+        upgrade command as follows:
+      </para>
+<screen>HELM_EXPERIMENTAL_OCI=1 helm upgrade \
+   --install trento-server oci://registry.suse.com/trento/trento-server \
+   --set trento-web.trentoWebOrigin=<replaceable>TRENTO_SERVER_HOSTNAME</replaceable> \
+   --set trento-web.adminUser.password=<replaceable>ADMIN_PASSWORD</replaceable> \
+   --set prometheus.server.nodeSelector.<replaceable>LABEL</replaceable>=<replaceable>VALUE</replaceable> \
+   --set postgresql.primary.nodeSelector.<replaceable>LABEL</replaceable>=<replaceable>VALUE</replaceable> \
+   --set trento-web.nodeSelector.<replaceable>LABEL</replaceable>=<replaceable>VALUE</replaceable> \
+   --set trento-runner.nodeSelector.<replaceable>LABEL</replaceable>=<replaceable>VALUE</replaceable></screen>
+    </section>
+    <xi:include href="helm_event_pruning.xml"/>
+    <section xml:id="sec-trento-enabling-email-alerts">
+      <title>Enabling email alerts</title>
+      <para>
+        Email alerting feature notifies the &sap; Basis administrator about important changes in
+        the &sap; Landscape being monitored by &trento;.
+      </para>
+      <para>
+        The reported events include the following:
+      </para>
+      <itemizedlist>
+        <listitem>
+          <para>
+            Host heartbeat failed
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Cluster health detected critical
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Database health detected critical
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            &sap; System health detected critical
+          </para>
+        </listitem>
+      </itemizedlist>
+      <para>
+        This feature is disabled by default. It can be enabled at installation time or anytime at a
+        later stage. In both cases, the procedure is the same and uses the following placeholders:
+      </para>
+      <variablelist>
+        <varlistentry>
+          <term><replaceable>SMTP_SERVER</replaceable></term>
+          <listitem>
+            <para>
+              The SMTP server designated to send email alerts
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><replaceable>SMTP_PORT</replaceable></term>
+          <listitem>
+            <para>
+              Port on the SMTP server
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><replaceable>SMTP_USER</replaceable></term>
+          <listitem>
+            <para>
+              User name to access SMTP server
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><replaceable>SMTP_PASSWORD</replaceable></term>
+          <listitem>
+            <para>
+              Password to access SMTP server
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><replaceable>ALERTING_SENDER</replaceable></term>
+          <listitem>
+            <para>
+              Sender email for alert notifications
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><replaceable>ALERTING_RECIPIENT</replaceable></term>
+          <listitem>
+            <para>
+              Recipient email for alert notifications.
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+      <para>
+        The command to enable email alerts is as follows:
+      </para>
+<screen>HELM_EXPERIMENTAL_OCI=1 helm upgrade \
+   --install trento-server oci://registry.suse.com/trento/trento-server \
+   --set trento-web.trentoWebOrigin=<replaceable>TRENTO_SERVER_HOSTNAME</replaceable> \
+   --set trento-web.adminUser.password=<replaceable>ADMIN_PASSWORD</replaceable> \
+   --set trento-web.alerting.enabled=true \
+   --set trento-web.alerting.smtpServer=<replaceable>SMTP_SERVER</replaceable> \
+   --set trento-web.alerting.smtpPort=<replaceable>SMTP_PORT</replaceable> \
+   --set trento-web.alerting.smtpUser=<replaceable>SMTP_USER</replaceable> \
+   --set trento-web.alerting.smtpPassword=<replaceable>SMTP_PASSWORD</replaceable> \
+   --set trento-web.alerting.sender=<replaceable>ALERTING_SENDER</replaceable> \
+   --set trento-web.alerting.recipient=<replaceable>ALERTING_RECIPIENT</replaceable></screen>
+    </section>
+    <section xml:id="sec-trento-enabling-ssl">
+      <title>Enabling SSL</title>
+      <para>
+        Ingress may be used to provide SSL termination for the Web component of &t.server;. This
+        would allow to encrypt the communication from the agent to the server, which is already
+        secured by the corresponding API key. It would also allow HTTPS access to the Web console
+        with trusted certificates.
+      </para>
+      <para>
+        Configuration must be done in the tls section of the <filename>values.yaml</filename> file
+        of the chart of the &t.server; Web component.
+      </para>
+      <para>
+        For details on the required Ingress setup and configuration, refer to:
+        <link
+          xlink:href="https://kubernetes.io/docs/concepts/services-networking/ingress/"
+         />.
+        Particularly, refer to section
+        <link
+          xlink:href="https://kubernetes.io/docs/concepts/services-networking/ingress/#tls"
+         />
+        for details on the secret format in the YAML configuration file.
+      </para>
+      <para>
+        Additional steps are required on the Agent side.
+        <remark>toms 2022-09-14: which steps?</remark>
+      </para>
+    </section>
+  </section>
+  <xi:include href="systemd-install.xml"/>
+  <xi:include href="container-install.xml"/>
+  <xi:include href="ansible-install.xml"/>
+</section>

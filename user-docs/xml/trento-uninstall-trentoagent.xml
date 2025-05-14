@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="file:/usr/share/xml/geekodoc/rng/geekodoc5-flat.rnc"
+   type="application/relax-ng-compact-syntax"?>
+<!DOCTYPE article
+[
+  <!ENTITY % entities SYSTEM "generic-entities.ent">
+  %entities;
+]>
+
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="sec-trento-uninstall-trentoagent">
+  <title>Uninstalling a {t.agent}</title>
+  <para>
+    To uninstall a {t.agent}, perform the following steps:
+  </para>
+  <procedure>
+    <step>
+      <para>Log in to the {t.agent} host.</para>
+    </step>
+    <step>
+      <para>Stop the {t.agent}:</para>
+      <screen>{prompt.user}sudo systemctl stop trento-agent</screen>
+    </step>
+    <step>
+      <para>
+        Remove the package:
+      </para>
+      <screen>{prompt.user}sudo zypper remove trento-agent</screen>
+    </step>
+  </procedure>
+</section>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="file:/usr/share/xml/geekodoc/rng/geekodoc5-flat.rnc"
+   type="application/relax-ng-compact-syntax"?>
+<!DOCTYPE article
+[
+  <!ENTITY % entities SYSTEM "generic-entities.ent">
+  %entities;
+]>
+
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="sec-trento-updating-trento-checks">
+  <title>Updating {trento} Checks</title>
+  <para>Configuration checks are an integral part of the checks engine, but they are delivered separately. This allows customers
+  to update the checks catalog in their setup whenever updates to existing checks and new checks are released, without
+  waiting for a new version release cycle.</para>
+       <para> The procedure of updating the configuration checks depends on the {t.server} deployment type: {k8s}, systemd or containerized.</para>
+   <para>In a {k8s} deployment, checks are delivered as a container image, and you can
+    use Helm with the following options to pull the latest image:</para>
+<programlisting>
+  helm ... \
+ --set trento-wanda.checks.image.tag=latest \
+ --set trento-wanda.checks.image.repository=registry.suse.com/trento/trento-checks  \
+ --set trento-wanda.checks.image.pullPolicy=Always \
+ ...
+</programlisting>
+   <para>In a systemd deployment, checks are delivered as an RPM package, and you can 
+    use zypper to update your checks catalog:</para>
+      <screen>{prompt.user}sudo zypper ref
+{prompt.user}sudo zypper update trento-checks</screen>
+  <para>In a containerized deployment, checks are delivered as a container image, and
+   you can user Docker to pull the latest version into the trento-checks volume created during the installation process:</para>
+<screen>{prompt.user}docker run \
+-v trento-checks:/usr/share/trento/checks \
+registry.suse.com/trento/trento-checks:latest
+</screen>
+</section>

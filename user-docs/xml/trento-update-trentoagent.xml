@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="file:/usr/share/xml/geekodoc/rng/geekodoc5-flat.rnc"
+   type="application/relax-ng-compact-syntax"?>
+<!DOCTYPE article
+[
+  <!ENTITY % entities SYSTEM "generic-entities.ent">
+  %entities;
+]>
+
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="sec-trento-updating-trentoagent">
+  <title>Updating a {t.agent}</title>
+  <para>
+    To update the {t.agent}, follow the procedure below:
+  </para>
+  <procedure>
+    <step>
+      <para>Log in to the {t.agent} host.</para>
+    </step>
+    <step>
+      <para>Stop the {t.agent}:</para>
+      <screen>{prompt.user}sudo systemctl stop trento-agent</screen>
+    </step>
+    <step>
+      <para>
+        Install the new package:
+      </para>
+      <screen>{prompt.user}sudo zypper ref
+{prompt.user}sudo zypper install trento-agent</screen>
+    </step>
+    <step>
+      <para>
+        Copy the file <filename>/etc/trento/agent.yaml.rpmsave</filename> to <filename>/etc/trento/agent.yaml</filename>. Make sure that entries <parameter>facts-service-url</parameter>,
+        <parameter>server-url</parameter>, and <parameter>api-key</parameter>
+        in <filename>/etc/trento/agent.yaml</filename> are correct.
+      </para>
+    </step>
+    <step>
+      <para>
+        Start the {t.agent}:
+      </para>
+      <screen>{prompt.user}sudo systemctl start trento-agent</screen>
+    </step>
+    <step>
+      <para>Check the status of the {t.agent}:</para>
+      <screen>{prompt.user}sudo systemctl status trento-agent
+● trento-agent.service - {t.agent} service
+   Loaded: loaded (/usr/lib/systemd/system/trento-agent.service; enabled; vendor preset: disabled)
+   Active: active (running) since Wed 2021-11-24 17:37:46 UTC; 4s ago
+ Main PID: 22055 (trento)
+    Tasks: 10
+   CGroup: /system.slice/trento-agent.service
+           ├─22055 /usr/bin/trento agent start --consul-config-dir=/srv/consul/consul.d
+           └─22220 /usr/bin/ruby.ruby2.5 /usr/sbin/SUSEConnect -s
+
+[...]</screen>
+    </step>
+    <step>
+      <para>Check the version in the <guimenu>Hosts</guimenu> overview of the {t.web} (URL
+            <uri>http://<replaceable>TRENTO_SERVER_HOSTNAME</replaceable></uri>).</para>
+    </step>
+    <step>
+      <para> Repeat this procedure in all {t.agent} hosts. </para>
+    </step>
+  </procedure>
+
+</section>

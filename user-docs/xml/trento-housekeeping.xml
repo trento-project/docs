@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="file:/usr/share/xml/geekodoc/rng/geekodoc5-flat.rnc"
+   type="application/relax-ng-compact-syntax"?>
+<!DOCTYPE article
+[
+  <!ENTITY % entities SYSTEM "generic-entities.ent">
+  %entities;
+]>
+
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="sec-housekeeping">
+      <title>Housekeeping</title>
+     <para>
+    When the heartbeat of an agent fails, an option to clean-up the corresponding host is displayed in the
+    <guimenu>Hosts</guimenu> overview and the corresponding <guimenu>Host details</guimenu> view.
+     </para>
+           <figure>
+              <title>Clean up button in <guimenu>Hosts</guimenu> overview</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="trento-cleanup-hosts-overview.png"
+                    width="70%" />
+                </imageobject>
+              </mediaobject>
+            </figure>
+                 <figure>
+              <title>Clean up button in <guimenu>Host details</guimenu> view</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="trento-cleanup-host-details-view.png"
+                    width="70%" />
+                </imageobject>
+              </mediaobject>
+            </figure>
+      <para>Use the <guimenu>Clean up</guimenu> button to remove all the components discovered by the agent in the host (including the host
+       itself and other components that might depend on the ones running on the host) from the console.</para>
+       <para>
+       For example, when cleaning up the host where the primary application server of an {sap} System is registered,
+       the entire {sap} System is removed from the console.
+      </para>
+      <para>
+      Similarly, when a registered application or {hana} instance is no longer discovered, an option to clean it up is
+       displayed in the corresponding overview and the corresponding details view.
+      </para>
+           <figure>
+              <title>Clean up button {sap} systems overview</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="trento-cleanup-sap-instance-overview.png"
+                    width="70%" />
+                </imageobject>
+              </mediaobject>
+            </figure>
+                 <figure>
+              <title>Clean up button in {sap} system details view</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata fileref="trento-cleanup-sap-instance-details-view.png"
+                    width="70%" />
+                </imageobject>
+              </mediaobject>
+            </figure>
+           <para>Use the <guimenu>Clean up</guimenu> button to remove the instance and any dependencies from the console.</para>
+           <para>
+           For example, cleaning up the ASCS instance of an {sap}
+           system removes the entire {sap} system from the console.
+      </para>
+    </section>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="file:/usr/share/xml/geekodoc/rng/geekodoc5-flat.rnc"
+   type="application/relax-ng-compact-syntax"?>
+<!DOCTYPE article
+[
+  <!ENTITY % entities SYSTEM "generic-entities.ent">
+  %entities;
+]>
+
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="sec-trento-rotating-apikeys">
+    <title>Rotating API keys</title>
+    <para>Communication from the {t.agent} to the {t.server} is secured by a API key
+     that must be provided in the agent configuration file.</para>
+   <para>By default, the API key does not have an expiration date. You can set up a custom expiration date to increase the
+    overall security of the setup and meet internal security requirements.</para>
+   <para>To do this, go to the <guimenu>Settings</guimenu> view and click
+    the <guimenu>Generate Key</guimenu> button in the <guimenu>API Key</guimenu> section:</para>
+          <figure>
+        <title><guimenu>Checks catalog</guimenu></title>
+        <mediaobject>
+          <imageobject>
+            <imagedata width="80%"
+              fileref="trento-api-key-settings.png" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+   <para>Whenever a new key is generated, the configuration of all the reporting agents must be updated accordingly.</para>
+  </section>

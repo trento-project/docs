@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="file:/usr/share/xml/geekodoc/rng/geekodoc5-flat.rnc"
+   type="application/relax-ng-compact-syntax"?>
+<!DOCTYPE article
+[
+  <!ENTITY % entities SYSTEM "generic-entities.ent">
+  %entities;
+]>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="sec-trento-installing-trentoagent">
+  <title>Installing {t.agent}s</title>
+  <para>
+    Before you can install a {t.agent}, you must obtain the API key of your {t.server}.
+    Proceed as follows:
+  </para>
+  <procedure>
+    <step>
+      <para>
+        Open the URL of the Trento Web interface
+        (<uri>http://<replaceable>TRENTO_SERVER_HOSTNAME</replaceable></uri>).
+        It prompts you for a user name and password:
+      </para>
+      <!-- add login of Trento Server -->
+      <informalfigure>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="trento-web-login.png" width="30%"/>
+          </imageobject>
+        </mediaobject>
+      </informalfigure>
+    </step>
+    <step>
+      <para>
+        Enter the credentials for the <systemitem
+        class="username">admin</systemitem> user (specified during installation of
+        {t.server}).
+      </para>
+    </step>
+    <step>
+      <para>
+        Click <guimenu>Login</guimenu>.
+      </para>
+    </step>
+    <step>
+      <para>
+        When you are logged in, go to Settings:
+      </para>
+      <!-- Add API key screen -->
+      <informalfigure>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="trento-settings-apikey.png" width="80%"/>
+          </imageobject>
+        </mediaobject>
+      </informalfigure>
+    </step>
+    <step>
+      <para>
+        Click the <guimenu>Copy</guimenu> button to copy the key to the clipboard.
+      </para>
+    </step>
+  </procedure>
+  <para>
+    To install the {t.agent} on an SAP host and register it with the {t.server},
+    repeat the steps in <xref linkend="pro-trento-installing-trentoagent"/>:
+  </para>
+  <procedure xml:id="pro-trento-installing-trentoagent">
+    <title>Installing {t.agent}s</title>
+    <step>
+      <para>
+        Install the package:
+      </para>
+<screen>{prompt.user}sudo zypper ref
+{prompt.user}sudo zypper install trento-agent</screen>
+    </step>
+    <step>
+      <para>
+        Open the configuration file <filename>/etc/trento/agent.yaml</filename>
+        and uncomment (remove the
+        <literal>#</literal> character) the entries for <parameter>facts-service-url</parameter>,
+        <parameter>server-url</parameter> and <parameter>api-key</parameter>.
+        Update the values as necessary:
+      </para>
+      <itemizedlist>
+        <listitem>
+          <para>
+            <parameter>facts-service-url</parameter>: the address of the AMQP
+            RabbitMQ service used for communication with the checks engine
+            (wanda). The correct value of this parameter depends on how
+            {t.server} was deployed.
+          </para>
+          <para>
+            In a {k8s} deployment, it is
+            <uri>amqp://trento:trento@TRENTO_SERVER_HOSTNAME:5672/</uri>. If the
+            default RabbitMQ username and password
+            (<literal>trento:trento</literal>) were updated using Helm, the
+            parameter must use a user-defined value.
+          </para>
+          <para>
+            In a systemd or containerized deployment, the correct value is
+            <uri>amqp://TRENTO_USER:TRENTO_USER_PASSWORD@TRENTO_SERVER_HOSTNAME:5672/vhost</uri>.
+            If <replaceable>TRENTO_USER</replaceable> and
+            <replaceable>TRENTO_USER_PASSWORD</replaceable> have been replaced
+            with custom values, you must use them.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <parameter>server-url</parameter>: URL for the Trento Server
+            (<uri>http://TRENTO_SERVER_HOSTNAME</uri>)
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <parameter>api-key</parameter>: the API key retrieved from the Web console
+          </para>
+        </listitem>
+      </itemizedlist>
+    </step>
+    <step>
+      <para>
+        If SSL termination has been enabled on the server side, you can encrypt
+        the communication from the agent to the server as follows:
+      </para>
+      <itemizedlist>
+        <listitem>
+          <para>
+            Provide an HTTPS URL instead of an HTTP one.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Import the certificate from the Certificate Authority that has
+            issued your {t.server} SSL certificate into the {t.agent} host as
+            follows:
+          </para>
+          <procedure>
+            <step>
+              <para>
+                Copy the CA certificate in the PEM format to
+                <filename>/etc/pki/trust/anchors/</filename>. If the CA
+                certificate is in the CRT format, convert it to PEM using the
+                following <command>openssl</command> command:
+              </para>
+<screen><command>openssl</command> x509 -in mycert.crt -out mycert.pem -outform PEM</screen>
+            </step>
+            <step>
+              <para>
+                Run the <command>update-ca-certificates</command> command.
+              </para>
+            </step>
+          </procedure>
+        </listitem>
+      </itemizedlist>
+    </step>
+    <step>
+      <para>
+        Start the {t.agent}:
+      </para>
+<screen>{prompt.user}sudo systemctl enable --now trento-agent</screen>
+    </step>
+    <step>
+      <para>
+        Check the status of the {t.agent}:
+      </para>
+<screen>{prompt.user}sudo systemctl status trento-agent
+● trento-agent.service - {t.agent} service
+     Loaded: loaded (/usr/lib/systemd/system/trento-agent.service; enabled; vendor preset: disabled)
+     Active: active (running) since Wed 2021-11-24 17:37:46 UTC; 4s ago
+   Main PID: 22055 (trento)
+      Tasks: 10
+     CGroup: /system.slice/trento-agent.service
+             ├─22055 /usr/bin/trento agent start --consul-config-dir=/srv/consul/consul.d
+             └─22220 /usr/bin/ruby.ruby2.5 /usr/sbin/SUSEConnect -s
+
+[...]</screen>
+    </step>
+    <step>
+      <para>
+        Repeat this procedure on all SAP hosts that you want to monitor.
+      </para>
+    </step>
+  </procedure>
+</section>

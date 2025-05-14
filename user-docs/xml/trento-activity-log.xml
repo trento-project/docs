@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="file:/usr/share/xml/geekodoc/rng/geekodoc5-flat.rnc"
+   type="application/relax-ng-compact-syntax"?>
+<!DOCTYPE article
+[
+  <!ENTITY % entities SYSTEM "generic-entities.ent">
+  %entities;
+]>
+<section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" xml:id="sec-activity-log">
+  <title>Activity Log</title>
+  <para>
+    {trento} collects system events and user actions in the Activity Log. It can
+    be accessed from the left-hand side panel of the {trento} console.
+  </para>
+  <para>
+    Each entry in the Activity Log includes the following:
+  </para>
+  <itemizedlist>
+    <listitem>
+      <para>
+        A timestamp: the day and time (server time, not browser time) the system
+        event or the user action occurred
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        A message: type of the occurred event or user action
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The user that triggered the event or performed the action. User system
+        is used for events triggered by the system itself.
+      </para>
+    </listitem>
+  </itemizedlist>
+  <para>
+    Clicking on the chevron icon in the activity log entry opens a modal window containing the activity metadata.
+  </para>
+  <para>
+    The Activity Log allows to filter by the type of event or user action
+    (commonly referred to as resource type) and by the user that triggered the
+    event or performed the action. Only active users are available for
+    filtering. The Activity Log also allows you to filter out entries that are
+    newer and/or older than an specific date and time (server time).
+  </para>
+  <para>
+    Once a filter has been set, click <guimenu>Apply</guimenu> to filter out the
+    undesired entries and <guimenu>Reset</guimenu> to remove all the filters.
+  </para>
+  <para>
+    Entries related to user management can only be displayed by users that have
+    the <constant>all:all</constant> or <constant>all:users</constant>  permissions. This includes the following:
+  </para>
+  <itemizedlist>
+    <listitem>
+      <para>
+        Login attempts
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        User creations
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        User modifications
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        User deletions
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Profile updates
+      </para>
+    </listitem>
+  </itemizedlist>
+  <para>
+    Entries in the Activity Log are sorted from newer to older. Click
+    <guimenu>Refresh</guimenu> to update the Activity Log view with entries
+    generated since they accessed the view or after the last refresh
+  </para>
+  <para>
+    The pagination features at the bottom of the Activity Log allow you to
+    specify the number of entries to display in a page, go to the next or
+    previous page of the view, and jump to the last page and back to first one.
+  </para>
+  <para>
+    The default retention time for entries in the Activity Log is one month.
+    This can be changed in the Activity Log section under
+    <guimenu>Settings</guimenu>. Changing the retention time requires the
+    <constant>all:settings</constant> permissions. Entries older than the specified retention time are deleted every day at midnight (server time).
+  </para>
+</section>
