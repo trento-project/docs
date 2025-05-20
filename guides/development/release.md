@@ -9,7 +9,7 @@ These are the main steps, to be repeated for each relevant repository:
 
 - Bump the version by changing the file holding the most recent version number, named `VERSION` and located at the root of the repository.
 - Push this change as a commit on the `main` branch (admins only), or open a pull-request as usual.
-  This will trigger a couple of automated steps:
+  This will trigger the following automated steps:
   - update the changelog;
   - add a tag to the repository;
   - publish the release on GitHub;
