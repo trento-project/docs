@@ -1,7 +1,7 @@
 # Release Process
 
 To issue a new version of any Trento component (e.g. Web, Agent, Wanda, etc.), a new GitHub release needs to be published in the respective repository.  
-Most of the process is automated via GitHub Actions.
+Most of this process is automated via GitHub Actions.
 
 ## Overview
 
@@ -16,5 +16,6 @@ These are the main steps, to be repeated for each relevant repository:
   - build container images hosted on ghcr.io;
   - update SUSE distribution packages in OBS.
 
-Note that the Continous Integration pipelines are not involved in this release process (i.e. changing just the `VERSION` file won't trigger a test run), so developers should rely on the fact that the `main` branch is expected to always be in a green build status.  
-If it's not, one should work to achieve a green build _before_ bumping the version.
+> ⚠️ **Note**  
+The Continuous Integration test phase is not executed during this release process (i.e. changing just the `VERSION` file won't trigger any test job), so developers should rely on the fact that the `main` branch is expected to always be in a green build status.  
+> If it's not, one should work to achieve a green build on `main` _before_ bumping the version.
