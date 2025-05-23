@@ -1,0 +1,62 @@
+include::generic-attributes.adoc[]
+include::product-attributes.adoc[]
+
+[[sec-trento-updating-trentoagent]]
+== Updating a {tragent}
+
+To update the {tragent}, follow the procedure below:
+
+. Log in to the {tragent} host.
+. Stop the {tragent}:
++
+====
+[source,bash,subs="attributes"]
+----
+{prompt_sudo}systemctl stop trento-agent
+----
+====
++
+. Install the new package:
++
+====
+[source,bash,subs="attributes"]
+----
+{prompt_sudo}zypper ref
+{prompt_sudo}zypper install trento-agent
+----
+====
++
+. Copy the file `+/etc/trento/agent.yaml.rpmsave+` to
+`+/etc/trento/agent.yaml+`. Make sure that entries
+`+facts-service-url+`, `+server-url+`, and `+api-key+` in
+`+/etc/trento/agent.yaml+` are correct.
+. Start the {tragent}:
++
+====
+[source,bash,subs="attributes"]
+----
+{prompt_sudo}systemctl start trento-agent
+----
+====
++
+. Check the status of the {tragent}:
++
+====
+[source,bash]
+----
+sudo systemctl status trento-agent
+● trento-agent.service - Trento Agent service
+   Loaded: loaded (/usr/lib/systemd/system/trento-agent.service; enabled; vendor preset: disabled)
+   Active: active (running) since Wed 2021-11-24 17:37:46 UTC; 4s ago
+ Main PID: 22055 (trento)
+    Tasks: 10
+   CGroup: /system.slice/trento-agent.service
+           ├─22055 /usr/bin/trento agent start --consul-config-dir=/srv/consul/consul.d
+           └─22220 /usr/bin/ruby.ruby2.5 /usr/sbin/SUSEConnect -s
+
+[...]
+----
+====
++
+. Check the version in the Hosts overview of the {trweb} (URL `+http://TRENTO_SERVER_HOSTNAME+`).
+. Repeat this procedure in all {tragent} hosts.

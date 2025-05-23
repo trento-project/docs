@@ -1,0 +1,98 @@
+include::generic-attributes.adoc[]
+include::generic-attributes.adoc[]
+include::product-attributes.adoc[]
+
+[[sec-trento-installing-trentoagent]]
+== Installing {tragent}s
+
+Before you can install a {tragent}, you must obtain the API key of your
+{trserver}. Proceed as follows:
+
+. Open the URL of the Trento Web console. It prompts you for
+a user name and password:
++
+image::trento-web-login.png[trento-web-login,scaledwidth=30.0%]
++
+. Enter the credentials for the `+admin+` user (specified during
+installation of {trserver}).
+. Click *Login*.
+. When you are logged in, go to *Settings*:
++
+image::trento-settings-apikey.png[trento-settings-apikey,scaledwidth=80.0%]
+. Click the **Copy** button to copy the key to the clipboard.
+
+Install the {tragent} on an {sap} host and register it with the
+{trserver} as follows:
+
+. Install the package:
++
+====
+[source,bash,subs="attributes"]
+----
+{prompt_sudo}zypper ref
+{prompt_sudo}zypper install trento-agent
+----
+====
+. Open the configuration file `+/etc/trento/agent.yaml+` and uncomment
+(remove the `+#+` character) the entries for `+facts-service-url+`,
+`+server-url+` and `+api-key+`. Update the values as necessary:
+** `+facts-service-url+`: the address of the AMQP RabbitMQ service used
+for communication with the checks engine (wanda). The correct value of
+this parameter depends on how {trserver} was deployed.
++
+In a {k8s} deployment, it is
+amqp://trento:trento@TRENTO_SERVER_HOSTNAME:5672/. If the default
+RabbitMQ username and password (`+trento:trento+`) were updated using
+Helm, the parameter must use a user-defined value.
++
+In a systemd or containerized deployment, the correct value is
+`+amqp://TRENTO_USER:TRENTO_USER_PASSWORD@TRENTO_SERVER_HOSTNAME:5672/vhost+`.
+If `+TRENTO_USER+` and `+TRENTO_USER_PASSWORD+` have been replaced with
+custom values, you must use them.
+** `+server-url+`: URL for the Trento Server
+(http://TRENTO_SERVER_HOSTNAME)
+** `+api-key+`: the API key retrieved from the Web console
+. If SSL termination has been enabled on the server side, you can
+encrypt the communication from the agent to the server as follows:
+.. Provide an HTTPS URL instead of an HTTP one.
+.. Import the certificate from the Certificate Authority that has issued
+your {trserver} SSL certificate into the {tragent} host as follows:
+... Copy the CA certificate in the PEM format to
+`+/etc/pki/trust/anchors/+`. If the CA certificate is in the CRT format,
+convert it to PEM using the following `+openssl+` command:
++
+====
+[source,bash,subs="attributes"]
+----
+openssl x509 -in mycert.crt -out mycert.pem -outform PEM
+----
+====
++
+... Run the `+update-ca-certificates+` command.
+. Start the {tragent}:
++
+====
+[source,bash,subs="attributes"]
+----
+{prompt_sudo}systemctl enable --now trento-agent
+----
+====
+. Check the status of the {tragent}:
++
+====
+[source,bash,subs="attributes"]
+----
+{prompt_sudo}systemctl status trento-agent
+● trento-agent.service - Trento Agent service
+     Loaded: loaded (/usr/lib/systemd/system/trento-agent.service; enabled; vendor preset: disabled)
+     Active: active (running) since Wed 2021-11-24 17:37:46 UTC; 4s ago
+   Main PID: 22055 (trento)
+      Tasks: 10
+     CGroup: /system.slice/trento-agent.service
+             ├─22055 /usr/bin/trento agent start --consul-config-dir=/srv/consul/consul.d
+             └─22220 /usr/bin/ruby.ruby2.5 /usr/sbin/SUSEConnect -s
+
+[...]
+----
+====
+. Repeat this procedure on all SAP hosts that you want to monitor.

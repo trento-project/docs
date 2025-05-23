@@ -1,0 +1,206 @@
+include::generic-attributes.adoc[]
+include::product-attributes.adoc[]
+
+== Containerized deployment
+
+A containerized deployment of {trserver} is identical to the systemd
+deployment. However, the web and check engine components are deployed as
+Docker containers.
+
+Follow the steps in <<sec-systemd-deployment>>, but skip the *Install
+Trento using RPM packages* step and follow the procedures as described below.
+
+=== Install Trento using Docker
+
+==== Install Docker container runtime
+
+. Enable the containers module:
++
+[source,bash]
+----
+SUSEConnect --product sle-module-containers/15.5/x86_64
+----
++
+[NOTE]
+====
+To use a different Service Pack than SP5, you have to choose the
+appropriate repository. For example,
+`+SUSEConnect --product sle-module-containers/15.3/x86_64+` for SLE15
+SP3, `+SUSEConnect --product sle-module-containers/15.4/x86_64+` for
+SLE15 SP4.
+====
+. Install Docker:
++
+[source,bash]
+----
+zypper install docker
+----
+. Enable and start Docker:
++
+[source,bash]
+----
+systemctl enable --now docker
+----
+
+==== Create a dedicated Docker network for Trento
+
+. Create the Trento Docker network:
++
+[source,bash]
+----
+docker network create trento-net
+----
++
+[NOTE]
+====
+When creating the `+trento-net+` network, Docker assigns a default
+subnet to it: `+172.17.0.0/16+`. Ensure that this subnet is allowed by
+the rules specified in your PostgreSQL configuration. For more
+information, refer to the upstream
+https://www.postgresql.org/docs/current/auth-pg-hba-conf.html[`+pg_hba.conf+`]
+documentation.
+====
+. Verify the subnet of `+trento-net+`:
++
+[source,bash]
+----
+docker network inspect trento-net --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}'
+----
++
+Expected output is as follows:
++
+[source,bash]
+----
+172.17.0.0/16
+----
+
+==== Install Trento on Docker
+
+. Create secret environment variables:
++
+[NOTE]
+====
+Consider using an environment variable file (see
+https://docs.docker.com/engine/reference/commandline/run/#env[official
+Docker documentation]). Adjust the docker command below for use with the
+env file. In any case, make sure you keep a copy of the generated keys
+in a safe location, in case you need to reuse them in the future.
+====
++
+[source,bash]
+----
+WANDA_SECRET_KEY_BASE=$(openssl rand -out /dev/stdout 48 | base64)
+TRENTO_SECRET_KEY_BASE=$(openssl rand -out /dev/stdout 48 | base64)
+ACCESS_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
+REFRESH_TOKEN_ENC_SECRET=$(openssl rand -out /dev/stdout 48 | base64)
+----
+. Install the checks on the system in a shared volume:
++
+[source,bash]
+----
+docker volume create trento-checks \
+  && docker run \
+  -v trento-checks:/usr/share/trento/checks \
+  registry.suse.com/trento/trento-checks:latest
+----
+. Deploy trento-wanda:
++
+[source,bash]
+----
+docker run -d --name wanda \
+    -p 4001:4000 \
+    --network trento-net \
+    --add-host "host.docker.internal:host-gateway" \
+    -v trento-checks:/usr/share/trento/checks:ro \
+    -e CORS_ORIGIN=localhost \
+    -e SECRET_KEY_BASE=$WANDA_SECRET_KEY_BASE \
+    -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
+    -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost \
+    -e DATABASE_URL=ecto://wanda_user:wanda_password@host.docker.internal/wanda \
+    --restart always \
+    --entrypoint /bin/sh \
+    registry.suse.com/trento/trento-wanda:latest \
+    -c "/app/bin/wanda eval 'Wanda.Release.init()' && /app/bin/wanda start"
+----
+. Deploy trento-web.
++
+Make sure to change the `+ADMIN_USER+` and `+ADMIN_PASSWORD+`, these are
+the credentials that are required to login to the trento-web UI.
+Depending on how you intend to connect to the console, a working
+hostname, FQDN, or an IP is required in `+TRENTO_WEB_ORIGIN+` for HTTPS.
+Otherwise websockets fail to connect, causing no real-time updates on
+the UI.
++
+[NOTE]
+====
+Add `+CHARTS_ENABLED=false+` if Prometheus is not installed, or you do
+not want to use Trento's charts functionality.
+====
++
+[source,bash]
+----
+docker run -d \
+-p 4000:4000 \
+--name trento-web \
+--network trento-net \
+--add-host "host.docker.internal:host-gateway" \
+-e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost \
+-e ENABLE_ALERTING=false \
+-e DATABASE_URL=ecto://trento_user:web_password@host.docker.internal/trento \
+-e EVENTSTORE_URL=ecto://trento_user:web_password@host.docker.internal/trento_event_store \
+-e PROMETHEUS_URL='http://host.docker.internal:9090' \
+-e SECRET_KEY_BASE=$TRENTO_SECRET_KEY_BASE \
+-e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
+-e REFRESH_TOKEN_ENC_SECRET=$REFRESH_TOKEN_ENC_SECRET \
+-e ADMIN_USER='admin' \
+-e ADMIN_PASSWORD='test1234' \
+-e ENABLE_API_KEY='true' \
+-e TRENTO_WEB_ORIGIN='trento.example.com' \
+--restart always \
+--entrypoint /bin/sh \
+registry.suse.com/trento/trento-web:latest \
+-c "/app/bin/trento eval 'Trento.Release.init()' && /app/bin/trento start"
+----
++
+Email alerting are disabled by default, as described in
+https://github.com/trento-project/web/blob/main/guides/alerting/alerting.md#enabling-alerting[enabling
+alerting] guide. Enable alerting by setting `+ENABLE_ALERTING+` env to
+`+true+`. Additional required variables are:
+`+[ALERT_SENDER,ALERT_RECIPIENT,SMTP_SERVER,SMTP_PORT,SMTP_USER,SMTP_PASSWORD]+`
+All other settings should remain at their default.
++
+Example:
++
+[source,bash]
+----
+docker run -d \
+
+...[other settings]...
+
+-e ENABLE_ALERTING=true \
+-e ALERT_SENDER=<<SENDER_EMAIL_ADDRESS>> \
+-e ALERT_RECIPIENT=<<RECIPIENT_EMAIL_ADDRESS>> \
+-e SMTP_SERVER=<<SMTP_SERVER_ADDRESS>> \
+-e SMTP_PORT=<<SMTP_PORT>> \
+-e SMTP_USER=<<SMTP_USER>> \
+-e SMTP_PASSWORD=<<SMTP_PASSWORD>> \
+
+...[other settings]...
+----
+. Check that everything is running as expected:
++
+[source,bash]
+----
+docker ps
+----
++
+Expected output:
++
+[source,bash]
+----
+CONTAINER ID   IMAGE                                         COMMAND                  CREATED          STATUS          PORTS                                       NAMES
+8b44333aec39   registry.suse.com/trento/trento-web:2.2.0    "/bin/sh -c '/app/bi…"   6 seconds ago    Up 5 seconds    0.0.0.0:4000->4000/tcp, :::4000->4000/tcp   trento-web
+e859c07888ca   registry.suse.com/trento/trento-wanda:1.2.0   "/bin/sh -c '/app/bi…"   18 seconds ago   Up 16 seconds   0.0.0.0:4001->4000/tcp, :::4001->4000/tcp   wanda
+----
++
+Both containers must run and listen on the specified ports.

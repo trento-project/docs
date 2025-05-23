@@ -1,0 +1,56 @@
+include::generic-attributes.adoc[]
+include::product-attributes.adoc[]
+
+[[sec-integration-with-SUSE-Manager]]
+== Integration with {smlm}
+
+{trento} can be inegrated with {smlm} to provide the
+{sap} administrator with information about relevant patches and
+upgradable packages for any host that is registered with both
+applications.
+
+The user must enter the connection settings for {smlm}
+in the Settings view:
+
+.{smlm} settings
+image::trento-suse-manager-settings.png[trento-suse-manager-settings,scaledwidth=80.0%]
+
+When the {smlm} settings are configured, the {sap}
+Basis administrator can test the connection by clicking the Test button.
+If the connection is successful, the *Host Details* view of each host
+managed by {smlm} displays a summary of available
+patches and upgradable packages:
+
+.Available software updates in the Host Details view
+image::trento-summary-of-available-software-updates.png[trento-summary-of-available-software-updates,scaledwidth=80.0%]
+
+Click *Relevant Patches* to view a list of patches available for the host:
+
+.Available Patches overview
+image::trento-available-patches-overview.png[trento-available-patches-overview,scaledwidth=80.0%]
+
+Click *Upgradable Packages* to view a list of packages that can be upgraded on that particular
+host:
+
+.Upgradable Packages overview
+image::trento-upgradable-packages-overview.png[trento-upgradable-packages-overview,scaledwidth=80.0%]
+
+Click an advisory or patch link to access the corresponding details view
+with relevant information, such us whether it requires a reboot or not,
+associated vulnerabilities, or a list of affected hosts:
+
+.Advisory Details view
+image::trento-advisory-details-view.png[trento-advisory-details-view,scaledwidth=80.0%]
+
+There are three types of patches or advisories: security advisories, bug
+fixes and feature enhancements. Security advisories are considered
+critical. If an advisory is available, the health of the host is set to
+critical. If there are available patches but none of them is a security
+one, the health of the host switches to warning. When a host cannot be
+found in {smlm}, or there is a problem retrieving the
+data for it, its health is set to unknown.
+
+You can clear the {smlm} settings from the Settings
+view at any time. When you do this, all information about available
+software updates disappears from the console, and the status of the
+hosts is adjusted accordingly.

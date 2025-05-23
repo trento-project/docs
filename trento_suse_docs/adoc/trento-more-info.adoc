@@ -1,0 +1,8 @@
+include::generic-attributes.adoc[]
+include::product-attributes.adoc[]
+
+[[sec-trento-more-information]]
+== More information
+
+* Official project website: https://www.trento-project.io/
+* Trento project: https://github.com/trento-project/web

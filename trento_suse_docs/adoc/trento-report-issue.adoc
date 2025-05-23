@@ -1,0 +1,35 @@
+include::generic-attributes.adoc[]
+include::product-attributes.adoc[]
+
+[[sec-trento-report-problem]]
+== Reporting an Issue
+
+{suse} customers with registered {sles4sap}{nbsp}15 (SP3 or higher)
+distributions can report {trento} issues either directly in the {scc}
+or through the corresponding vendor, depending on their licensing model.
+Problems must be reported under {sles4sap}{nbsp}15 and component
+trento.
+
+When opening a support case for {trento}, provide the relevant
+deployment option for {trserver}: {k8s}, systemd or containerized.
+
+In case of a {k8s} deployment, provide the output of the {trento}
+support plugin and the scenario dump, as explained in section
+<<sec-trento-problemanalysis>>.
+
+In case of a systemd deployment, provide the status and the journal of
+the trento-web and trento-wanda services.
+
+In case of a containerized deployment, provide the logs of the
+trento-web and trento-wanda containers. Use `+docker ps+` to retrieve
+the IDs of both containers, then `+docker logs CONTAINER_ID+` to
+retrieve the corresponding logs.
+
+For issues with a particular {tragent}, or a component discovered by a
+particular {tragent}, also provide the following:
+
+* status of the {tragent}
+* journal of the {tragent}
+* output of the command `+supportconfig+` in the {tragent} host. See
+https://documentation.suse.com/sles/html/SLES-all/cha-adm-support.html#sec-admsupport-cli
+for information on how to run this command from command line.

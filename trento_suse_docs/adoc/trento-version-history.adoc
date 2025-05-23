@@ -1,0 +1,128 @@
+include::generic-attributes.adoc[]
+include::product-attributes.adoc[]
+
+[[sec-trento-version-history]]
+== Highlights of {trento} versions
+
+Below is a list of the most important user-facing features in the
+different versions of {trento}. For a more detailed information about
+the changes included in each new version, visit
+https://github.com/trento-project.
+
+* For changes in the {trento} Helm Chart, visit
+https://github.com/trento-project/helm-charts/releases.
+* For changes in the {trserver} Web component, visit
+https://github.com/trento-project/web/releases.
+* For changes in the {trserver} old checks engine component (runner),
+visit https://github.com/trento-project/runner/releases.
+* For changes in the {trserver} new checks engine component (wanda),
+visit https://github.com/trento-project/wanda/releases.
+* For changes it the {trento} checks, visit
+https://github.com/trento-project/checks/releases.
+* For changes in the {tragent}, visit
+https://github.com/trento-project/agent/releases.
+
+[indent=-1]
+Version 2.4.0 (released on 2024/12/06)::
+  Consisting of Helm chart 2.4.0, Web component 2.4.0, checks engine
+  (wanda) 1.4.0, configuration checks 1.0.0 and agent 2.4.0.
+
+  * New permission-based user management system with optional MFA.
+  * SSO and third-party IDP integration via OIDC, OAUTH2 and SAML
+  protocols.
+  * Contextual, detailed overview of available patches and upgradable
+  packages in the SUSE Multi-Linux Manager integration.
+  * Inception of the Activity Log, allowing users to browse a single
+  centralized event log for their entire SAP landscape.
+  * {trento} Checks delivery is now decoupled from the core platform,
+  and the Checks themselves have been relicensed from Apache 2.0 to GPL
+  3.0
+  * Enhanced discovery capabilities including clusters using angi
+  architecture and SAP systems running on JAVA stacks.
+  * New HANA scale-out cluster configuration checks.
+  * More ASCS/ERS cluster configuration checks.
+
+Version 2.3.2 (released on 2024/09/01)::
+  Consisting of Helm chart 2.3.2, Web component 2.3.2, checks engine
+  (wanda) 1.3.0 and agent 2.3.0.
+  * Fix for bug in the web component causing it to crash upon certain
+  events after update from an earlier version.
+
+Version 2.3.1 (released on 2024/06/18)::
+  Consisting of Helm chart 2.3.1, Web component 2.3.1, checks engine
+  (wanda) 1.3.0 and agent 2.3.0.
+  * non-K8s installation of {trento} Server.
+  * Enhanced discovery capabilities, including improved support HANA
+  multi-tenant architecture, HANA scale out cluster discovery, discovery
+  of clsluters using diskless SBD and maintenance awareness.
+  * Information about available patches and upgradable packages for each
+  registered hosts via integration with SUSE Multi-Linux Manager.
+  * Rotating API key.
+  * Saptune configuration checks.
+  * Simpler, more secure architecture without Grafana.
+  * Revamped metric visualization.
+  * Enhanced Checks Catalog view with dynamic filtering capabilities.
+Version 2.2.0 (released on 2023/12/04)::
+  Consisting of Helm chart 2.2.0, Web component 2.2.0, checks engine
+  (wanda) 1.2.0 and agent 2.2.0.
+  * saptune Web integration.
+  * Intance clean-up capabilities.
+  * Ability to run host-level configuration checks.
+
+Version 2.1.0 (released on 2023/08/02)::
+  Consisting of Helm chart 2.1.0, Web component 2.1.0, checks engine
+  (wanda) 1.1.0 and agent 2.1.0.
+  * ASCS/ERS cluster discovery, from single-sid, two-node scenarios to
+  multi-sid, multi-node setups. The discovery covers both versions of
+  the enqueue server, ENSA1 and ENSA2, and both scenarios with resource
+  managed instance filesystems and simple mount setups.
+  * Host clean-up capabilities, allowing users to get rid of hosts that
+  are no longer part of their SAP environment.
+  * New checks results view that leverages the potential of the new
+  checks engine (wanda) and provides the user with insightful
+  information about the check execution.
+
+Version 2.0.0 (released on 2023/04/26)::
+  Consisting of Helm chart 2.0.0, Web component 2.0.0, checks engine
+  (wanda) 1.0.0 and agent 2.0.0.
+  * A brand-new safer, faster, ligher SSH-less configuration checks
+  engine (wanda) which not only opens the door to configuration checks
+  for other HA scenarios (ASCS/ER, HANA scale-up cost optimized, {hana}
+  scale-out) and other targes in the environment (hosts, {hana}
+  databases, {netweaver} instances), but also will allow customization
+  of existing checks and addition of custom checks.
+  * Addition of VMware to the list of known platforms.
+  * Versioned external APIs for both the Web and the checks engine
+  (wanda) components. The full list of available APIs can be found at
+  https://www.trento-project.io/web/swaggerui/ and
+  https://www.trento-project.io/wanda/swaggerui/ respectively.
+
+Version 1.2.0 (released on 2022/11/04)::
+  Consisting of Helm chart 1.2.0, Web component 1.2.0, checks engine
+  (runner) 1.1.0 and agent 1.1.0.
+  * Configuration checks for HANA scale-up performance optimized two-node
+  clusters on on-premise bare metal platforms, including KVM and
+  Nutanix.
+  * A dynamic dashboard that allows you to determine, at a glance, the
+  overall health status of your SAP environment.
+
+Version 1.1.0 (released on 2022/07/14)::
+  Consisting of Helm chart 1.1.0, Web component 1.1.0, checks engine
+  (runner) 1.0.1 and agent 1.1.0.
+  * Fix for major bug in the checks engine that prevented the Web
+  component to load properly.
+
+Version 1.0.0 (general availability, released on 2022/04/29)::
+  Consisting of Helm chart 1.0.0, Web component 1.0.0, checks engine
+  (runner) 1.0.0 and agent 1.0.0.
+  * Clean, simple Web console designed with SAP basis in mind. It reacts
+  in real time to changes happening in the backend environment thanks to
+  the event-driven technology behind it.
+  * Automated discovery of SAP systems, SAP instances and {hana}
+  scale-up two-node clusters
+  * Configuration checks for {hana} scale-up performance optimized
+  two-node clusters on Azure, AWS and GCP.
+  * Basic integration with Grafana and Prometheus to provide graphic
+  dashboards about CPU and memory utilization in each discovered host.
+  * Basic alert emails for critical events happening in the monitored
+  environment.

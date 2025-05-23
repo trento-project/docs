@@ -1,0 +1,59 @@
+include::generic-attributes.adoc[]
+include::product-attributes.adoc[]
+
+[[sec-trento-manage-tags]]
+== Managing tags
+
+Tags are used to label specific objects with location, owner, etc. The
+objects can be hosts, clusters, databases or {sap} systems. Tags make
+it easier to distinguish and show all these different objects, making
+your lists more readable and searchable. You can use any text you like
+to create your tags except blank spaces and special characters other
+than + - = . , _ : and @.
+
+The following subsection shows how you can add, remove, and filter
+objects based on your tags.
+
+[[sec-trento-add-tags]]
+=== Adding tags to hosts, clusters, databases, and SAP Systems
+
+To add one or more tags to your objects, proceed as follows:
+
+. Log in to {trento}.
+. In the Trento dashboard, go to the overview of the desired object. For
+example, the *Hosts* overview.
+. In the *Hosts* overview, search for the host you want to tag.
+. In the *Tags* column, click the *Add Tag* entry.
+. Enter the desired tag and press *Enter*.
+. Use the described steps to assign other tags to the same or a
+different host.
+
+You can use the procedure to assign tags to other objects, such as
+Clusters, SAP Systems, or HANA Databases.
+
+[[sec-trento-remove-tags]]
+=== Removing tags
+
+To remove existing tags, click the appropriate part in the dashboard:
+
+. Log in to {trento}.
+. In the Trento dashboard, go to the overview of the desired object. For
+example, the *Hosts* overview.
+. In the *Hosts* overview, search for the host you want to remove a tag
+from.
+. In the *Tags* column, click the × icon to remove the tag.
+. Use the described steps to remove other tags from the same or a
+different host.
+
+[[sec-trento-filter-tags]]
+=== Filter by tags
+
+Tags can be used to filter objects.
+
+. In the {trento} dashboard, go to the desired overview.
+. In the second row, click the *Filter tags* drop-down list to view all
+existing tags.
+. Select one or more tags to display all hosts that have the selected
+tags.
+
+To remove the filter, click the × icon from the same drop-down list.

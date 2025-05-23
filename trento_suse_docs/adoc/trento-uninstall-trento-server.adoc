@@ -1,0 +1,20 @@
+include::generic-attributes.adoc[]
+include::product-attributes.adoc[]
+
+[[sec-trento-uninstall-trentoserver]]
+== Uninstalling {trserver}
+
+The procedure to uninstall the {trserver} depends on the deployment
+type: {k8s}, systemd or containerized. The section covers {k8s}
+deployments.
+
+If {trserver} was deployed manually, you need to uninstall it manually.
+If {trserver} was deployed using the Helm chart, you can also use Helm
+to uninstall it as follows:
+
+====
+[source,bash]
+----
+helm uninstall trento-server
+----
+====

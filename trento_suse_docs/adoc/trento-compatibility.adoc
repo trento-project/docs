@@ -1,0 +1,21 @@
+include::generic-attributes.adoc[]
+include::product-attributes.adoc[]
+
+[[sec-trento-compatibility-matrix]]
+== Compatibility matrix between {trserver} and {tragent}s
+
+.Compatibility matrix between {trserver} and {tragent}s
+[cols="^1,^1,^1,^1,^1,^1,^1,^1,^1", options="header"]
+|===
+^|{tragent} 8+^|{trserver}|
+|1.0 |1.1 |1.2 |2.0 |2.1 |2.2 |2.3 |2.4
+
+|1.0 |[.green]#✓# | | | | | | |
+|1.1 |[.green]#✓# |[.green]#✓# | | | | | |
+|1.2 |[.green]#✓# |[.green]#✓# |[.green]#✓# | | | | |
+|2.0 | | | |[.green]#✓# | | | |
+|2.1 | | | |[.green]#✓# |[.green]#✓# | | |
+|2.2 | | | |[.green]#✓# |[.green]#✓# |[.green]#✓# | |
+|2.3 | | | |[.green]#✓# |[.green]#✓# |[.green]#✓# |[.green]#✓# |
+|2.4 | | | |[.green]#✓# |[.green]#✓# |[.green]#✓# |[.green]#✓# |[.green]#✓#
+|===
