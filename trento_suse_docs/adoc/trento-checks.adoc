@@ -2,7 +2,7 @@ include::generic-attributes.adoc[]
 include::product-attributes.adoc[]
 
 [[sec-trento-checks]]
-== Performing configuration checks
+== Performing configuration checks WE ADED SOME CHANGES HERE!
 
 {trento} provides configuration checks that ensure your infrastructure
 setup adheres to our or other vendor's Best Practices, and it does not
