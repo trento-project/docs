@@ -66,37 +66,3 @@ jobs:
         uses: openSUSE/doc-ci@gha-validate
         with:
           dc-files: ${{ matrix.dc-files }}
-  open-pr-to-doc-unversioned:
-    if: github.ref == 'refs/heads/restructure_docs_directory'
-    runs-on: ubuntu-latest
-    needs: validate
-    steps:
-      - name: Checkout source repo (docs repo)
-        uses: actions/checkout@v4
-    
-      - name: Clone doc-unversioned
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-      
-          git clone https://x-access-token:${{ secrets.DOC_UNVERSIONED_PAT }}@github.com/EMaksy/doc-unversioned.git
-
-          cd doc-unversioned
-          git fetch origin
-          git checkout main          
-          git checkout -b sync-trento-docs
-
-          cp -r ../trento_suse_docs/* trento/
-          git add trento/*
-          git commit -m "Sync user-docs content to doc-unversioned trento/ after CI success"
-          git push origin sync-trento-docs
-      - name: Debug Repo
-        run: echo "Running in $GITHUB_REPOSITORY"
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.DOC_UNVERSIONED_PAT }}
-          title: "Sync docs after CI success"
-          body: "Triggered by workflow run sync-trento-docs"
-          base: main
-          branch: sync-trento-docs
