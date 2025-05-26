@@ -1,0 +1,7 @@
+include::generic-attributes.adoc[]
+include::product-attributes.adoc[]
+
+[[test-sec]]
+== Test article
+
+
