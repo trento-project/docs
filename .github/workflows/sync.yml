@@ -2,6 +2,10 @@ name: Sync Trento Docs from SUSE/doc-unversioned
 
 on:
   workflow_dispatch:
+  push:
+   branches:
+      - fetch_docs_from_upstream
+
 
 jobs:
   sync-docs:
@@ -22,6 +26,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+
       - name: Fetch upstream trento directory
         run: |
           mkdir temp-source
@@ -30,7 +35,8 @@ jobs:
           git remote add origin https://github.com/SUSE/doc-unversioned.git
           git sparse-checkout init --cone
           git sparse-checkout set trento
-          git pull --depth=1 --single-branch origin main
+          git fetch --depth=1 origin main
+          git checkout main
           cd ..
 
       - name: Replace local directory with upstream content
