@@ -1,0 +1,43 @@
+name: docs
+title: Trento Documentation
+version: ~
+nav:
+  - modules/trento_suse/nav.adoc
+  - modules/components/nav.adoc
+  - modules/api/nav.adoc
+  - modules/dev_docs/nav.adoc
+
+ext:
+  collector:
+# Trento official documentation
+    - clean:
+        dir: modules/trento_suse/pages
+    - clean:
+        dir: modules/trento_suse/images
+    - scan:
+        dir: trento_suse/adoc
+        files: '**/*.adoc'
+        into: modules/trento_suse/pages
+    - scan:
+        dir: trento_suse/images/src/png
+        files: '**/*.png'
+        into: modules/trento_suse/images
+# Trento upstream projects components
+    - clean:
+        dir: modules/components/pages
+    - scan:
+        dir:  components/
+        files: '**/*.adoc'
+        into: modules/components/pages
+# Trento developer documentation at dev_docs
+    - clean:
+        dir: modules/dev_docs
+    - scan:
+        dir: dev_docs/
+        files: '**/*.adoc'
+        into: modules/dev_docs/pages
+# Images dev_docs guides architecture
+    - scan:
+        dir: dev_docs/architecture
+        files: '**/*.{png,jpg,jpeg,svg,gif}'
+        into: modules/dev_docs/images

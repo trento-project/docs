@@ -1,0 +1,41 @@
+.Developer Documentation
+
+
+* ADR
+** xref:adr/README.adoc[ADR Documentation]
+** xref:adr/0001-record-architecture-decisions.adoc[0001: Record Architecture Decisions]
+** xref:adr/0002-build-a-dsl-to-declare-checks.adoc[0002: Build a DSL to Declare Checks]
+** xref:adr/0003-build-a-check-execution-orchestrator.adoc[0003: Build a Check Execution Orchestrator]
+** xref:adr/0004-add-facts-gathering-capabilities-to-the-agent.adoc[0004: Add Facts Gathering to the Agent]
+** xref:adr/0005-use-protobuf-to-define-and-generate-contracts.adoc[0005: Use Protobuf for Contracts]
+** xref:adr/0006-use-cloudevents-to-describe-event-data.adoc[0006: Use CloudEvents for Event Data]
+** xref:adr/0007-use-jwt-tokens-as-authentication-mechanism.adoc[0007: Use JWT Tokens for Authentication]
+** xref:adr/0008-rest-api-versioning-strategy.adoc[0008: REST API Versioning Strategy]
+** xref:adr/0009-frontend-directory-structure-and-architecture.adoc[0009: Frontend Directory Structure]
+** xref:adr/0010-web-dashboard-directory-structure-and-contexts.adoc[0010: Web Dashboard Structure & Contexts]
+** xref:adr/0011-sap-system-database-aggregate-split.adoc[0011: SAP System DB Aggregate Split]
+** xref:adr/0012-reactiveness.adoc[0012: Reactiveness]
+** xref:adr/0013-suma-integration.adoc[0013: SUMA Integration]
+** xref:adr/0014-decoupling-of-trento-checks-from-wanda.adoc[0014: Decouple Trento Checks from Wanda]
+** xref:adr/0015-activity-logging.adoc[0015: Activity Logging]
+** xref:adr/0016-discarded-discovery-events.adoc[0016: Discarded Discovery Events]
+** xref:adr/0018-agent-operations-orchestration.adoc[0018: Agent Operations Orchestration]
+** xref:adr/0019-e2e-testing-practices.adoc[0019: E2E Testing Practices]
+** xref:adr/0020-checks-customization.adoc[0020: Checks Customization]
+
+* Coding Standards
+** xref:coding-standarts/README.adoc[Coding Standards Overview]
+** xref:coding-standarts/elixir.adoc[Elixir]
+** xref:coding-standarts/go.adoc[Go]
+** xref:coding-standarts/javascript.adoc[JavaScript]
+
+* Architecture
+*** xref:architecture/trento-architecture.adoc[Trento Architecture]
+
+* Development
+** xref:development/pr-env-ssl-certificate-setup.adoc[PR Env SSL Certificate Setup]
+** xref:development/release.adoc[Release Process]
+** xref:development/test-manual-installation-with-agents.adoc[Test Manual Installation with Agents]
+
+* RFC
+** xref:rfc/0001-checks-customization.adoc[Check Customization]
