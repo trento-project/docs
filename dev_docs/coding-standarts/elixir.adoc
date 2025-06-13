@@ -1,0 +1,148 @@
+== Elixir coding standards
+
+=== Style Guide
+
+Trento follows the https://github.com/rrrene/elixir-style-guide[Credo
+style guide].
+
+==== Linting
+
+The linting is enforced by the https://github.com/rrrene/credo[credo
+tool] locally and in the CI.
+
+Use the link:../templates/.credo.exs[.credo.exs template] as a starting
+point for your project.
+
+==== Additional rules and exceptions
+
+* Private functions must appear after public functions in order of
+usage.
+
+=== Static analysis
+
+https://github.com/jeremyjh/dialyxir[Dialyzer] must be used to check for
+type correctness.
+
+Please write specs `+@spec+` tags for all public functions and typespecs
+for defined types, to help Dialyzer doings its job.
+
+=== Code smells
+
+The https://github.com/lucasvegi/Elixir-Code-Smells[Catalog of
+Elixir-specific Code Smells] is a good reference for common code smells
+in Elixir.
+
+=== CI
+
+Please use the link:../templates/elixir-ci.yaml[CI template] as a
+starting point for your project.
+
+=== Documentation
+
+Use https://github.com/elixir-lang/ex_doc[ExDoc] to generate the
+documentation for the project.
+
+Please add relevant documentation to `+@moduledoc+` and `+@doc+`
+attributes and make sure to run `+mix docs+` to check the generated
+documentation before submitting a PR.
+
+Repositories that don’t publish a package to Hex, should publish the
+generated documentation to GitHub pages using the
+link:../templates/elixir-ci.yaml[generate-elixir-docs action].
+
+=== Testing
+
+Testing guidelines:
+
+* Read https://pragprog.com/titles/lmelixir/testing-elixir/[Testing
+Elixir].
+* Prefer https://github.com/thoughtbot/ex_machina[factories] over
+fixtures to create test data.
+* Hook to https://hexdocs.pm/telemetry/readme.html[Telemetry] events of
+3rd party packages to synchronize the test code. Find
+https://elixirforum.com/t/testing-and-telemetry-events-how-to-test-if-they-are-sent/28273/5[here]
+a generic example and
+https://github.com/trento-project/wanda/pull/180[here] another example
+based on AMQP connections.
+* https://dashbit.co/blog/mocks-and-explicit-contracts[Mocks and
+explicit contracts]
+* https://groups.google.com/g/elixir-ecto/c/BKpLf092dWs/m/VaCvfZpEBQAJ[Controller
+tests as integration tests] (_pre-Phoenix Context_ but still relevant)
+
+==== Test coverage
+
+Test coverage is enforced by https://coveralls.io/[coveralls.io]. Please
+add https://github.com/parroty/excoveralls[excoveralls] to the list of
+dependencies and setup `+mix.exs+` file as shown here:
+
+[source,elixir]
+----
+def project do
+  [
+    app: :yourapp,
+    version: "1.0.0",
+    elixir: "~> 1.0.0",
+    deps: deps(),
+    test_coverage: [tool: ExCoveralls],
+    preferred_cli_env: [
+      coveralls: :test,
+      "coveralls.github": :test
+    ]
+  ]
+end
+
+defp deps do
+  [
+    {:excoveralls, "~> 0.10", only: :test}
+  ]
+end
+
+# If you have a custom mix task you can override the coveralls.github task
+defp aliases do
+  [
+    "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+    "ecto.reset": ["ecto.drop", "ecto.setup"],
+    test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+    "coveralls.github": ["ecto.create --quiet", "ecto.migrate --quiet", "coveralls.github"]
+  ]
+end
+----
+
+The link:../templates/elixir-ci.yaml#131[CI template] includes a step to
+upload the coverage report to coveralls.io.
+
+Please refer to the
+https://docs.coveralls.io/coveralls-notifications[coveralls notification
+documentation] to allow coveralls to post comments with the coverage
+report in the PR.
+
+=== Phoenix
+
+Guidelines for applications using Phoenix:
+
+* Use the https://hexdocs.pm/phoenix/overview.html[Phoenix
+documentation] as a starting point for your project.
+* Always refer to the https://hexdocs.pm/ecto/Ecto.html[Ecto
+documentation].
+* Start with
+https://hexdocs.pm/phoenix/contexts.html#starting-with-generators[generators]
+when possible, as they give a reference for the directory structure and
+naming.
+* Use
+https://github.com/gothinkster/elixir-phoenix-realworld-example-app[realworld
+example app] as a reference for the directory structure, naming and code
+organization in general.
+* Instead of https://hexdocs.pm/phoenix/routing.html#path-helpers[Router
+Path helpers], prefer using the full path in the tests
+(e.g. `+/api/rabbits+`) to test that the route is correct.
+* Document APIs using
+https://github.com/open-api-spex/open_api_spex[OpenAPI], cast and
+validate operations in controllers using the provided
+https://github.com/open-api-spex/open_api_spex#validating-and-casting-params[plug],
+and test controllers using
+https://github.com/open-api-spex/open_api_spex#validate-responses[OpenAPISpex.TestAssertions].
+* The link:../templates/elixir-ci.yaml[CI template] includes a step to
+generate the Swagger UI and publish it to GitHub pages. Please refer to
+https://github.com/open-api-spex/open_api_spex/pull/489[this pr] to
+configure the `+ApiSpec+` module so that it does not depend on a running
+`+Endpoint+` when generating the `+openapi.json+` file.
