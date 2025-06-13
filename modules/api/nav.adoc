@@ -1,0 +1,3 @@
+.Trento Open Api
+* https://www.trento-project.io/wanda/swaggerui/[Wanda^]
+* https://www.trento-project.io/web/swaggerui/[Web^]
