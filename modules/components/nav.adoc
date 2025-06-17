@@ -1,33 +1,39 @@
 .Trento Components
 
-** Agent
+* Agent
 
-*** xref:agent/ci-cd-variables.adoc[CI-CD-Variables]
-*** xref:agent/development/how-to-make-a-release.adoc[How to make a release]
+** xref:agent/ci-cd-variables.adoc[CI-CD-Variables]
+** xref:agent/development/how-to-make-a-release.adoc[How to make a release]
 
-** Helm-Charts
-*** xref:helm_charts/trento-server.adoc[Trento Server]
+* Helm-Charts
+** xref:helm_charts/trento-server.adoc[Trento Server]
 
-** Web
-*** Alerting
-**** xref:web/alerting/alerting.adoc[Alerting]
-*** Authentication
-**** xref:web/authentication/jwt_specification.adoc[JWT Specification]
-**** xref:web/authentication/spa_flow.adoc[SPA Authentication Flow]
-*** Development
-**** xref:web/development/environment_variables.adoc[Environment Variables]
-**** xref:web/development/hack_on_the_trento.adoc[Development Setup]
-*** Integration
-**** xref:web/integration/oidc.adoc[OIDC Integration]
-*** Monitoring
-**** xref:web/monitoring/monitoring.adoc[Monitoring]
+* Web
+
+** Alerting
+*** xref:web/alerting/alerting.adoc[Alerting]
+
+** Authentication
+*** xref:web/authentication/jwt_specification.adoc[JWT Specification]
+*** xref:web/authentication/spa_flow.adoc[SPA Authentication Flow]
+
+** Development
+*** xref:web/development/environment_variables.adoc[Environment Variables]
+*** xref:web/development/hack_on_the_trento.adoc[Development Setup]
+
+** Integration
+*** xref:web/integration/oidc.adoc[OIDC Integration]
+
+** Monitoring
+*** xref:web/monitoring/monitoring.adoc[Monitoring]
 
 
-** Wanda
-*** xref:wanda/specification.adoc[Wanda Specification]
-*** xref:wanda/expression_language.adoc[Expression Language]
-*** xref:wanda/gatherers.adoc[Data Gatherers]
-*** xref:wanda/rhai_expressions_cheat_sheet.adoc[Rhai Expressions Cheat Sheet]
-*** Development
-**** xref:wanda/development/hack_on_wanda.adoc[Wanda Development]
-**** xref:wanda/development/demo.adoc[Wanda Demo]
+* Wanda
+** xref:wanda/specification.adoc[Wanda Specification]
+** xref:wanda/expression_language.adoc[Expression Language]
+** xref:wanda/gatherers.adoc[Data Gatherers]
+** xref:wanda/rhai_expressions_cheat_sheet.adoc[Rhai Expressions Cheat Sheet]
+
+** Development
+*** xref:wanda/development/hack_on_wanda.adoc[Wanda Development]
+*** xref:wanda/development/demo.adoc[Wanda Demo]

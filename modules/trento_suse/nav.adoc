@@ -1,2 +1,0 @@
-.Getting Started with Trento
-* xref:trento-guide.adoc[Trento Guide]
