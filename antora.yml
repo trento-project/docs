@@ -7,57 +7,33 @@ nav:
 - modules/api/nav.adoc
 - modules/developer/nav.adoc
 
-asciidoc: 
-  attributes: 
-        dsc: "https://documentation.suse.com"  
-        sc-rn: "https://www.suse.com/releasenotes"  
-        k8s: "Kubernetes"
-        nbsp:  
-        prompt_root: '#{nbsp}'
-        suse: 'SUSE'
-        sle: '{suse} Linux Enterprise'
-        sles: '{sle} Server'
-        sls: "{sles}"
-        sap: "SAP"  
-        sles4sap: "{sls} for {sap} applications"  
-        zypper: "Zypper"  
-        kube: "Kubernetes"  
-        prompt_user: ">{nbsp}"  
-        prompt_sudo: ">{nbsp}sudo{nbsp}"
-        mdash: "—"  
-        hana: '{sap} HANA'
-        pace: "Pacemaker"  
-        rootuser: "root"  
-        prometheus: "Prometheus"  
-        postgresql: "PostgreSQL"  
-        scc: "scc-hypervisor-collector"  
-        smlm: "{suse} Multi-Linux Manager"  
-        netweaver: "{sap} NetWeaver"
-        saptune: "saptune"
-        sles4sapa: "SLES{nbsp}for{nbsp}SAP"
-        rancher: "{suse} Rancher Prime"
-        rke: "{rancher} {kube} Engine (RKE)"
 ext:
   collector:
-# Fetch trento official documentation
+    # Fetch trento official documentation
     - run:
         command: git clone https://github.com/SUSE/doc-unversioned temp-doc-unversioned
-    - clean:
-        dir: modules/trento_doc_unversioned/pages
-    - clean:
-        dir: modules/trento_doc_unversioned/images
-    
+    # Get content from doc-unversioned
     - scan:
         dir: temp-doc-unversioned/trento/adoc
         files: '**/*.adoc'
         into: modules/trento_doc_unversioned/pages
+    # Get images from doc-unversioned
     - scan:
         dir: temp-doc-unversioned/trento/images/src/png
         files: '**/*.png'
         into: modules/trento_doc_unversioned/images
+    # Build asciidoc attributes from doc-unversioned
+    - run:
+        command: ./scripts/generate-attributes-yaml.sh temp-doc-unversioned/trento/adoc/generic-attributes.adoc ./antora_tmp/antora.yml
+    # Scan generated antora file to merge the asciidoc attributes
+    - scan:
+        dir: antora_tmp
+        files: 'antora.yml'
+    # Clean fetched doc-unversioned and remove generated antora file
     - clean:
         dir: temp-doc-unversioned
-
+    - clean:
+        dir: antora_tmp
 
 # Trento upstream projects components
     - clean:

@@ -2,3 +2,4 @@
 .env
 antora_public
 node_modules
+antora_tmp
