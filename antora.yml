@@ -38,10 +38,16 @@ ext:
 # Trento upstream projects components
     - clean:
         dir: modules/components/pages
+    - clean:
+        dir: modules/components/images
     - scan:
         dir:  components/
         files: '**/*.adoc'
         into: modules/components/pages
+    - scan:
+        dir: components/assets
+        files: '**/*.{png,jpg,jpeg,svg,gif}'
+        into: modules/components/images
 # Trento developer documentation
     - clean:
         dir: modules/developer/pages
@@ -49,9 +55,11 @@ ext:
         dir: developer/
         files: '**/*.adoc'
         into: modules/developer/pages
-# Images developer guides architecture
+# Images developer documentation
+    - clean:
+        dir: modules/developer/images
     - scan:
-        dir: developer/architecture
+        dir: developer/assets
         files: '**/*.{png,jpg,jpeg,svg,gif}'
         into: modules/developer/images
 
