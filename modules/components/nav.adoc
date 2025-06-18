@@ -10,8 +10,7 @@
 
 * Web
 
-** Alerting
-*** xref:web/alerting/alerting.adoc[Alerting]
+** xref:web/alerting/alerting.adoc[Alerting]
 
 ** Authentication
 *** xref:web/authentication/jwt_specification.adoc[JWT Specification]
