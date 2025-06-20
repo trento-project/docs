@@ -1,0 +1,66 @@
+name: docs
+title: Trento Documentation
+version: ~
+nav:
+- modules/trento_doc_unversioned/nav.adoc
+- modules/components/nav.adoc
+- modules/api/nav.adoc
+- modules/developer/nav.adoc
+
+ext:
+  collector:
+    # Fetch trento official documentation
+    - run:
+        command: git clone https://github.com/SUSE/doc-unversioned temp-doc-unversioned
+    # Get content from doc-unversioned
+    - scan:
+        dir: temp-doc-unversioned/trento/adoc
+        files: '**/*.adoc'
+        into: modules/trento_doc_unversioned/pages
+    # Get images from doc-unversioned
+    - scan:
+        dir: temp-doc-unversioned/trento/images/src/png
+        files: '**/*.png'
+        into: modules/trento_doc_unversioned/images
+    # Build asciidoc attributes from doc-unversioned
+    - run:
+        command: ./scripts/generate-attributes-yaml.sh temp-doc-unversioned/trento/adoc/generic-attributes.adoc ./antora_tmp/antora.yml
+    # Scan generated antora file to merge the asciidoc attributes
+    - scan:
+        dir: antora_tmp
+        files: 'antora.yml'
+    # Clean fetched doc-unversioned and remove generated antora file
+    - clean:
+        dir: temp-doc-unversioned
+    - clean:
+        dir: antora_tmp
+
+# Trento upstream projects components
+    - clean:
+        dir: modules/components/pages
+    - clean:
+        dir: modules/components/images
+    - scan:
+        dir:  components/
+        files: '**/*.adoc'
+        into: modules/components/pages
+    - scan:
+        dir: components/assets
+        files: '**/*.{png,jpg,jpeg,svg,gif}'
+        into: modules/components/images
+# Trento developer documentation
+    - clean:
+        dir: modules/developer/pages
+    - scan:
+        dir: developer/
+        files: '**/*.adoc'
+        into: modules/developer/pages
+# Images developer documentation
+    - clean:
+        dir: modules/developer/images
+    - scan:
+        dir: developer/assets
+        files: '**/*.{png,jpg,jpeg,svg,gif}'
+        into: modules/developer/images
+
+

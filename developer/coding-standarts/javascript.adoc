@@ -1,0 +1,76 @@
+== JavaScript coding standards
+
+=== Style Guide
+
+Trento follows the https://github.com/airbnb/javascript[Airbnb style
+guide], wherever possible.
+
+=== Linting
+
+The linting is enforced through https://eslint.org/[ESLint] locally and
+in the CI.
+
+Use the link:../templates/.eslintrc.js[.eslintrc.js template] as a
+starting point for a new project.
+
+=== Formatting
+
+Code formatting is applied using https://prettier.io/[Prettier], and
+enforced with a CI check.
+
+Use the link:../templates/.prettierrc.js[.prettierrc.js template] as a
+starting point for a new project.
+
+==== Additional rules and exceptions
+
+* Always prefer an arrow function (`+() => {}+`) to a regular
+`+function(){}+`. It has lower memory footprint and it’s more concise.
+* PropTypes are being avoided for the moment when writing a new React
+component.
+
+==== `+npm+`, `+yarn+`, `+pnpm+`?
+
+`+npm+`.
+
+=== Testing
+
+End-to-end tests in production-like environments are performed using
+https://www.cypress.io/[Cypress].
+
+Unit testing of JavaScript code and React components is performed using
+https://jestjs.io/[Jest] and
+https://testing-library.com/docs/react-testing-library/intro[React
+Testing Library].
+
+==== Testing guidelines
+
+* Prefer factories created with
+https://github.com/thoughtbot/fishery[Fishery] and
+https://fakerjs.dev/[Faker] over fixtures to craft test data.
+* As a rule of thumb one should avoid mocking and creating spies
+wherever possible.
+
+==== Storybook
+
+https://storybook.js.org/[Storybook] is used to develop UI components in
+isolation.
+
+When writing UI components, every PR should have new Storybook stories
+attached or have existing ones updated.
+
+=== Books and guides
+
+* https://developer.mozilla.org/en-US/docs/Web/JavaScript[MDN’s
+JavaScript documentation] _is_ the only reliable source of truth about
+JavaScript on the web.
+* https://reactjs.org/docs/getting-started.html[React documentation]
+* https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/README.md[You
+Don’t Know JS]
+* A bit old but gold:
+https://www.oreilly.com/library/view/javascript-the-good/9780596517748/[JavaScript:
+The Good Parts]
+* https://www.nodejsdesignpatterns.com[Node.JS Design Patterns]: a good
+book if you want to write a full-baked JS application.
+* https://redux.js.org/usage/[Redux usage guidelines]
+* https://redux.js.org/usage/writing-tests[Redux: writing tests]
+* https://redux-saga.js.org/docs/advanced/Testing/[Testing Redux sagas]
