@@ -14,15 +14,15 @@ ext:
     - clean:
         dir: modules/trento_documentation/images
     - scan:
-        dir: trento_documentation/adoc
+        dir: trento/adoc
         files: '**/*.adoc'
         into: modules/trento_documentation/pages
     - scan:
-        dir: trento_documentation/images/src/png
+        dir: trento/images/src/png
         files: '**/*.png'
         into: modules/trento_documentation/images
     - run:
-        command: ./scripts/generate-attributes-yaml.sh trento_documentation/adoc/generic-attributes.adoc ./antora_tmp/antora.yml
+        command: ./scripts/generate-attributes-yaml.sh trento/adoc/generic-attributes.adoc ./antora_tmp/antora.yml
     - scan:
         dir: antora_tmp
         files: 'antora.yml'
