@@ -1,3 +1,4 @@
-= Welcome!
+= Trento Documentation
 
-You are home.
+
+== What is Trento?

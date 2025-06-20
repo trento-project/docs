@@ -1,3 +1,5 @@
 .Trento Open Api
-* https://www.trento-project.io/wanda/swaggerui/[Wanda^]
-* https://www.trento-project.io/web/swaggerui/[Web^]
+* https://www.trento-project.io/wanda/swaggerui/[Wanda Api]
+* https://www.trento-project.io/wanda/readme.html[Wanda Guides and Modules]
+* https://www.trento-project.io/web/swaggerui/[Web Api]
+* https://www.trento-project.io/web/readme.html[Web Modules and Mix Tasks]
