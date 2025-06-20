@@ -3,27 +3,27 @@ name: Validate user facing documentation
 on:
   push:
     paths:
-      - 'trento_documentation/DC-*'
-      - 'trento_documentation/xml/**'
-      - 'trento_documentation/adoc/**'
-      - 'trento_documentation/images/src/**'
-      - '**/trento_documentation/DC-*'
-      - '**/trento_documentation/xml/**'
-      - '**/trento_documentation/adoc/**'
-      - '**/trento_documentation/images/src/**'
+      - 'trento/DC-*'
+      - 'trento/xml/**'
+      - 'trento/adoc/**'
+      - 'trento/images/src/**'
+      - '**/trento/DC-*'
+      - '**/trento/xml/**'
+      - '**/trento/adoc/**'
+      - '**/trento/images/src/**'
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
-      - 'trento_documentation/DC-*'
-      - 'trento_documentation/xml/**'
-      - 'trento_documentation/adoc/**'
-      - 'trento_documentation/images/src/**'
-      - '**/trento_documentation/DC-*'
-      - '**/trento_documentation/xml/**'
-      - '**/trento_documentation/adoc/**'
-      - '**/trento_documentation/images/src/**'
+      - 'trento/DC-*'
+      - 'trento/xml/**'
+      - 'trento/adoc/**'
+      - 'trento/images/src/**'
+      - '**/trento/DC-*'
+      - '**/trento/xml/**'
+      - '**/trento/adoc/**'
+      - '**/trento/images/src/**'
   workflow_dispatch:
-    
+
 jobs:
   select-dc-files:
     runs-on: ubuntu-latest
