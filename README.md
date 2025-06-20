@@ -1,7 +1,7 @@
 # Trento docs
 
 This repository is the source of truth for the Trento project documentation. 
-- [Trento user facing documentation](./trento_documentation/)
+- [Trento user facing documentation](./trento/)
 - [Trento components documentation](./components/)
 - [Developer Documentation](./developer/)
 - [Templates](./templates)
