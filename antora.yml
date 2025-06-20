@@ -2,36 +2,30 @@ name: docs
 title: Trento Documentation
 version: ~
 nav:
-- modules/trento_doc_unversioned/nav.adoc
+- modules/trento_documentation/nav.adoc
 - modules/components/nav.adoc
 - modules/api/nav.adoc
 - modules/developer/nav.adoc
 
 ext:
   collector:
-    # Fetch trento official documentation
-    - run:
-        command: git clone https://github.com/SUSE/doc-unversioned temp-doc-unversioned
-    # Get content from doc-unversioned
+    - clean:
+        dir: modules/trento_documentation/pages
+    - clean:
+        dir: modules/trento_documentation/images
     - scan:
-        dir: temp-doc-unversioned/trento/adoc
+        dir: trento_documentation/adoc
         files: '**/*.adoc'
-        into: modules/trento_doc_unversioned/pages
-    # Get images from doc-unversioned
+        into: modules/trento_documentation/pages
     - scan:
-        dir: temp-doc-unversioned/trento/images/src/png
+        dir: trento_documentation/images/src/png
         files: '**/*.png'
-        into: modules/trento_doc_unversioned/images
-    # Build asciidoc attributes from doc-unversioned
+        into: modules/trento_documentation/images
     - run:
-        command: ./scripts/generate-attributes-yaml.sh temp-doc-unversioned/trento/adoc/generic-attributes.adoc ./antora_tmp/antora.yml
-    # Scan generated antora file to merge the asciidoc attributes
+        command: ./scripts/generate-attributes-yaml.sh trento_documentation/adoc/generic-attributes.adoc ./antora_tmp/antora.yml
     - scan:
         dir: antora_tmp
         files: 'antora.yml'
-    # Clean fetched doc-unversioned and remove generated antora file
-    - clean:
-        dir: temp-doc-unversioned
     - clean:
         dir: antora_tmp
 

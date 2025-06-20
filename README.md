@@ -1,12 +1,10 @@
 # Trento docs
 
 This repository is the source of truth for the Trento project documentation. 
-
+- [Trento user facing documentation](./trento_documentation/)
 - [Trento components documentation](./components/)
 - [Developer Documentation](./developer/)
 - [Templates](./templates)
-
-> **Note:** The content of user facing documentation is fetched from https://github.com/SUSE/doc-unversioned/tree/main/trento
 
 ## How to contribute to development documentation? 
 
@@ -34,7 +32,7 @@ This repository is the source of truth for the Trento project documentation.
   5. Build Antora page
 
   ```bash
-  npx antora --fetch antora-playbook.yml
+  npx antora antora-playbook.yml
   ```
 
   6. Run page
