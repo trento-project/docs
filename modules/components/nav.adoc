@@ -8,21 +8,16 @@
 * Helm-Charts
 ** xref:helm_charts/trento-server.adoc[Trento Server]
 
-* Web
-
+* xref:web/README.adoc[Web]
 ** xref:web/alerting/alerting.adoc[Alerting]
-
 ** Authentication
 *** xref:web/authentication/jwt_specification.adoc[JWT Specification]
 *** xref:web/authentication/spa_flow.adoc[SPA Authentication Flow]
-
 ** Development
 *** xref:web/development/environment_variables.adoc[Environment Variables]
 *** xref:web/development/hack_on_the_trento.adoc[Development Setup]
-
 ** Integration
 *** xref:web/integration/oidc.adoc[OIDC Integration]
-
 ** Monitoring
 *** xref:web/monitoring/monitoring.adoc[Monitoring]
 

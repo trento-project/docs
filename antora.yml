@@ -57,4 +57,13 @@ ext:
         files: '**/*.{png,jpg,jpeg,svg,gif}'
         into: modules/developer/images
 
-
+# Fetch README of upstrem projects
+    # Fetch trento official documentation
+    - run:
+        command: git clone --branch antora_readme --depth 1 https://github.com/trento-project/web.git temp-web
+    - scan:
+        dir: temp-web/
+        files: 'README.adoc'
+        into: modules/components/pages/web/
+    - clean:
+        dir: temp-web/
