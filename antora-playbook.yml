@@ -1,7 +1,8 @@
 site:
-  title: Trento Documentation
+  title: Trento
   url: https://trento-project.github.io
   start_page: docs::index.adoc
+
 
 content:
   sources:
@@ -10,8 +11,8 @@ content:
         - HEAD
 ui:
   bundle:
-    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
-#    url: /home/emaksy/Documents/Work/Trento/docs/antora-ui-default/build/ui-bundle.zip
+    # url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
+    url: /home/emaksy/Documents/Work/Trento/docs/antora-ui-default/build/ui-bundle.zip
     snapshot: true
 
 

@@ -23,20 +23,26 @@ This repository is the source of truth for the Trento project documentation.
    ```
 
   4. Install Dependency
-
+  
   ```bash
   npm i -D -E antora
   ```
 
-  5. Build Antora page
+  5. Rebuild Ui Bundle inside `antora-ui-default`
+
+  ```bash
+    npx gulp bundle
+  ```
+
+  6. Build Antora page
 
   ```bash
   npx antora antora-playbook.yml
   ```
 
-  6. Run page
+  7. Run page
 
- ```bash
- xdg-open antora_public/index.html
- ```
+  ```bash
+  xdg-open antora_public/index.html
+  ```
 
