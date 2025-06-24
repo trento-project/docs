@@ -3,3 +3,8 @@
 antora_public
 node_modules
 antora_tmp
+
+./trento-antora-ui/public/
+./trento-antora-ui/build/
+./node_modules/
+./preview-src

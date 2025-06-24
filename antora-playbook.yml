@@ -11,8 +11,7 @@ content:
         - HEAD
 ui:
   bundle:
-    # url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
-    url: /home/emaksy/Documents/Work/Trento/docs/antora-ui-default/build/ui-bundle.zip
+    url: ./trento-antora-ui/build/ui-bundle.zip
     snapshot: true
 
 
