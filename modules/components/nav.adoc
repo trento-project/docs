@@ -21,7 +21,6 @@
 ** Monitoring
 *** xref:web/monitoring/monitoring.adoc[Monitoring]
 
-
 * Wanda
 ** xref:wanda/specification.adoc[Wanda Specification]
 ** xref:wanda/expression_language.adoc[Expression Language]

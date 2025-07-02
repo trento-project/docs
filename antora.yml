@@ -59,11 +59,38 @@ ext:
 
 # Fetch README of upstrem projects
     # Fetch trento official documentation
+
+    # trento web  https://github.com/trento-project/web.git
     - run:
-        command: git clone --branch antora_readme --depth 1 https://github.com/trento-project/web.git temp-web
+        command: git clone --branch antora_readme --depth 1 https://github.com/trento-project/web.git temp/web
     - scan:
-        dir: temp-web/
+        dir: temp/web/
         files: 'README.adoc'
         into: modules/components/pages/web/
+    - scan:
+        dir: temp/web/guides/
+        files: '**/*.adoc'
+        into: modules/components/pages/web/
+    - scan:
+        dir: temp/web/guides/
+        files: '**/*.{png,jpg,jpeg,svg,gif}'
+        into: modules/components/images
+
+
+    # trento web  https://github.com/trento-project/wanda.git
+    - run:
+        command: git clone --branch antora_readme --depth 1 https://github.com/trento-project/wanda.git temp/wanda
+    - scan:
+        dir: temp/wanda/
+        files: 'README.adoc'
+        into: modules/components/pages/wanda/
+    - scan:
+        dir: temp/wanda/guides/
+        files: '**/*.adoc'
+        into: modules/components/pages/wanda/
+    - scan:
+        dir: temp/wanda/guides/
+        files: '**/*.{png,jpg,jpeg,svg,gif}'
+        into: modules/components/images
     - clean:
-        dir: temp-web/
+        dir: temp

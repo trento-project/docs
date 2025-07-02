@@ -1,6 +1,7 @@
 # Trento docs
 
-This repository is the source of truth for the Trento project documentation. 
+This repository is the source of truth for the Trento project documentation.
+
 - [Trento user facing documentation](./trento/)
 - [Trento components documentation](./components/)
 - [Developer Documentation](./developer/)
@@ -31,7 +32,7 @@ This repository is the source of truth for the Trento project documentation.
   5. Rebuild Ui Bundle inside `antora-ui-default`
 
   ```bash
-    npx gulp bundle
+  npx gulp bundle
   ```
 
   6. Build Antora page

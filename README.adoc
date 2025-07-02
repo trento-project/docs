@@ -1,0 +1,61 @@
+== Trento docs
+
+This repository is the source of truth for the Trento project
+documentation.
+
+* link:./trento/[Trento user facing documentation]
+* link:./components/[Trento components documentation]
+* link:./developer/[Developer Documentation]
+
+=== How to contribute to development documentation?
+
+[arabic]
+. *Create new documentation in `+.adoc+`*.
+. *Choose the appropriate location* for your new `+.adoc+` file:
+
+* For *user facing docs*, use `+trento/adr/<article.adoc>+`.
+* For *developer documentation*,like adr, rfc or architecture use
+`+deveveloper/+`.
+* For *component-specific docs*, like web, wanda or the agent, use
+`+components/<component-name>/+`.
+
+[arabic, start=3]
+. *Add new documentation to trento-docs site by enriching the Antora
+navigation* The content of the modules directory is responsible for
+building of the documentation page.
+
+Open the appropriate `+nav.adoc+` file under
+`+modules/<module>/nav.adoc+` and add a new entry for your page, for
+example: `+adoc    * xref:my-new-page.adoc[My New Page]+`
+
+[arabic, start=4]
+. Install Dependency
+
+[source,bash]
+----
+npm i -D -E antora
+----
+
+[arabic, start=5]
+. Rebuild Ui Bundle inside `+antora-ui-default+`
+
+[source,bash]
+----
+npx gulp bundle
+----
+
+[arabic, start=6]
+. Build Antora page
+
+[source,bash]
+----
+npx antora antora-playbook.yml
+----
+
+[arabic, start=7]
+. Run page
+
+[source,bash]
+----
+xdg-open antora_public/index.html
+----
