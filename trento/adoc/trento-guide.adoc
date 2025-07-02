@@ -8,7 +8,7 @@ include::generic-attributes.adoc[]
 
 // include::common_copyright_gfdl.xml[]
 
-include::trento-intro.adoc[]
+include::trento-intros.adoc[]
 include::trento-lifecycle.adoc[]
 include::trento-requirements.adoc[]
 include::trento-install-server.adoc[]
