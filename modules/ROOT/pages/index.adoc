@@ -1,4 +1,0 @@
-= Trento Documentation
-
-
-== What is Trento?
