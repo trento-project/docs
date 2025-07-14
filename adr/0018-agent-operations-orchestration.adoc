@@ -89,9 +89,10 @@ the agent operators so they can be executed.
 
 ==== Orchestration
 
-The operations orchestration is composed only by 2 states: - Dispatch
-the step operations to target agents - Wait until all the target agents
-have reported back
+The operations orchestration is composed only by 2 states:
+
+ * Dispatch the step operations to target agents 
+ * Wait until all the target agents have reported back
 
 This image represents the states and transitions:
 
@@ -115,10 +116,11 @@ This image represents the states and transitions:
 Deciding if a step operation must be executed in some agents or not is
 something really useful. This will let us define some multi-agent
 operations where some step operations are only executed in certain
-agents. Some examples could be: - Run cluster operations only in DC
-nodes - Run SAP operations only in nodes with specific features, like
-ASCS or PAS nodes - Exclude running operations in nodes like majority
-makers
+agents. Some examples could be:
+
+ * Run cluster operations only in DC nodes 
+ * Run SAP operations only in nodes with specific features, like ASCS or PAS nodes 
+ * Exclude running operations in nodes like majority makers
 
 The predicate will be a simple RHAI expression that returns a boolean.
 We will pass some agent specific values in the requests, so each agent
@@ -141,38 +143,20 @@ link:#operation[Operation] chapter.
 
 ==== Out of scope in the first implementation
 
-To make the delivery of this feature easier and faster, we have decided
-to let out some of the initial features we wanted to implement: -
-Multi-step operations rollback. When the operation implements a lot of
-steps, returning to the original state in case of failure has some
-challenges as all intermediate steps must be rolled back in reverse
-other. - Restart of operations with abnormal or unknown exit due the
-code crashes. We will "`let it fail`" by now, as in the majority of the
-cases, the error will be caused for things that will hardly be fixed in
-a subsequent execution. These can be things like: database access error,
-error publishing or reading from RabbitMQ, agent reporting an incorrect
-payload, internal state got corrupted, etc Additional rationale about
-postponing this implementation is that the first few operations we will
-implement (saptune solution apply, cluster maintenance on/off, SAP
-application layer instance start/stop) won’t harm the target agents if
-the operation is not resumed. If the operation request arrives to the
-agent, it will perform it in an atomic transactional change, so no
-matter what, the initial request done by the user will be effective. The
-worst thing that can happen is that the internal saved state of the
-operation might not match which what happened in the agent, but we are
-fine accepting this as an initial trade-off. As an effect, this makes
-the orchestrator not 100% reliable between what Wanda saved in its
-database and what happened in the target agents. Either way, once a we
-start implementing a multi-step rollback feature we will resume the task
-of implementing proper restarts.
+To make the delivery of this feature easier and faster, we have decided to let out some of the initial features we wanted to implement:
+ 
+ * Multi-step operations rollback. When the operation implements a lot of steps, returning to the original state in case of failure has some challenges as all intermediate steps must be rolled back in reverse other. 
+ * Restart of operations with abnormal or unknown exit due the
+ code crashes. We will "`let it fail`" by now, as in the majority of the cases, the error will be caused for things that will hardly be fixed in a subsequent execution. These can be things like: database access error, error publishing or reading from RabbitMQ, agent reporting an incorrect payload, internal state got corrupted, etc Additional rationale about postponing this implementation is that the first few operations we will implement (saptune solution apply, cluster maintenance on/off, SAP application layer instance start/stop) won’t harm the target agents if the operation is not resumed. If the operation request arrives to the agent, it will perform it in an atomic transactional change, so no matter what, the initial request done by the user will be effective. The worst thing that can happen is that the internal saved state of the operation might not match which what happened in the agent, but we are fine accepting this as an initial trade-off. As an effect, this makes the orchestrator not 100% reliable between what Wanda saved in its database and what happened in the target agents. Either way, once a we start implementing a multi-step rollback feature we will resume the task of implementing proper restarts.
 
 === Consequences
 
 Implementing the agent operations framework with this design enables us
-the following, so we can…: - Implement multi-agent and multi-step
-operations - Use a reliable self-implement Agent operators that we are
-sure they do exactly what we want and are tested - Decide if the
-operation step is executed only in certain targets using a deterministic
-predicate - Have a controlled and consistent operations registry - Save
-all the executed operations and have a historical record - In the
-future, rollback complex multi-step operations to the initial state
+the following, so we can…:
+
+ * Implement multi-agent and multi-step operations 
+ * Use a reliable self-implement Agent operators that we are sure they do exactly what we want and are tested 
+ * Decide if the operation step is executed only in certain targets using a deterministic predicate 
+ * Have a controlled and consistent operations registry 
+ * Save all the executed operations and have a historical record 
+ * In the future, rollback complex multi-step operations to the initial state
