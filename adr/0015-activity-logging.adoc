@@ -65,13 +65,16 @@ logger appending the log entry to the persistence layer
 
 === Consequences
 
-The depicted decision has the following effects: - the footprint of the
-feature rollout is kept at minimum. No extra deps are needed - changes
-to already existent modules/code is near to zero - we can leverage
-postgres searching capabilities
+The depicted decision has the following effects: 
 
-Tradeoffs: - number of writes to the database are amplified for relevant
-activities because of insertions and reindexing - the size of the
-activity log table depends on the number of logged activities combined
-with the retention time set by the user - Activity log context
-references web related modules in order to match controller/action pairs
+*  the footprint of the
+feature rollout is kept at minimum. No extra deps are needed 
+* changes to already existent modules/code is near to zero 
+* we can leverage postgres searching capabilities
+
+Tradeoffs: 
+
+* number of writes to the database are amplified for relevant
+activities because of insertions and reindexing 
+* the size of the activity log table depends on the number of logged activities combined with the retention time set by the user 
+* Activity log context references web related modules in order to match controller/action pairs
