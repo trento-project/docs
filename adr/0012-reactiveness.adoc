@@ -35,16 +35,20 @@ https://en.wikipedia.org/wiki/Kiosk_software[Kiosk mode].
 Not every part of the system will need full blown reactiveness, so
 implementation and maintenance is simplified where possible.
 
-Examples of not totally reactive sections could be: - `+Checks Catalog+`
+Examples of not totally reactive sections could be: 
+
+* `+Checks Catalog+`
 (ie its content is not expected, at least currently, to change real-time
-based on new checks made available on wanda) - `+Settings+` (ie a user
+based on new checks made available on wanda) 
+* `+Settings+` (ie a user
 operating in the settings, is not expected to see changes made by
 another user in real time)
 
-Examples of sections where reactiveness is necessary: - `+Dashboard+` -
-`+Overviews+` (_Hosts_, _Clusters_, _SAP Systems_, _HANA Databases_) -
-`+Details+` (_Host Details_, _Cluster Details_, _SAP System Details_,
-_HANA Database Details_)
+Examples of sections where reactiveness is necessary: 
+
+* `+Dashboard+` 
+* `+Overviews+` (_Hosts_, _Clusters_, _SAP Systems_, _HANA Databases_) 
+* `+Details+` (_Host Details_, _Cluster Details_, _SAP System Details_,_HANA Database Details_)
 
 In any case, actions having effects on parts of the system where
 reactiveness is desired still need to keep supporting the desired
