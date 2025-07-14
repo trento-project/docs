@@ -16,12 +16,12 @@ the publisher (Trento Agent) and the collector (Trento Web): Trento
 Agent’s job is done once the payload has been received and stored.
 
 There are cases in which a discovery sent from a Trento Agent is not
-processed; they can be categorized as: 1. The Trento Agent fails to
-connect to the Trento Web instance (network issues); 2. The Trento Agent
-fails to authenticate with the Trento Web instance (authentication
-issues); 3. The request payload does not match the expected shape, thus
-it cannot be mapped to a command (API contract issues); 4. The discovery
-is rejected because of the current state in Trento.
+processed; they can be categorized as: 
+ 
+ 1. The Trento Agent fails to connect to the Trento Web instance (network issues); 
+ 2. The Trento Agent fails to authenticate with the Trento Web instance (authentication issues); 
+ 3. The request payload does not match the expected shape, thus it cannot be mapped to a command (API contract issues); 
+ 4. The discovery is rejected because of the current state in Trento.
 
 Currently all these scenarios result in an error being returned by the
 `+collect+` endpoint and subsequent log in trento agent.
