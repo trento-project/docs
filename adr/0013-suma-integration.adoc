@@ -56,8 +56,11 @@ SUMA in a proxied fashion does not support required consistency within
 Trento, because the information gotten at discovery time (the one
 affecting host’s health) may differ from the one retrieved later.
 
-For this reasons we decided to: > track software updates discovery
+For this reasons we decided to: 
+____
+track software updates discovery
 results at discovery time and expose the tracked results via Trento API
+____
 
 === Consequences
 
