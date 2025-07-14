@@ -1,0 +1,10 @@
+== Trento docs
+
+This repository contains the Trento project documentation that does not
+interest a specific service, such as ADR, coding standards and best
+practices, CI workflows, and templates.
+
+* xref:./coding-standards/README.adoc[Coding standards]
+* xref:./adr/README.adoc[Architecture Decision Records (ADR)]
+* link:https://github.com/trento-project/docs/tree/main/templates[Templates]
+* link:https://github.com/trento-project/docs/tree/main/guides[Guides]
