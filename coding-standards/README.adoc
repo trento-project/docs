@@ -21,6 +21,6 @@ Guide] on how to write/receive a code review.
 
 === Language-specific guidelines
 
-* link:./elixir.md[Elixir]
-* link:./go.md[Go]
-* link:./javascript.md[JS]
+* link:./elixir.adoc[Elixir]
+* link:./go.adoc[Go]
+* link:./javascript.adoc[JS]
