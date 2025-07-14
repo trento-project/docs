@@ -9,7 +9,7 @@ Accepted
 === Context
 
 Follow up of ADR
-https://github.com/trento-project/docs/blob/main/adr/0017-agent-operations-framework.md[17.
+https://github.com/trento-project/docs/blob/main/adr/0017-agent-operations-framework.adoc[17.
 Agent Operations Framework] which describes the actions to implement
 write operations in Trento agents. In this case, this ADR describes the
 orchestration layer, which takes care of dispatching all the operation
@@ -37,13 +37,13 @@ This means that the operations are short-lived processes responsible for
 handling individual operation requests. We already do the same with
 check executions with a successful outcome.
 
-The process is able to: - Decide which agent will receive the operation
-(from now on: target agents) - Dispatch the individual operator requests
-to the target agents - Wait for the reports and compute the overall step
-result after receiving the feedback from all the targets - Move to the
-next operation step once the previous one is successfully completed -
-Save the intermediate and final state of the operation as an historic
-record
+The process is able to: 
+
+* Decide which agent will receive the operation(from now on: target agents) 
+* Dispatch the individual operator requests to the target agents 
+* Wait for the reports and compute the overall step result after receiving the feedback from all the targets 
+* Move to the next operation step once the previous one is successfully completed
+* Save the intermediate and final state of the operation as an historic record
 
 At the end, all the orchestration is defined as a state machine that
 moves the current state through different stages.
@@ -81,7 +81,7 @@ describe the operation itself. Find here a dummy example:
 
 As commented, the steps define the operator to be executed in the
 agents. Check the
-https://github.com/trento-project/docs/blob/main/adr/0017-agent-operations-framework.md[Agent
+https://github.com/trento-project/docs/blob/main/adr/0017-agent-operations-framework.adoc[Agent
 related ADR] for more information. The `+required_args+` field defines
 the arguments that must be provided from the outside with a key/value
 format. For example: `+saptune_solution=HANA+`. They will be passed to
