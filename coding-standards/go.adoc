@@ -4,7 +4,7 @@
 
 Linting is enforced by https://golangci-lint.run[golangci-lint] locally
 and in the CI pipeline. Use the
-link:../templates/.golangci.yaml[.golangci.yaml template] as a starting
+link:https://github.com/trento-project/docs/blob/main/templates/.golangci.yaml[.golangci.yaml template] as a starting
 point for your project.
 
 === Documentation

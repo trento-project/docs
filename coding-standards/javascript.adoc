@@ -10,7 +10,7 @@ guide], wherever possible.
 The linting is enforced through https://eslint.org/[ESLint] locally and
 in the CI.
 
-Use the link:../templates/.eslintrc.js[.eslintrc.js template] as a
+Use the link:https://github.com/trento-project/docs/blob/main/templates/.eslintrc.js[.eslintrc.js template] as a
 starting point for a new project.
 
 === Formatting
@@ -18,7 +18,7 @@ starting point for a new project.
 Code formatting is applied using https://prettier.io/[Prettier], and
 enforced with a CI check.
 
-Use the link:../templates/.prettierrc.js[.prettierrc.js template] as a
+Use the link:https://github.com/trento-project/docs/blob/main/templates/.prettierrc.js[.prettierrc.js template] as a
 starting point for a new project.
 
 ==== Additional rules and exceptions

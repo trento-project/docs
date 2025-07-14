@@ -48,7 +48,7 @@ documentation before submitting a PR.
 
 Repositories that don’t publish a package to Hex, should publish the
 generated documentation to GitHub pages using the
-link:../templates/elixir-ci.yaml[generate-elixir-docs action].
+link:.https://github.com/trento-project/docs/blob/main/templates/elixir-ci.yaml[generate-elixir-docs action].
 
 === Testing
 
@@ -141,7 +141,7 @@ validate operations in controllers using the provided
 https://github.com/open-api-spex/open_api_spex#validating-and-casting-params[plug],
 and test controllers using
 https://github.com/open-api-spex/open_api_spex#validate-responses[OpenAPISpex.TestAssertions].
-* The link:../templates/elixir-ci.yaml[CI template] includes a step to
+* The link:https://github.com/trento-project/docs/blob/main/templates/elixir-ci.yaml[CI template] includes a step to
 generate the Swagger UI and publish it to GitHub pages. Please refer to
 https://github.com/open-api-spex/open_api_spex/pull/489[this pr] to
 configure the `+ApiSpec+` module so that it does not depend on a running
