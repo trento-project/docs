@@ -21,6 +21,6 @@ Guide] on how to write/receive a code review.
 
 === Language-specific guidelines
 
-* link:./elixir.adoc[Elixir]
-* link:./go.adoc[Go]
-* link:./javascript.adoc[JS]
+* link:https://github.com/trento-project/docs/blob/main/coding-standards/elixir.adoc[Elixir]
+* link:https://github.com/trento-project/docs/blob/main/coding-standards/go.adoc[Go]
+* link:https://github.com/trento-project/docs/blob/main/coding-standards/javascript.adoc[JS]

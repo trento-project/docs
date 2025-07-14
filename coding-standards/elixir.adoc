@@ -10,7 +10,7 @@ style guide].
 The linting is enforced by the https://github.com/rrrene/credo[credo
 tool] locally and in the CI.
 
-Use the link:../templates/.credo.exs[.credo.exs template] as a starting
+Use the link:https://github.com/trento-project/docs/blob/main/templates/.credo.exs[.credo.exs template] as a starting
 point for your project.
 
 ==== Additional rules and exceptions
@@ -34,7 +34,7 @@ in Elixir.
 
 === CI
 
-Please use the link:../templates/elixir-ci.yaml[CI template] as a
+Please use the link:https://github.com/trento-project/docs/blob/main/templates//elixir-ci.yaml[CI template] as a
 starting point for your project.
 
 === Documentation
