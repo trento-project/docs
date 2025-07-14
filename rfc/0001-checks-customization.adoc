@@ -27,17 +27,22 @@ Activity Log
 == Motivation
 
 The purpose of this RFC is to define what Checks customization entails
-in overall Trento Architecture: - where data and operations belong - the
-interactions involved between the components (mainly server and checks
-engine) - authorizing customization operations - tracking customization
+in overall Trento Architecture:
+
+ * where data and operations belong 
+ * the interactions involved between the components (mainly server and checks engine) 
+ * authorizing customization operations 
+ * tracking customization
 activities
 
 == Detailed design
 
 Considering the outlined link:#use-cases-outline[use cases] we need to:
-- define link:#customizable-check[when a check can be customized] -
-persist custom values (basically CRUD-ish operations) on a check+target
-basis - use custom values in the checks execution by the Check Engine
+
+* define link:#customizable-check[when a check can be customized] 
+* persist custom values (basically CRUD-ish operations) on a check+target
+basis 
+* use custom values in the checks execution by the Check Engine
 (Wanda)
 
 Since check engine is meant to deal with Checks, it looks naturally
@@ -114,21 +119,22 @@ an option.
 ==== Caveats
 
 After some deeper research there are some caveates to be take into
-account for check customizability - check
-https://github.com/trento-project/checks/blob/main/checks/3A59DC.yaml[3A59DC]
-will be not allowed for customization because of its nature (what it is
-attempting to do and how it is written) - if one of the values of a
-check is a list, that specific value won’t be allowed for modification
-(deferred implementation)
+account for check customizability
+
+* check https://github.com/trento-project/checks/blob/main/checks/3A59DC.yaml[3A59DC] will be not allowed for customization because of its nature (what it is attempting to do and how it is written)
+
+* if one of the values of a check is a list, that specific value won’t be allowed for modification (deferred implementation)
 
 === Operations on custom values
 
 In order to support applying custom values, changing them after they’ve
 been set and also reset to SUSE’s default ones, the following new
-operations would be introduced: - link:#apply-custom-values[Apply custom
-values] - link:#change-custom-values[Change custom values] -
-link:#reset-check-to-defaults[Reset custom values] -
-link:#reading-customization[Reading custom values]
+operations would be introduced: 
+
+* link:#apply-custom-values[Apply custom values] 
+* link:#change-custom-values[Change custom values]
+* link:#reset-check-to-defaults[Reset custom values]
+* link:#reading-customization[Reading custom values]
 
 *Disclaimer:* all following endpoints, methods, paths, query strings,
 parameters are indicative at this point and up for further refinement.
@@ -219,18 +225,24 @@ input for the operations will be defined at due time.
 ==== Reading customization
 
 A target’s checks selection workflow gets extended with customization
-capabilities, hence the following extra information is needed: - whether
-a check is customizable - whether a value of a customizable check can be
-customized (ie a value which is a list cannot be customized, yet) -
-identify which is the value being used based on the context (requires
+capabilities, hence the following extra information is needed: 
+
+* whether a check is customizable 
+* whether a value of a customizable check can be customized (ie a value which is a list cannot be customized, yet)
+* identify which is the value being used based on the context (requires
 evaluating `+when+` conditions) so that the user know what actually is
-going to be overridden - whether a check has been already customized -
-which are the custom values that have been applied
+going to be overridden 
+* whether a check has been already customized
+*which are the custom values that have been applied
 
 Since reading the checks catalog alone wouldn’t be enough anymore,
-options are: - the current read operation on the catalog is extended to
-carry the customization data - a read operation is added specifically
-targeting custom values - a read operation is added to fulfill the
+options are:
+
+* the current read operation on the catalog is extended to
+carry the customization data  
+* a read operation is added specifically
+targeting custom values 
+* a read operation is added to fulfill the
 overall Checks Selection (meaning the read catalog operation remains as
 such while an _extended catalog_ representation, as depicted in the
 first option, becomes an operation on its own)
@@ -385,19 +397,23 @@ case) can allow/disallow certain operations.
 Currently,
 https://github.com/trento-project/docs/blob/main/adr/0015-activity-logging.md[Activity
 Logging] is pretty much scoped to server component tracking activities
-of the following nature: - API based operations, that is calls to
-specific http requests - domain events emitted by the system
+of the following nature:
+
+ * API based operations, that is calls to
+specific http requests 
+ * domain events emitted by the system
 
 Having checks customization operations in wanda adds a challenge since
 those interesting actions are not passing through the Activity Logging
 subsystem.
 
-Options available to get a valuable outcome are: - checks customization
-operations are proxied via server component (meaning we have twin
-operations exposed by trento web that actually just call wanda) - wanda
-emits messages after it applies customization so that interested parties
-- web - acknowledges the operation was successfully completed and tracks
-relevant entries in the activity log
+Options available to get a valuable outcome are:
+
+  * checks customization
+  operations are proxied via server component (meaning we have twin
+  operations exposed by trento web that actually just call wanda)  
+  * wanda emits messages after it applies customization so that interested parties
+  * web acknowledges the operation was successfully completed and tracks relevant entries in the activity log
 
 Activity Logging needs to evolve to support logging actions in a
 distributed system like Trento, however this is out of scope for this
@@ -408,32 +424,26 @@ specific RFC.
 == Alternatives
 
 The main alternative point is storing custom values in Web rather than
-in Wanda.
+in Wanda. Generally speaking all the considerations made previously keep their
+validity. Here’s the main points considered about storing custom values in web:
 
-Generally speaking all the considerations made previously keep their
-validity.
-
-Here’s the main points considered about storing custom values in web: -
-having web responsible for checks customization data and operations
-means leaking a responsibility where it does not naturally belong - in
-the context of a standalone Compliance Check Engine, Checks
+ * having web responsible for checks customization data and operations
+means leaking a responsibility where it does not naturally belong
+ * in the context of a standalone Compliance Check Engine, Checks
 Customization feature would be clunky to use because custom values would
 not be organically part of the check engine, but would need to be
-provided every time even if they did not change - using the overriding
-values in a checks execution requires sending those from web to wanda
-via the `+ExecutionRequested+` message hence either: - we change the
-message contract - we inappropriately send the overriding values in
-`+ExecutionRequested+` env entry - also the start endpoint in Wanda
-needs to be changed - having checks and their customization in different
-places makes it harder to operate when checks change (meaning that if a
-check changes its spec we need to react to that and possibly invalidate
-a previously made customization for instance. We have a similar
+provided every time even if they did not change
+ * using the overriding values in a checks execution requires sending those from web to wanda via the `+ExecutionRequested+` message hence either:  
+    - we change the message contract 
+    - we inappropriately send the overriding values in `+ExecutionRequested+` env entry 
+ * also the start endpoint in Wanda needs to be changed
+ * having checks and their customization in different places makes it harder to operate when checks change (meaning that if a check changes its spec we need to react to that and possibly invalidate a previously made customization for instance. We have a similar
 situation with selected checks stored in web and the possibility that a
 selected check is removed)
 
 == Unresolved questions
 
-* consider the difference between customizing checks for a host vs
+Consider the difference between customizing checks for a host vs
 customizing checks for a cluster (host checks execution vs cluster
 checks execution) target_id might not be sufficient, we might need to
-take into account the group id as well
+take into account the group id as well.
