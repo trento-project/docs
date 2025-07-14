@@ -6,5 +6,5 @@ practices, CI workflows, and templates.
 
 * xref:./coding-standards/README.adoc[Coding standards]
 * xref:./adr/README.adoc[Architecture Decision Records (ADR)]
-* xref:./templates[Templates]
-* xref:./guides[Guides]
+* link:https://github.com/trento-project/docs/tree/main/templates[Templates]
+* link:https://github.com/trento-project/docs/tree/main/guides[Guides]
