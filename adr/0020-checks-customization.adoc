@@ -14,11 +14,12 @@ environments may necessitate deviations from these defaults for certain
 checks to accurately reflect their operational reality or specific
 configurations.
 
-Therefore, a mechanism is needed to - allow users to override the
-built-in expected values of specific checks for particular targets -
-have these overrides used during check executions - track changes in the
-activity log - allow to opt-out from customizability for either entire
-checks or specific values within a check
+Therefore, a mechanism is needed to:
+
+* allow users to override the built-in expected values of specific checks for particular targets 
+* have these overrides used during check executions 
+* track changes in the activity log 
+* allow to opt-out from customizability for either entire checks or specific values within a check
 
 === Considered Options
 
@@ -49,11 +50,12 @@ applied during execution is needed in any case.
 
 === Decision
 
-We will introduce the checks customization capabilities to Wanda in
-order to - keep cohesive and consistent responsibility about check
-related actions and data - keep execution process simple and
-straightforward also in a standalone engine usage - allow for simpler
-management of check specifications changes and check additions/removals
+We will introduce the checks customization capabilities to Wanda in order to:
+
+* keep cohesive and consistent responsibility about check
+related actions and data 
+* keep execution process simple and straightforward also in a standalone engine usage 
+* allow for simpler management of check specifications changes and check additions/removals
 
 ==== Checks Customizability
 
@@ -73,17 +75,17 @@ This will be defined in the check specification via the following entry
 
 ==== Operations
 
-Wanda will expose API endpoints to manage custom values for a given
-check and target: - retrieving the selectable checks for a given target.
-This will expose relevant check information in addition to the
-customization status - applying, changing, or resetting custom values
+Wanda will expose API endpoints to manage custom values for a given check and target:
+
+* retrieving the selectable checks for a given target.
+This will expose relevant check information in addition to the customization status
+* applying, changing, or resetting custom values
 for a specific check and target
 
-Notes: - Wanda will need to enforce authorization for customization
-operations by checking abilities embedded within the JWT provided by
-Web, which currently is also the auth server - the catalog endpoint
-remains unchanged. It will not expose the customization status of
-checks, although it will expose the customizability status of the check
+Notes: 
+
+* Wanda will need to enforce authorization for customization operations by checking abilities embedded within the JWT provided by Web, which currently is also the auth server
+* the catalog endpoint remains unchanged. It will not expose the customization status of checks, although it will expose the customizability status of the check
 itself as it’s defined in the specification
 
 ==== Execution
@@ -112,15 +114,10 @@ to support message based activities.
 
 === Consequences
 
-The depicted decision has the following effects: - *Increased
-Flexibility:* users gain the ability to tailor check expectations to
-their specific environment needs, improving the relevance and accuracy
-of compliance results - *Consolidated Logic:* keeping customization
-logic and data within Wanda aligns with its responsibility as the Check
-Engine - *Simpler sync management*: check specifications changes and
-check additions/removals can be responded to in order to keep the
-customization data in sync - *Enhanced Activity Logging*: the activity
-logging subsystem supports cross components actions logging - *Enhanced
-Contracts*: messages will support the ability to carry the information
-about the user performing the operation, allowing for better tracking
-and auditing of actions taken within the system
+The depicted decision has the following effects:
+
+ * *Increased Flexibility:* users gain the ability to tailor check expectations to their specific environment needs, improving the relevance and accuracy of compliance results 
+ * *Consolidated Logic:* keeping customization logic and data within Wanda aligns with its responsibility as the Check Engine 
+ * *Simpler sync management*: check specifications changes and check additions/removals can be responded to in order to keep the customization data in sync 
+ * *Enhanced Activity Logging*: the activity logging subsystem supports cross components actions logging 
+ * *Enhanced Contracts*: messages will support the ability to carry the information about the user performing the operation, allowing for better tracking and auditing of actions taken within the system
