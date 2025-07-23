@@ -1,6 +1,6 @@
 [[checks_customization]]
 
-== Checks Customization
+== Checks Customization with a little typo fix
 
 === Overview of checks Customization
 
