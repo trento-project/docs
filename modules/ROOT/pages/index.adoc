@@ -1,0 +1,6 @@
+= Trento Documentation
+
+
+== What is Trento?
+
+Trento is an open-source web application, built by SUSE, to enhance day-2 operations of SAP workloads. It can be used to proactively prevent infrastructural issues by diagnosing common issues, validate systems configuration against best practices, and remove toil from routine OS tasks on mission-critical systems. 

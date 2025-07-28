@@ -1,0 +1,159 @@
+name: docs
+title: Trento Documentation
+version: ~
+nav:
+- modules/trento_documentation/nav_trento_documentation.adoc
+- modules/developer_guide/nav_developer_guide.adoc
+- modules/api_specification/nav_api_specification.adoc
+
+ext: 
+  collector:
+    ## Remove previous documentation
+    - clean:
+        - dir: trento_docs_site_public
+        - dir: tmp_docs
+    ## Documentation Fetching from diffrent upstream repositories
+    - run:
+        - command: git clone --depth 1 https://github.com/trento-project/docs.git tmp_docs/developer_guide
+        - command: git clone --depth 1 https://github.com/SUSE/doc-unversioned tmp_docs/docs_repo
+        - command: git clone --depth 1 https://github.com/trento-project/web.git tmp_docs/web
+        - command: git clone --depth 1 https://github.com/trento-project/agent tmp_docs/agent
+        - command: git clone --depth 1 https://github.com/trento-project/helm-charts tmp_docs/helm-charts
+        - command: git clone --depth 1 https://github.com/trento-project/ansible tmp_docs/ansible
+        - command: git clone --depth 1 https://github.com/trento-project/checks tmp_docs/checks
+        - command: git clone --depth 1 https://github.com/trento-project/workbench.git tmp_docs/workbench
+        - command: git clone --depth 1 https://github.com/trento-project/contracts tmp_docs/contracts
+        - command: git clone --depth 1 https://github.com/trento-project/tlint.git tmp_docs/tlint
+        - command: git clone --depth 1 https://github.com/trento-project/wanda.git tmp_docs/wanda
+        - command: git clone --depth 1 https://github.com/trento-project/photofinish.git tmp_docs/photofinish
+        - command: git clone --depth 1 https://github.com/trento-project/support.git tmp_docs/support
+        - command: git clone --depth 1 https://github.com/trento-project/continuous-delivery.git tmp_docs/continuous_delivery
+        - command: git clone --depth 1 https://github.com/trento-project/werkzeugkoffer.git tmp_docs/werkzeugkoffer
+        - command: git clone --depth 1 https://github.com/trento-project/mcp-server.git tmp_docs/mcp-server
+
+  # Trento official documentation repo https://github.com/SUSE/doc-unversioned
+    - scan:
+      - dir: tmp_docs/docs_repo/trento/adoc
+        files: '**/*.adoc'
+        into: modules/trento_documentation/pages
+      - dir: tmp_docs/docs_repo/trento/images/src/png
+        files: '**/*.png'
+        into: modules/trento_documentation/images
+    - run:
+        command: ./scripts/generate-attributes-yaml.sh ./tmp_docs/docs_repo/trento/adoc/generic-attributes.adoc ./tmp_docs/docs_repo/antora_tmp/antora.yml
+    - scan:
+        dir: ./tmp_docs/docs_repo/antora_tmp
+        files: 'antora.yml'
+    
+    # Trento upstream projects documentation
+    ## Trento docs repo https://github.com/trento-project/docs
+    - scan:
+      - dir: tmp_docs/developer_guide/
+        files: 'README.adoc'
+        into: modules/developer_guide/pages
+      - dir:  tmp_docs/developer_guide/
+        files: '**/*.adoc'
+        into: modules/developer_guide/pages/
+      - dir: tmp_docs/developer_guide/images/
+        files: '**/*.{png,jpg,jpeg,svg,gif}'
+        into: modules/developer_guide/images/images
+    ## Trento Web
+    - scan:
+      - dir: tmp_docs/web/
+        files: '*.adoc'
+        into: modules/web/pages
+      - dir: tmp_docs/web/guides
+        files: '**/*.adoc'
+        into: modules/web/pages/
+      - dir: tmp_docs/web/guides/
+        files: '**/*.{png,jpg,jpeg,svg,gif}'
+        into: modules/web/images/
+    ## Trento Agent
+    - scan:
+      - dir: tmp_docs/agent/
+        files: '*.adoc'
+        into: modules/agent/pages
+      - dir: tmp_docs/agent/docs
+        files: '**/*.adoc'
+        into: modules/agent/pages
+    ## Trento Helm
+    - scan:
+      - dir: tmp_docs/helm-charts/
+        files: '*.adoc'
+        into: modules/helm-charts/pages
+      - dir: tmp_docs/helm-charts/docs
+        files: '**/*.adoc'
+        into: modules/helm-charts/pages
+    ## Trento Ansible
+    - scan:
+      - dir: tmp_docs/ansible
+        files: '*.adoc'
+        into: modules/ansible/pages
+    ## Trento Checks
+    - scan:
+      - dir: tmp_docs/checks
+        files: '*.adoc'
+        into: modules/checks/pages
+    ## Trento Workbench
+    - scan:
+      - dir: tmp_docs/workbench
+        files: '*.adoc'
+        into: modules/workbench/pages
+      - dir: tmp_docs/workbench
+        files: '**/*.{png,jpg,jpeg,svg,gif}'
+        into: modules/workbench/images
+      ## Trento Contracts
+    - scan:
+      - dir: tmp_docs/contracts
+        files: '*.adoc'
+        into: modules/contracts/pages
+      ## Trento Tlint
+    - scan:
+      - dir: tmp_docs/tlint/
+        files: 'README.adoc'
+        into: modules/tlint/pages
+      - dir: tmp_docs/tlint/www/
+        files: '*.adoc'
+        into: modules/tlint/pages/www/ 
+    ## Trento Wanda
+    - scan:
+      - dir: tmp_docs/wanda/
+        files: '*.adoc'
+        into: modules/wanda/pages
+      - dir: tmp_docs/wanda/guides
+        files: '**/*.adoc'
+        into: modules/wanda/pages/
+      - dir: tmp_docs/wanda/guides/
+        files: '**/*.{png,jpg,jpeg,svg,gif}'
+        into: modules/wanda/images/
+      ## Trento Contracts
+    - scan:
+      - dir: tmp_docs/photofinish
+        files: '*.adoc'
+        into: modules/photofinish/pages
+      ## Trento Support
+    - scan:
+      - dir: tmp_docs/support
+        files: '*.adoc'
+        into: modules/support/pages
+      ## Trento Continuous-delivery        
+    - scan:
+      - dir: tmp_docs/continuous_delivery
+        files: '*.adoc'
+        into: modules/continuous_delivery/pages
+      ## Trento werkzeugkoffer       
+    - scan:
+      - dir: tmp_docs/werkzeugkoffer/
+        files: 'README.adoc'
+        into: modules/werkzeugkoffer/pages
+      - dir: tmp_docs/werkzeugkoffer/demo-idp/
+        files: 'README.adoc'
+        into: modules/werkzeugkoffer/pages/demo_idp/
+## Trento MCP Server https://github.com/trento-project/mcp-server/tree/main
+    - scan:
+      - dir: tmp_docs/mcp-server/
+        files: '*.adoc'
+        into: modules/mcp-server/pages
+      - dir: tmp_docs/mcp-server/docs/
+        files: '**/*.adoc'
+        into: modules/mcp-server/pages/docs

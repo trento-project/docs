@@ -1,1 +1,14 @@
 .elixir_ls
+
+
+# Node.js dependencies
+node_modules/
+trento-antora-ui/node_modules/
+
+# Ignore UI build artifacts
+trento-antora-ui/public/
+
+# Ignore docs output
+trento_docs_site_public/
+tmp_docs/
+node_modules

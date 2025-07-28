@@ -1,0 +1,9 @@
+* API specifiactions
+** OpenApi
+*** https://www.trento-project.io/web/swaggerui/[Web]
+*** https://www.trento-project.io/wanda/swaggerui/[Wanda]
+** Elixir Modules
+*** https://www.trento-project.io/web[Web]
+*** https://www.trento-project.io/wanda[Wanda]
+** Go Modules
+*** https://pkg.go.dev/github.com/trento-project/agent[Agent]
