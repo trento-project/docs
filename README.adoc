@@ -1,21 +1,20 @@
 = Trento docs
 
-This repository contains the Trento project documentation that does not
-interest a specific service, such as ADR, coding standards and best
-practices, CI workflows, and templates.
-
-* xref:./architecture/trento-architecture.adoc[Architecture]
-* xref:./architecture/adr/README.adoc[Architecture Decision Records (ADR)]
-* xref:./coding-standards/README.adoc[Coding standards]
+This repository contains the Trento project documentation that does not interest a specific service, such as ADR, coding standards and best practices, CI workflows, and templates. The xref:./content[*content* directory] is the home of these sources.
+ 
+* xref:./content/architecture/trento-architecture.adoc[Architecture]
+* xref:./content/architecture/adr/README.adoc[Architecture Decision Records (ADR)]
+* xref:./content/coding-standards/README.adoc[Coding standards]
 * link:https://github.com/trento-project/docs/tree/main/rfc[Request for Comments (RFC)]
 * link:https://github.com/trento-project/docs/tree/main/internal_notes[Internal Notes]
 * link:https://github.com/trento-project/docs/tree/main/templates[Templates]
 * link:https://github.com/trento-project/docs/tree/main/guides[Guides]
 
-== Trento Docs-Site
+== Trento docs site
 
-The trento-docs-site directory builds and publishes the link:https://www.trento-project.io/docs/[Trento project’s unified documentation site] using https://antora.org/[Antora].
+The `trento-docs-site` directory builds the link:https://www.trento-project.io/docs/[Trento project’s unified documentation site] using https://antora.org/[Antora]. Learn more about xref:./trento-docs-site/README.adoc[the documentation hub here].
 
-== Trento Docs-Site Ui
 
-The trento-docs-site-ui is used to customize and design the layout of the docs page.
+== Trento docs site ui
+
+The `trento-docs-site-ui` directory is used to customize and design the layout of the link:https://www.trento-project.io/docs/[Trento docs site]. Learn more about the xref:./trento-docs-site-ui/README.adoc[ui customization here].

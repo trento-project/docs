@@ -1,17 +1,18 @@
 site:
   title: Trento Documentation
-  url: https://trento-project.github.io/
-  start_page: ROOT::index.adoc
+  url: https://trento-project.github.io
+  start_page: docs::index.adoc
 
 content:
   sources:
-    - url: .
+    - url: ./../
+      start_path: trento-docs-site
       branches:
         - HEAD
 
 ui:
   bundle:
-    url: ./trento-antora-ui/build/ui-bundle.zip
+    url: ./../trento-docs-site-ui/build/ui-bundle.zip
     snapshot: true
 
 
