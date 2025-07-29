@@ -1,7 +1,7 @@
 name: Publish Trento docs on GitHub Pages
 on:
   push:
-    branches: [main,merge_with_docs_site]
+    branches: [main]
   workflow_dispatch:
 concurrency:
   group: github-pages
@@ -32,7 +32,7 @@ jobs:
     - name: Upload Artifacts
       uses: actions/upload-pages-artifact@v3
       with:
-        path: trento_docs_site_public
+        path: trento-docs-site/trento_docs_site_public
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4

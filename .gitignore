@@ -2,13 +2,12 @@
 
 
 # Node.js dependencies
-node_modules/
-trento-antora-ui/node_modules/
+trento-docs-site/node_modules/
+trento-docs-site-ui/node_modules/
 
 # Ignore UI build artifacts
-trento-antora-ui/public/
+trento-docs-site-ui/public/
 
 # Ignore docs output
-trento_docs_site_public/
-tmp_docs/
-node_modules
+trento-docs-site/trento_docs_site_public/
+trento-docs-site/tmp_docs/

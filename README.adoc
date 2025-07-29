@@ -1,4 +1,4 @@
-== Trento docs
+= Trento docs
 
 This repository contains the Trento project documentation that does not
 interest a specific service, such as ADR, coding standards and best
@@ -11,3 +11,11 @@ practices, CI workflows, and templates.
 * link:https://github.com/trento-project/docs/tree/main/internal_notes[Internal Notes]
 * link:https://github.com/trento-project/docs/tree/main/templates[Templates]
 * link:https://github.com/trento-project/docs/tree/main/guides[Guides]
+
+== Trento Docs-Site
+
+The trento-docs-site directory builds and publishes the link:https://www.trento-project.io/docs/[Trento project’s unified documentation site] using https://antora.org/[Antora].
+
+== Trento Docs-Site Ui
+
+The trento-docs-site-ui is used to customize and design the layout of the docs page.
