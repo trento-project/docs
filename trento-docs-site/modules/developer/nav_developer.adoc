@@ -42,61 +42,61 @@
 *** xref:trento-docs-site-ui/README.adoc[Documentation Page UI]
 
 ** Components
-*** xref:docs:agent:README.adoc[Trento Agent]
-**** xref:docs:agent:ci-cd-variables.adoc[CI-CD-Variables]
-**** xref:docs:agent:development/how-to-make-a-release.adoc[How to make a release]
+*** xref:ROOT:agent:README.adoc[Trento Agent]
+**** xref:ROOT:agent:ci-cd-variables.adoc[CI-CD-Variables]
+**** xref:ROOT:agent:development/how-to-make-a-release.adoc[How to make a release]
 
-*** xref:docs:ansible:README.adoc[Trento Ansible]
+*** xref:ROOT:ansible:README.adoc[Trento Ansible]
 
-*** xref:docs:checks:README.adoc[Trento Checks]
+*** xref:ROOT:checks:README.adoc[Trento Checks]
 
-*** xref:docs:helm-charts:README.adoc[Trento Helm Charts]
-**** xref:docs:helm-charts:cert-manager/cert-manager.adoc[Cert Manager]
-**** xref:docs:helm-charts:rabbitmq-tls/rabbitmq-tls.adoc[RabbitMQ TLS]
-**** xref:docs:helm-charts:trento-server/trento-server.adoc[Trento Server]
+*** xref:ROOT:helm-charts:README.adoc[Trento Helm Charts]
+**** xref:ROOT:helm-charts:cert-manager/cert-manager.adoc[Cert Manager]
+**** xref:ROOT:helm-charts:rabbitmq-tls/rabbitmq-tls.adoc[RabbitMQ TLS]
+**** xref:ROOT:helm-charts:trento-server/trento-server.adoc[Trento Server]
 
-*** xref:docs:web:README.adoc[Trento Web]
-**** xref:docs:web:monitoring/monitoring.adoc[Monitoring]
-**** xref:docs:web:alerting/alerting.adoc[Alerting]
+*** xref:ROOT:web:README.adoc[Trento Web]
+**** xref:ROOT:web:monitoring/monitoring.adoc[Monitoring]
+**** xref:ROOT:web:alerting/alerting.adoc[Alerting]
 **** Authentication
-***** xref:docs:web:authentication/jwt_specification.adoc[JWT Specification]
-***** xref:docs:web:authentication/spa_flow.adoc[SPA Authentication Flow]
+***** xref:ROOT:web:authentication/jwt_specification.adoc[JWT Specification]
+***** xref:ROOT:web:authentication/spa_flow.adoc[SPA Authentication Flow]
 **** Integration
-***** xref:docs:web:integration/oidc.adoc[OIDC Integration]
+***** xref:ROOT:web:integration/oidc.adoc[OIDC Integration]
 **** Development
-***** xref:docs:web:development/environment_variables.adoc[Environment Variables]
-***** xref:docs:web:development/hack_on_the_trento.adoc[Hack on the Trento Web]
+***** xref:ROOT:web:development/environment_variables.adoc[Environment Variables]
+***** xref:ROOT:web:development/hack_on_the_trento.adoc[Hack on the Trento Web]
 
-*** xref:docs:wanda:README.adoc[Trento Wanda]
+*** xref:ROOT:wanda:README.adoc[Trento Wanda]
 **** Checks development
-***** xref:docs:wanda:specification.adoc[Checks Specification]
-***** xref:docs:wanda:expression_language.adoc[Expression Language]
-***** xref:docs:wanda:gatherers.adoc[Gatherers]
+***** xref:ROOT:wanda:specification.adoc[Checks Specification]
+***** xref:ROOT:wanda:expression_language.adoc[Expression Language]
+***** xref:ROOT:wanda:gatherers.adoc[Gatherers]
 **** Hack on Wanda
-***** xref:docs:wanda:development/demo.adoc[Demo environment]
-***** xref:docs:wanda:development/hack_on_wanda.adoc[Development Setup]
-**** xref:docs:wanda:rhai_expressions_cheat_sheet.cheat.adoc[Rhai Expressions Cheat Sheet]
+***** xref:ROOT:wanda:development/demo.adoc[Demo environment]
+***** xref:ROOT:wanda:development/hack_on_wanda.adoc[Development Setup]
+**** xref:ROOT:wanda:rhai_expressions_cheat_sheet.cheat.adoc[Rhai Expressions Cheat Sheet]
 
-*** xref:docs:workbench:README.adoc[Trento Workbench]
+*** xref:ROOT:workbench:README.adoc[Trento Workbench]
 
-*** xref:docs:contracts:README.adoc[Trento Contracts]
+*** xref:ROOT:contracts:README.adoc[Trento Contracts]
 
-*** xref:docs:tlint:README.adoc[Trento TLint]
-**** xref:docs:tlint:www/README.adoc[Trento TLint web]
+*** xref:ROOT:tlint:README.adoc[Trento TLint]
+**** xref:ROOT:tlint:www/README.adoc[Trento TLint web]
 
-*** xref:docs:photofinish:README.adoc[Trento Photofinish]
+*** xref:ROOT:photofinish:README.adoc[Trento Photofinish]
 
-*** xref:docs:support:README.adoc[Trento Support Utilities]
+*** xref:ROOT:support:README.adoc[Trento Support Utilities]
 
-*** xref:docs:continuous_delivery:README.adoc[Trento Continuous delivery]
+*** xref:ROOT:continuous_delivery:README.adoc[Trento Continuous delivery]
 
-*** xref:docs:werkzeugkoffer:README.adoc[Trento Werkzeugkoffer]
-**** xref:docs:werkzeugkoffer:demo_idp/README.adoc[Demo IDP Playbook]
+*** xref:ROOT:werkzeugkoffer:README.adoc[Trento Werkzeugkoffer]
+**** xref:ROOT:werkzeugkoffer:demo_idp/README.adoc[Demo IDP Playbook]
 
-*** xref:docs:mcp-server:README.adoc[Trento MCP Server]
-**** xref:docs:mcp-server:docs/README.adoc[Trento MCP Server documentation]
-***** xref:docs:mcp-server:docs/integration-suse-ai.adoc[SUSE AI integration]
-***** xref:docs:mcp-server:docs/integration-vscode.adoc[VS Code integration]
-***** xref:docs:mcp-server:docs/configuration-options.adoc[Configuration options]
-**** xref:docs:mcp-server:docs/developer/README.adoc[Trento MCP Server developer documentation]
-***** xref:docs:mcp-server:docs/developer/getting-started.adoc[Getting started with Trento MCP Server]
+*** xref:ROOT:mcp-server:README.adoc[Trento MCP Server]
+**** xref:ROOT:mcp-server:docs/README.adoc[Trento MCP Server documentation]
+***** xref:ROOT:mcp-server:docs/integration-suse-ai.adoc[SUSE AI integration]
+***** xref:ROOT:mcp-server:docs/integration-vscode.adoc[VS Code integration]
+***** xref:ROOT:mcp-server:docs/configuration-options.adoc[Configuration options]
+**** xref:ROOT:mcp-server:docs/developer/README.adoc[Trento MCP Server developer documentation]
+***** xref:ROOT:mcp-server:docs/developer/getting-started.adoc[Getting started with Trento MCP Server]

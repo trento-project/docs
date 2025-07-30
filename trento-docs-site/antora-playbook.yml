@@ -1,7 +1,7 @@
 site:
   title: Trento Documentation
-  url: https://trento-project.github.io
-  start_page: docs::index.adoc
+  url: https://trento-project.github.io/docs
+  start_page: ROOT::index.adoc
 
 content:
   sources:
