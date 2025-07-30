@@ -1,0 +1,49 @@
+<!-- History -->
+<revhistory xml:id="rh-article-trento">
+  <revision><date>2025-06-05</date>
+    <revdescription>
+      <para>
+        Initial version
+      </para>
+    </revdescription>
+  </revision>
+</revhistory>
+<!-- Series -->
+<meta name="series" its:translate="no"
+xmlns:its="http://www.w3.org/2005/11/its">Products &amp; Solutions</meta>
+<!-- Task -->
+<meta name="task" its:translate="no" xmlns:its="http://www.w3.org/2005/11/its"
+><phrase>Compliance</phrase><phrase>High Availability</phrase><phrase>Monitoring</phrase>
+</meta>
+<!-- Docmanager -->
+<dm:docmanager xmlns:dm="urn:x-suse:ns:docmanager">
+  <dm:bugtracker>
+    <dm:url>https://bugzilla.suse.com/enter_bug.cgi</dm:url>
+    <dm:component>Trento</dm:component>
+    <dm:product>Documentation</dm:product>
+    <dm:assignee>dpopov@suse.com</dm:assignee>
+  </dm:bugtracker>
+  <!-- <dm:editurl>https://github.com/SUSE/doc-unversioned/edit/main/trento/adoc/</dm:editurl> -->
+  <dm:translation>no</dm:translation>
+</dm:docmanager>
+<!-- Productname & Version -->
+<!--
+<meta name="productname" its:translate="no">
+<productname version="trento">&sles4sap;</productname>
+</meta>
+-->
+<!-- Social Media -->
+<meta name="title" its:translate="yes"
+      xmlns:its="http://www.w3.org/2005/11/its">Getting Started with {trento}</meta>
+<meta name="social-descr" its:translate="yes"
+      xmlns:its="http://www.w3.org/2005/11/its">Use {trento} for {sles4sapa}</meta>
+<!-- Search -->
+<meta name="description" its:translate="yes"
+      xmlns:its="http://www.w3.org/2005/11/its">How to use {trento} for {sles4sap}</meta>
+<abstract>
+  <para>
+    {trento} is an open cloud native Web console that aims to help {sap} Basis consultants and
+    administrators to check the configuration, monitor and manage the entire OS stack of their
+    {sap} environments, including HA features.
+  </para>
+</abstract>
