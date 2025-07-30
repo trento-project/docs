@@ -34,7 +34,7 @@ jobs:
     - name: Upload Artifacts
       uses: actions/upload-pages-artifact@v3
       with:
-        path: trento-docs-site/trento_docs_site_public
+        path: trento-docs-site/trento-docs-site-public
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4

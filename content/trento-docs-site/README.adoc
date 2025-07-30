@@ -1,4 +1,4 @@
-= Trento Docs-Site
+= Trento Documentation Page
 
 This directory builds and publishes the link:https://www.trento-project.io/docs/[Trento project’s unified documentation site] using https://antora.org/[Antora].
 
@@ -47,7 +47,7 @@ npm i -D -E antora
 npx antora antora-playbook.yml
 ----
 
-This will generate the site into the trento_docs_site_public/ folder.
+This will generate the site into the trento-docs-site-public/ folder.
 
 === 4. Preview Locally
 
@@ -55,7 +55,7 @@ To preview the generated site in your browser, start a local static web server:
 
 [source,bash]
 ----
-npx http-server trento_docs_site_public/ -c-1 -p 3000
+npx http-server trento-docs-site-public/ -c-1 -p 3000
 ----
 
 - `-c-1`: Disables caching

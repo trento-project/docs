@@ -17,7 +17,7 @@ ui:
 
 
 output:
-  dir: ./trento_docs_site_public
+  dir: ./trento-docs-site-public
 
 antora:
   extensions:

@@ -3,14 +3,14 @@ title: Trento Documentation
 version: ~
 nav:
 - modules/trento_documentation/nav_trento_documentation.adoc
-- modules/developer_guide/nav_developer_guide.adoc
+- modules/developer/nav_developer.adoc
 - modules/api_specification/nav_api_specification.adoc
 
 ext:
   collector:
     ## Remove previous documentation
     - clean:
-        - dir: trento-docs-site/trento_docs_site_public
+        - dir: trento-docs-site/trento-docs-site-public
         - dir: trento-docs-site/tmp_docs
     ## Fetch documentation from diffrent upstream repositories
     - run:
@@ -48,19 +48,13 @@ ext:
     - scan:
       - dir: ./../
         files: 'README.adoc'
-        into: modules/developer_guide/pages
+        into: modules/developer/pages
       - dir:  content/
         files: '**/*.adoc'
-        into: modules/developer_guide/pages/
+        into: modules/developer/pages/
       - dir: content/images/
         files: '**/*.{png,jpg,jpeg,svg,gif}'
-        into: modules/developer_guide/images/images
-      - dir: trento-docs-site
-        files: 'README.adoc'
-        into: modules/developer_guide/pages/trento-docs-site
-      - dir: trento-docs-site-ui
-        files: 'README.adoc'
-        into: modules/developer_guide/pages/trento-docs-site-ui
+        into: modules/developer/images/images
     ## Trento Web https://github.com/trento-project/web
     - scan:
       - dir: trento-docs-site/tmp_docs/web/
