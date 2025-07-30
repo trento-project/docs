@@ -2,9 +2,9 @@ name: ROOT
 title: Trento Documentation
 version: ~
 nav:
-- modules/trento_documentation/nav_trento_documentation.adoc
+- modules/user-guide/nav_user_guide.adoc
 - modules/developer/nav_developer.adoc
-- modules/api_specification/nav_api_specification.adoc
+- modules/api-specification/nav_api_specification.adoc
 
 ext:
   collector:
@@ -14,7 +14,7 @@ ext:
         - dir: trento-docs-site/tmp_docs
     ## Fetch documentation from diffrent upstream repositories
     - run:
-        - command: git clone --depth 1 https://github.com/SUSE/doc-unversioned trento-docs-site/tmp_docs/docs_repo
+        - command: git clone --depth 1 https://github.com/SUSE/doc-unversioned trento-docs-site/tmp_docs/user-guide
         - command: git clone --depth 1 https://github.com/trento-project/web.git trento-docs-site/tmp_docs/web
         - command: git clone --depth 1 https://github.com/trento-project/agent trento-docs-site/tmp_docs/agent
         - command: git clone --depth 1 https://github.com/trento-project/helm-charts trento-docs-site/tmp_docs/helm-charts
@@ -26,22 +26,22 @@ ext:
         - command: git clone --depth 1 https://github.com/trento-project/wanda.git trento-docs-site/tmp_docs/wanda
         - command: git clone --depth 1 https://github.com/trento-project/photofinish.git trento-docs-site/tmp_docs/photofinish
         - command: git clone --depth 1 https://github.com/trento-project/support.git trento-docs-site/tmp_docs/support
-        - command: git clone --depth 1 https://github.com/trento-project/continuous-delivery.git trento-docs-site/tmp_docs/continuous_delivery
+        - command: git clone --depth 1 https://github.com/trento-project/continuous-delivery.git trento-docs-site/tmp_docs/continuous-delivery
         - command: git clone --depth 1 https://github.com/trento-project/werkzeugkoffer.git trento-docs-site/tmp_docs/werkzeugkoffer
         - command: git clone --depth 1 https://github.com/trento-project/mcp-server.git trento-docs-site/tmp_docs/mcp-server
 
     # Trento official documentation repo https://github.com/SUSE/doc-unversioned
     - scan:
-      - dir: trento-docs-site/tmp_docs/docs_repo/trento/adoc
+      - dir: trento-docs-site/tmp_docs/user-guide/trento/adoc
         files: '**/*.adoc'
-        into: modules/trento_documentation/pages
-      - dir: trento-docs-site/tmp_docs/docs_repo/trento/images/src/png
+        into: modules/user-guide/pages
+      - dir: trento-docs-site/tmp_docs/user-guide/trento/images/src/png
         files: '**/*.png'
-        into: modules/trento_documentation/images
+        into: modules/user-guide/images
     - run:
-        command: trento-docs-site/scripts/generate-attributes-yaml.sh ./trento-docs-site/tmp_docs/docs_repo/trento/adoc/generic-attributes.adoc ./trento-docs-site/tmp_docs/docs_repo/antora_tmp/antora.yml
+        command: trento-docs-site/scripts/generate-attributes-yaml.sh ./trento-docs-site/tmp_docs/user-guide/trento/adoc/generic-attributes.adoc ./trento-docs-site/tmp_docs/user-guide/antora_tmp/antora.yml
     - scan:
-        dir: trento-docs-site/tmp_docs/docs_repo/antora_tmp
+        dir: trento-docs-site/tmp_docs/user-guide/antora_tmp
         files: 'antora.yml'
     # Trento upstream projects documentation
     ## Trento docs repo https://github.com/trento-project/docs
@@ -136,9 +136,9 @@ ext:
         into: modules/support/pages
     ## Trento Continuous-delivery https://github.com/trento-project/continuous-delivery  
     - scan:
-      - dir: trento-docs-site/tmp_docs/continuous_delivery
+      - dir: trento-docs-site/tmp_docs/continuous-delivery
         files: '*.adoc'
-        into: modules/continuous_delivery/pages
+        into: modules/continuous-delivery/pages
     ## Trento werkzeugkoffer https://github.com/trento-project/werkzeugkoffer
     - scan:
       - dir: trento-docs-site/tmp_docs/werkzeugkoffer/
