@@ -1,10 +1,11 @@
 = Trento docs
+ifndef::site-gen-antora[:relfileprefix: /content/]
 
-This repository contains the Trento project documentation that does not interest a specific service, such as ADR, coding standards and best practices, CI workflows, and templates. The xref:./content[*content* directory] is the home of these sources.
+This repository contains the Trento project documentation that does not interest a specific service, such as ADR, coding standards and best practices, CI workflows, and templates. The xref:.[*content* directory] is the home of these sources.
  
-* xref:./content/architecture/trento-architecture.adoc[Architecture]
-* xref:./content/architecture/adr/README.adoc[Architecture Decision Records (ADR)]
-* xref:./content/coding-standards/README.adoc[Coding standards]
+* xref:architecture/trento-architecture.adoc[Architecture]
+* xref:architecture/adr/README.adoc[Architecture Decision Records (ADR)]
+* xref:coding-standards/README.adoc[Coding standards]
 * link:https://github.com/trento-project/docs/tree/main/rfc[Request for Comments (RFC)]
 * link:https://github.com/trento-project/docs/tree/main/internal_notes[Internal Notes]
 * link:https://github.com/trento-project/docs/tree/main/templates[Templates]

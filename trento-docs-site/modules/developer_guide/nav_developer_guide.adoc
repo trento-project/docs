@@ -37,8 +37,11 @@
 *** xref:internal_notes/release.adoc[Release Process]
 *** xref:internal_notes/test-manual-installation-with-agents.adoc[Test Manual Installation with Agents]
 
-** Components
+** Trento Documentation Page
+*** xref:trento-docs-site/README.adoc[Documentation Page]
+*** xref:trento-docs-site-ui/README.adoc[Documentation Page UI]
 
+** Components
 *** xref:docs:agent:README.adoc[Trento Agent]
 **** xref:docs:agent:ci-cd-variables.adoc[CI-CD-Variables]
 **** xref:docs:agent:development/how-to-make-a-release.adoc[How to make a release]

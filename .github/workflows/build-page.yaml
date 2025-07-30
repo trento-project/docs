@@ -1,4 +1,4 @@
-name: Publish Trento docs on GitHub Pages
+name: Publish Trento documentation on GitHub Pages
 on:
   push:
     branches: [main]

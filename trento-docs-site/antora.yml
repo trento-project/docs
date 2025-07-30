@@ -6,13 +6,13 @@ nav:
 - modules/developer_guide/nav_developer_guide.adoc
 - modules/api_specification/nav_api_specification.adoc
 
-ext: 
+ext:
   collector:
     ## Remove previous documentation
     - clean:
         - dir: trento-docs-site/trento_docs_site_public
         - dir: trento-docs-site/tmp_docs
-    ## Documentation Fetching from diffrent upstream repositories
+    ## Fetch documentation from diffrent upstream repositories
     - run:
         - command: git clone --depth 1 https://github.com/SUSE/doc-unversioned trento-docs-site/tmp_docs/docs_repo
         - command: git clone --depth 1 https://github.com/trento-project/web.git trento-docs-site/tmp_docs/web
@@ -30,7 +30,7 @@ ext:
         - command: git clone --depth 1 https://github.com/trento-project/werkzeugkoffer.git trento-docs-site/tmp_docs/werkzeugkoffer
         - command: git clone --depth 1 https://github.com/trento-project/mcp-server.git trento-docs-site/tmp_docs/mcp-server
 
-  # Trento official documentation repo https://github.com/SUSE/doc-unversioned
+    # Trento official documentation repo https://github.com/SUSE/doc-unversioned
     - scan:
       - dir: trento-docs-site/tmp_docs/docs_repo/trento/adoc
         files: '**/*.adoc'
@@ -43,11 +43,10 @@ ext:
     - scan:
         dir: trento-docs-site/tmp_docs/docs_repo/antora_tmp
         files: 'antora.yml'
-    
     # Trento upstream projects documentation
     ## Trento docs repo https://github.com/trento-project/docs
     - scan:
-      - dir: ./
+      - dir: ./../
         files: 'README.adoc'
         into: modules/developer_guide/pages
       - dir:  content/
@@ -56,7 +55,13 @@ ext:
       - dir: content/images/
         files: '**/*.{png,jpg,jpeg,svg,gif}'
         into: modules/developer_guide/images/images
-    ## Trento Web
+      - dir: trento-docs-site
+        files: 'README.adoc'
+        into: modules/developer_guide/pages/trento-docs-site
+      - dir: trento-docs-site-ui
+        files: 'README.adoc'
+        into: modules/developer_guide/pages/trento-docs-site-ui
+    ## Trento Web https://github.com/trento-project/web
     - scan:
       - dir: trento-docs-site/tmp_docs/web/
         files: '*.adoc'
@@ -67,7 +72,7 @@ ext:
       - dir: trento-docs-site/tmp_docs/web/guides/
         files: '**/*.{png,jpg,jpeg,svg,gif}'
         into: modules/web/images/
-    ## Trento Agent
+    ## Trento Agent https://github.com/trento-project/agent
     - scan:
       - dir: trento-docs-site/tmp_docs/agent/
         files: '*.adoc'
@@ -75,7 +80,7 @@ ext:
       - dir: trento-docs-site/tmp_docs/agent/docs
         files: '**/*.adoc'
         into: modules/agent/pages
-    ## Trento Helm
+    ## Trento Helm https://github.com/trento-project/helm-charts
     - scan:
       - dir: trento-docs-site/tmp_docs/helm-charts/
         files: '*.adoc'
@@ -83,17 +88,17 @@ ext:
       - dir: trento-docs-site/tmp_docs/helm-charts/docs
         files: '**/*.adoc'
         into: modules/helm-charts/pages
-    ## Trento Ansible
+    ## Trento Ansible https://github.com/trento-project/ansible
     - scan:
       - dir: trento-docs-site/tmp_docs/ansible
         files: '*.adoc'
         into: modules/ansible/pages
-    ## Trento Checks
+    ## Trento Checks https://github.com/trento-project/checks
     - scan:
       - dir: trento-docs-site/tmp_docs/checks
         files: '*.adoc'
         into: modules/checks/pages
-    ## Trento Workbench
+    ## Trento Workbench https://github.com/trento-project/workbench
     - scan:
       - dir: trento-docs-site/tmp_docs/workbench
         files: '*.adoc'
@@ -101,12 +106,12 @@ ext:
       - dir: trento-docs-site/tmp_docs/workbench
         files: '**/*.{png,jpg,jpeg,svg,gif}'
         into: modules/workbench/images
-      ## Trento Contracts
+    ## Trento Contracts https://github.com/trento-project/contracts
     - scan:
       - dir: trento-docs-site/tmp_docs/contracts
         files: '*.adoc'
         into: modules/contracts/pages
-      ## Trento Tlint
+    ## Trento Tlint https://github.com/trento-project/tlint
     - scan:
       - dir: trento-docs-site/tmp_docs/tlint/
         files: 'README.adoc'
@@ -114,7 +119,7 @@ ext:
       - dir: trento-docs-site/tmp_docs/tlint/www/
         files: '*.adoc'
         into: modules/tlint/pages/www/ 
-    ## Trento Wanda
+    ## Trento Wanda https://github.com/trento-project/wanda
     - scan:
       - dir: trento-docs-site/tmp_docs/wanda/
         files: '*.adoc'
@@ -125,22 +130,22 @@ ext:
       - dir: trento-docs-site/tmp_docs/wanda/guides/
         files: '**/*.{png,jpg,jpeg,svg,gif}'
         into: modules/wanda/images/
-      ## Trento Contracts
+    ## Trento Photofinish https://github.com/trento-project/photofinish
     - scan:
       - dir: trento-docs-site/tmp_docs/photofinish
         files: '*.adoc'
         into: modules/photofinish/pages
-      ## Trento Support
+    ## Trento Support https://github.com/trento-project/support
     - scan:
       - dir: trento-docs-site/tmp_docs/support
         files: '*.adoc'
         into: modules/support/pages
-      ## Trento Continuous-delivery        
+    ## Trento Continuous-delivery https://github.com/trento-project/continuous-delivery  
     - scan:
       - dir: trento-docs-site/tmp_docs/continuous_delivery
         files: '*.adoc'
         into: modules/continuous_delivery/pages
-      ## Trento werkzeugkoffer       
+    ## Trento werkzeugkoffer https://github.com/trento-project/werkzeugkoffer
     - scan:
       - dir: trento-docs-site/tmp_docs/werkzeugkoffer/
         files: 'README.adoc'
@@ -148,7 +153,7 @@ ext:
       - dir: trento-docs-site/tmp_docs/werkzeugkoffer/demo-idp/
         files: 'README.adoc'
         into: modules/werkzeugkoffer/pages/demo_idp/
-## Trento MCP Server https://github.com/trento-project/mcp-server/tree/main
+    ## Trento MCP Server https://github.com/trento-project/mcp-server/
     - scan:
       - dir: trento-docs-site/tmp_docs/mcp-server/
         files: '*.adoc'

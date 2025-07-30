@@ -28,3 +28,4 @@ antora:
 asciidoc:
   attributes:
     page-pagination: ''
+    site-gen-antora: ''
