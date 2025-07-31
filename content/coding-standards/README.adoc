@@ -1,4 +1,4 @@
-== Coding standards and best practices
+== Coding standards
 
 === Pull requests
 

@@ -1,4 +1,4 @@
-= Trento Documentation UI
+= Documentation Page UI
 
 This project is a customized UI bundle for Antora, based on the https://gitlab.com/antora/antora-ui-default[Antora default UI]. It provides the branding and layout for the Trento documentation site.
 Checkout the whole documentation at link:https://docs.antora.org/antora-ui-default/[Antora Default UI Documentation].

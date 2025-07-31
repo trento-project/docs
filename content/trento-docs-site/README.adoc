@@ -1,4 +1,4 @@
-= Trento Documentation Page
+= Documentation Page
 
 This directory builds and publishes the link:https://www.trento-project.io/docs/[Trento project’s unified documentation site] using https://antora.org/[Antora].
 

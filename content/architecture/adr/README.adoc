@@ -1,4 +1,4 @@
-== ADR
+== Architectural Decision Record
 
 Trento’s ADR repository contains the Architecture Decision Records (ADR)
 for the project. Please refer to the ADR GitHub page and this article

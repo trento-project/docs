@@ -1,4 +1,4 @@
-== Testing the setup
+== Test Manual Installation with Agents
 
 To test the
 https://github.com/trento-project/docs/blob/main/guides/manual-installation.adoc[manual
