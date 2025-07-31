@@ -1,0 +1,102 @@
+// Trento docs https://github.com/trento-project/docs
+* xref:README.adoc[Developer Documentation]
+
+** xref:architecture/trento-architecture.adoc[Trento Architecture]
+*** xref:architecture/adr/README.adoc[Architectural Decision Record]
+**** xref:architecture/adr/0001-record-architecture-decisions.adoc[1. Record architecture decisions]
+**** xref:architecture/adr/0002-build-a-dsl-to-declare-checks.adoc[2. Build a DSL to declare checks]
+**** xref:architecture/adr/0003-build-a-check-execution-orchestrator.adoc[3. Build a check execution orchestrator]
+**** xref:architecture/adr/0004-add-facts-gathering-capabilities-to-the-agent.adoc[4. Add facts-gathering capabilities to the agent]
+**** xref:architecture/adr/0005-use-protobuf-to-define-and-generate-contracts.adoc[5. Use Protocol Buffers to define and generate contracts]
+**** xref:architecture/adr/0006-use-cloudevents-to-describe-event-data.adoc[6. Use CloudEvents to describe event data]
+**** xref:architecture/adr/0007-use-jwt-tokens-as-authentication-mechanism.adoc[7. Use JWT tokens as authentication mechanism]
+**** xref:architecture/adr/0008-rest-api-versioning-strategy.adoc[8. Rest API versioning strategy]
+**** xref:architecture/adr/0009-frontend-directory-structure-and-architecture.adoc[9. Frontend directory structure and architecture]
+**** xref:architecture/adr/0010-web-dashboard-directory-structure-and-contexts.adoc[10. Web repository directory structure and contexts]
+**** xref:architecture/adr/0011-sap-system-database-aggregate-split.adoc[11. SAP system and database aggregate split]
+**** xref:architecture/adr/0012-reactiveness.adoc[12. Reactiveness]
+**** xref:architecture/adr/0013-suma-integration.adoc[13. Tracking Software updates discovery results]
+**** xref:architecture/adr/0014-decoupling-of-trento-checks-from-wanda.adoc[14. Decoupling of Trento checks from Wanda]
+**** xref:architecture/adr/0015-activity-logging.adoc[15. Activity Logging]
+**** xref:architecture/adr/0016-discarded-discovery-events.adoc[16. Discarded Discovery Events]
+**** xref:architecture/adr/0017-agent-operations-framework.adoc[17. Agent Operations Framework]
+**** xref:architecture/adr/0018-agent-operations-orchestration.adoc[18. Agent operations orchestration]
+**** xref:architecture/adr/0019-e2e-testing-practices.adoc[19. E2E Testing Practices & Page Object Implementation]
+**** xref:architecture/adr/0020-checks-customization.adoc[20. Checks Customization]
+
+**  xref:coding-standards/README.adoc[Coding standards]
+*** xref:coding-standards/elixir.adoc[Elixir coding standards]
+*** xref:coding-standards/go.adoc[Golang coding standards]
+*** xref:coding-standards/javascript.adoc[JavaScript coding standards]
+
+** RFC
+*** xref:rfc/0001-checks-customization.adoc[1. Check Customization]
+
+** Internal Notes
+*** xref:internal-notes/pr-env-ssl-certificate-setup.adoc[SSL Certificate creation and setup Guide for Pull Request Environments]
+*** xref:internal-notes/release.adoc[Release Process]
+*** xref:internal-notes/test-manual-installation-with-agents.adoc[Test Manual Installation with Agents]
+
+** Trento Documentation Page
+*** xref:trento-docs-site/README.adoc[Documentation Page]
+*** xref:trento-docs-site-ui/README.adoc[Documentation Page UI]
+
+** Components
+*** xref:ROOT:agent:README.adoc[Trento Agent]
+**** xref:ROOT:agent:ci-cd-variables.adoc[CI/CD Variables expected by Trento GH Action Runner]
+**** xref:ROOT:agent:development/how-to-make-a-release.adoc[How to release a new version of Trento Agent]
+
+*** xref:ROOT:ansible:README.adoc[Trento Ansible]
+
+*** xref:ROOT:checks:README.adoc[Trento Checks]
+
+*** xref:ROOT:helm-charts:README.adoc[Trento Helm Charts]
+**** xref:ROOT:helm-charts:cert-manager/cert-manager.adoc[Adding cert-manager for HTTPS]
+**** xref:ROOT:helm-charts:rabbitmq-tls/rabbitmq-tls.adoc[Generate TLS certificates for RabbitMQ]
+**** xref:ROOT:helm-charts:trento-server/trento-server.adoc[Trento Server Helm Chart]
+
+*** xref:ROOT:web:README.adoc[Trento Web]
+**** xref:ROOT:web:monitoring/monitoring.adoc[Monitoring]
+**** xref:ROOT:web:alerting/alerting.adoc[Alerting]
+**** Authentication
+***** xref:ROOT:web:authentication/jwt_specification.adoc[JWT]
+***** xref:ROOT:web:authentication/spa_flow.adoc[Trento Single Page Application]
+**** Integration
+***** xref:ROOT:web:integration/oidc.adoc[OpenID Connect]
+**** Development
+***** xref:ROOT:web:development/environment_variables.adoc[Environment Variables]
+***** xref:ROOT:web:development/hack_on_the_trento.adoc[Hack on the Trento Web]
+
+*** xref:ROOT:wanda:README.adoc[Trento Wanda]
+**** Checks development
+***** xref:ROOT:wanda:specification.adoc[Checks Specification]
+***** xref:ROOT:wanda:expression_language.adoc[Expression Language]
+***** xref:ROOT:wanda:gatherers.adoc[Gatherers]
+**** Hack on Wanda
+***** xref:ROOT:wanda:development/demo.adoc[Wanda Demo]
+***** xref:ROOT:wanda:development/hack_on_wanda.adoc[Hack on Wanda]
+**** xref:ROOT:wanda:rhai_expressions_cheat_sheet.cheat.adoc[Rhai expressions cheatsheet]
+
+*** xref:ROOT:workbench:README.adoc[Workbench - Trento Agent Operators]
+
+*** xref:ROOT:contracts:README.adoc[Trento Contracts]
+
+*** xref:ROOT:tlint:README.adoc[TLint]
+**** xref:ROOT:tlint:www/README.adoc[TLint web]
+
+*** xref:ROOT:photofinish:README.adoc[Trento Photofinish]
+
+*** xref:ROOT:support:README.adoc[Trento Support Utilities]
+
+*** xref:ROOT:continuous-delivery:README.adoc[Continuous delivery project]
+
+*** xref:ROOT:werkzeugkoffer:README.adoc[werkzeugkoffer - Trento infrastructure & development tools]
+**** xref:ROOT:werkzeugkoffer:demo_idp/README.adoc[demo-idp Playbook - Provision a Keycloak IDP]
+
+*** xref:ROOT:mcp-server:README.adoc[Trento MCP Server]
+**** xref:ROOT:mcp-server:docs/README.adoc[Trento MCP Server documentation]
+***** xref:ROOT:mcp-server:docs/integration-suse-ai.adoc[SUSE AI integration]
+***** xref:ROOT:mcp-server:docs/integration-vscode.adoc[VS Code integration]
+***** xref:ROOT:mcp-server:docs/configuration-options.adoc[Configuration options]
+**** xref:ROOT:mcp-server:docs/developer/README.adoc[Trento MCP Server developer documentation]
+***** xref:ROOT:mcp-server:docs/developer/getting-started.adoc[Getting started with Trento MCP Server]

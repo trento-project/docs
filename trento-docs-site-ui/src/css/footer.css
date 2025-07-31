@@ -1,0 +1,28 @@
+footer.footer {
+  background-color: var(--footer-background);
+  color: var(--footer-font-color);
+  font-size: calc(15 / var(--rem-base) * 1rem);
+  line-height: var(--footer-line-height);
+  padding: 1.5rem;
+}
+
+footer.footer.hidden-footer {
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.footer p {
+  margin: 0.5rem 0;
+}
+
+.footer a {
+  color: var(--footer-link-font-color);
+}

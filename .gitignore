@@ -1,1 +1,13 @@
 .elixir_ls
+
+
+# Node.js dependencies
+trento-docs-site/node_modules/
+trento-docs-site-ui/node_modules/
+
+# Ignore UI build artifacts
+trento-docs-site-ui/public/
+
+# Ignore docs output
+trento-docs-site/trento-docs-site-public/
+trento-docs-site/tmp_docs/

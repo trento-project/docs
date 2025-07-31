@@ -1,0 +1,31 @@
+site:
+  title: Trento Documentation
+  url: https://trento-project.github.io/docs
+  start_page: ROOT::index.adoc
+
+content:
+  sources:
+    - url: ./../
+      start_path: trento-docs-site
+      branches:
+        - HEAD
+
+ui:
+  bundle:
+    url: ./../trento-docs-site-ui/build/ui-bundle.zip
+    snapshot: true
+
+
+output:
+  dir: ./trento-docs-site-public
+
+antora:
+  extensions:
+  - '@antora/collector-extension'
+  - require: '@antora/lunr-extension'
+    index_latest_only: true
+
+asciidoc:
+  attributes:
+    page-pagination: ''
+    site-gen-antora: ''

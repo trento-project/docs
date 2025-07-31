@@ -1,0 +1,64 @@
+= Documentation Page
+
+This directory builds and publishes the link:https://www.trento-project.io/docs/[Trento project’s unified documentation site] using https://antora.org/[Antora].
+
+The actual documentation content is maintained in separate upstream repositories:
+
+== Included Repositories
+
+* https://github.com/trento-project/docs[docs]
+* https://github.com/SUSE/doc-unversioned[doc-unversioned]
+* https://github.com/trento-project/web[web]
+* https://github.com/trento-project/agent[agent]
+* https://github.com/trento-project/helm-charts[helm-charts]
+* https://github.com/trento-project/ansible[ansible]
+* https://github.com/trento-project/checks[checks]
+* https://github.com/trento-project/workbench[workbench]
+* https://github.com/trento-project/contracts[contracts]
+* https://github.com/trento-project/tlint[tlint]
+* https://github.com/trento-project/wanda[wanda]
+* https://github.com/trento-project/photofinish[photofinish]
+* https://github.com/trento-project/support[support]
+* https://github.com/trento-project/continuous-delivery[continuous-delivery]
+* https://github.com/trento-project/werkzeugkoffer[werkzeugkoffer]
+* https://github.com/trento-project/mcp-server[mcp-server]
+
+== How to Build and Preview the Site
+
+=== 1. Clone the Repository
+
+[source,bash]
+----
+git clone git@github.com:trento-project/docs.git;
+cd docs/trento-docs-site
+----
+
+=== 2. Install Dependency
+
+[source,bash]
+----
+npm i -D -E antora
+----
+
+=== 3. Build Antora page
+
+[source,bash]
+----
+npx antora antora-playbook.yml
+----
+
+This will generate the site into the trento-docs-site-public/ folder.
+
+=== 4. Preview Locally
+
+To preview the generated site in your browser, start a local static web server:
+
+[source,bash]
+----
+npx http-server trento-docs-site-public/ -c-1 -p 3000
+----
+
+- `-c-1`: Disables caching
+- `-p 3000`: Runs the server on port 3000
+
+Open your browser and visit:  http://localhost:3000[localhost at port 3000]
