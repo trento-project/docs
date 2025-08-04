@@ -1,9 +1,11 @@
 <header class="header">
   <nav class="navbar">
     <div class="navbar-brand">
-      <img src="{{uiRootPath}}/img/trento-logo-horizontal.svg" alt="Trento Icon">
+
       <!--<a class="navbar-item" href="{{{or site.url siteRootPath}}}">{{site.title}}</a> -->
-      <a class="navbar-item" href="{{{or site.url siteRootPath}}}"></a>
+      <a class="navbar-item" href="https://www.trento-project.io/">
+      <img src="{{uiRootPath}}/img/trento-logo-horizontal.svg" alt="Trento Icon">
+      </a>
       {{#if env.SITE_SEARCH_PROVIDER}}
       <div class="navbar-item search hide-for-print">
         <div id="search-field" class="field">
@@ -22,7 +24,9 @@
         <a class="navbar-item" href="https://www.trento-project.io/">Home</a>
         <a class="navbar-item" href="https://www.trento-project.io/about/">About</a>
         <a class="navbar-item" href="https://www.trento-project.io/blog/">Blog</a>
-        <a class="navbar-item" href="https://github.com/trento-project">GitHub</a>
+        <a class="navbar-item" href="https://github.com/trento-project">
+        <img src="{{uiRootPath}}/img/GitHub_Logo.png" alt="Trento Icon">
+        </a>
         </div>
         </div>
       </div>

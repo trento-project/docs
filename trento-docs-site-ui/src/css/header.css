@@ -26,7 +26,7 @@ body {
 .navbar-brand {
   display: flex;
   flex: auto;
-  padding-left: 1rem;
+  padding: 1rem;
 }
 
 .navbar-brand .navbar-item {
@@ -39,6 +39,12 @@ body {
   font-size: calc(22 / var(--rem-base) * 1rem);
   flex-wrap: wrap;
   line-height: 1;
+}
+
+.navbar-brand .navbar-item:first-child img {
+  max-height: 2.5rem;
+  width: auto;
+  display: block;
 }
 
 .navbar-brand .navbar-item:first-child a {
@@ -61,7 +67,7 @@ body {
   font-size: 0.95rem;
   width: 150px;
   border: 1px solid #dbdbdb;
-  border-radius: 0.1em;
+  border-radius: 0.35em;
   line-height: 1.5;
   padding: 0 0.25em;
 }
@@ -276,7 +282,7 @@ body {
 
   .navbar-end > .navbar-item,
   .navbar-end .navbar-link {
-    color: var(--navbar-font-color);
+    color: var(--navbar-button-font-color-trento);
   }
 
   .navbar-end > a.navbar-item:hover,
@@ -288,6 +294,17 @@ body {
 
   .navbar-end .navbar-link::after {
     border-color: currentColor;
+  }
+
+  .navbar-end > a.navbar-item:last-child {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 0.5rem;
+  }
+
+  .navbar-end > a.navbar-item:last-child img {
+    height: 1.75rem;
+    width: auto;
   }
 
   .navbar-dropdown {
