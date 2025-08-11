@@ -47,6 +47,7 @@
 **** xref:ROOT:agent:development/how-to-make-a-release.adoc[How to release a new version of Trento Agent]
 
 *** xref:ROOT:ansible:README.adoc[Trento Ansible]
+**** xref:ROOT:ansible:local-development-environment.adoc[Local Development Environment]
 
 *** xref:ROOT:checks:README.adoc[Trento Checks]
 
