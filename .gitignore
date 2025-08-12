@@ -9,5 +9,4 @@ trento-docs-site-ui/node_modules/
 trento-docs-site-ui/public/
 
 # Ignore docs output
-trento-docs-site/trento-docs-site-public/
-trento-docs-site/tmp_docs/
+trento-docs-site/build
