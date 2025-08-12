@@ -88,7 +88,7 @@ ext:
         files: '*.adoc'
         into: modules/ansible/pages
       - dir: trento-docs-site/build/tmp_components/ansible/docs
-        files: '*.adoc'
+        files:  '**/*.adoc'
         into: modules/ansible/pages
     ## Trento Checks https://github.com/trento-project/checks
     - scan:
