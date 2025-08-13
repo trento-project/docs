@@ -12,6 +12,14 @@ ext:
     - clean:
         - dir: trento-docs-site/build
     ## Fetch documentation from diffrent upstream repositories
+
+    # Generate navigation for components
+    - run: 
+      - command: node trento-docs-site/scripts/generate-components.nav.js
+    - scan:
+      - dir: trento-docs-site/build/gen_navigation/
+        files: 'nav_components.adoc'
+        into: modules/developer/partials
     - run:
         - command: git clone --depth 1 https://github.com/SUSE/doc-unversioned trento-docs-site/build/tmp_docs/user-guide
         ## Content of the Components Section
