@@ -10,3 +10,6 @@ trento-docs-site-ui/public/
 
 # Ignore docs output
 trento-docs-site/build
+
+# 
+.tool-versions
