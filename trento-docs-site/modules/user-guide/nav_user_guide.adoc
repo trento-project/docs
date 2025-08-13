@@ -8,6 +8,7 @@
  ** xref:trento-sso-integration.adoc[Single Sign-On integration]
  ** xref:trento-activity-log.adoc[Activity Log]
  ** xref:trento-checks.adoc[Performing configuration checks]
+ ** xref:trento-checks-customization.adoc[Checks Customization]
  ** xref:trento-web-console.adoc[Using Trento Web]
  ** xref:trento-housekeeping.adoc[Housekeeping]
  ** xref:trento-manage-tags.adoc[Managing tags]
