@@ -45,6 +45,7 @@ async function generateComponentsNav() {
         const docsDirPath = path.join(componentPath, docsDirName);
         try {
           const docsEntries = (await fs.readdir(docsDirPath, { withFileTypes: true }))
+            .filter(entry => !(entry.isDirectory() && /^images?$/i.test(entry.name))) // skip image dirs
             .sort((a, b) => a.name.localeCompare(b.name));
 
           for (const entry of docsEntries) {
@@ -54,6 +55,7 @@ async function generateComponentsNav() {
             } else if (entry.isDirectory()) {
               navContent += `**** ${entry.name}\n`;
               const subEntries = (await fs.readdir(path.join(docsDirPath, entry.name), { withFileTypes: true }))
+                .filter(sub => !(sub.isDirectory() && /^images?$/i.test(sub.name))) // skip image dirs inside subfolders too
                 .sort((a, b) => a.name.localeCompare(b.name));
 
               for (const subFile of subEntries) {
