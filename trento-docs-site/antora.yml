@@ -167,4 +167,4 @@ ext:
         into: modules/mcp-server/pages
       - dir: trento-docs-site/build/tmp_components/mcp-server/docs/
         files: '**/*.adoc'
-        into: modules/mcp-server/pages/docs
+        into: modules/mcp-server/pages
