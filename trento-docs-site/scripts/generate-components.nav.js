@@ -18,7 +18,11 @@ async function extractTitle(filePath) {
 }
 
 // Folders to ignore in navigation
-const IGNORED_DIRS = /^(images?|examples)$/i;
+const IGNORED_DIRS = ['image', 'images', 'examples'];
+
+function isIgnoredDir(name) {
+  return IGNORED_DIRS.includes(name.toLowerCase());
+}
 
 async function generateComponentsNav() {
   try {
@@ -48,7 +52,7 @@ async function generateComponentsNav() {
         const docsDirPath = path.join(componentPath, docsDirName);
         try {
           const docsEntries = (await fs.readdir(docsDirPath, { withFileTypes: true }))
-            .filter(entry => !(entry.isDirectory() && IGNORED_DIRS.test(entry.name))) // skip ignored dirs
+            .filter(entry => !(entry.isDirectory() && isIgnoredDir(entry.name))) // skip ignored dirs
             .sort((a, b) => a.name.localeCompare(b.name));
 
           for (const entry of docsEntries) {
@@ -58,7 +62,7 @@ async function generateComponentsNav() {
             } else if (entry.isDirectory()) {
               navContent += `**** ${entry.name}\n`;
               const subEntries = (await fs.readdir(path.join(docsDirPath, entry.name), { withFileTypes: true }))
-                .filter(sub => !(sub.isDirectory() && IGNORED_DIRS.test(sub.name))) // skip ignored dirs inside subfolders too
+                .filter(sub => !(sub.isDirectory() && isIgnoredDir(sub.name))) // skip ignored dirs inside subfolders too
                 .sort((a, b) => a.name.localeCompare(b.name));
 
               for (const subFile of subEntries) {

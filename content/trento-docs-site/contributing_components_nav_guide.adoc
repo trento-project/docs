@@ -1,0 +1,114 @@
+= Antora Components Contribution Guidelines
+:toc:
+
+This document describes the **mandatory rules** for adding and organizing documentation that will be published on the Trento Antora site.
+
+== Upstream-First Workflow
+
+The Antora documentation site is **not** edited directly.
+
+Instead:
+1. You make changes in the **upstream GitHub project** where the code or documentation belongs.
+2. The build process collects documentation from multiple upstream projects into the `tmp_components/` directory.
+3. The `generateComponentsNav.js` script creates the navigation (`nav_components.adoc`) based on the collected files.
+4. The Antora site is generated from this structure.
+
+[IMPORTANT]
+====
+**You must follow the rules in this guide** when editing documentation in your upstream repository.  
+Breaking these rules can cause your documentation to be excluded or incorrectly linked in the Antora site.
+====
+
+== Mandatory Rules
+
+=== 1. Directory Structure
+
+Each component (upstream project) must follow this pattern:
+
+[source]
+----
+component-name/
+├── README.adoc
+├── docs/
+│   ├── some-doc.adoc
+│   └── subdir/
+│       └── nested-doc.adoc
+└── guides/
+    └── guide-doc.adoc
+----
+
+=== 2. README.adoc Requirements
+
+* Every component **must** have a `README.adoc` in its root.
+* The first line must be an AsciiDoc title starting with `=`:
+
+[source,asciidoc]
+----
+= Trento Agent
+----
+
+This title appears in the Antora navigation for the component.
+
+=== 3. File Inclusion Rules
+
+The script will include:
+- All `.adoc` files inside `docs/` and `guides/` directories.
+- `.adoc` files inside subdirectories of `docs/` and `guides/`.
+
+=== 4. Ignored Directories
+
+The following directories are **always ignored** (at any level under `docs/` or `guides/`):
+* `image`
+* `images`
+* `examples`
+
+Any `.adoc` files inside these directories will not be shown in the navigation.
+
+=== 5. Title Extraction
+
+For every `.adoc` file:
+- The script takes the first header starting with `=`.
+- The `=` is removed before inserting into the navigation.
+
+Example:
+
+[source,asciidoc]
+----
+= CI/CD Variables expected by Trento GH Action Runner
+----
+
+Becomes:
+
+[source]
+----
+**** xref:ROOT:agent:ci-cd-variables.adoc[CI/CD Variables expected by Trento GH Action Runner]
+----
+
+=== 6. Ordering
+
+- Components appear **alphabetically** by directory name.
+- Files and subdirectories inside `docs/` or `guides/` appear **alphabetically**.
+
+== Developer Workflow
+
+1. Edit `.adoc` files in your **upstream repository**, following these rules.
+2. Commit and push changes.
+3. The build process will:
+   - Pull the updated documentation into `tmp_components/`.
+   - Generate navigation according to these rules.
+4. Your changes will appear on the Antora site after the build.
+
+== Example Generated Navigation
+
+[source]
+----
+*** xref:ROOT:agent:README.adoc[Trento Agent]
+**** xref:ROOT:agent:ci-cd-variables.adoc[CI/CD Variables expected by Trento GH Action Runner]
+**** development
+***** xref:ROOT:agent:development/how-to-make-a-release.adoc[How to release a new version of Trento Agent]
+----
+
+Following these rules ensures that:
+- Documentation from all upstream projects integrates cleanly.
+- Navigation remains consistent and easy to use.
+- The Antora site reflects the latest upstream changes without manual edits.
