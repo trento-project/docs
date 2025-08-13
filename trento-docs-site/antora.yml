@@ -13,13 +13,6 @@ ext:
         - dir: trento-docs-site/build
     ## Fetch documentation from diffrent upstream repositories
 
-    # Generate navigation for components
-    - run: 
-      - command: node trento-docs-site/scripts/generate-components.nav.js
-    - scan:
-      - dir: trento-docs-site/build/gen_navigation/
-        files: 'nav_components.adoc'
-        into: modules/developer/partials
     - run:
         - command: git clone --depth 1 https://github.com/SUSE/doc-unversioned trento-docs-site/build/tmp_docs/user-guide
         ## Content of the Components Section
@@ -37,6 +30,15 @@ ext:
         - command: git clone --depth 1 https://github.com/trento-project/continuous-delivery.git trento-docs-site/build/tmp_components/continuous-delivery
         - command: git clone --depth 1 https://github.com/trento-project/werkzeugkoffer.git trento-docs-site/build/tmp_components/werkzeugkoffer
         - command: git clone --depth 1 https://github.com/trento-project/mcp-server.git trento-docs-site/build/tmp_components/mcp-server
+
+
+    # Generate navigation for components
+    - run: 
+      - command: node trento-docs-site/scripts/generate-components.nav.js
+    - scan:
+      - dir: trento-docs-site/build/gen_navigation/
+        files: 'nav_components.adoc'
+        into: modules/developer/partials
 
     # Trento official documentation repo https://github.com/SUSE/doc-unversioned
     - scan:
