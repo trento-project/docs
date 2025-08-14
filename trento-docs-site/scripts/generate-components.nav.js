@@ -158,15 +158,19 @@ const writeNavigationFile = async (navContent, config) => {
   return navFilePath;
 };
 
-const printGenerationResult = (navContent,navFilePath,components) => {
-console.log(`📊 Processed ${components.length} components`);
-console.log('\n' + '='.repeat(60));
-console.log('📄 GENERATED NAVIGATION CONTENT FOR COMPONENTS Section');
-console.log('='.repeat(60));
-console.log(navContent);
-console.log('='.repeat(60));
-console.log(`✅ Navigation file generated: ${navFilePath}`);
-} 
+const printGenerationResult = (navContent, navFilePath, components) => {
+  const consoleOutput = [
+    `📊 Processed ${components.length} upstream Components: ${components.join(', ')}`,
+    '============================================================',
+    '📄 GENERATED NAVIGATION CONTENT FOR COMPONENTS Section',
+    '============================================================',
+    navContent,
+    '============================================================',
+    `✅ Navigation file generated: ${navFilePath}`
+  ].join('\n');
+  console.log(consoleOutput);
+};
+
 
 const generateComponentsNav = async () => {
   try {
