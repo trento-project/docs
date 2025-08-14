@@ -1,114 +1,123 @@
-= Antora Components Contribution Guidelines
-:toc:
+= Components Navigation Generator – Contribution Guidelines
 
-This document describes the **mandatory rules** for adding and organizing documentation that will be published on the Trento Antora site.
+== Overview
 
-== Upstream-First Workflow
+This script is part of the Trento Antora documentation build process.  
+Its role is to **automatically generate the `Components` section navigation** (`nav_components.adoc`) by scanning multiple upstream repositories cloned during the build.
 
-The Antora documentation site is **not** edited directly.
+All content changes should happen **in the respective upstream repositories** (e.g., `trento-project/agent`, `trento-project/web`, etc.).  
+The script simply **reflects** those changes into the Antora site during the CI build.
 
-Instead:
-1. You make changes in the **upstream GitHub project** where the code or documentation belongs.
-2. The build process collects documentation from multiple upstream projects into the `tmp_components/` directory.
-3. The `generateComponentsNav.js` script creates the navigation (`nav_components.adoc`) based on the collected files.
-4. The Antora site is generated from this structure.
+== Why we need rules
 
-[IMPORTANT]
-====
-**You must follow the rules in this guide** when editing documentation in your upstream repository.  
-Breaking these rules can cause your documentation to be excluded or incorrectly linked in the Antora site.
-====
+Since the navigation is automatically built, **consistent directory and file structure is critical**.  
+We must define rules so that:
 
-== Mandatory Rules
+* Documentation is discoverable
+* The navigation is clean and predictable
+* Unwanted folders (e.g., assets, examples) are excluded
+* Titles are human-friendly and based on document headers
 
-=== 1. Directory Structure
+== Folders and files ignored
 
-Each component (upstream project) must follow this pattern:
+The script ignores certain folders inside documentation directories:
 
-[source]
+[source,js]
 ----
-component-name/
-├── README.adoc
-├── docs/
-│   ├── some-doc.adoc
-│   └── subdir/
-│       └── nested-doc.adoc
-└── guides/
-    └── guide-doc.adoc
+ignoredDirs: ['image', 'images', 'examples']
 ----
 
-=== 2. README.adoc Requirements
+That means any directory named `image`, `images`, or `examples` (case-insensitive) is **skipped**.  
+They will not appear in the navigation.
 
-* Every component **must** have a `README.adoc` in its root.
-* The first line must be an AsciiDoc title starting with `=`:
+== Recognized documentation folders
 
-[source,asciidoc]
+Inside each upstream component repository, the following folders are scanned for `.adoc` files:
+
+[source,js]
 ----
-= Trento Agent
+docsDirNames: ['docs', 'guides']
 ----
 
-This title appears in the Antora navigation for the component.
+If a component does not have these folders, it will still be listed if it has a `README.adoc`.
 
-=== 3. File Inclusion Rules
+== README handling
 
-The script will include:
-- All `.adoc` files inside `docs/` and `guides/` directories.
-- `.adoc` files inside subdirectories of `docs/` and `guides/`.
-
-=== 4. Ignored Directories
-
-The following directories are **always ignored** (at any level under `docs/` or `guides/`):
-* `image`
-* `images`
-* `examples`
-
-Any `.adoc` files inside these directories will not be shown in the navigation.
-
-=== 5. Title Extraction
-
-For every `.adoc` file:
-- The script takes the first header starting with `=`.
-- The `=` is removed before inserting into the navigation.
+Each component must have a `README.adoc` at its root.  
+This acts as the entry point in the navigation for that component.
 
 Example:
-
-[source,asciidoc]
 ----
-= CI/CD Variables expected by Trento GH Action Runner
+*** xref:ROOT:agent:README.adoc[Trento Agent]
 ----
 
-Becomes:
+The `README.adoc`'s first-level AsciiDoc title (`= My Title`) is used as the link text.
 
-[source]
+> NOTE: README files inside `docs` or `guides` are ignored to avoid conflicts with Antora’s navigation and xref resolution. Only the root README must be used.
+
+== Title extraction
+
+The script reads the first-level title in each `.adoc` file:
+
+[source,js]
 ----
-**** xref:ROOT:agent:ci-cd-variables.adoc[CI/CD Variables expected by Trento GH Action Runner]
+REGEX.contentTitle: /^=\s*(.+)/m
 ----
 
-=== 6. Ordering
+If no title is found, the file name (without extension) is used.
 
-- Components appear **alphabetically** by directory name.
-- Files and subdirectories inside `docs/` or `guides/` appear **alphabetically**.
+The script **removes the `=`** when building navigation, so:
 
-== Developer Workflow
-
-1. Edit `.adoc` files in your **upstream repository**, following these rules.
-2. Commit and push changes.
-3. The build process will:
-   - Pull the updated documentation into `tmp_components/`.
-   - Generate navigation according to these rules.
-4. Your changes will appear on the Antora site after the build.
-
-== Example Generated Navigation
-
-[source]
 ----
+= How to release a new version of Trento Agent
+----
+
+becomes:
+
+----
+***** xref:ROOT:agent:development/how-to-make-a-release.adoc[How to release a new version of Trento Agent]
+----
+
+== Navigation structure
+
+* Components are listed under a `** Components` section.
+* Each component appears at level 3 (`***`) in the nav.
+* Its `docs/` and `guides/` contents appear as level 4+ entries (`****`, `*****`, etc.).
+
+Example output:
+
+----
+** Components
+
 *** xref:ROOT:agent:README.adoc[Trento Agent]
 **** xref:ROOT:agent:ci-cd-variables.adoc[CI/CD Variables expected by Trento GH Action Runner]
 **** development
 ***** xref:ROOT:agent:development/how-to-make-a-release.adoc[How to release a new version of Trento Agent]
 ----
 
-Following these rules ensures that:
-- Documentation from all upstream projects integrates cleanly.
-- Navigation remains consistent and easy to use.
-- The Antora site reflects the latest upstream changes without manual edits.
+== Process flow
+
+. The CI pipeline clones all upstream repos into `trento-docs-site/build/tmp_components`.
+. The script:
+.. Reads the list of component directories.
+.. For each component:
+... Adds its `README.adoc` to navigation.
+... Scans `docs/` and `guides/` for `.adoc` files, ignoring `images` and `examples` directories.
+... Extracts human-friendly titles.
+... Builds `xref:` links.
+. Writes the generated nav to `trento-docs-site/build/gen_navigation/nav_components.adoc`.
+. Prints a summary log with:
+.. Number of processed components
+.. List of component names
+.. Generated navigation content
+.. Output file path
+
+== Summary
+
+If you contribute documentation to any Trento upstream repository:
+
+* **Always** add or update the `README.adoc` at the root for that component.
+* Place `.adoc` documentation in `docs/` or `guides/`.
+* Do **not** put `.adoc` files inside `images/`, `image/`, or `examples/` folders (they are ignored).
+* Use proper first-level titles in `.adoc` files (`= My Title`).
+* Remember: The script runs automatically during CI — the nav file is never edited manually.
