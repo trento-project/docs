@@ -62,6 +62,10 @@ const processDirectoryEntries = async (entries, dirPath, componentName, parentPa
   const nextLevel = '*'.repeat(level.length + 1);
   
   for (const entry of entries) {
+    if (entry.isFile() && entry.name === config.readmeFileName) {
+      console.warn(`⚠️ Skipping ${path.join(dirPath, entry.name)} - only root README is processed`);
+      continue;
+    }
     if (entry.isFile() && isAdocFile(config.docsFileFormat)(entry.name)) {
       const filePath = path.join(dirPath, entry.name);
       const relativePath = parentPath ? `${parentPath}/${entry.name}` : entry.name;
@@ -92,6 +96,10 @@ const processDocsDirectory = async (componentPath, componentName, docsDirName, c
   for (const entry of docsEntries) {
     const entryPath = path.join(docsDirPath, entry.name);
     
+    if (entry.isFile() && entry.name === config.readmeFileName) {
+      console.warn(`⚠️ Skipping ${entryPath} - only root README is processed`);
+      continue;
+    }
     if (entry.isFile() && isAdocFile(config.docsFileFormat)(entry.name)) {
       content += await processAdocFile(entryPath, componentName, entry.name, '****', config);
     } else if (entry.isDirectory()) {
@@ -149,9 +157,9 @@ const processAllComponents = async (components, config) => {
       navContent += componentContent;
     }
   }
-  // Remove extra trailing empty lines
   return navContent.trimEnd() + '\n';
 };
+
 const writeNavigationFile = async (navContent, config) => {
   const navFilePath = getNavFilePath(config);
   await fs.writeFile(navFilePath, navContent, config.encoding);
