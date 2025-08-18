@@ -16,7 +16,7 @@ ext:
     - run:
         - command: git clone --depth 1 --single-branch https://github.com/SUSE/doc-unversioned trento-docs-site/build/tmp_docs/user-guide
         ## Content of the Components Section
-        - command: git clone --depth 1 --single-branch https://github.com/trento-project/agent trento-docs-site/build/tmp_components/agent
+        - command: git clone --depth 1 --branch fix_docs --single-branch https://github.com/trento-project/agent trento-docs-site/build/tmp_components/agent
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/ansible trento-docs-site/build/tmp_components/ansible
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/checks trento-docs-site/build/tmp_components/checks
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/continuous-delivery trento-docs-site/build/tmp_components/continuous-delivery
