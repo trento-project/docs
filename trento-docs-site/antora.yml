@@ -12,7 +12,6 @@ ext:
     - clean:
         - dir: trento-docs-site/build
     ## Fetch documentation from different upstream repositories
-
     - run:
         - command: git clone --depth 1 --single-branch https://github.com/SUSE/doc-unversioned trento-docs-site/build/tmp_docs/user-guide
         ## Content of the Components Section
