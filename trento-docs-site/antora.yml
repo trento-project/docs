@@ -19,16 +19,16 @@ ext:
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/ansible trento-docs-site/build/tmp_components/ansible
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/checks trento-docs-site/build/tmp_components/checks
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/continuous-delivery trento-docs-site/build/tmp_components/continuous-delivery
-        - command: git clone --depth 1 --single-branch https://github.com/trento-project/contracts trento-docs-site/build/tmp_components/contracts
-        - command: git clone --depth 1 --single-branch https://github.com/trento-project/helm-charts trento-docs-site/build/tmp_components/helm-charts
-        - command: git clone --depth 1 --single-branch https://github.com/trento-project/mcp-server trento-docs-site/build/tmp_components/mcp-server
+        - command: git clone --depth 1 --branch fix_docs --single-branch https://github.com/trento-project/contracts trento-docs-site/build/tmp_components/contracts
+        - command: git clone --depth 1 --branch fix_docs --single-branch https://github.com/trento-project/helm-charts trento-docs-site/build/tmp_components/helm-charts
+        - command: git clone --depth 1 --branch fix_docs --single-branch https://github.com/trento-project/mcp-server trento-docs-site/build/tmp_components/mcp-server
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/photofinish trento-docs-site/build/tmp_components/photofinish
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/support trento-docs-site/build/tmp_components/support
-        - command: git clone --depth 1 --single-branch https://github.com/trento-project/tlint trento-docs-site/build/tmp_components/tlint
+        - command: git clone --depth 1 --branch fix_docs --single-branch https://github.com/trento-project/tlint trento-docs-site/build/tmp_components/tlint
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/wanda trento-docs-site/build/tmp_components/wanda
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/web trento-docs-site/build/tmp_components/web
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/werkzeugkoffer trento-docs-site/build/tmp_components/werkzeugkoffer
-        - command: git clone --depth 1 --single-branch https://github.com/trento-project/workbench trento-docs-site/build/tmp_components/workbench
+        - command: git clone --depth 1 --branch fix_docs --single-branch https://github.com/trento-project/workbench trento-docs-site/build/tmp_components/workbench
 
     # Generate navigation for components
     - run:
