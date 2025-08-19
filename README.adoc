@@ -9,7 +9,6 @@ This repository contains the Trento project documentation that does not interest
 * link:https://github.com/trento-project/docs/tree/main/content/rfc[Request for Comments (RFC)]
 * link:https://github.com/trento-project/docs/tree/main/content/internal-notes[Internal Notes]
 * link:https://github.com/trento-project/docs/tree/main/content/templates[Templates]
-* link:https://github.com/trento-project/docs/tree/main/content/guides[Guides]
 
 == Trento docs site
 

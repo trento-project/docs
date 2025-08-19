@@ -26,7 +26,7 @@ ext:
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/support trento-docs-site/build/tmp_components/support
         - command: git clone --depth 1 --branch fix_docs --single-branch https://github.com/trento-project/tlint trento-docs-site/build/tmp_components/tlint
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/wanda trento-docs-site/build/tmp_components/wanda
-        - command: git clone --depth 1 --single-branch https://github.com/trento-project/web trento-docs-site/build/tmp_components/web
+        - command: git clone --depth 1 --branch docs_auto_build --single-branch https://github.com/trento-project/web trento-docs-site/build/tmp_components/web
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/werkzeugkoffer trento-docs-site/build/tmp_components/werkzeugkoffer
         - command: git clone --depth 1 --branch fix_docs --single-branch https://github.com/trento-project/workbench trento-docs-site/build/tmp_components/workbench
 
@@ -147,7 +147,7 @@ ext:
       - dir: trento-docs-site/build/tmp_components/web/guides
         files: '**/*.adoc'
         into: modules/web/pages/
-      - dir: trento-docs-site/build/tmp_components/web/guides
+      - dir: trento-docs-site/build/tmp_components/web/guides/images
         files: '**/*.{png,jpg,jpeg,svg,gif}'
         into: modules/web/images/
     ## Trento werkzeugkoffer https://github.com/trento-project/werkzeugkoffer
