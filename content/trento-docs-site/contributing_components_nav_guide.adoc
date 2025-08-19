@@ -98,19 +98,26 @@ Example output:
 == Process flow
 
 . The CI pipeline clones all upstream repos into `trento-docs-site/build/tmp_components`.
-. The script:
-.. Reads the list of component directories.
+. The script (`trento-docs-site/scripts/generate-components.nav.js`):
+.. Creates the output directory `trento-docs-site/build/gen_navigation` if it doesn't exist.
+.. Reads the list of component directories from `tmp_components`.
 .. For each component:
-... Adds its `README.adoc` to navigation.
-... Scans `docs/` and `guides/` for `.adoc` files, ignoring `images` and `examples` directories.
-... Extracts human-friendly titles.
-... Builds `xref:` links.
-. Writes the generated nav to `trento-docs-site/build/gen_navigation/nav_components.adoc`.
-. Prints a summary log with:
-.. Number of processed components
-.. List of component names
-.. Generated navigation content
-.. Output file path
+... Checks for a root `README.adoc` file (components without README are skipped).
+... Extracts the title from README using regex `/^=\s*(.+)/m`.
+... Adds the README to navigation as a level 3 entry (`***`).
+... Scans `docs/` and `guides/` directories for `.adoc` files.
+... Ignores directories named `image`, `images`, or `examples` (case-insensitive).
+... For each `.adoc` file found:
+.... Extracts title from first-level AsciiDoc header or uses filename as fallback.
+.... Creates xref links with format `xref:ROOT:componentName:filePath[title]`.
+.... Handles nested directories by creating appropriate navigation levels.
+... Skips any README files found inside `docs/` or `guides/` directories.
+.. Builds the final navigation content starting with `** Components` header.
+. Writes the generated navigation to `trento-docs-site/build/gen_navigation/nav_components.adoc`.
+. Prints a comprehensive summary log showing:
+.. Number of processed components with their names.
+.. Complete generated navigation content.
+.. Output file path confirmation.
 
 == Summary
 
