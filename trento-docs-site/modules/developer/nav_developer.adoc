@@ -35,7 +35,6 @@
 ** Internal Notes
 *** xref:internal-notes/pr-env-ssl-certificate-setup.adoc[SSL Certificate creation and setup Guide for Pull Request Environments]
 *** xref:internal-notes/release.adoc[Release Process]
-*** xref:internal-notes/test-manual-installation-with-agents.adoc[Test Manual Installation with Agents]
 
 ** Trento Documentation Page
 *** xref:trento-docs-site/README.adoc[Documentation Page]
