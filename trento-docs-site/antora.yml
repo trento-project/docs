@@ -123,11 +123,11 @@ ext:
     ## Trento Tlint https://github.com/trento-project/tlint
     - scan:
       - dir: trento-docs-site/build/tmp_components/tlint
-        files: 'README.adoc'
-        into: modules/tlint/pages
-      - dir: trento-docs-site/build/tmp_components/tlint/www
         files: '*.adoc'
-        into: modules/tlint/pages/www
+        into: modules/tlint/pages
+      - dir: trento-docs-site/build/tmp_components/tlint/docs
+        files: '**/*.adoc'
+        into: modules/tlint/pages
     ## Trento Wanda https://github.com/trento-project/wanda
     - scan:
       - dir: trento-docs-site/build/tmp_components/wanda
