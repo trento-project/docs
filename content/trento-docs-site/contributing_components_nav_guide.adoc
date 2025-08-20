@@ -53,7 +53,78 @@ Example:
 
 The `README.adoc`'s first-level AsciiDoc title (`= My Title`) is used as the link text.
 
-> NOTE: README files inside `docs` or `guides` are ignored to avoid conflicts with Antora’s navigation and xref resolution. Only the root README must be used.
+=== Subdirectory README files
+
+The script supports `README.adoc` files in subdirectories within `docs/` or `guides/`.
+When a subdirectory contains a `README.adoc` file, the directory name becomes a clickable link to that README.
+
+Example:
+----
+**** xref:ROOT:mcp-server:Developer/README.adoc[Developer]
+**** xref:ROOT:mcp-server:Trento MCP Server documentation/README.adoc[Trento MCP Server documentation]
+----
+
+This creates a more organized navigation where subdirectories with README files provide contextual documentation for their contents, while the directory name remains clear for navigation purposes.
+
+== Cross-platform compatibility (GitHub + Antora)
+
+To ensure documentation works seamlessly on both GitHub and Antora, follow these conditional formatting patterns:
+
+=== File path prefixes
+
+In root README files, use conditional prefixes to ensure proper navigation:
+
+[source,adoc]
+----
+ifndef::site-gen-antora[:relfileprefix: docs/]
+ifndef::site-gen-antora[:relfileprefix: guides/]
+----
+
+This ensures links work correctly in both GitHub (which needs the path prefix) and Antora (which doesn't).
+
+=== Image handling
+
+For images, use the conditional imagesdir attribute:
+
+[source,adoc]
+----
+ifndef::imagesdir[:imagesdir: ../images]
+----
+
+Store all images in the `docs/images/` or `guides/images/` directory of your component. Reference them like this:
+
+[source,adoc]
+----
+image::trento-spa-refresh.png[Refresh token success diagram]
+
+.Refresh token failure diagram
+image::trento-spa-refresh-failed.png[Refresh token failure diagram]
+----
+
+The Antora collector automatically scans image directories and places them correctly:
+
+[source,yaml]
+----
+- dir: trento-docs-site/build/tmp_components/web/guides/images
+  files: '**/*.{png,jpg,jpeg,svg,gif}'
+  into: modules/web/images/
+----
+
+=== Cross-references (Root README only)
+
+When linking from the root README to other files in the same component root, use conditional syntax:
+
+[source,adoc]
+----
+ifdef::site-gen-antora[]
+See xref:CONTRIBUTING.adoc[contribution guidelines].
+endif::[]
+ifndef::site-gen-antora[]
+See link:CONTRIBUTING.adoc[contribution guidelines].
+endif::[]
+----
+
+This ensures proper xref resolution in Antora while maintaining GitHub compatibility. This pattern is only needed in root README files when linking to other root-level files.
 
 == Title extraction
 
@@ -127,4 +198,9 @@ If you contribute documentation to any Trento upstream repository:
 * Place `.adoc` documentation in `docs/` or `guides/`.
 * Do **not** put `.adoc` files inside `images/`, `image/`, or `examples/` folders (they are ignored).
 * Use proper first-level titles in `.adoc` files (`= My Title`).
+* **Follow cross-platform compatibility patterns**:
+** Use `ifndef::site-gen-antora[:relfileprefix: docs/]` or `guides/` in root README files.
+** Use `ifndef::imagesdir[:imagesdir: ../images]` for image directories.
+** Store images in `docs/images/` or `guides/images/` directories.
+** Use conditional xref/link syntax in root README when linking to root-level files.
 * Remember: The script runs automatically during CI — the nav file is never edited manually.
