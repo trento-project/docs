@@ -76,7 +76,22 @@ const processDirectoryEntries = async (entries, dirPath, componentName, parentPa
 };
 
 const processDirectory = async (dirPath, componentName, parentPath, level, config) => {
-  let content = `${level} ${path.basename(dirPath)}\n`;
+  const dirName = path.basename(dirPath);
+  const readmePath = path.join(dirPath, config.readmeFileName);
+  
+  let content = '';
+  
+  // Check if directory contains README.adoc
+  try {
+    await fs.access(readmePath);
+    // Directory has README, create xref link
+    const title = await extractTitle(readmePath, config);
+    const relativePath = parentPath ? `${parentPath}/${config.readmeFileName}` : config.readmeFileName;
+    content = `${level} ${createXref(componentName, relativePath, title)}\n`;
+  } catch (error) {
+    // No README found, use directory name
+    content = `${level} ${dirName}\n`;
+  }
   
   const entries = await readDirectoryEntries(dirPath, config);
   if (entries.length > 0) {
