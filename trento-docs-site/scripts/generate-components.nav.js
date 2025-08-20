@@ -63,7 +63,7 @@ const processDirectoryEntries = async (entries, dirPath, componentName, parentPa
   
   for (const entry of entries) {
     if (entry.isFile() && entry.name === config.readmeFileName) {
-      console.warn(`⚠️ Skipping ${path.join(dirPath, entry.name)} - only root README is processed`);
+      // Skip README files as they're handled in processDirectory
       continue;
     }
     if (entry.isFile() && isAdocFile(config.docsFileFormat)(entry.name)) {
@@ -80,14 +80,12 @@ const processDirectory = async (dirPath, componentName, parentPath, level, confi
   const readmePath = path.join(dirPath, config.readmeFileName);
   
   let content = '';
-  
   // Check if directory contains README.adoc
   try {
     await fs.access(readmePath);
-    // Directory has README, create xref link
-    const title = await extractTitle(readmePath, config);
-    const relativePath = parentPath ? `${parentPath}/${config.readmeFileName}` : config.readmeFileName;
-    content = `${level} ${createXref(componentName, relativePath, title)}\n`;
+    // Directory has README, create xref link with directory name as title
+    const relativePath = parentPath ? `${parentPath}/${config.readmeFileName}` : `${dirName}/${config.readmeFileName}`;
+    content = `${level} ${createXref(componentName, relativePath, dirName)}\n`;
   } catch (error) {
     // No README found, use directory name
     content = `${level} ${dirName}\n`;
@@ -112,7 +110,7 @@ const processDocsDirectory = async (componentPath, componentName, docsDirName, c
     const entryPath = path.join(docsDirPath, entry.name);
     
     if (entry.isFile() && entry.name === config.readmeFileName) {
-      console.warn(`⚠️ Skipping ${entryPath} - only root README is processed`);
+      // Skip README files as they're handled in processDirectory
       continue;
     }
     if (entry.isFile() && isAdocFile(config.docsFileFormat)(entry.name)) {
