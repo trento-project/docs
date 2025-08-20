@@ -27,7 +27,7 @@ ext:
         - command: git clone --depth 1 --branch fix_docs --single-branch https://github.com/trento-project/tlint trento-docs-site/build/tmp_components/tlint
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/wanda trento-docs-site/build/tmp_components/wanda
         - command: git clone --depth 1 --branch docs_auto_build --single-branch https://github.com/trento-project/web trento-docs-site/build/tmp_components/web
-        - command: git clone --depth 1 --single-branch https://github.com/trento-project/werkzeugkoffer trento-docs-site/build/tmp_components/werkzeugkoffer
+        - command: git clone --depth 1 --branch docs_autobuild --single-branch https://github.com/trento-project/werkzeugkoffer trento-docs-site/build/tmp_components/werkzeugkoffer
         - command: git clone --depth 1 --branch fix_docs --single-branch https://github.com/trento-project/workbench trento-docs-site/build/tmp_components/workbench
 
     # Generate navigation for components
@@ -69,7 +69,7 @@ ext:
         files: '*.adoc'
         into: modules/agent/pages
       - dir: trento-docs-site/build/tmp_components/agent/docs
-        files: '**/*.adoc'
+        files: ['**/*.adoc', '!README.adoc']
         into: modules/agent/pages
     ## Trento Ansible https://github.com/trento-project/ansible
     - scan:
@@ -77,7 +77,7 @@ ext:
         files: '*.adoc'
         into: modules/ansible/pages
       - dir: trento-docs-site/build/tmp_components/ansible/docs
-        files: '**/*.adoc'
+        files: ['**/*.adoc', '!README.adoc']
         into: modules/ansible/pages
     ## Trento Checks https://github.com/trento-project/checks
     - scan:
@@ -100,7 +100,7 @@ ext:
         files: '*.adoc'
         into: modules/helm-charts/pages
       - dir: trento-docs-site/build/tmp_components/helm-charts/docs
-        files: '**/*.adoc'
+        files: ['**/*.adoc', '!README.adoc']
         into: modules/helm-charts/pages
     ## Trento MCP Server https://github.com/trento-project/mcp-server/
     - scan:
@@ -126,7 +126,7 @@ ext:
         files: '*.adoc'
         into: modules/tlint/pages
       - dir: trento-docs-site/build/tmp_components/tlint/docs
-        files: '**/*.adoc'
+        files: ['**/*.adoc', '!README.adoc']
         into: modules/tlint/pages
     ## Trento Wanda https://github.com/trento-project/wanda
     - scan:
@@ -134,7 +134,7 @@ ext:
         files: '*.adoc'
         into: modules/wanda/pages
       - dir: trento-docs-site/build/tmp_components/wanda/guides
-        files: '**/*.adoc'
+        files: ['**/*.adoc', '!README.adoc']
         into: modules/wanda/pages/
       - dir: trento-docs-site/build/tmp_components/wanda/guides
         files: '**/*.{png,jpg,jpeg,svg,gif}'
@@ -145,7 +145,7 @@ ext:
         files: '*.adoc'
         into: modules/web/pages
       - dir: trento-docs-site/build/tmp_components/web/guides
-        files: '**/*.adoc'
+        files: ['**/*.adoc', '!README.adoc']
         into: modules/web/pages/
       - dir: trento-docs-site/build/tmp_components/web/guides/images
         files: '**/*.{png,jpg,jpeg,svg,gif}'
@@ -155,9 +155,9 @@ ext:
       - dir: trento-docs-site/build/tmp_components/werkzeugkoffer
         files: 'README.adoc'
         into: modules/werkzeugkoffer/pages
-      - dir: trento-docs-site/build/tmp_components/werkzeugkoffer/demo-idp
-        files: 'README.adoc'
-        into: modules/werkzeugkoffer/pages/demo_idp/
+      - dir: trento-docs-site/build/tmp_components/werkzeugkoffer/docs
+        files: ['**/*.adoc', '!README.adoc']
+        into: modules/werkzeugkoffer/pages
     ## Trento Workbench https://github.com/trento-project/workbench
     - scan:
       - dir: trento-docs-site/build/tmp_components/workbench
