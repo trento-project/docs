@@ -8,18 +8,18 @@ nav:
 
 ext:
   collector:
-    ## Remove previous documentation
+    ## Remove previous documentation build
     - clean:
         - dir: trento-docs-site/build
-    ## Fetch documentation from different upstream repositories
+    ## Fetch documentation from different trento upstream repositories
     - run:
+        ## user facing documentation https://documentation.suse.com/sles-sap/trento/html/SLES-SAP-trento/index.html
         - command: git clone --depth 1 --single-branch https://github.com/SUSE/doc-unversioned trento-docs-site/build/tmp_docs/user-guide
-        ## Content of the Components Section
+        ## Content of the auto builded components section part of nav_developer.adoc
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/agent trento-docs-site/build/tmp_components/agent
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/ansible trento-docs-site/build/tmp_components/ansible
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/checks trento-docs-site/build/tmp_components/checks
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/continuous-delivery trento-docs-site/build/tmp_components/continuous-delivery
-        ## Contracts must be fixed
         - command: git clone --depth 1 --branch fix_docs --single-branch https://github.com/trento-project/contracts trento-docs-site/build/tmp_components/contracts
         - command: git clone --depth 1 --branch fix_docs --single-branch https://github.com/trento-project/helm-charts trento-docs-site/build/tmp_components/helm-charts
         - command: git clone --depth 1 --branch fix_docs --single-branch https://github.com/trento-project/mcp-server trento-docs-site/build/tmp_components/mcp-server
@@ -31,14 +31,13 @@ ext:
         - command: git clone --depth 1 --branch docs_autobuild --single-branch https://github.com/trento-project/werkzeugkoffer trento-docs-site/build/tmp_components/werkzeugkoffer
         - command: git clone --depth 1 --branch fix_docs --single-branch https://github.com/trento-project/workbench trento-docs-site/build/tmp_components/workbench
 
-    # Generate navigation for components
+    # Generate navigation for components in nav_developer.adoc
     - run:
       - command: node trento-docs-site/scripts/generate-components.nav.js
     - scan:
       - dir: trento-docs-site/build/gen_navigation
         files: 'nav_components.adoc'
         into: modules/developer/partials
-
     # Trento official documentation repo https://github.com/SUSE/doc-unversioned
     - scan:
       - dir: trento-docs-site/build/tmp_docs/user-guide/trento/adoc
