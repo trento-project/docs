@@ -11,7 +11,7 @@ body {
 .navbar {
   background: var(--navbar-background);
   color: var(--navbar-button-font-color-trento);
-  font-size: calc(16 / var(--rem-base) * 1rem);
+  font-size: calc(14.4 / var(--rem-base) * 1rem);
   height: var(--navbar-height);
   position: fixed;
   top: 0;
@@ -44,9 +44,9 @@ body {
 }
 
 .navbar-brand .navbar-item:first-child img {
-  max-height: 3.5rem;
-  width: 10rem;
-  height: auto;
+  max-height: 36px;
+  width: auto;
+  height: 36px;
   display: block;
   padding-right: 0.5rem;
 }
@@ -305,8 +305,8 @@ body {
   .navbar-end > a.navbar-item:hover,
   .navbar-end .navbar-link:hover,
   .navbar-end .navbar-item.has-dropdown:hover .navbar-link {
-    background: var(--navbar_hover-background);
     color: var(--navbar-button-font-color-trento);
+    filter: invert(14%) sepia(39%) saturate(748%) hue-rotate(121deg) brightness(20%) contrast(96%);
   }
 
   .navbar-end .navbar-link::after {
@@ -320,7 +320,7 @@ body {
   }
 
   .navbar-end > a.navbar-item:last-child img {
-    height: 1.75rem;
+    height: 1rem;
     width: auto;
   }
 
