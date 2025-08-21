@@ -4,5 +4,5 @@
   font-weight: 400;
   src:
     url(~@fontsource/lato/files/lato-latin-400-normal.woff2) format("woff2"),
-    url(~@fontsource/lato/files/lato-latin-400-normal.woff) format("woff")
+    url(~@fontsource/lato/files/lato-latin-400-normal.woff) format("woff");
 }
