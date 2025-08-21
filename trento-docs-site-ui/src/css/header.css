@@ -10,8 +10,8 @@ body {
 
 .navbar {
   background: var(--navbar-background);
-  color: var(--navbar-font-color);
-  font-size: calc(16 / var(--rem-base) * 1rem);
+  color: var(--navbar-button-font-color-trento);
+  font-size: calc(14.4 / var(--rem-base) * 1rem);
   height: var(--navbar-height);
   position: fixed;
   top: 0;
@@ -26,11 +26,13 @@ body {
 .navbar-brand {
   display: flex;
   flex: auto;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
   padding-left: 1rem;
 }
 
 .navbar-brand .navbar-item {
-  color: var(--navbar-font-color);
+  color: var(--navbar-button-font-color-trento);
 }
 
 .navbar-brand .navbar-item:first-child {
@@ -39,6 +41,14 @@ body {
   font-size: calc(22 / var(--rem-base) * 1rem);
   flex-wrap: wrap;
   line-height: 1;
+}
+
+.navbar-brand .navbar-item:first-child img {
+  max-height: 36px;
+  width: auto;
+  height: 36px;
+  display: block;
+  padding-right: 0.5rem;
 }
 
 .navbar-brand .navbar-item:first-child a {
@@ -61,14 +71,13 @@ body {
   font-size: 0.95rem;
   width: 150px;
   border: 1px solid #dbdbdb;
-  border-radius: 0.1em;
+  border-radius: 0.35em;
   line-height: 1.5;
   padding: 0 0.25em;
 }
 
 #search-input:disabled {
   background-color: #dbdbdb;
-  /* disable cursor */
   cursor: not-allowed;
   pointer-events: all !important;
 }
@@ -129,10 +138,21 @@ body {
 
 .navbar-item,
 .navbar-link {
-  color: var(--navbar-menu-font-color);
+  color: var(--nav);
   display: block;
   line-height: var(--doc-line-height);
-  padding: 0.5rem 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.navbar-item img {
+  width: calc(24 / var(--rem-base) * 1rem);
+  height: calc(24 / var(--rem-base) * 1rem);
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .navbar-item.has-dropdown {
@@ -167,7 +187,7 @@ body {
 }
 
 .navbar-dropdown .navbar-item small {
-  color: var(--toolbar-muted-color);
+  color: var(--navbar-button-font-color-trento);
   font-size: calc(12 / var(--rem-base) * 1rem);
 }
 
@@ -220,6 +240,8 @@ body {
     overflow-y: auto;
     overscroll-behavior: none;
     padding: 0.5rem 0;
+    text-align: center;
+    color: var(--navbar-button-font-color-trento);
   }
 
   .navbar-menu:not(.is-active) {
@@ -248,6 +270,7 @@ body {
     display: flex;
     position: relative;
     flex: none;
+    padding: 0.5rem;
   }
 
   .navbar-item:not(.has-dropdown),
@@ -276,18 +299,29 @@ body {
 
   .navbar-end > .navbar-item,
   .navbar-end .navbar-link {
-    color: var(--navbar-font-color);
+    color: var(--navbar-button-font-color-trento);
   }
 
   .navbar-end > a.navbar-item:hover,
   .navbar-end .navbar-link:hover,
   .navbar-end .navbar-item.has-dropdown:hover .navbar-link {
-    background: var(--navbar_hover-background);
-    color: var(--navbar-font-color);
+    color: var(--navbar-button-font-color-trento);
+    filter: invert(14%) sepia(39%) saturate(748%) hue-rotate(121deg) brightness(20%) contrast(96%);
   }
 
   .navbar-end .navbar-link::after {
     border-color: currentColor;
+  }
+
+  .navbar-end > a.navbar-item:last-child {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 0.5rem;
+  }
+
+  .navbar-end > a.navbar-item:last-child img {
+    height: 1rem;
+    width: auto;
   }
 
   .navbar-dropdown {

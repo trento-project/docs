@@ -92,10 +92,13 @@
 }
 
 .nav-menu {
+  max-width: 30rem;
+  min-width: 0;
   min-height: 100%;
   padding: 0.5rem 0.75rem;
   line-height: var(--nav-line-height);
   position: relative;
+  box-sizing: border-box;
 }
 
 .nav-menu-toggle {
