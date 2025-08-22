@@ -10,6 +10,10 @@ const CONFIG = {
   docsDirNames: ["docs", "guides"], // Source directories to scan for documentation in upstream project repo
   ignoredDirs: ["image", "images", "examples"], // Directories to exclude when scanning docsDirNames
   readmeFileName: "README.adoc",
+  docsLevel: "****", // Navigation level for docs directory entries (web/docs/article.adoc)
+  readmeLevel: "***", // Navigation level for README files for the upstream project (web/README.adoc, wanda/README.adoc)
+  lineEnding: "\n", // Line ending for generated content
+  xrefModule: "ROOT", // Antora module for xref links
 };
 const REGEX = {
   contentTitle: /^=\s*(.+)/m, // Matches AsciiDoc title (= Title) and captures the title text
@@ -44,40 +48,88 @@ const extractTitle = async (filePath, config) => {
     return fallbackTitle;
   }
 };
-
-const createXref = (componentName, filePath, title) => {
-  return `xref:ROOT:${componentName}:${filePath}[${title}]`;
+// Creates clickable navigation links in the generated navigation file.
+// createXref("trento-agent", "installation.adoc", "Installation Guide") --> xref:ROOT:trento-agent:installation.adoc[Installation Guide]
+// xref:ROOT:trento-agent:installation.adoc[Installation Guide] --> xref:ROOT:trento-agent:installation.adoc[Installation Guide]
+const createXref = (componentName, filePath, title, config) => {
+  return `xref:${config.xrefModule}:${componentName}:${filePath}[${title}]`;
 };
 
-const processAdocFile = async (
+const getNextLevel = (currentLevel) => "*".repeat(currentLevel.length + 1);
+
+// For README files at component root level
+const generateReadmeNavEntry = async (filePath, componentName, config) => {
+  const { lineEnding, readmeLevel, readmeFileName } = config;
+  const title = await extractTitle(filePath, config);
+  return `${readmeLevel} ${createXref(componentName, readmeFileName, title, config)}${lineEnding}`;
+};
+
+// For docs/guides files
+const generateDocsNavEntry = async (
   filePath,
   componentName,
   relativePath,
+  config,
+) => {
+  const { lineEnding, docsLevel } = config;
+  const title = await extractTitle(filePath, config);
+  const xrefPath = relativePath ?? path.basename(filePath);
+  return `${docsLevel} ${createXref(componentName, xrefPath, title, config)}${lineEnding}`;
+};
+
+// For docs/guides files with custom level (for nested content)
+const generateNestedDocsNavEntry = async (
+  filePath,
+  componentName,
+  relativePath,
+  parentLevel,
+  config,
+) => {
+  const { lineEnding } = config;
+  const level = getNextLevel(parentLevel);
+  const title = await extractTitle(filePath, config);
+  const xrefPath = relativePath ?? path.basename(filePath);
+  return `${level} ${createXref(componentName, xrefPath, title, config)}${lineEnding}`;
+};
+
+// For directory entries (when needed)
+const generateDirNavEntry = (
+  componentName,
+  relativePath,
+  dirName,
   level,
   config,
 ) => {
-  const title = await extractTitle(filePath, config);
-  const xrefPath = relativePath || path.basename(filePath);
-  return `${level} ${createXref(componentName, xrefPath, title)}\n`;
+  const { lineEnding } = config;
+  return `${level} ${createXref(componentName, relativePath, dirName, config)}${lineEnding}`;
 };
 
-const readDirectoryEntries = async (dirPath, config) => {
+// Determines if a directory entry should be included in navigation (excludes ignored directories but keeps all files)
+const shouldIncludeEntry = (entry, ignoredDirs) => {
+  return !(entry.isDirectory() && isIgnoredDir(ignoredDirs)(entry.name));
+};
+
+// Reads directory content, filters out ignored directories, and returns sorted entries (files + non-ignored directories)
+const getFilteredDirectoryContent = async (dirPath, config) => {
   try {
     const entries = await fs.readdir(dirPath, { withFileTypes: true });
     return entries
-      .filter(
-        (entry) =>
-          !(
-            entry.isDirectory() && isIgnoredDir(config.ignoredDirs)(entry.name)
-          ),
-      )
+      .filter((entry) => shouldIncludeEntry(entry, config.ignoredDirs))
       .sort((a, b) => a.name.localeCompare(b.name));
   } catch (error) {
     return [];
   }
 };
 
-const processDirectoryEntries = async (
+const isReadmeFile = (entry, config) => {
+  return entry.isFile() && entry.name === config.readmeFileName;
+};
+
+const isProcessableAdocFile = (entry, config) => {
+  return entry.isFile() && isAdocFile(config.docsFileFormat)(entry.name);
+};
+
+const generateNavContentFromDocsDir = async (
   entries,
   dirPath,
   componentName,
@@ -86,23 +138,23 @@ const processDirectoryEntries = async (
   config,
 ) => {
   let content = "";
-  const nextLevel = "*".repeat(level.length + 1);
 
   for (const entry of entries) {
-    if (entry.isFile() && entry.name === config.readmeFileName) {
-      // Skip README files as they're handled in processDirectory
+    // Checks if a directory entry is a README file that should must be skipped in docs/guides
+    if (isReadmeFile(entry, config)) {
       continue;
     }
-    if (entry.isFile() && isAdocFile(config.docsFileFormat)(entry.name)) {
+
+    if (isProcessableAdocFile(entry, config)) {
       const filePath = path.join(dirPath, entry.name);
       const relativePath = parentPath
         ? `${parentPath}/${entry.name}`
         : entry.name;
-      content += await processAdocFile(
+      content += await generateNestedDocsNavEntry(
         filePath,
         componentName,
         relativePath,
-        nextLevel,
+        level,
         config,
       );
     }
@@ -117,8 +169,9 @@ const processDirectory = async (
   level,
   config,
 ) => {
+  const { readmeFileName, lineEnding } = config;
   const dirName = path.basename(dirPath);
-  const readmePath = path.join(dirPath, config.readmeFileName);
+  const readmePath = path.join(dirPath, readmeFileName);
 
   let content = "";
   // Check if directory contains README.adoc
@@ -126,17 +179,23 @@ const processDirectory = async (
     await fs.access(readmePath);
     // Directory has README, create xref link with directory name as title
     const relativePath = parentPath
-      ? `${parentPath}/${config.readmeFileName}`
-      : `${dirName}/${config.readmeFileName}`;
-    content = `${level} ${createXref(componentName, relativePath, dirName)}\n`;
+      ? `${parentPath}/${readmeFileName}`
+      : `${dirName}/${readmeFileName}`;
+    content = generateDirNavEntry(
+      componentName,
+      relativePath,
+      dirName,
+      level,
+      config,
+    );
   } catch (error) {
     // No README found, use directory name
-    content = `${level} ${dirName}\n`;
+    content = `${level} ${dirName}${lineEnding}`;
   }
 
-  const entries = await readDirectoryEntries(dirPath, config);
+  const entries = await getFilteredDirectoryContent(dirPath, config);
   if (entries.length > 0) {
-    content += await processDirectoryEntries(
+    content += await generateNavContentFromDocsDir(
       entries,
       dirPath,
       componentName,
@@ -155,7 +214,7 @@ const processDocsDirectory = async (
   config,
 ) => {
   const docsDirPath = path.join(componentPath, docsDirName);
-  const docsEntries = await readDirectoryEntries(docsDirPath, config);
+  const docsEntries = await getFilteredDirectoryContent(docsDirPath, config);
 
   if (docsEntries.length === 0) {
     return "";
@@ -169,11 +228,10 @@ const processDocsDirectory = async (
       continue;
     }
     if (entry.isFile() && isAdocFile(config.docsFileFormat)(entry.name)) {
-      content += await processAdocFile(
+      content += await generateDocsNavEntry(
         entryPath,
         componentName,
         entry.name,
-        "****",
         config,
       );
     } else if (entry.isDirectory()) {
@@ -181,7 +239,7 @@ const processDocsDirectory = async (
         entryPath,
         componentName,
         entry.name,
-        "****",
+        config.docsLevel,
         config,
       );
     }
@@ -192,8 +250,7 @@ const processDocsDirectory = async (
 const processReadme = async (componentPath, componentName, config) => {
   const readmePath = path.join(componentPath, config.readmeFileName);
   try {
-    const title = await extractTitle(readmePath, config);
-    return `*** ${createXref(componentName, config.readmeFileName, title)}\n`;
+    return await generateReadmeNavEntry(readmePath, componentName, config);
   } catch (error) {
     return "";
   }
@@ -227,7 +284,7 @@ const processComponent = async (componentName, config) => {
     componentName,
     config,
   );
-  return readmeContent + docsContent + "\n";
+  return readmeContent + docsContent + config.lineEnding;
 };
 
 const getComponents = async (config) => {
@@ -253,7 +310,7 @@ const processAllComponents = async (components, config) => {
       navContent += componentContent;
     }
   }
-  return navContent.trimEnd() + "\n";
+  return navContent.trimEnd() + config.lineEnding;
 };
 
 const writeNavigationFile = async (navContent, config) => {
@@ -262,7 +319,7 @@ const writeNavigationFile = async (navContent, config) => {
   return navFilePath;
 };
 
-const printGenerationResult = (navContent, navFilePath, components) => {
+const printGenerationResult = (navContent, navFilePath, components, config) => {
   const consoleOutput = [
     `📊 Processed ${components.length} upstream Components: ${components.join(", ")}`,
     "============================================================",
@@ -271,26 +328,26 @@ const printGenerationResult = (navContent, navFilePath, components) => {
     navContent,
     "============================================================",
     `✅ Navigation file generated: ${navFilePath}`,
-  ].join("\n");
+  ].join(config.lineEnding);
   console.log(consoleOutput);
 };
 
-const generateComponentsNav = async () => {
+const generateComponentsNav = async (config = CONFIG) => {
   try {
     // Ensure output directory exists
-    await fs.mkdir(CONFIG.outputDir, { recursive: true });
+    await fs.mkdir(config.outputDir, { recursive: true });
     // Get all components
-    const components = await getComponents(CONFIG);
+    const components = await getComponents(config);
     // Process all components
-    const navContent = await processAllComponents(components, CONFIG);
+    const navContent = await processAllComponents(components, config);
     // Write navigation file
-    const navFilePath = await writeNavigationFile(navContent, CONFIG);
-    // console log build process
-    printGenerationResult(navContent, navFilePath, components);
+    const navFilePath = await writeNavigationFile(navContent, config);
+    // console log build process and generated navigation file
+    printGenerationResult(navContent, navFilePath, components, config);
   } catch (error) {
     console.error("❌ Error generating navigation:", error);
     process.exit(1);
   }
 };
 
-generateComponentsNav();
+generateComponentsNav(CONFIG);
