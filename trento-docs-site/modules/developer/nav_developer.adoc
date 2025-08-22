@@ -38,7 +38,8 @@
 
 ** Trento Documentation Page
 *** xref:trento-docs-site/README.adoc[Documentation Page]
-*** xref:trento-docs-site/contributing_components_nav_guide.adoc[Antora Components Contribution Guidelines]
+*** Contribution guide
+**** xref:trento-docs-site/contribution-upstream/contributing_components_nav_guide.adoc[Antora Components Contribution Guidelines]
 *** xref:trento-docs-site-ui/README.adoc[Documentation Page UI]
 
 ** Components
