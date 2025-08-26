@@ -52,9 +52,9 @@
 *** xref:ROOT:checks:README.adoc[Trento Checks]
 
 *** xref:ROOT:helm-charts:README.adoc[Trento Helm Charts]
-**** xref:ROOT:helm-charts:cert-manager/cert-manager.adoc[Adding cert-manager for HTTPS]
-**** xref:ROOT:helm-charts:rabbitmq-tls/rabbitmq-tls.adoc[Generate TLS certificates for RabbitMQ]
-**** xref:ROOT:helm-charts:trento-server/trento-server.adoc[Trento Server Helm Chart]
+**** xref:ROOT:helm-charts:cert-manager.adoc[Adding cert-manager for HTTPS]
+**** xref:ROOT:helm-charts:rabbitmq-tls.adoc[Generate TLS certificates for RabbitMQ]
+**** xref:ROOT:helm-charts:trento-server.adoc[Trento Server Helm Chart]
 
 *** xref:ROOT:web:README.adoc[Trento Web]
 **** xref:ROOT:web:monitoring/monitoring.adoc[Monitoring]
