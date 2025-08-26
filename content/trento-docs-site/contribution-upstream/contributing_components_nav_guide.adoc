@@ -1,25 +1,9 @@
 = Component Documentation Navigation Guide
 
-:script_name= generate-components.nav.js
-:script_path= https://github.com/trento-project/docs/tree/main/trento-docs-site/scripts/{script_name}
-:scanned_upstream_directories= `docs/` and `guides/`
-:component_build_dir= trento-docs-site/build/tmp_components/
-:output_dir= trento-docs-site/build/gen_navigation
-:output_file= nav_components.adoc
-:ignored_dirs= `image`, `images`, and `examples`
-:title_header_format= `= Title`
-:nav_component_level= **
-:nav_readme_level= ***
-:nav_docs_level= ****
-:nav_nested_level= *****
-:xref_module= ROOT
-:docs_directories= docs/ and guides/
-:upstream_repos= trento-project/agent, trento-project/web
-:regex= /^=\s*(.+)/m
 
 == Overview
 
-The at link:{script_path}[*{script_name}*] script automatically generates Antora navigation for upstream component documentation by scanning their {scanned_upstream_directories} directories and creating a structured navigation file.
+The auto build script, link:{script_path}[*{script_name}*], automatically generates Antora navigation for upstream component documentation by scanning their *{scanned_upstream_directories}* directories and creating a structured navigation file.
 
 === How It Works
 
@@ -29,7 +13,7 @@ The at link:{script_path}[*{script_name}*] script automatically generates Antora
 . **Outputs** `{output_file}` for inclusion in Antora site
 
 All content changes should happen **in the upstream repositories** (e.g., `{upstream_repos}`, etc.).
-The script simply **reflects** those changes into the Antora site during the CI build.
+The script **reflects** those changes into the Antora site during the CI build.
 
 == Process Flow
 
@@ -61,6 +45,7 @@ The script simply **reflects** those changes into the Antora site during the CI 
 
 Each upstream component, like {upstream_repos} **must** have this structure:
 
+[source,bash,subs="+attributes"]
 ----
 component/
 ├── README.adoc        # In navigation ({nav_readme_level} level)
@@ -75,6 +60,7 @@ component/
 
 Inside `{docs_directories}` directories:
 
+[source,bash,subs="+attributes"]
 ----
 docs/
 ├── installation.adoc        # Direct files → navigation level {nav_docs_level}
@@ -88,7 +74,7 @@ docs/
 ├── Development/             # Subdirectory → navigation level {nav_docs_level}
 │   ├── setup.adoc           # Nested files → navigation level {nav_nested_level}
 │   ├── Testing/             # Deeper nesting → navigation level {nav_nested_level} TOO DEEP - Try to avoid
-│   │   ├── unit-tests.adoc  # Files inside → navigation level ****** TOO DEEP - Try to avoid
+│   │   ├── unit-tests.adoc  # Files inside → navigation level {nav_nested_level}* TOO DEEP - Try to avoid
 ----
 
 ==== Directory README Behavior
@@ -100,20 +86,26 @@ When a directory contains a `README.adoc` file:
 * **Purpose**: README provides context/overview for the directory contents
 
 Example:
+
+[source,bash,subs="+attributes"]
 ----
 docs/
-└── Api/                    # Directory name: "Api"
-    └── README.adoc         # Title: "{title_header_format} Comprehensive API Documentation Guide"
+└── Api/             # Directory name: "Api"
+    └── README.adoc  # Title: "{title_header_format} Comprehensive API Documentation Guide"
 ----
 
 **Generated navigation:**
+
+[source,bash,subs="+attributes"]
 ----
 **** xref:{xref_module}:component:Api/README.adoc[Api]    # Label = "Api" (directory name)
 ----
 
 **Not:**
+
+[source,bash,subs="+attributes"]
 ----
-**** xref:{xref_module}:component:Api/README.adoc[Comprehensive API Documentation Guide]  # ❌ Wrong
+**** xref:{xref_module}:component:Api/README.adoc[Comprehensive API Documentation Guide]
 ----
 
 This keeps navigation labels **concise and consistent** while allowing README content to provide detailed context.
@@ -129,24 +121,26 @@ This keeps navigation labels **concise and consistent** while allowing README co
 
 === Real-World Example: MCP Server
 
+[source,bash,subs="+attributes"]
 ----
 mcp-server/
-├── README.adoc                                  # {title_header_format} Trento MCP Server
+├── README.adoc                            # {title_header_format} Trento MCP Server
 ├── docs/
-│   ├── Developer/                               # Directory → nav label: "Developer"
-│   │   ├── README.adoc                         # README title ignored for nav label
-│   │   └── getting-started.adoc                # {title_header_format} Getting Started
-│   ├── examples/                               # IGNORED - entire directory excluded
-│   │   └── ...                                 # All contents IGNORED
-│   └── Trento MCP Server documentation/        # Directory → nav label: "Trento MCP Server documentation"
-│       ├── README.adoc                         # README title ignored for nav label
-│       ├── configuration-options.adoc          # {title_header_format} Configuration Options
-│       ├── integration-suse-ai.adoc            # {title_header_format} SUSE AI Integration
-│       └── integration-vscode.adoc             # {title_header_format} VS Code Integration
+│   ├── Developer/                         # Directory → nav label: "Developer"
+│   │   ├── README.adoc                    # README title ignored for nav label
+│   │   └── getting-started.adoc           # {title_header_format} Getting Started
+│   ├── examples/                          # IGNORED - entire directory excluded
+│   │   └── ...                            # All contents IGNORED
+│   └── Trento MCP Server documentation/   # Directory → nav label: "Trento MCP Server documentation"
+│       ├── README.adoc                    # README title ignored for nav label
+│       ├── configuration-options.adoc     # {title_header_format} Configuration Options
+│       ├── integration-suse-ai.adoc       # {title_header_format} SUSE AI Integration
+│       └── integration-vscode.adoc        # {title_header_format} VS Code Integration
 ----
 
 === Generated Navigation
 
+[source,bash,subs="+attributes"]
 ----
 {nav_component_level} Components
 
@@ -168,7 +162,6 @@ mcp-server/
 [source,asciidoc]
 ----
 = SUSE AI Integration       ← This becomes the navigation label
-:description: How to integrate with SUSE AI
 
 == Prerequisites           ← Section headers are ignored for navigation
 ----
@@ -190,6 +183,7 @@ SUSE AI Integration        ← Plain text won't be extracted
 
 === RECOMMENDED Structure
 
+[source,bash,subs="+attributes"]
 ----
 component/
 ├── README.adoc                   # Component overview
@@ -216,6 +210,7 @@ component/
 
 === BETTER Alternative
 
+[source,bash,subs="+attributes"]
 ----
 component/
 └── docs/
@@ -255,8 +250,8 @@ In root README files, use conditional prefixes to ensure proper navigation:
 
 [source,adoc]
 ----
-ifndef::site-gen-antora[:relfileprefix: docs/]
-ifndef::site-gen-antora[:relfileprefix: guides/]
+\ifndef::site-gen-antora[:relfileprefix: docs/]
+\ifndef::site-gen-antora[:relfileprefix: guides/]
 ----
 
 Example: link:https://github.com/trento-project/agent/blob/main/README.adoc?plain=1#L1[Trento Agent example]
@@ -269,7 +264,7 @@ For images, use the conditional `imagesdir` attribute:
 
 [source,adoc]
 ----
-ifndef::imagesdir[:imagesdir: ../images]
+\ifndef::imagesdir[:imagesdir: ../images]
 ----
 
 Store all images in the `{docs_directories}/images/` directory of your component.
@@ -298,12 +293,12 @@ When linking from the root README to other files in the same component root, use
 
 [source,adoc]
 ----
-ifdef::site-gen-antora[]
+\ifdef::site-gen-antora[]
 See xref:CONTRIBUTING.adoc[contribution guidelines].
-endif::[]
-ifndef::site-gen-antora[]
+\endif::[]
+\ifndef::site-gen-antora[]
 See link:CONTRIBUTING.adoc[contribution guidelines].
-endif::[]
+\endif::[]
 ----
 
 This ensures proper xref resolution in Antora while maintaining GitHub compatibility. This pattern is only needed in root README files when linking to other root-level files.
@@ -315,14 +310,14 @@ The script supports various configuration options in `CONFIG`:
 [source,javascript]
 ----
 const CONFIG = {
-  docsDirNames: ["docs", "guides"],           // Directories to scan
+  docsDirNames: ["docs", "guides"],             // Directories to scan
   ignoredDirs: ["image", "images", "examples"], // Directories to ignore
-  readmeFileName: "README.adoc",              // README file name
-  docsFileFormat: ".adoc",                    // File format to process
-  readmeLevel: "***",                         // Navigation level for READMEs
-  docsLevel: "****",                          // Navigation level for docs files
-  xrefModule: "ROOT",                         // Antora module for cross-references
-  lineEnding: "\n"                            // Line ending format
+  readmeFileName: "README.adoc",                // README file name
+  docsFileFormat: ".adoc",                      // File format to process
+  readmeLevel: "***",                           // Navigation level for READMEs
+  docsLevel: "****",                            // Navigation level for docs files
+  xrefModule: "ROOT",                           // Antora module for cross-references
+  lineEnding: "\n"                              // Line ending format
 };
 ----
 

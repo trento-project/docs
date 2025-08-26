@@ -38,6 +38,7 @@
 
 ** Trento Documentation Page
 *** xref:trento-docs-site/README.adoc[Documentation Page]
+*** xref:trento-docs-site/contribution-upstream/contributing_components_nav_guide.adoc[How to Contribute Component Navigation]
 *** xref:trento-docs-site-ui/README.adoc[Documentation Page UI]
 
 include::partial$nav_components.adoc[]
