@@ -29,7 +29,7 @@ The script **reflects** those changes into the Antora site during the CI build.
 ... Ignores directories named {ignored_dirs}.
 ... For each `.adoc` file found:
 .... Extracts title from first-level AsciiDoc header or uses filename as fallback.
-.... Creates xref links with format `xref:{xref_module}:componentName:filePath[title]`.
+.... Creates xref links with format `\xref:{xref_module}:componentName:filePath[title]`.
 .... Handles nested directories by creating appropriate navigation levels.
 ... Skips any README files found inside `docs/` or `guides/` directories.
 .. Builds the final navigation content starting with `{nav_component_level} Components` header.
@@ -267,7 +267,7 @@ For images, use the conditional `imagesdir` attribute:
 \ifndef::imagesdir[:imagesdir: ../images]
 ----
 
-Store all images in the `{docs_directories}/images/` directory of your component.
+Store all images in the `{docs_directories}` images directory of your component.
 
 Images can be embedded in an article with the set imagesdir :
 [source,adoc]
