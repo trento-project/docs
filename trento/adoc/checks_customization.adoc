@@ -1,0 +1,51 @@
+[[checks_customization]]
+
+== Checks Customization
+
+=== Overview of checks Customization
+
+Trento makes it possible to adjust expected check values to match target-specific requirements. This can be done directly through the Trento Web console without modifying the original check or impacting other targets.
+
+The Trento web console receives a check catalog from Wanda. In the check selection view of a specific target, you can see all available check categories. Click on a category to expand the list of checks associated with it. If you have the *required permissions*, a settings icon appears to the right of a customizable check. Click on the settings icon to open a modal window where you can adjust check values.
+
+==== The check customization modal includes the following elements:
+
+* Selected Check ID.
+
+* Check description.
+
+* Warning message that neither Trento nor SUSE can be held responsible for system malfunctions caused by deviations in the target configuration from best practices.
+
+* A list of all customizable check values. Each value includes a value name with the original default check value and an input field with the current customized or default value.
+
+* The current target-specific provider.
+
+* Save, Reset and Close buttons at the bottom.
+
+The Save button is disabled by default. The button is enabled when the user checks the warning and modifies a value. The custom values are stored in the Wanda’s database, so they persist across system reboots.
+
+The Reset button is enabled only when the check has been customized. Use the button to reverse the changes.
+
+A Modified Pill indicator next to the check ID indicates that the values have been customized. A Reset icon next to the Settings icon can be used to revert to default values.
+
+=== Target-specific Check Customization
+
+A check is always executed on a target, which can be a host or a cluster. Users can customize check values specific to the target environment to ensure optimal system performance. Customizations are target-specific, and they do not affect other targets or the original default check values.
+
+=== Required permissions
+
+Only admin users and users with the `all:checks_customization` permission can customize checks. The customization button in the Trento Web console is not shown for users without this permission. If a check has been modified, the modified Pill is shown for all users.
+
+=== Customizable checks
+
+All checks with the following value types are customizable:
+
+- String
+- Number
+- Boolean
+
+User input is validated to ensure that the input value matches the expected type before allowing to save the custom values in Wanda's database. If the input type is incorrect or mixed, the customization fails, triggering a toast notification, that checks customization failed and a warning message in the modal itself.
+
+=== Check Customization Persistence
+
+Customized check values are persistently stored in Wanda’s database. This ensures that any modifications made by users are consistently applied across subsequent executions. Additionally, customized values remain in effect even after system restarts or updates, ensuring continuous adherence to target-specific configurations.
