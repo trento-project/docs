@@ -8,8 +8,8 @@ content:
     - url: ./../
       start_path: trento-docs-site
       branches:
-        - HEAD
-
+        - versioning
+        - versioning-suse
 ui:
   bundle:
     url: ./../trento-docs-site-ui/build/ui-bundle.zip
