@@ -7,9 +7,7 @@ content:
   sources:
     - url: ./../
       start_path: trento-docs-site
-      branches:
-        - versioning
-        - versioning-suse
+      branches: [versioning, versioning-suse]
 ui:
   bundle:
     url: ./../trento-docs-site-ui/build/ui-bundle.zip
