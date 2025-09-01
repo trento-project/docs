@@ -1,8 +1,8 @@
-== 2. API Key Management and Authentication
+== 2. Personal Access Tokens Management and Authentication
 
 [width="100%",cols="<18%,<82%",]
 |===
-|Feature Name | API Keys Management and Authentication
+|Feature Name | Personal Access Tokens Management and Authentication
 |Start Date | Aug26th, 2025
 |Category | Architecture, Authnz
 |PR | https://github.com/trento-project/docs/pull/92[#92]
@@ -12,7 +12,7 @@
 
 == Summary
 
-Add api key management and authentication.
+Add Personal Access Tokens (PATs) management and authentication.
 
 == Motivation
 
@@ -31,58 +31,58 @@ While this approach works well for user-interactive scenarios as the web UI, it 
  * the `access_token` issued at login is short-lived, with a default lifetime of 3 minutes, unless a global configuration is set to extend it
  * the refresh token flow adds complexity to the client requiring it to track current access token expiration or react to unauthorized requests to trigger refresh
 
-This RFC proposes the introduction of API Keys management and the enhancement of the current authentication for an improved support of different kind of clients (agent/UI/third party software)
+This RFC proposes the introduction of Personal Access Tokens (PATs) management and the enhancement of the current authentication for an improved support of different kind of clients (agent/UI/third party software)
 
 === Use Cases outline
 
- * As a user, I want to generate an API Key with a custom expiration date, so that I can use it for third-party integrations
- * As a user, I want to revoke an API Key, so that I can ensure it is no longer valid and cannot be used
- * As a trento administrator, I want all API Keys of a deleted user to be not usable anymore, to prevent unauthorized access
+ * As a user, I want to generate a Personal Access Token with a custom expiration date, so that I can use it for third-party integrations
+ * As a user, I want to revoke a Personal Access Token, so that I can ensure it is no longer valid and cannot be used
+ * As a trento administrator, I want all Personal Access Tokens of a deleted user to be not usable anymore, to prevent unauthorized access
 
 Edit related use cases are not part of the initial implementation, ie:
 
- * As a user, I want to change the expiration date of an API Key
- * As a user, I want to regenerate an API Key
+ * As a user, I want to change the expiration date of a Personal Access Token
+ * As a user, I want to regenerate a Personal Access Token
 
 == Detailed design
 
 Considering the outlined link:#_use_cases_outline[use cases] we need to:
 
- * expose CRUD-ish link:#_api_key_operations[operations] to generate/revoke API Keys references
- * link:#_authenticating_api_keys[authenticate API Keys] when used in API calls
- * ensure that all link:#_api_keys_on_service_providers[service components] properly handle API Keys (ie an API Key can also be used to access Wanda's APIs)
+ * expose CRUD-ish link:#_personal_access_token_operations[operations] to generate/revoke PATs references
+ * link:#_authenticating_personal_access_tokens[authenticate PATs] when used in API calls
+ * ensure that all link:#_personal_access_tokens_on_service_providers[service components] properly handle PATs (ie a PAT can also be used to access Wanda's APIs)
 
-NOTE: At the time of writing we are considering the generated API Keys to _carry_ the same permissions as the user who created them.
+NOTE: At the time of writing we are considering the generated PATs to _carry_ the same permissions as the user who created them.
 
-=== API Key Operations
+=== Personal Access Token Operations
 
-In order to support standard API Key Management features, the following new operations would be introduced:
+In order to support standard Personal Access Token Management features, the following new operations would be introduced:
 
-* link:#_generate_a_new_api_key[Generate a new API Key] 
-* link:#_revoke_an_api_key[Revoke an API Key]
-* link:#_retrieve_api_keys[Retrieve API Keys]
+* link:#_generate_a_new_personal_access_token[Generate a new Personal Access Token] 
+* link:#_revoke_a_personal_access_token[Revoke a Personal Access Token]
+* link:#_retrieve_personal_access_tokens[Retrieve Personal Access Tokens]
 
 *Disclaimer:* endpoints, methods, paths, query strings, parameters are indicative at this point and subject to change.
 
-==== Generate a new API Key
+==== Generate a new Personal Access Token
 
-This operation allows to generate a new API Key for the currently logged user.
+This operation allows to generate a new Personal Access Token for the currently logged user.
 
 The user must provide a name and an expiration date:
 
  * name is mandatory and should be unique within the user's scope
  * expiration date should be in ISO 8601 format
- * expiration date can be omitted or provided as `null` to indicate no expiration (non-expiring keys are still under evaluation)
+ * expiration date can be omitted or provided as `null` to indicate no expiration (non-expiring tokens are still under evaluation)
 
 *Endpoint*
 
-`+POST /profile/api_keys+`
+`+POST /profile/tokens+`
 
 *Request*
 [source,json]
 ----
 {
-    "name": "an-api-key-name",
+    "name": "a-token-name",
     "expire_at": "2025-12-31T23:59:59Z"
 }
 ----
@@ -110,24 +110,24 @@ Note that:
  * this is the only place where the `access_token` would be exposed.
  * the token is not stored in trento
 
-==== Revoke an API Key
+==== Revoke a Personal Access Token
 
-This operation deletes the reference to an API Key and as a result, the API Key will no longer be valid and cannot be used, regardless of its expiration date. See link:#_guarding_against_revoked_tokens[Guarding against revoked tokens].
+This operation deletes the reference to a Personal Access Token and as a result, the PAT will no longer be valid and cannot be used, regardless of its expiration date. See link:#_guarding_against_revoked_tokens[Guarding against revoked tokens].
 
 *Endpoint*
 
-`+DELETE /profile/api_keys/:name+`
+`+DELETE /profile/tokens/:name+`
 
-Note that using `name` is safe because in combination with the currently logged user identifier, it uniquely identifies the API Key.
+Note that using `name` is safe because in combination with the currently logged user identifier, it uniquely identifies the Personal Access Token.
 
-==== Retrieve API Keys
+==== Retrieve Personal Access Tokens
 
-This operation exposes the list of API Keys metadata for the currently logged user. +
+This operation exposes the list of Personal Access Tokens metadata for the currently logged user. +
 The actual token is exposed only once at generation time.
 
 *Endpoint*
 
-`+GET /profile/api_keys+`
+`+GET /profile/tokens+`
 
 *Response*
 [source,json]
@@ -151,13 +151,13 @@ The actual token is exposed only once at generation time.
 ]
 ----
 
-Its response will be used to build the API Keys list UI
+Its response will be used to build the Personal Access Tokens list UI
 
-image::./images/0002-api-keys-list.png[API Keys list]
+image::./images/0002-pats-list.png[Personal Access Tokens list]
 
-=== Authenticating API Keys
+=== Authenticating Personal Access Tokens
 
-Since an API Key is effectively a JWT that will then be used to authenticate requests, the idea is to levarage https://datatracker.ietf.org/doc/html/rfc7519#section-4[JWT Claims] to attach relevant information for authentication flow.
+Since a PAT is effectively a JWT that will then be used to authenticate requests, the idea is to levarage https://datatracker.ietf.org/doc/html/rfc7519#section-4[JWT Claims] to attach relevant information for authentication flow.
 
 ==== Determining authentication rule
 
@@ -166,25 +166,21 @@ Currently Trento supports two different authentication flows:
  * agents: they send an agent specific token via a `X-Trento-apiKey: <token>` header
  * user based authorization (ie UI): token is sent via a `Authorization: Bearer <token>` header
 
-By introducing api keys we need a way to distinguish whether we are user based requests or api keys requests.
+By introducing PATs we need a way to distinguish whether we are authenticating user based requests or PAT requests.
 
 ===== *Option 1: use a different header*
 
-1a: use `X-Trento-ApiKey: <token>` header for API Key requests. +
-This would mean changing the way we process requests for agents and make sure they use a different header like `X-Trento-Agent-ApiKey: <token>`.
-
-1b: use a complete different naming for api keys like `X-Trento-User-ApiKey: <token>` or the like
+Use a `X-Trento-PAT: <token>` or the like for PAT authenticated requests.
 
 ===== *Option 2: rely on the claims shape*
 
-We could use the same `Authorization: Bearer <token>` header for API Key requests, and rely on the claims shape of a presented token (e.g. check for the presence of a specific claim).
+We could use the same `Authorization: Bearer <token>` header for PAT authenticated requests, and rely on the claims shape of a presented token (e.g. check for the presence of a specific claim).
 
 This would allow us to keep headers combinations slim and simple.
 
 '''
 
-Both options 1b and 2 are equally valid. +
-Option 2, though, has the advantage of not requiring changes to the way we process requests for agents, besides keeping headers combinations simple.
+Both options are equally valid, option 2 just keeps headers combinations simple.
 
 ==== Guarding against revoked tokens
 
@@ -229,34 +225,34 @@ NOTE: https://datatracker.ietf.org/doc/html/rfc7519#section-4.1[All the names ar
 
 Option 1 fits well as it relies on the standard JWT identification.
 
-=== API Keys on service providers
+=== Personal Access Tokens on service providers
 
 Trento is composed of multiple services, each potentially requiring to authenticate and authorize a presented token.
 
 Currently https://github.com/trento-project/wanda[Wanda] is the only service that exposes authenticated resources, besides web.
 
-However, unlike web, Wanda does not have knowledge about the API keys (to determine whether one has been revoked/invalidated) nor users (to make sure abilities attached to a token are still valid for the given user).
+However, unlike web, Wanda does not have knowledge about the Personal Access Tokens (to determine whether one has been revoked) nor users (to make sure abilities attached to a token are still valid for the given user).
 
-This is a concern because unauthorized access could be granted to Wanda's resources even if the token has been revoked/invalidated and additionally to that, the user's abilities may have changed since the token was first issued.
+This is a concern because unauthorized access could be granted to Wanda's resources even if the token has been revoked and additionally to that, the user's abilities may have changed since the token was first issued.
 
 Options are:
 
- . make sure Wanda does not accept any requests made with an API key
- . introduce a mechanism for Wanda to validate API keys and user permissions (ie communicate with web's relevant APIs)
+ . make sure Wanda does not accept any requests made with a Personal Access Token
+ . introduce a mechanism for Wanda to validate Personal Access Tokens and user permissions (ie communicate with web's relevant APIs)
  . consider the introduction of a proxy/API gateway that does validate tokens before hitting a resource provider
 
 This section might require an RFC on its own.
 
 == Drawbacks
 
-The main identified drawback revolves around the API key consistency across services.
+The main identified drawback revolves around the PAT consistency across services.
 
 == Alternatives
 
 == Unresolved questions
 
-The main unresolved question is about link:_api_keys_on_service_providers[API keys on service providers]:
+The main unresolved question is about link:_personal_access_tokens_on_service_providers[Personal Access Tokens on service providers]:
 
- . How can we ensure that API keys are properly revoked/invalidated across all services?
+ . How can we ensure that Personal Access Tokens are properly revoked/invalidated across all services?
  . How to make sure that user permissions are consistent across all services?
 
