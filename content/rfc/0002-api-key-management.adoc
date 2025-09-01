@@ -38,14 +38,17 @@ This RFC proposes the introduction of API Keys management and the enhancement of
  * As a user, I want to generate an API Key with a custom expiration date, so that I can use it for third-party integrations
  * As a user, I want to revoke an API Key, so that I can ensure it is no longer valid and cannot be used
  * As a trento administrator, I want all API Keys of a deleted user to be not usable anymore, to prevent unauthorized access
- * As a user, I want to change the expiration date of an API Key (TBD whether a new one should be generated and invalidate the current or the same key should be kept)
- * As a user, I want to regenerate an API Key (TBD whether the previous one should be invalidated)
+
+Edit related use cases are not part of the initial implementation, ie:
+
+ * As a user, I want to change the expiration date of an API Key
+ * As a user, I want to regenerate an API Key
 
 == Detailed design
 
 Considering the outlined link:#_use_cases_outline[use cases] we need to:
 
- * expose CRUD-ish link:#_api_key_operations[operations] to generate/revoke/change API Keys references
+ * expose CRUD-ish link:#_api_key_operations[operations] to generate/revoke API Keys references
  * link:#_authenticating_api_keys[authenticate API Keys] when used in API calls
  * ensure that all link:#_api_keys_on_service_providers[service components] properly handle API Keys (ie an API Key can also be used to access Wanda's APIs)
 
@@ -57,7 +60,6 @@ In order to support standard API Key Management features, the following new oper
 
 * link:#_generate_a_new_api_key[Generate a new API Key] 
 * link:#_revoke_an_api_key[Revoke an API Key]
-* link:#_edit_an_api_key[Edit an API Key]
 * link:#_retrieve_api_keys[Retrieve API Keys]
 
 *Disclaimer:* endpoints, methods, paths, query strings, parameters are indicative at this point and subject to change.
@@ -117,29 +119,6 @@ This operation deletes the reference to an API Key and as a result, the API Key 
 `+DELETE /profile/api_keys/:name+`
 
 Note that using `name` is safe because in combination with the currently logged user identifier, it uniquely identifies the API Key.
-
-==== Edit an API Key
-
-This operation allows to change an API Key's metadata.
-
-TBD:
-
- * whether changing the expiration date means generating a new token *and* invalidating the current one or simply updating the expiration date of the current token
- * whether regenerating the API Key requires invalidating the current one or not
-
-See link:#_token_invalidation[Token invalidation].
-
-*Endpoint*
-
-`+PATCH /profile/api_keys/:name+`
-
-[source,json]
-----
-{
-    "name": "new-api-key-name",
-    "expire_at": "2026-12-31T23:59:59Z"
-}
-----
 
 ==== Retrieve API Keys
 
@@ -249,71 +228,6 @@ NOTE: https://datatracker.ietf.org/doc/html/rfc7519#section-4.1[All the names ar
 '''
 
 Option 1 fits well as it relies on the standard JWT identification.
-
-==== Token invalidation
-
-Assuming token regeneration (with or without a change in the expiration date) requires invalidating the current one, we need a way to determine whether a token has been changed since it was issued.
-
-===== *Option 1: rely on `jti` claim*
-
-We could re-assign a new `jti` value to the token every time it is regenerated, however in this case we'd need another unchanging identifier attached to it. +
-to keep supporting link:_guarding_against_revoked_tokens[Guarding against revoked tokens].
-
-Sample claims
-[source,json]
-----
-{
-  "jti": "2bc2f4e0-a599-45fc-a4cf-30c29f51c75a",
-  "sub": "<user_id>",
-  "exp": "<expiration_date>",
-  "trnttknid": "<api_key_id>"
-}
-----
-or in an object
-[source,json]
-----
-{
-  "jti": "2bc2f4e0-a599-45fc-a4cf-30c29f51c75a",
-  "sub": "<user_id>",
-  "exp": "<expiration_date>",
-  "trnt": {
-    "tknid": "<api_key_id>",
-  }
-}
-----
-
-===== *Option 2: attach a custom claim for token version*
-
-Alternatively we could keep `jti` as the unchanging unique identifier of the token and use a custom claim to indicate the version of the token.
-
-[source,json]
-----
-{
-  "jti": "2bc2f4e0-a599-45fc-a4cf-30c29f51c75a",
-  "sub": "<user_id>",
-  "exp": "<expiration_date>",
-  "trnt": {
-    "tknvsn": "<version>"
-  }
-}
-----
-
-`tknvsn` could be an integer that is incremented each time the token is regenerated or a UUID, also changed upon regeneration.
-In any case we could use this claim to determine whether the token being presented has been changed - thus invalidated - since it was issued.
-
-'''
-
-Option 2 keeps the semantic meaning of the `jti` claim while allowing for token versioning.
-
-==== Checking token expiration
-
-Token expiration is currently based on the https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.4[`exp`] claim.
-
-Depending on what we decide it should happen on token changes, we might need to revisit part of the expiration check mechanism.
-
-If we decide that changing a token's expiration date means regenerating it and thus invalidating previous, we don't need to do anything because of the depicted link:_token_invalidation[Token invalidation].
-
-Otherwise, if we decide that changing a token's expiration date *does not* mean regenerating it, and *does not* invalidate previous one, we need to make sure we rely on the stored expiration date, rather than on `exp` claim.
 
 === API Keys on service providers
 
