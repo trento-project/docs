@@ -7,10 +7,6 @@ on:
       - 'trento/xml/**'
       - 'trento/adoc/**'
       - 'trento/images/src/**'
-      - '**/trento/DC-*'
-      - '**/trento/xml/**'
-      - '**/trento/adoc/**'
-      - '**/trento/images/src/**'
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
@@ -18,10 +14,6 @@ on:
       - 'trento/xml/**'
       - 'trento/adoc/**'
       - 'trento/images/src/**'
-      - '**/trento/DC-*'
-      - '**/trento/xml/**'
-      - '**/trento/adoc/**'
-      - '**/trento/images/src/**'
   workflow_dispatch:
 
 jobs:
