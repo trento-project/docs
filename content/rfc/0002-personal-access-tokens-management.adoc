@@ -91,6 +91,7 @@ The user must provide a name and an expiration date:
 [source,json]
 ----
 {
+    "jti": "9018c06c-4a13-4da3-8216-5f7857f0524d",
     "name": "foo",
     "expire_at": "2025-12-31T23:59:59.000000Z",
     "created_at": "2025-08-28T15:17:25.065254Z",
@@ -116,9 +117,8 @@ This operation deletes the reference to a Personal Access Token and as a result,
 
 *Endpoint*
 
-`+DELETE /profile/tokens/:name+`
-
-Note that using `name` is safe because in combination with the currently logged user identifier, it uniquely identifies the Personal Access Token.
+`+DELETE /profile/tokens/:jti+` +
+`+DELETE /profile/tokens/9018c06c-4a13-4da3-8216-5f7857f0524d+`
 
 ==== Retrieve Personal Access Tokens
 
@@ -134,16 +134,19 @@ The actual token is exposed only once at generation time.
 ----
 [
     {
+        "jti": "9018c06c-4a13-4da3-8216-5f7857f0524d",
         "name": "foo",
         "expire_at": "2025-12-31T23:59:59.000000Z",
         "created_at": "2025-08-29T08:06:05.931995Z"
     },
     {
+        "jti": "55da61f1-4307-41b9-810d-2aad983338af",
         "name": "bar",
         "expire_at": "2025-09-19T22:00:00.078446Z",
         "created_at": "2025-08-29T08:05:22.051956Z"
     },
     {
+        "jti": "0f88a062-74ef-44ea-86d8-de41672bf53a",
         "name": "baz",
         "expire_at": null,
         "created_at": "2025-08-29T07:49:20.078446Z"
@@ -194,7 +197,7 @@ By using a UUID as `jti` claim we are pretty confident about its uniqueness, mak
 
 ===== *Option 2: attach the token identifier to the JWT*
 
-If we don't use jti we'd need to rely on a private claim name to include the token identifier - for instance the row id in the database - in the JWT.
+If we don't use jti we'd need to rely on a private claim name to include the token identifier - for instance the row id in the database if jti is not the primary key - in the JWT.
 
 In order to reduce claim name collision chances, we can namespace trento related claims. 
 
