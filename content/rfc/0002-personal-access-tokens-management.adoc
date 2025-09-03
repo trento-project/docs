@@ -37,7 +37,7 @@ This RFC proposes the introduction of Personal Access Tokens (PATs) management a
  * As a user, I want to revoke a Personal Access Token, so that I can ensure it is no longer valid and cannot be used
  * As a trento administrator, I want all Personal Access Tokens of a deleted or disabled user to be not usable anymore, to prevent unauthorized access
 
-Edit related use cases are not part of the initial implementation, ie:
+Edit related use cases are not part of the initial implementation, eg:
 
  * As a user, I want to change the expiration date of a Personal Access Token
  * As a user, I want to regenerate a Personal Access Token
