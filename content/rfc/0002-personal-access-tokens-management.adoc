@@ -250,6 +250,10 @@ The main identified drawback revolves around the PAT consistency across services
 
 == Alternatives
 
+The following alternatives could be considered in replacement of or as an addition to what mentioned in the RFC:
+
+ * allow users to select scopes for a Personal Access Token (currently not feasible because Trento auth system is role/ability based rather than scope based and roles are assigned to users by admins) requires significant changes
+
 == Unresolved questions
 
 The main unresolved question is about link:#_personal_access_tokens_on_service_providers[Personal Access Tokens on service providers]:
