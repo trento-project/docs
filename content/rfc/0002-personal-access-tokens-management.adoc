@@ -3,12 +3,10 @@
 [width="100%",cols="<18%,<82%",]
 |===
 |Feature Name | Personal Access Tokens Management and Authentication
-|Start Date | Aug26th, 2025
+|Start Date | Aug 26th, 2025
 |Category | Architecture, Authnz
 |PR | https://github.com/trento-project/docs/pull/92[#92]
 |===
-
-:toc:
 
 == Summary
 
@@ -160,7 +158,7 @@ image::../images/rfc/0002-pats-list.png[Personal Access Tokens list]
 
 === Authenticating Personal Access Tokens
 
-Since a PAT is effectively a JWT that will then be used to authenticate requests, the idea is to levarage https://datatracker.ietf.org/doc/html/rfc7519#section-4[JWT Claims] to attach relevant information for authentication flow.
+Since a PAT is effectively a JWT that will then be used to authenticate requests, the idea is to leverage https://datatracker.ietf.org/doc/html/rfc7519#section-4[JWT Claims] to attach relevant information for authentication flow.
 
 ==== Determining authentication rule
 
@@ -254,7 +252,7 @@ The main identified drawback revolves around the PAT consistency across services
 
 == Unresolved questions
 
-The main unresolved question is about link:_personal_access_tokens_on_service_providers[Personal Access Tokens on service providers]:
+The main unresolved question is about link:#_personal_access_tokens_on_service_providers[Personal Access Tokens on service providers]:
 
  . How can we ensure that Personal Access Tokens are properly revoked/invalidated across all services?
  . How to make sure that user permissions are consistent across all services?
