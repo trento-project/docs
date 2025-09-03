@@ -156,7 +156,7 @@ The actual token is exposed only once at generation time.
 
 Its response will be used to build the Personal Access Tokens list UI
 
-image::./images/0002-pats-list.png[Personal Access Tokens list]
+image::../images/rfc/0002-pats-list.png[Personal Access Tokens list]
 
 === Authenticating Personal Access Tokens
 
