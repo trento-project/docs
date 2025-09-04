@@ -106,7 +106,7 @@ $ curl -X GET "..." -H "Authorization: Bearer <THE-GENERATED-TOKEN>"
 
 Note that:
 
- * this is the only place where the `access_token` would be exposed.
+ * this is the only place where the `PAT` would be exposed.
  * the token is not stored in trento
 
 ==== Revoke a Personal Access Token
@@ -154,8 +154,6 @@ The actual token is exposed only once at generation time.
 
 Its response will be used to build the Personal Access Tokens list UI
 
-image::../images/rfc/0002-pats-list.png[Personal Access Tokens list]
-
 === Authenticating Personal Access Tokens
 
 Since a PAT is effectively a JWT that will then be used to authenticate requests, the idea is to leverage https://datatracker.ietf.org/doc/html/rfc7519#section-4[JWT Claims] to attach relevant information for authentication flow.
@@ -187,44 +185,9 @@ Both options are equally valid, option 2 just keeps headers combinations simple.
 
 We want to make sure that a revoked (aka deleted/not existent) token - even though not expired yet - cannot be used, and to do so we need a bit of information within the token's claims so that we can query for its existence.
 
-===== *Option 1: rely on `jti` claim*
-
 We can rely on the https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.7[`jti`] claim and have it stored alongside with token's metadata for checking existence at authentication time.
 
 By using a UUID as `jti` claim we are pretty confident about its uniqueness, making it safe to query against for existence.
-
-===== *Option 2: attach the token identifier to the JWT*
-
-If we don't use jti we'd need to rely on a private claim name to include the token identifier - for instance the row id in the database if jti is not the primary key - in the JWT.
-
-In order to reduce claim name collision chances, we can namespace trento related claims. 
-
-For example:
-[source,json]
-----
-{
-  "sub": "<user_id>",
-  "exp": "<expiration_date>",
-  "trnttknid": "<api_key_id>"
-}
-----
-or via an object that allows for reduced repetition of `trnt` in case of extra claims needed
-[source,json]
-----
-{
-  "sub": "<user_id>",
-  "exp": "<expiration_date>",
-  "trnt": {
-    "tknid": "<api_key_id>"
-  }
-}
-----
-
-NOTE: https://datatracker.ietf.org/doc/html/rfc7519#section-4.1[All the names are short because a core goal of JWTs is for the representation to be compact]
-
-'''
-
-Option 1 fits well as it relies on the standard JWT identification.
 
 === Personal Access Tokens on service providers
 
