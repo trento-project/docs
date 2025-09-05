@@ -26,10 +26,15 @@ antora:
     index_latest_only: true
 
 asciidoc:
+  extensions:
+    - asciidoctor-kroki
   attributes:
     page-pagination: ''
     site-gen-antora: ''
     imagesdir: _images
+    kroki-server-url: https://kroki.io
+    kroki-fetch-diagram: true
+    kroki-default-format: svg
     script_name: 'generate-components.nav.js'
     script_path: 'https://github.com/trento-project/docs/tree/main/trento-docs-site/scripts/{script_name}'
     scanned_upstream_directories: 'docs/ and guides/'
