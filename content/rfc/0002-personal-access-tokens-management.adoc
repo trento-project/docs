@@ -46,11 +46,31 @@ Edit related use cases are not part of the initial implementation, eg:
 
 Considering the outlined link:#_use_cases_outline[use cases] we need to:
 
- * expose CRUD-ish link:#_personal_access_token_operations[operations] to generate/revoke PATs references
+ * expose CRUD-ish link:#_personal_access_token_operations[operations] to generate/revoke PATs link:#_personal_access_tokens_metadata_storage[references stored in web]
  * link:#_authenticating_personal_access_tokens[authenticate PATs] when used in API calls
  * ensure that all link:#_personal_access_tokens_on_service_providers[service components] properly handle PATs (ie a PAT can also be used to access Wanda's APIs)
 
 NOTE: At the time of writing we are considering the generated PATs to _carry_ the same permissions as the user who created them.
+
+=== Personal Access Token Metadata storage
+
+To enable operations on PATs, the following metadata will be stored in trento.
+
+[source,ascii]
+----
++------------+---------------+----------+------------------------------------+
+| Column     | Data Type     | Null?    | Constraints                        |
++------------+---------------+----------+------------------------------------+
+| jti        | UUID          | NOT NULL | PRIMARY KEY                        |
+| name       | VARCHAR(255)  | NOT NULL |                                    |
+| expire_at  | TIMESTAMP     | NULL     |                                    |
+| user_id    | BIGINT        | NOT NULL | FOREIGN KEY → public.users(id)     |
+| created_at | TIMESTAMP     | NOT NULL |                                    |
+| updated_at | TIMESTAMP     | NOT NULL |                                    |
++------------+---------------+----------+------------------------------------+
+
+(user_id, name) is a UNIQUE INDEX
+----
 
 === Personal Access Token Operations
 
