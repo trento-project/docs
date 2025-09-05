@@ -96,7 +96,7 @@ The operations orchestration is composed only by 2 states:
 
 This image represents the states and transitions:
 
-[mermaid]
+[source,mermaid,svg]
 ----
   graph TD;
       A[Start operation]-->B{Steps left to run?};
