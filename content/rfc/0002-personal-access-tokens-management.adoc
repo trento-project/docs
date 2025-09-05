@@ -239,7 +239,9 @@ Options are:
  . introduce a mechanism for Wanda to validate Personal Access Tokens and user permissions (ie communicate with web's relevant APIs)
  . consider the introduction of a proxy/API gateway that does validate tokens before hitting a resource provider
 
-This section might require an RFC on its own.
+This section might require an RFC on its own, however the current proposal is to expose a https://www.oauth.com/oauth2-servers/token-introspection-endpoint[token introspection endpoint] from web and have Wanda communicate with it to validate tokens beyond stateless integrity.
+
+This same endpoint could expose user permissions information, allowing Wanda to make more informed authorization decisions based on fresh data.
 
 == Drawbacks
 
@@ -250,10 +252,11 @@ The main identified drawback revolves around the PAT consistency across services
 The following alternatives could be considered in replacement of or as an addition to what mentioned in the RFC:
 
  * allow users to select scopes for a Personal Access Token (currently not feasible because Trento auth system is role/ability based rather than scope based and roles are assigned to users by admins) requires significant changes
+ * decouple wanda and web from sharing `ACCESS_TOKEN_ENC_SECRET` and introduce https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-key-sets[JWKS] as per https://datatracker.ietf.org/doc/html/rfc7517[RFC7517]. Valuable but deferred
 
-== Unresolved questions
+== Questions
 
-The main unresolved question is about link:#_personal_access_tokens_on_service_providers[Personal Access Tokens on service providers]:
+The following questions are resolved in link:#_personal_access_tokens_on_service_providers[Personal Access Tokens on service providers]:
 
  . How can we ensure that Personal Access Tokens are properly revoked/invalidated across all services?
  . How to make sure that user permissions are consistent across all services?
