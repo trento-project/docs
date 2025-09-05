@@ -52,6 +52,20 @@ Considering the outlined link:#_use_cases_outline[use cases] we need to:
 
 NOTE: At the time of writing we are considering the generated PATs to _carry_ the same permissions as the user who created them.
 
+=== PATs are JWTs
+
+The main reason about having JWTs as PATs is that, besides JWT being a consolidated standard, we have already in place the machinery to create/validate them.
+
+Additionally to this, claims are useful to store relevant information that we can then extract and use for validation.
+
+For completeness it is fair to mention that we could get to the same result also with an opaque token. +
+We could for instance use https://hexdocs.pm/phoenix/Phoenix.Token.html[Phoenix.Token], that allows encoding/decoding relevant content as we do with a JWT.
+
+However we need to consider the following: +
+unless we decide to use a different header, then using such tokens via `Authorization: Bearer <token>` would mean having to try to decode it first in a way and if that fails fallback to the other decoding strategy, introducing unnecessary complexity (also considering that we'd need to check on actual decoding errors to decide whether to even try the following strategy in the chain)
+
+Additionally, in order to make wanda able to verify the integrity of such tokens we'd need to have it share the same secret key base as web, but this would be avoided by making wanda call web's APIs to validate tokens.
+
 === Personal Access Token Metadata storage
 
 To enable operations on PATs, the following metadata will be stored in trento.
