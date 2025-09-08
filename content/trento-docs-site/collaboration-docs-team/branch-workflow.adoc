@@ -1,27 +1,26 @@
-= Git branch workflow: Managing a single repository with multiple branches
+= Managing a single documentation repository with multiple branches
 
 == Summary
 
-This guide describes the workflow for maintaining synchronized documentation branches in a single repository.
-The Development team and the Documentation team collaborate using this workflow to ensure documentation consistency across versions.
+This guide describes the workflow for maintaining synchronized documentation branches in a single repository. The Trento Development team and the Documentation team collaborate using this workflow to ensure documentation consistency across versions.
 
 == Repository structure
 
 The documentation repository contains:
 
 `main` branch::
-  Contains the latest development documentation for the open source project.
-  Uses `version: ~` and `display_version: latest` in the `antora.yml` file.
+  Contains the latest pre-released development documentation for the trento open source project.
+  Uses `version: ~` and `display_version: pre-release` in the `antora.yml` file.
 
 `suse` branch::
-  Contains the official release documentation for SUSE.
-  Uses `version: suse` and `display_version: 2.5` in the `antora.yml` file.
+  Contains the official released version of Trento documentation at link:https://documentation.suse.com/en-us/sles-sap/trento/html/SLES-SAP-trento/index.html[SUSE official docs portal].
+  Uses `version: latest` in `antora.yml` file.
 
-The suse branch will always represent the latest released versionand reflects the released version at link:https://documentation.suse.com/sles-sap/trento/html/SLES-SAP-trento/index.html[documentation.suse.com]
+The link:https://github.com/trento-project/docs/tree/suse[`suse`] branch will always represent the latest released version of Trento.
 
-== Weekly synchronization procedure
+== Synchronization of main and suse branch
 
-Synchronize the branches at least weekly during or after the Documentation team sync call.
+Synchronize the branches as often as possible, but at least weekly during or after the Documentation team sync call.
 This procedure ensures all improvements from `main` are included in the release suse branch.
 
 === Synchronization steps
@@ -101,4 +100,5 @@ What if someone else pushed to the release branch?::
   `git pull origin suse`
 
 How can I preview changes before pushing?::
-  Create a draft pull request from your local branch to review changes before force-pushing.
+  - Create a draft pull request from your local branch to review changes before force-pushing.
+  - Build antora page locally to preview the page

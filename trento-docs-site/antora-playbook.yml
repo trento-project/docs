@@ -14,7 +14,6 @@ ui:
     url: ./../trento-docs-site-ui/build/ui-bundle.zip
     snapshot: true
 
-
 output:
   dir: ./build/trento-docs-site-public
 
