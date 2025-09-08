@@ -5,7 +5,7 @@
 |Feature Name | Personal Access Tokens Management and Authentication
 |Start Date | Aug 26th, 2025
 |Category | Architecture, Authnz
-|PR | https://github.com/trento-project/docs/pull/92[#92]
+|PR | https://github.com/trento-project/docs/pull/91[#91]
 |===
 
 == Summary
