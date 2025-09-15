@@ -154,36 +154,43 @@ This operation deletes the reference to a Personal Access Token and as a result,
 
 ==== Retrieve Personal Access Tokens
 
-This operation exposes the list of Personal Access Tokens metadata for the currently logged user. +
-The actual token is exposed only once at generation time.
+Retrieval of PATs is necessary for users to manage their own tokens as well as for user admins to manage other users' tokens.
+
+We're going to leverage existing user retrieval endpoints to expose PATs metadata.
 
 *Endpoint*
 
-`+GET /profile/tokens+`
+`+GET /api/v1/users/<user_id>+` for user admins +
+`+GET /api/v1/profile+` for regular users accessing their own profile
+
+Only Personal Access Tokens metadata will be exposed: the actual token is exposed only once at generation time.
 
 *Response*
 [source,json]
 ----
-[
-    {
-        "jti": "9018c06c-4a13-4da3-8216-5f7857f0524d",
-        "name": "foo",
-        "expire_at": "2025-12-31T23:59:59.000000Z",
-        "created_at": "2025-08-29T08:06:05.931995Z"
-    },
-    {
-        "jti": "55da61f1-4307-41b9-810d-2aad983338af",
-        "name": "bar",
-        "expire_at": "2025-09-19T22:00:00.078446Z",
-        "created_at": "2025-08-29T08:05:22.051956Z"
-    },
-    {
-        "jti": "0f88a062-74ef-44ea-86d8-de41672bf53a",
-        "name": "baz",
-        "expire_at": null,
-        "created_at": "2025-08-29T07:49:20.078446Z"
-    }
-]
+{
+    // other user fields
+    "personal_access_tokens": [
+        {
+            "jti": "9018c06c-4a13-4da3-8216-5f7857f0524d",
+            "name": "foo",
+            "expire_at": "2025-12-31T23:59:59.000000Z",
+            "created_at": "2025-08-29T08:06:05.931995Z"
+        },
+        {
+            "jti": "55da61f1-4307-41b9-810d-2aad983338af",
+            "name": "bar",
+            "expire_at": "2025-09-19T22:00:00.078446Z",
+            "created_at": "2025-08-29T08:05:22.051956Z"
+        },
+        {
+            "jti": "0f88a062-74ef-44ea-86d8-de41672bf53a",
+            "name": "baz",
+            "expire_at": null,
+            "created_at": "2025-08-29T07:49:20.078446Z"
+        }
+    ]
+}
 ----
 
 Its response will be used to build the Personal Access Tokens list UI
