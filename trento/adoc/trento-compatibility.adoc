@@ -2,6 +2,8 @@ include::product-attributes.adoc[]
 
 [[sec-trento-compatibility-matrix]]
 == Compatibility matrix between {trserver} and {tragent}s
+:revdate: 2025-06-10
+
 
 .Compatibility matrix between {trserver} and {tragent}s
 [cols="^1,^1,^1,^1,^1,^1,^1,^1,^1,^1", options="header"]

@@ -2,6 +2,8 @@ include::product-attributes.adoc[]
 
 [[sec-trento-updating-trentoagent]]
 == Updating a {tragent}
+:revdate: 2025-06-10
+
 
 To update the {tragent}, follow the procedure below:
 

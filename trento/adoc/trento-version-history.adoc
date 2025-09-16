@@ -2,6 +2,8 @@ include::product-attributes.adoc[]
 
 [[sec-trento-version-history]]
 == Highlights of {trento} versions
+:revdate: 2025-06-10
+
 
 Below is a list of the most important user-facing features in the
 different versions of {trento}. For a more detailed information about

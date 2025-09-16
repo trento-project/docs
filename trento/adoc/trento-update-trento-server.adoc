@@ -2,6 +2,8 @@ include::product-attributes.adoc[]
 
 [[sec-trento-updating-trentoserver]]
 == Updating {trserver}
+:revdate: 2025-06-10
+
 
 The procedure to update {trserver} depends on the chosen deployment
 option: {k8s}, systemd, or containerized.

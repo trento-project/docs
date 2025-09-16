@@ -2,6 +2,8 @@ include::product-attributes.adoc[]
 
 [[sec-trento-updating-trento-checks]]
 == Updating {trento} Checks
+:revdate: 2025-06-10
+
 
 Configuration checks are an integral part of the checks engine, but they
 are delivered separately. This allows customers to update the checks

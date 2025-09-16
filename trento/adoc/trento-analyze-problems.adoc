@@ -2,6 +2,8 @@ include::product-attributes.adoc[]
 
 [[sec-trento-problemanalysis]]
 == Problem Analysis
+:revdate: 2025-06-10
+
 
 This section covers common problems and how to analyze them.
 

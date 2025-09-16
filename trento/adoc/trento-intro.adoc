@@ -2,6 +2,8 @@ include::product-attributes.adoc[]
 
 [[sec-trento-what]]
 == What is {trento}?
+:revdate: 2025-06-10
+
 
 {trento} is the official version of the Trento community project. It is a comprehensive monitoring solution consisting of two main components: the {trserver} and the {tragent}. {trento} provides the following functionality and features:
 

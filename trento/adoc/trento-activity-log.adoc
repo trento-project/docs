@@ -2,6 +2,8 @@ include::product-attributes.adoc[]
 
 [[sec-activity-log]]
 == Activity Log
+:revdate: 2025-06-10
+
 
 {trento} collects system events and user actions in the Activity Log.
 It can be accessed from the left-hand side panel of the {trento}

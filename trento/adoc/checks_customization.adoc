@@ -1,6 +1,8 @@
 [[checks_customization]]
 
 == Checks Customization
+:revdate: 2025-06-03
+
 
 === Overview of checks Customization
 

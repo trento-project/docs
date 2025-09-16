@@ -2,6 +2,8 @@ include::product-attributes.adoc[]
 
 [[sec-systemd-deployment]]
 == systemd deployment
+:revdate: 2025-08-05
+
 
 A systemd installation of {trento} Server, based on RPM packages, can be done
 manually using the latest available version of SUSE Linux Enterprise Server for

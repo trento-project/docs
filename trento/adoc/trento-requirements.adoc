@@ -2,6 +2,8 @@ include::product-attributes.adoc[]
 
 [[sec-trento-requirements]]
 == Requirements
+:revdate: 2025-08-06
+
 
 This section describes requirements for the {trserver} and its {tragent}s.
 

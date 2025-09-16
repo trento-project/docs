@@ -2,6 +2,8 @@ include::product-attributes.adoc[]
 
 [[sec-trento-user-management]]
 == User management
+:revdate: 2025-06-10
+
 
 {trento} provides a local permission-based user management feature with
 optional multi-factor authentication. This feature enables segregation
