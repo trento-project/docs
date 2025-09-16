@@ -1,6 +1,8 @@
 include::product-attributes.adoc[]
 
 == Containerized deployment
+:revdate: 2025-08-05
+
 
 A containerized deployment of {trserver} is identical to the systemd
 deployment. However, the web and check engine components are deployed as

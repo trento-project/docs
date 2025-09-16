@@ -3,6 +3,8 @@ include::product-attributes.adoc[]
 
 [[helm-event-pruning]]
 == Configuring event pruning
+:revdate: 2025-05-23
+
 
 The event pruning feature allows administrators to manage how long registered events are stored in the database and how often the expired events are removed.
 

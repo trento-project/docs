@@ -2,6 +2,8 @@ include::product-attributes.adoc[]
 
 [[integrating-single-sign-on]]
 == Single Sign-On integration
+:revdate: 2025-06-10
+
 
 {trento} can be integrated for Single Sign-On (SSO) with a third-party identity
 provider (IDP).

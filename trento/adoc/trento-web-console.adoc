@@ -2,6 +2,8 @@ include::product-attributes.adoc[]
 
 [[sec-trento-use-webconsole]]
 == Using {trweb}
+:revdate: 2025-06-10
+
 
 The left sidebar in the {trweb} contains the following entries:
 

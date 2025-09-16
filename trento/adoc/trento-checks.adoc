@@ -2,6 +2,8 @@ include::product-attributes.adoc[]
 
 [[sec-trento-checks]]
 == Performing configuration checks
+:revdate: 2025-06-10
+
 
 {trento} provides configuration checks that ensure your infrastructure
 setup adheres to our or other vendor's Best Practices, and it does not

@@ -1,3 +1,4 @@
+<date><?dbtimestamp format="B d, Y"?></date>
 <!-- History -->
 <revhistory xml:id="rh-article-trento">
   <revision><date>2025-06-05</date>

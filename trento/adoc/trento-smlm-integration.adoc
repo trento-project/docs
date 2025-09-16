@@ -2,6 +2,8 @@ include::product-attributes.adoc[]
 
 [[sec-integration-with-SUSE-Manager]]
 == Integration with {smlm}
+:revdate: 2025-06-10
+
 
 {trento} can be inegrated with {smlm} to provide the
 {sap} administrator with information about relevant patches and

@@ -2,6 +2,8 @@ include::product-attributes.adoc[]
 
 [[sec-trento-rotating-apikeys]]
 == Rotating API keys
+:revdate: 2025-06-10
+
 
 Communication from the {tragent} to the {trserver} is secured by a API
 key that must be provided in the agent configuration file.

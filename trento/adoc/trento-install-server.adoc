@@ -2,6 +2,8 @@ include::product-attributes.adoc[]
 
 [[sec-trento-installing-trentoserver]]
 == Installing {trserver}
+:revdate: 2025-08-05
+
 
 [[sec-trento-k8s-deployment]]
 === {k8s} deployment

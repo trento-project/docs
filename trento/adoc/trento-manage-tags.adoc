@@ -2,6 +2,8 @@ include::product-attributes.adoc[]
 
 [[sec-trento-manage-tags]]
 == Managing tags
+:revdate: 2025-06-10
+
 
 Tags are used to label specific objects with location, owner, etc. The
 objects can be hosts, clusters, databases or {sap} systems. Tags make

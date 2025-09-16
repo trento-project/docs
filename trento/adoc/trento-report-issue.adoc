@@ -2,6 +2,8 @@ include::product-attributes.adoc[]
 
 [[sec-trento-report-problem]]
 == Reporting an Issue
+:revdate: 2025-06-10
+
 
 {suse} customers with registered {sles4sap}{nbsp}15 (SP3 or higher)
 distributions can report {trento} issues either directly in the {scc}
