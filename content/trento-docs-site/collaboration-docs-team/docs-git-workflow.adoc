@@ -1,0 +1,120 @@
+= Git Workflow for Trento Documentation
+
+== The Two-Branch Model
+
+This workflow is designed for simplicity and safety, using only two permanent branches with clearly defined roles.
+
+`main` (The Development Branch)::
+*   *Purpose:* The single source of truth for all new content and future developments. All new work starts here.
+*   *Corresponds to:* The `prerelease` version of the documentation.
+*   *`antora.yml` config:* `version: ~`, `display_version: pre-release`
+
+`latest` (The Stable Branch)::
+*   *Purpose:* This branch reflects the content of the officially published and supported documentation. It is only updated for new releases or critical hotfixes.
+*   *Corresponds to:* The `released` version (e.g., `2.5`).
+*   *`antora.yml` config:* `version: '2.5'`, `display_version: 'latest: 2.5'`
+
+== The Workflow in Detail: Three Clear Use Cases
+
+Every task falls into one of the following three processes.
+
+=== Use Case 1: Developing New Content
+
+This is the standard process for all daily work. It ensures that the `release` branch remains stable and untouched.
+
+. *Create a Branch:* Every new task (e.g., a new chapter, a new feature or a correction) begins on a new, short-lived branch created from `main`.
++
+[source,bash]
+----
+# Ensure your local main is up-to-date
+git checkout main
+git pull origin main
+
+# Create a new branch for your task
+git checkout -b feature/new-feature
+----
+
+. *Do the Work:* Make all your changes and commits on this `feature/*` branch.
+
+. *Integrate:* When the work is complete, merge the `feature/*` branch back into `main` using a Pull Request (PR).
+
+
+====
+New content is *always* and *only* integrated into the `main` branch.
+====
+
+=== Use Case 2: Publishing a New Release
+
+This is a deliberate, manual process to promote the `prerelease` content to become the new version.
+
+. *Update the `latest` Branch:* Merge all the new content that has accumulated in `main` since the last release into the `latest` branch.
++
+[source,bash]
+----
+# Switch to the latest branch and ensure it's up-to-date
+git checkout latest
+git pull origin latest
+
+# Merge all changes from main
+git merge main
+----
+
+. *Update Configuration:* After the merge, edit the `antora.yml` file directly on the `latest` branch to reflect the new version number (e.g., update `2.5` to `2.6`). Commit this change.
+
+
+====
+Content flows in one direction only: from `main` into `release`.
+====
+
+=== Use Case 3: Applying a Critical Hotfix
+
+This process is for urgent corrections to the already published documentation. It uses `cherry-pick` in a controlled and safe manner.
+
+. *Create the Fix in `main` (The Golden Rule):* The fix is *always* created in the `main` branch first. This is the most important step to prevent future problems. The process is the same as developing new content:
+.. Create a `fix/*` branch from `main`.
+.. Make the correction and commit it. The commit should be small and contain only the fix.[1]
+.. Merge the `fix/*` branch back into `main` via a Pull Request.
+
+. *Apply the Fix to `latest`:* After the fix is in `main`, port the specific commit containing the correction over to the `latest` branch.
++
+[source,bash]
+----
+# Switch to the latest branch
+git checkout latest
+
+# Apply the specific commit from main
+git cherry-pick <commit-hash-of-the-fix>
+----
++
+NOTE: You can find the `<commit-hash-of-the-fix>` from the git history log of the `main` branch.
+
+
+====
+A hotfix is always implemented in `main` and then ported to `release` via `cherry-pick`. Never commit a fix directly to the `release` branch.
+====
+
+== A Note on `git cherry-pick`
+
+It is critical to understand how `cherry-pick` works to use it safely.
+
+What it does::
+`cherry-pick` copies the changes from a commit and creates a *brand new commit* on the target branch. The original and the copied commit have different IDs, even though they contain the same change.[2, 3]
+
+The risk::
+If changes are copied back and forth without a clear process, Git "forgets" the relationship between the changes. This can create "time bombs" that lead to unexpected and difficult merge conflicts later, because Git might try to apply the same change twice.[3]
+
+Why our workflow is safe::
+By following the strict rule of **"Fix always in `main` first"**, we defuse this risk. Since the fix already exists in `main` before it is copied to `latest`, there will be no conflict when you perform the next major merge from `main` into `latest`. Git will recognize that the content change is already present.
+
+In this workflow, `cherry-pick` is a specialized tool used *only* for hotfixes. For all other integrations, the safer `git merge` process is used.[4, 5]
+
+== Workflow Summary
+
+[options="header"]
+
+|===
+| Action | Starting Branch | Target Branch | Method
+| *New Content* | `main` | `main` | `feature` branch + Merge
+| *New Release* | `main` | `release` | `git merge main`
+| *Hotfix* | `main` | `release` | `fix` branch in `main` + `cherry-pick`
+|===
