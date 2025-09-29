@@ -7,7 +7,7 @@ content:
   sources:
     - url: ./../
       start_path: trento-docs-site
-      branches: [HEAD, suse]
+      branches: [HEAD, latest]
 
 ui:
   bundle:
