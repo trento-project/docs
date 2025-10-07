@@ -3,6 +3,7 @@
 This document defines the Git branching strategy for the Trento documentation project.
 
 The workflow follows a **Promotion-Based Branching Model (Docs-as-Code)** using two protected, long-lived branches:
+
 * `main` — for development (pre-release content)
 * `latest` — for the stable, published documentation
 
@@ -22,8 +23,8 @@ This model is designed for:
 Two permanent branches define the flow of work:
 
 `main` (Development Branch)::
-*Purpose:* The single source of truth for all new or upcoming content.  
-*Contains:* The *pre-release* version of the documentation.
+* *Purpose:* The single source of truth for all new or upcoming content.
+* *Contains:* The *pre-release* version of the documentation.
 
 `latest` (Stable Branch)::
 *Purpose:* Reflects the content of the *currently published and supported* release.  
@@ -59,11 +60,14 @@ git pull origin main
 git checkout -b feature/describe-new-feature
 ----
 
-. **Do the Work**  
+. **Do the Work**
++
 Edit, commit, and review changes locally.
 
 . **Integrate via Pull Request**
++
 Push your branch and open a PR targeting `main`.
+
 
 [IMPORTANT]
 ====
@@ -94,7 +98,7 @@ git checkout -b release/prepare-v2.6
 +
 [source,bash]
 ----
-git merge main
+git merge --no-ff main
 ----
 Conflicts, especially in `antora.yml`, are expected.  
 Resolve them by keeping the structure from `latest`, then commit:
