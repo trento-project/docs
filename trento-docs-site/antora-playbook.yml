@@ -7,14 +7,12 @@ content:
   sources:
     - url: ./../
       start_path: trento-docs-site
-      branches:
-        - HEAD
+      branches: [HEAD, latest]
 
 ui:
   bundle:
     url: ./../trento-docs-site-ui/build/ui-bundle.zip
     snapshot: true
-
 
 output:
   dir: ./build/trento-docs-site-public
@@ -30,19 +28,3 @@ asciidoc:
     page-pagination: ''
     site-gen-antora: ''
     imagesdir: _images
-    script_name: 'generate-components.nav.js'
-    script_path: 'https://github.com/trento-project/docs/tree/main/trento-docs-site/scripts/{script_name}'
-    scanned_upstream_directories: 'docs/ and guides/'
-    component_build_dir: 'trento-docs-site/build/tmp_components/'
-    output_dir: 'trento-docs-site/build/gen_navigation'
-    output_file: 'nav_components.adoc'
-    ignored_dirs: 'image, images, and examples'
-    title_header_format: = Title
-    nav_component_level: '**'
-    nav_readme_level: '***'
-    nav_docs_level: '****'
-    nav_nested_level: '*****'
-    xref_module: 'ROOT'
-    docs_directories: 'docs/ and guides/'
-    upstream_repos: 'trento-project/agent, trento-project/web'
-    regex: '/^=\s*(.+)/m'

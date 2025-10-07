@@ -1,0 +1,203 @@
+= Git Workflow for Trento Documentation
+
+This document defines the Git branching strategy for the Trento documentation project.
+
+The workflow follows a **Promotion-Based Branching Model (Docs-as-Code)** using two protected, long-lived branches:
+
+* `main` — for development (pre-release content)
+* `latest` — for the stable, published documentation
+
+All changes are promoted from `main` to `latest` through formal Pull Requests.  
+An optional archiving process preserves historical versions, ensuring a future-proof and traceable documentation lifecycle.
+
+== Foundation and Principles
+
+This model is designed for:
+
+* **Clarity:** A simple, two-branch structure (`main` and `latest`) that is easy to understand and communicate.
+* **Safety:** Protected branches and required Pull Requests prevent accidental or unreviewed changes.
+* **Stability:** A dedicated `latest` branch serves as the source for the link:https://documentation.suse.com/sles-sap/trento/html/SLES-SAP-trento/index.html[official documentation^], providing a static and reliable build target.
+
+== Branch Roles and Responsibilities
+
+Two permanent branches define the flow of work:
+
+`main` (Development Branch)::
+* *Purpose:* The single source of truth for all new or upcoming content.
+* *Contains:* The *pre-release* version of the documentation.
+
+`latest` (Stable Branch)::
+*Purpose:* Reflects the content of the *currently published and supported* release.  
+*Contains:* The *official* version (e.g., v2.5).
+
+== Branch Protection
+
+To maintain stability and consistency:
+
+* Both `main` and `latest` are **protected branches**.
+* All changes—whether new features, fixes, or releases—must go through Pull Requests.
+
+This policy ensures:
+
+. **Accident Prevention:** No one can push unreviewed changes directly to protected branches.
+. **Quality Control:** Every change is reviewed, improving overall documentation quality.
+
+== Workflows
+
+Each documentation task follows one of three main workflows.
+
+=== 1. Developing New Content
+
+The default process for writing or updating documentation.  
+It keeps `latest` stable while new material is developed on `main`.
+
+. **Sync and Branch from `main`**
++
+[source,bash]
+----
+git checkout main
+git pull origin main
+git checkout -b feature/describe-new-feature
+----
+
+. **Do the Work**
++
+Edit, commit, and review changes locally.
+
+. **Integrate via Pull Request**
++
+Push your branch and open a PR targeting `main`.
+
+
+[IMPORTANT]
+====
+New content is *always merged into `main` only*.  
+The `latest` branch never receives direct feature changes.
+====
+
+=== 2. Publishing a New Release
+
+Used to promote the current `main` state into a new stable release on `latest`.
+
+. **Prepare for Release**
++
+[NOTE]
+====
+Before starting, ensure `main` and `latest` are up-to-date.
+[source,bash]
+----
+git checkout main
+git pull origin main
+git checkout latest
+git pull origin latest
+git checkout -b release/prepare-v2.6
+----
+====
+
+. **Merge `main` and Resolve Conflicts**
++
+[source,bash]
+----
+git merge --no-ff main
+----
+Conflicts, especially in `antora.yml`, are expected.  
+Resolve them by keeping the structure from `latest`, then commit:
++
+[source,bash]
+----
+git add antora.yml
+git commit
+----
+
+. **Update Version Metadata**
+Edit `antora.yml` to reflect the new version (e.g., change from `2.5` → `2.6`) and commit the change.
+
+. **Open the Release PR**
++
+[source,bash]
+----
+git push origin release/prepare-v2.6
+----
+Create a Pull Request targeting `latest`.  
+After review and approval, merge the PR.  
+The `latest` branch now represents version 2.6.
+
+[IMPORTANT]
+====
+Content flows from `main` → `latest` only through reviewed Pull Requests.
+====
+
+**Trigger the Documentation Build**
+Rebuild manually or wait for the scheduled workflow to publish updates:
+link:https://www.trento-project.io/docs/[www.trento-project.io/docs^]
+
+=== 3. Applying a Critical Hotfix
+
+Used for urgent corrections to published (stable) documentation.
+
+. **Always Fix `main` First**
++
+[source,bash]
+----
+git checkout main
+git pull origin main
+git checkout -b fix/typo-in-command
+----
+Commit and PR your fix into `main`.
+
+. **Backport the Fix to `latest`**
+Find the commit hash from `main`, then:
++
+[source,bash]
+----
+git checkout latest
+git pull origin latest
+git checkout -b hotfix/backport-typo
+git cherry-pick <commit-hash>
+git push origin hotfix/backport-typo
+----
+Open a PR targeting `latest`.
+
+[IMPORTANT]
+====
+Hotfixes are *first merged into `main`* and then *cherry-picked* into `latest`.  
+This guarantees consistency between development and release branches.
+====
+
+== Optional: Archiving Old Versions
+
+To keep historical documentation versions visible in Antora, add an **archiving step** before creating a new release.
+
+. **Archive the Current `latest`**
++
+[source,bash]
+----
+git checkout latest
+git pull origin latest
+git checkout -b v2.5
+git push origin v2.5
+----
+
+. **Update the Antora Playbook**
+Include the new version branch in your `antora-playbook.yml`:
++
+[source,yaml]
+----
+content:
+  sources:
+    - url: .
+      branches: [main, latest, v2.5]
+----
+
+Archived branches (e.g., `v2.5`, `v2.6`) will then appear as selectable versions in the documentation site’s UI.
+
+== Summary
+
+This workflow provides:
+
+* A **promotion-based flow** from `main` → `latest`
+* **Full traceability** through Pull Requests
+* **Safe hotfixing** via cherry-picks
+* **Optional version archiving** for long-term documentation history
+
+Use this process to maintain consistency, stability, and transparency in Trento’s documentation lifecycle.
