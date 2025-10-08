@@ -11,7 +11,7 @@ console.
 
 Each entry in the Activity Log includes the following:
 
-* A timestamp: the day and time (server time, not browser time) the
+* A timestamp: the day and time (UTC timezone) the
 system event or the user action occurred
 * A message: type of the occurred event or user action
 * The user that triggered the event or performed the action. User system
@@ -32,7 +32,7 @@ The Activity Log allows you to filter by the type of event or user action
 (commonly referred to as resource type), by the user that triggered the event or
 performed the action, and by severity status. Only active users are available
 for filtering. The Activity Log also allows you to filter out entries that are
-newer and/or older than an specific date and time (server time).
+newer and/or older than an specific date and time (UTC timezone).
 
 Once a filter has been set, click Apply to filter out the undesired
 entries and Reset to remove all the filters.
@@ -66,4 +66,4 @@ The default retention time for entries in the Activity Log is one month.
 This can be changed in the Activity Log section under Settings. Changing
 the retention time requires the `+all:settings+` permissions. Entries
 older than the specified retention time are deleted every day at
-midnight (server time).
+midnight (UTC timezone).
