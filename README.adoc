@@ -1,20 +1,22 @@
-= Developer Documentation
-ifndef::site-gen-antora[:relfileprefix: /content/]
+= Trento Documentation
 
-This repository contains the Trento project documentation that does not interest a specific service, such as ADR, coding standards and best practices, CI workflows, and templates. The link:https://github.com/trento-project/docs/tree/main/content[*content* directory] is the home of these sources.
- 
-* xref:architecture/trento-architecture.adoc[Architecture]
-* xref:architecture/adr/README.adoc[Architecture Decision Records (ADR)]
-* xref:coding-standards/README.adoc[Coding standards]
-* link:https://github.com/trento-project/docs/tree/main/content/rfc[Request for Comments (RFC)]
-* link:https://github.com/trento-project/docs/tree/main/content/internal-notes[Internal Notes]
-* link:https://github.com/trento-project/docs/tree/main/content/templates[Templates]
+The Trento docs live at the link:https://www.trento-project.io/docs[documentation hub], powered by link:https://antora.org/[Antora].
+The hub publishes two tracks:
+
+* **Pre-release (main)** – includes the newest changes and upcoming features.
+* **Stable (latest)** – the most recent released version.
+
+Content is sourced from multiple upstream Trento repositories and from the dedicated content repo:
+link:https://github.com/trento-project/docs-content[trento-project/docs-content].
 
 == Trento docs site
 
-The `trento-docs-site` directory builds the link:https://www.trento-project.io/docs/[Trento project’s unified documentation site] using https://antora.org/[Antora]. Learn more about xref:trento-docs-site/README.adoc[the documentation hub here].
+The `trento-docs-site` directory contains the Antora playbook, build scripts, and configuration used to assemble the
+link:https://www.trento-project.io/docs/[unified documentation site].  
+For details, see xref:trento-docs-site/README.adoc[Documentation hub (site) README].
 
+== Trento docs site UI
 
-== Trento docs site ui
-
-The `trento-docs-site-ui` directory is used to customize and design the layout of the link:https://www.trento-project.io/docs/[Trento docs site]. Learn more about the xref:trento-docs-site-ui/README.adoc[ui customization here].
+The `trento-docs-site-ui` directory customizes the look & feel of the site (theme, navigation, search UI, etc.) and produces
+the Antora UI bundle.  
+Learn more in xref:trento-docs-site-ui/README.adoc[UI customization README].
