@@ -40,7 +40,7 @@ If you choose not to install Prometheus, set `+CHARTS_ENABLED+` to
 `+false+` in the {trento} web RPM configuration file stored in
 `+/etc/trento/trento-web+`, or when it is provided to the {trento} web
 container. To use an existing Prometheus installation, set `+CHARTS_ENABLED+` to
-`+true+` 
+`+true+`
 ====
 
 [[prometheus-existing-installation, Use existing installation]]
@@ -513,8 +513,8 @@ server {
     ssl_prefer_server_ciphers on;
     ssl_session_cache shared:SSL:10m;
 
-    # Wanda rule
-    location ~ ^/(api/checks|api/v1/checks|api/v2/checks|api/v3/checks|api/groups|api/v1/groups)/  {
+    # Wanda rule for checks, groups, etc.
+    location ~ ^/(api(/(v[0-9]+/)?checks|api(/(v[0-9]+/)?groups))/  {
         allow all;
 
         # Proxy Headers
