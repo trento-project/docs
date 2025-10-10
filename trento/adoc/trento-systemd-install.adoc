@@ -530,6 +530,32 @@ server {
         proxy_pass http://localhost:4001;
     }
 
+    # Wanda openapi endpoints for all versions
+    location ~ ^/wanda/api/(v[0-9]+|latest)/openapi {
+        allow all;
+
+        # Proxy Headers
+        proxy_http_version 1.1;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Cluster-Client-Ip $remote_addr;
+
+        proxy_pass http://localhost:4001/api/$1/openapi;
+    }
+
+    # Wanda doc endpoint
+    location /wanda/api/doc {
+        allow all;
+
+        # Proxy Headers
+        proxy_http_version 1.1;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Cluster-Client-Ip $remote_addr;
+
+        proxy_pass http://localhost:4001/api/doc;
+    }
+
     # Web rule
     location / {
         proxy_http_version 1.1;
