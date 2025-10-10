@@ -513,8 +513,23 @@ server {
     ssl_prefer_server_ciphers on;
     ssl_session_cache shared:SSL:10m;
 
+    # Redirect openapi requests from Wanda doc portal
+    location ~ ^/api/(v[0-9]+|latest|all|unversioned)/openapi$ {
+        if ($http_referer ~* "^https?://[^/]+/wanda/") {
+            return 302 /wanda$request_uri;
+        }
+
+        # If not from wanda, proceed to TrentoWeb
+        proxy_http_version 1.1;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Cluster-Client-Ip $remote_addr;
+
+        proxy_pass http://localhost:4000;
+    }
+
     # Wanda rule for checks, groups, etc.
-    location ~ ^/(api(/(v[0-9]+/)?checks|api(/(v[0-9]+/)?groups))/  {
+    location ~ ^/(api/checks|api/v[0-9]+/checks|api/groups|api/v[0-9]+/groups)/  {
         allow all;
 
         # Proxy Headers
@@ -531,7 +546,7 @@ server {
     }
 
     # Wanda openapi endpoints for all versions
-    location ~ ^/wanda/api/(v[0-9]+|latest)/openapi {
+    location ~ ^/wanda/api/(v[0-9]+|latest|all|unversioned)/openapi {
         allow all;
 
         # Proxy Headers
@@ -541,6 +556,7 @@ server {
         proxy_set_header X-Cluster-Client-Ip $remote_addr;
 
         proxy_pass http://localhost:4001/api/$1/openapi;
+        proxy_redirect /api/$1/openapi /wanda/api/$1/openapi;
     }
 
     # Wanda doc endpoint
@@ -554,13 +570,14 @@ server {
         proxy_set_header X-Cluster-Client-Ip $remote_addr;
 
         proxy_pass http://localhost:4001/api/doc;
+        proxy_redirect /api/doc /wanda/api/doc;
     }
 
     # Web rule
     location / {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
+        proxy_set_header Connection "upgrade";
         proxy_set_header Host $host;
         proxy_cache_bypass $http_upgrade;
 
