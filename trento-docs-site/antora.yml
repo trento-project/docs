@@ -14,6 +14,7 @@ ext:
         - dir: trento-docs-site/build
     ## Fetch documentation from different trento upstream repositories
     - run:
+        - command: git clone --depth 1 --branch main https://github.com/trento-project/docs-content.git  trento-docs-site/build/docs-content
         ## Content of the auto builded components section part of nav_developer.adoc
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/agent trento-docs-site/build/tmp_components/agent
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/ansible trento-docs-site/build/tmp_components/ansible
@@ -38,14 +39,14 @@ ext:
         files: 'nav_components.adoc'
         into: modules/developer/partials
     # Trento user facing documentation from Trento docs repo https://github.com/trento-project/docs
-      - dir: trento/adoc
+      - dir: trento-docs-site/build/docs-content/trento/adoc
         files: '**/*.adoc'
         into: modules/user-guide/pages
-      - dir: trento/images/src/png
+      - dir: trento-docs-site/build/docs-content/trento/images/src/png
         files: '**/*.png'
         into: modules/user-guide/images
     - run:
-        command: trento-docs-site/scripts/generate-attributes-yaml.sh trento/adoc/generic-attributes.adoc ./trento-docs-site/build/adoc_variables/user-guide/antora.yml
+        command: trento-docs-site/scripts/generate-attributes-yaml.sh ./trento-docs-site/build/docs-content/trento/adoc/generic-attributes.adoc ./trento-docs-site/build/adoc_variables/user-guide/antora.yml
     - scan:
         dir: trento-docs-site/build/adoc_variables/user-guide/
         files: 'antora.yml'
@@ -53,10 +54,10 @@ ext:
       - dir: ./..
         files: 'README.adoc'
         into: modules/developer/pages
-      - dir: content
+      - dir: trento-docs-site/build/docs-content/content
         files: '**/*.adoc'
         into: modules/developer/pages/
-      - dir: content/images
+      - dir: trento-docs-site/build/docs-content/content/images
         files: '**/*.{png,jpg,jpeg,svg,gif}'
         into: modules/developer/images/images
     ## Trento upstream projects documentation
