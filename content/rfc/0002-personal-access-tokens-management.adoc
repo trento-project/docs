@@ -52,19 +52,14 @@ Considering the outlined link:#_use_cases_outline[use cases] we need to:
 
 NOTE: At the time of writing we are considering the generated PATs to _carry_ the same permissions as the user who created them.
 
-=== PATs are JWTs
+=== PATs as Opaque Tokens
 
-The main reason about having JWTs as PATs is that, besides JWT being a consolidated standard, we have already in place the machinery to create/validate them.
+The main reason about having opaque tokens as PATs is that by making them unrelated from secrets/keys we avoid PAT invalidation on secrets/keys rotation.
 
-Additionally to this, claims are useful to store relevant information that we can then extract and use for validation.
+For completeness it is fair to mention that the first version of the RFC considered the JWT alternative for PATs, however it was discarded because:
 
-For completeness it is fair to mention that we could get to the same result also with an opaque token. +
-We could for instance use https://hexdocs.pm/phoenix/Phoenix.Token.html[Phoenix.Token], that allows encoding/decoding relevant content as we do with a JWT.
-
-However we need to consider the following: +
-unless we decide to use a different header, then using such tokens via `Authorization: Bearer <token>` would mean having to try to decode it first in a way and if that fails fallback to the other decoding strategy, introducing unnecessary complexity (also considering that we'd need to check on actual decoding errors to decide whether to even try the following strategy in the chain)
-
-Additionally, in order to make wanda able to verify the integrity of such tokens we'd need to have it share the same secret key base as web, but this would be avoided by making wanda call web's APIs to validate tokens.
+ * JWTs would require a key/secret to be signed, and rotating such key/secret would invalidate all issued PATs
+ * we want, at this stage, keep the feature set minimal by avoiding extra complexity about regenerate/reissue PATs to users so that they can update integrated third-party software
 
 === Personal Access Token Metadata storage
 
@@ -72,18 +67,20 @@ To enable operations on PATs, the following metadata will be stored in trento.
 
 [source,ascii]
 ----
-+------------+---------------+----------+------------------------------------+
-| Column     | Data Type     | Null?    | Constraints                        |
-+------------+---------------+----------+------------------------------------+
-| jti        | UUID          | NOT NULL | PRIMARY KEY                        |
-| name       | VARCHAR(255)  | NOT NULL |                                    |
-| expire_at  | TIMESTAMP     | NULL     |                                    |
-| user_id    | BIGINT        | NOT NULL | FOREIGN KEY → public.users(id)     |
-| created_at | TIMESTAMP     | NOT NULL |                                    |
-| updated_at | TIMESTAMP     | NOT NULL |                                    |
-+------------+---------------+----------+------------------------------------+
++------------------+----------------+----------+---------------------+
+| Column           | Data Type      | Null?    | Constraints         |
++------------------+----------------+----------+---------------------+
+| id               | UUID           | NOT NULL | PRIMARY KEY         |
+| hashed_token     | VARCHAR(255)   | NOT NULL | PRIMARY KEY         |
+| name             | VARCHAR(255)   | NOT NULL |                     |
+| expires_at       | TIMESTAMP      | NULL     |                     |
+| user_id          | BIGINT         | NOT NULL | FOREIGN KEY (users) |
+| created_at       | TIMESTAMP      | NOT NULL |                     |
+| updated_at       | TIMESTAMP      | NOT NULL |                     |
++------------------+----------------+----------+---------------------+
 
 (user_id, name) is a UNIQUE INDEX
+(user_id, hashed_token) is a UNIQUE INDEX
 ----
 
 === Personal Access Token Operations
@@ -123,7 +120,7 @@ The user must provide a name and an expiration date:
 [source,json]
 ----
 {
-    "jti": "9018c06c-4a13-4da3-8216-5f7857f0524d",
+    "id": "9018c06c-4a13-4da3-8216-5f7857f0524d",
     "name": "foo",
     "expire_at": "2025-12-31T23:59:59.000000Z",
     "created_at": "2025-08-28T15:17:25.065254Z",
@@ -131,7 +128,7 @@ The user must provide a name and an expiration date:
 }
 ----
 
-The generated `access_token` must be included in the Authorization header when making API calls.
+The generated `access_token` is in the form of `trento_pat_<random_string>` and must be included in the Authorization header when making API calls.
 
 [source,console]
 ----
@@ -145,12 +142,12 @@ Note that:
 
 ==== Revoke a Personal Access Token
 
-This operation deletes the reference to a Personal Access Token and as a result, the PAT will no longer be valid and cannot be used, regardless of its expiration date. See link:#_guarding_against_revoked_tokens[Guarding against revoked tokens].
+This operation deletes the reference to a Personal Access Token and as a result, the PAT will no longer be valid and cannot be used. See link:#_guarding_against_revoked_tokens[Guarding against revoked tokens].
 
 *Endpoint*
 
-`+DELETE /profile/tokens/:jti+` +
-`+DELETE /profile/tokens/9018c06c-4a13-4da3-8216-5f7857f0524d+`
+`+DELETE /profile/tokens/:token_id+` +
+`+DELETE /users/:user_id/tokens/:token_id+`
 
 ==== Retrieve Personal Access Tokens
 
@@ -172,19 +169,19 @@ Only Personal Access Tokens metadata will be exposed: the actual token is expose
     // other user fields
     "personal_access_tokens": [
         {
-            "jti": "9018c06c-4a13-4da3-8216-5f7857f0524d",
+            "id": "9018c06c-4a13-4da3-8216-5f7857f0524d",
             "name": "foo",
             "expire_at": "2025-12-31T23:59:59.000000Z",
             "created_at": "2025-08-29T08:06:05.931995Z"
         },
         {
-            "jti": "55da61f1-4307-41b9-810d-2aad983338af",
+            "id": "55da61f1-4307-41b9-810d-2aad983338af",
             "name": "bar",
             "expire_at": "2025-09-19T22:00:00.078446Z",
             "created_at": "2025-08-29T08:05:22.051956Z"
         },
         {
-            "jti": "0f88a062-74ef-44ea-86d8-de41672bf53a",
+            "id": "0f88a062-74ef-44ea-86d8-de41672bf53a",
             "name": "baz",
             "expire_at": null,
             "created_at": "2025-08-29T07:49:20.078446Z"
@@ -197,7 +194,9 @@ Its response will be used to build the Personal Access Tokens list UI
 
 === Authenticating Personal Access Tokens
 
-Since a PAT is effectively a JWT that will then be used to authenticate requests, the idea is to leverage https://datatracker.ietf.org/doc/html/rfc7519#section-4[JWT Claims] to attach relevant information for authentication flow.
+At every request to Trento's APIs, the system needs to detect what kind of token is being provided and authenticate accordingly.
+
+In case of a Personal Access Token, the system needs to query for its existence, and check its expiration.
 
 ==== Determining authentication rule
 
@@ -212,9 +211,11 @@ By introducing PATs we need a way to distinguish whether we are authenticating u
 
 Use a `X-Trento-PAT: <token>` or the like for PAT authenticated requests.
 
-===== *Option 2: rely on the claims shape*
+===== *Option 2: rely on the token shape*
 
-We could use the same `Authorization: Bearer <token>` header for PAT authenticated requests, and rely on the claims shape of a presented token (e.g. check for the presence of a specific claim).
+We could use the same `Authorization: Bearer <token>` header for PAT authenticated requests, and rely on the shape of a presented token.
+
+Since PATs are in the form of `trento_pat_<random_string>`, we can easily detect whether a token is a PAT and attempt loading it from the database.
 
 This would allow us to keep headers combinations slim and simple.
 
@@ -224,11 +225,10 @@ Both options are equally valid, option 2 just keeps headers combinations simple.
 
 ==== Guarding against revoked tokens
 
-We want to make sure that a revoked (aka deleted/not existent) token - even though not expired yet - cannot be used, and to do so we need a bit of information within the token's claims so that we can query for its existence.
+We want to make sure that a revoked (aka deleted/not existent) token cannot be used, and to do so we will, at authentication time, query for the token hash against the database and:
 
-We can rely on the https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.7[`jti`] claim and have it stored alongside with token's metadata for checking existence at authentication time.
-
-By using a UUID as `jti` claim we are pretty confident about its uniqueness, making it safe to query against for existence.
+ * if the token is not found, authentication fails
+ * if the token is found but expired, authentication fails
 
 === Personal Access Tokens on service providers
 
@@ -246,7 +246,7 @@ Options are:
  . introduce a mechanism for Wanda to validate Personal Access Tokens and user permissions (ie communicate with web's relevant APIs)
  . consider the introduction of a proxy/API gateway that does validate tokens before hitting a resource provider
 
-This section might require an RFC on its own, however the current proposal is to expose a https://www.oauth.com/oauth2-servers/token-introspection-endpoint[token introspection endpoint] from web and have Wanda communicate with it to validate tokens beyond stateless integrity.
+This section might require an RFC on its own, however the current proposal is to expose a https://www.oauth.com/oauth2-servers/token-introspection-endpoint[token introspection endpoint] from web and have Wanda communicate with it to validate tokens.
 
 This same endpoint could expose user permissions information, allowing Wanda to make more informed authorization decisions based on fresh data.
 
@@ -259,7 +259,8 @@ The main identified drawback revolves around the PAT consistency across services
 The following alternatives could be considered in replacement of or as an addition to what mentioned in the RFC:
 
  * allow users to select scopes for a Personal Access Token (currently not feasible because Trento auth system is role/ability based rather than scope based and roles are assigned to users by admins) requires significant changes
- * decouple wanda and web from sharing `ACCESS_TOKEN_ENC_SECRET` and introduce https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-key-sets[JWKS] as per https://datatracker.ietf.org/doc/html/rfc7517[RFC7517]. Valuable but deferred
+ * use JWT as Personal Access Tokens instead of opaque tokens
+ * in case of PATs as JWTs, decouple wanda and web from sharing `ACCESS_TOKEN_ENC_SECRET` and introduce https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-key-sets[JWKS] as per https://datatracker.ietf.org/doc/html/rfc7517[RFC7517]
 
 == Questions
 
