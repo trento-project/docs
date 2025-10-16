@@ -2,6 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-k8s-deployment]]
 === {k8s} deployment
+:revdate: 2025-10-16
 
 The subsection uses the following placeholders:
 
