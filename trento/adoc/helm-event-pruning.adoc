@@ -1,8 +1,7 @@
-include::generic-attributes.adoc[]
 include::product-attributes.adoc[]
 
 [[helm-event-pruning]]
-== Configuring event pruning
+==== Configuring event pruning
 :revdate: 2025-05-23
 
 

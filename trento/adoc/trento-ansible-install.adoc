@@ -1,6 +1,6 @@
 include::product-attributes.adoc[]
 
-== Automated deployment with Ansible
+=== Automated deployment with Ansible
 :revdate: 2025-08-05
 
 

@@ -1,6 +1,6 @@
 include::product-attributes.adoc[]
 
-== Containerized deployment
+=== Containerized deployment
 :revdate: 2025-08-05
 
 
@@ -11,9 +11,9 @@ Docker containers.
 Follow the steps in <<sec-systemd-deployment>>, but skip the *Install
 Trento using RPM packages* step and follow the procedures as described below.
 
-=== Install Trento using Docker
+==== Install Trento using Docker
 
-==== Install Docker container runtime
+===== Install Docker container runtime
 
 . Enable the containers module (replace `15.x` with the correct Service Pack version):
 +
@@ -35,7 +35,7 @@ zypper install docker
 systemctl enable --now docker
 ----
 
-==== Create a dedicated Docker network for Trento
+===== Create a dedicated Docker network for Trento
 
 . Create the Trento Docker network:
 +
@@ -61,7 +61,7 @@ The output should be similar to this (the exact address may vary):
 . Open the _/var/lib/pgsql/data/pg_hba.conf_ file for editing and replace `0.0.0.0/0` with the address returned by the command in the previous step.
 . Restart the PostgreSQL server using the `systemctl restart postgresql` command.
 
-==== Install Trento on Docker
+===== Install Trento on Docker
 
 . Create secret environment variables:
 +
