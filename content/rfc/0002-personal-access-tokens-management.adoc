@@ -1,0 +1,271 @@
+== 2. Personal Access Tokens Management and Authentication
+
+[width="100%",cols="<18%,<82%",]
+|===
+|Feature Name | Personal Access Tokens Management and Authentication
+|Start Date | Aug 26th, 2025
+|Category | Architecture, Authnz
+|PR | https://github.com/trento-project/docs/pull/91[#91]
+|===
+
+== Summary
+
+Add Personal Access Tokens (PATs) management and authentication.
+
+== Motivation
+
+We want to simplify third-party clients integrations with Trento's APIs.
+
+Currently such clients would have to:
+
+ * perform a login API request with username/password
+ * use the provided `access_token` to make subsequent API calls
+ * refresh the token by using the `refresh_token` provided at login
+ * use the *new* `access_token` for subsequent API calls
+
+While this approach works well for user-interactive scenarios as the web UI, it may not be ideal for programmatic access or third-party integrations because:
+
+ * to perform initial login, a username/password pair needs to be known/stored by the client application, which may not be feasible or secure in all cases
+ * the `access_token` issued at login is short-lived, with a default lifetime of 3 minutes, unless a global configuration is set to extend it
+ * the refresh token flow adds complexity to the client requiring it to track current access token expiration or react to unauthorized requests to trigger refresh
+
+This RFC proposes the introduction of Personal Access Tokens (PATs) management and the enhancement of the current authentication for an improved support of different kind of clients (agent/UI/third party software)
+
+=== Use Cases outline
+
+ * As a user, I want to generate a Personal Access Token with a custom expiration date, so that I can use it for third-party integrations
+ * As a user, I want to revoke a Personal Access Token, so that I can ensure it is no longer valid and cannot be used
+ * As a trento administrator, I want all Personal Access Tokens of a deleted or disabled user to be not usable anymore, to prevent unauthorized access
+
+Edit related use cases are not part of the initial implementation, eg:
+
+ * As a user, I want to change the expiration date of a Personal Access Token
+ * As a user, I want to regenerate a Personal Access Token
+
+== Detailed design
+
+Considering the outlined link:#_use_cases_outline[use cases] we need to:
+
+ * expose CRUD-ish link:#_personal_access_token_operations[operations] to generate/revoke PATs link:#_personal_access_tokens_metadata_storage[references stored in web]
+ * link:#_authenticating_personal_access_tokens[authenticate PATs] when used in API calls
+ * ensure that all link:#_personal_access_tokens_on_service_providers[service components] properly handle PATs (ie a PAT can also be used to access Wanda's APIs)
+
+NOTE: At the time of writing we are considering the generated PATs to _carry_ the same permissions as the user who created them.
+
+=== PATs as Opaque Tokens
+
+The main reason about having opaque tokens as PATs is that by making them unrelated from secrets/keys we avoid PAT invalidation on secrets/keys rotation.
+
+For completeness it is fair to mention that the first version of the RFC considered the JWT alternative for PATs, however it was discarded because:
+
+ * JWTs would require a key/secret to be signed, and rotating such key/secret would invalidate all issued PATs
+ * we want, at this stage, keep the feature set minimal by avoiding extra complexity about regenerate/reissue PATs to users so that they can update integrated third-party software
+
+=== Personal Access Token Metadata storage
+
+To enable operations on PATs, the following metadata will be stored in trento.
+
+[source,ascii]
+----
++------------------+----------------+----------+---------------------+
+| Column           | Data Type      | Null?    | Constraints         |
++------------------+----------------+----------+---------------------+
+| id               | UUID           | NOT NULL | PRIMARY KEY         |
+| hashed_token     | VARCHAR(255)   | NOT NULL | PRIMARY KEY         |
+| name             | VARCHAR(255)   | NOT NULL |                     |
+| expires_at       | TIMESTAMP      | NULL     |                     |
+| user_id          | BIGINT         | NOT NULL | FOREIGN KEY (users) |
+| created_at       | TIMESTAMP      | NOT NULL |                     |
+| updated_at       | TIMESTAMP      | NOT NULL |                     |
++------------------+----------------+----------+---------------------+
+
+(user_id, name) is a UNIQUE INDEX
+(user_id, hashed_token) is a UNIQUE INDEX
+----
+
+=== Personal Access Token Operations
+
+In order to support standard Personal Access Token Management features, the following new operations would be introduced:
+
+* link:#_generate_a_new_personal_access_token[Generate a new Personal Access Token] 
+* link:#_revoke_a_personal_access_token[Revoke a Personal Access Token]
+* link:#_retrieve_personal_access_tokens[Retrieve Personal Access Tokens]
+
+*Disclaimer:* endpoints, methods, paths, query strings, parameters are indicative at this point and subject to change.
+
+==== Generate a new Personal Access Token
+
+This operation allows to generate a new Personal Access Token for the currently logged user.
+
+The user must provide a name and an expiration date:
+
+ * name is mandatory and should be unique within the user's scope
+ * expiration date should be in ISO 8601 format
+ * expiration date can be omitted or provided as `null` to indicate no expiration (non-expiring tokens are still under evaluation)
+
+*Endpoint*
+
+`+POST /profile/tokens+`
+
+*Request*
+[source,json]
+----
+{
+    "name": "a-token-name",
+    "expire_at": "2025-12-31T23:59:59Z"
+}
+----
+
+*Response*
+[source,json]
+----
+{
+    "id": "9018c06c-4a13-4da3-8216-5f7857f0524d",
+    "name": "foo",
+    "expire_at": "2025-12-31T23:59:59.000000Z",
+    "created_at": "2025-08-28T15:17:25.065254Z",
+    "access_token": "<THE-GENERATED-TOKEN>"
+}
+----
+
+The generated `access_token` is in the form of `trento_pat_<random_string>` and must be included in the Authorization header when making API calls.
+
+[source,console]
+----
+$ curl -X GET "..." -H "Authorization: Bearer <THE-GENERATED-TOKEN>"
+----
+
+Note that:
+
+ * this is the only place where the `PAT` would be exposed.
+ * the token is not stored in trento
+
+==== Revoke a Personal Access Token
+
+This operation deletes the reference to a Personal Access Token and as a result, the PAT will no longer be valid and cannot be used. See link:#_guarding_against_revoked_tokens[Guarding against revoked tokens].
+
+*Endpoint*
+
+`+DELETE /profile/tokens/:token_id+` +
+`+DELETE /users/:user_id/tokens/:token_id+`
+
+==== Retrieve Personal Access Tokens
+
+Retrieval of PATs is necessary for users to manage their own tokens as well as for user admins to manage other users' tokens.
+
+We're going to leverage existing user retrieval endpoints to expose PATs metadata.
+
+*Endpoint*
+
+`+GET /api/v1/users/<user_id>+` for user admins +
+`+GET /api/v1/profile+` for regular users accessing their own profile
+
+Only Personal Access Tokens metadata will be exposed: the actual token is exposed only once at generation time.
+
+*Response*
+[source,json]
+----
+{
+    // other user fields
+    "personal_access_tokens": [
+        {
+            "id": "9018c06c-4a13-4da3-8216-5f7857f0524d",
+            "name": "foo",
+            "expire_at": "2025-12-31T23:59:59.000000Z",
+            "created_at": "2025-08-29T08:06:05.931995Z"
+        },
+        {
+            "id": "55da61f1-4307-41b9-810d-2aad983338af",
+            "name": "bar",
+            "expire_at": "2025-09-19T22:00:00.078446Z",
+            "created_at": "2025-08-29T08:05:22.051956Z"
+        },
+        {
+            "id": "0f88a062-74ef-44ea-86d8-de41672bf53a",
+            "name": "baz",
+            "expire_at": null,
+            "created_at": "2025-08-29T07:49:20.078446Z"
+        }
+    ]
+}
+----
+
+Its response will be used to build the Personal Access Tokens list UI
+
+=== Authenticating Personal Access Tokens
+
+At every request to Trento's APIs, the system needs to detect what kind of token is being provided and authenticate accordingly.
+
+In case of a Personal Access Token, the system needs to query for its existence, and check its expiration.
+
+==== Determining authentication rule
+
+Currently Trento supports two different authentication flows:
+
+ * agents: they send an agent specific token via a `X-Trento-apiKey: <token>` header
+ * user based authorization (ie UI): token is sent via a `Authorization: Bearer <token>` header
+
+By introducing PATs we need a way to distinguish whether we are authenticating user based requests or PAT requests.
+
+===== *Option 1: use a different header*
+
+Use a `X-Trento-PAT: <token>` or the like for PAT authenticated requests.
+
+===== *Option 2: rely on the token shape*
+
+We could use the same `Authorization: Bearer <token>` header for PAT authenticated requests, and rely on the shape of a presented token.
+
+Since PATs are in the form of `trento_pat_<random_string>`, we can easily detect whether a token is a PAT and attempt loading it from the database.
+
+This would allow us to keep headers combinations slim and simple.
+
+'''
+
+Both options are equally valid, option 2 just keeps headers combinations simple.
+
+==== Guarding against revoked tokens
+
+We want to make sure that a revoked (aka deleted/not existent) token cannot be used, and to do so we will, at authentication time, query for the token hash against the database and:
+
+ * if the token is not found, authentication fails
+ * if the token is found but expired, authentication fails
+
+=== Personal Access Tokens on service providers
+
+Trento is composed of multiple services, each potentially requiring to authenticate and authorize a presented token.
+
+Currently https://github.com/trento-project/wanda[Wanda] is the only service that exposes authenticated resources, besides web.
+
+However, unlike web, Wanda does not have knowledge about the Personal Access Tokens (to determine whether one has been revoked) nor users (to make sure abilities attached to a token are still valid for the given user).
+
+This is a concern because unauthorized access could be granted to Wanda's resources even if the token has been revoked and additionally to that, the user's abilities may have changed since the token was first issued.
+
+Options are:
+
+ . make sure Wanda does not accept any requests made with a Personal Access Token
+ . introduce a mechanism for Wanda to validate Personal Access Tokens and user permissions (ie communicate with web's relevant APIs)
+ . consider the introduction of a proxy/API gateway that does validate tokens before hitting a resource provider
+
+This section might require an RFC on its own, however the current proposal is to expose a https://www.oauth.com/oauth2-servers/token-introspection-endpoint[token introspection endpoint] from web and have Wanda communicate with it to validate tokens.
+
+This same endpoint could expose user permissions information, allowing Wanda to make more informed authorization decisions based on fresh data.
+
+== Drawbacks
+
+The main identified drawback revolves around the PAT consistency across services.
+
+== Alternatives
+
+The following alternatives could be considered in replacement of or as an addition to what mentioned in the RFC:
+
+ * allow users to select scopes for a Personal Access Token (currently not feasible because Trento auth system is role/ability based rather than scope based and roles are assigned to users by admins) requires significant changes
+ * use JWT as Personal Access Tokens instead of opaque tokens
+ * in case of PATs as JWTs, decouple wanda and web from sharing `ACCESS_TOKEN_ENC_SECRET` and introduce https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-key-sets[JWKS] as per https://datatracker.ietf.org/doc/html/rfc7517[RFC7517]
+
+== Questions
+
+The following questions are resolved in link:#_personal_access_tokens_on_service_providers[Personal Access Tokens on service providers]:
+
+ . How can we ensure that Personal Access Tokens are properly revoked/invalidated across all services?
+ . How to make sure that user permissions are consistent across all services?
+
