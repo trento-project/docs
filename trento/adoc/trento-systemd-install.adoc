@@ -1,7 +1,7 @@
 include::product-attributes.adoc[]
 
 [[sec-systemd-deployment]]
-== systemd deployment
+=== systemd deployment
 :revdate: 2025-08-05
 
 
@@ -19,16 +19,16 @@ throughout this guide.
 * SP6
 * SP7
 
-=== List of dependencies
+==== List of dependencies
 
 * https://www.postgresql.org/[PostgreSQL]
 * https://rabbitmq.com/[RabbitMQ]
 * https://nginx.org/en/[NGINX]
 * https://prometheus.io/[Prometheus] (optional)
 
-=== Install {trento} dependencies
+==== Install {trento} dependencies
 
-==== Install Prometheus (Optional)
+===== Install Prometheus (Optional)
 
 https://prometheus.io/[Prometheus] is not required to run {trento}, but it
 is recommended, as it allows {trento} to display charts for each host with
@@ -44,7 +44,7 @@ container. To use an existing Prometheus installation, set `+CHARTS_ENABLED+` to
 ====
 
 [[prometheus-existing-installation, Use existing installation]]
-===== Use existing installation
+====== Use existing installation
 
 Minimal required Prometheus version is *2.28.0*.
 
@@ -57,7 +57,7 @@ packages. Use <<prometheus-packagehub>> as a reference to
 adjust the Prometheus configuration.
 
 [[prometheus-packagehub, Install Prometheus using the *unsupported* PackageHub repository]]
-===== Install Prometheus using the *unsupported* PackageHub repository
+====== Install Prometheus using the *unsupported* PackageHub repository
 
 https://packagehub.suse.com/[PackageHub] packages are tested by SUSE,
 but they do not come with the same level of support as the core SLES
@@ -142,7 +142,7 @@ firewall-cmd --zone=public --add-port=9090/tcp --permanent
 firewall-cmd --reload
 ----
 
-==== Install PostgreSQL
+===== Install PostgreSQL
 
 The current instructions are tested with the following PostgreSQL
 versions:
@@ -171,7 +171,7 @@ zypper in postgresql-server
 systemctl enable --now postgresql
 ----
 
-===== Configure PostgreSQL
+====== Configure PostgreSQL
 
 . Start `+psql+` with the `+postgres+` user to open a connection to the
 database:
@@ -244,7 +244,7 @@ listen_addresses = '*'
 systemctl restart postgresql
 ----
 
-==== Install RabbitMQ
+===== Install RabbitMQ
 
 . Install RabbitMQ server:
 +
@@ -273,7 +273,7 @@ firewall-cmd --reload
 systemctl enable --now rabbitmq-server
 ----
 
-===== Configure RabbitMQ
+====== Configure RabbitMQ
 
 To configure RabbitMQ for a production system, follow the official
 suggestions in the
@@ -298,7 +298,7 @@ rabbitmqctl add_vhost vhost
 rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
 ----
 
-=== Install {trento} using RPM packages
+==== Install {trento} using RPM packages
 
 The `+trento-web+` and `+trento-wanda+` packages come in the supported
 SLES4SAP distributions by default.
@@ -310,7 +310,7 @@ Install {trento} web and wanda:
 zypper install trento-web trento-wanda
 ----
 
-==== Create the configuration files
+===== Create the configuration files
 
 Both services depend on respective configuration files. They must be
 placed in `+/etc/trento/trento-web+` and `+/etc/trento/trento-wanda+`
@@ -338,7 +338,7 @@ Otherwise websockets fail to connect, causing no real-time updates in
 the UI.
 ====
 
-==== trento-web configuration
+===== trento-web configuration
 
 ====
 [source,bash]
@@ -387,7 +387,7 @@ SMTP_PASSWORD=<<SMTP_PASSWORD>>
 ----
 ====
 
-==== trento-wanda configuration
+===== trento-wanda configuration
 
 ====
 [source,bash]
@@ -402,7 +402,7 @@ ACCESS_TOKEN_ENC_SECRET=some-secret
 ----
 ====
 
-==== Start the services
+===== Start the services
 
 Enable and start the services:
 
@@ -411,7 +411,7 @@ Enable and start the services:
 systemctl enable --now trento-web trento-wanda
 ----
 
-==== Monitor the services
+===== Monitor the services
 
 Use `+journalctl+` to check if the services are up and running
 correctly. For example:
@@ -422,7 +422,7 @@ journalctl -fu trento-web
 ----
 
 [[validate-the-health-status-of-trento-web-and-wanda]]
-=== Check the health status of trento web and wanda
+==== Check the health status of trento web and wanda
 
 You can check if {trento} web and wanda services function correctly by
 accessing accessing the `+healthz+` and `+readyz+` API.
@@ -460,7 +460,7 @@ correctly, the output should be as follows:
 ----
 ====
 
-=== Install and configure NGINX
+==== Install and configure NGINX
 
 . Install NGINX package:
 +
@@ -548,13 +548,13 @@ server {
 ----
 ====
 
-=== Prepare SSL certificate for NGINX
+==== Prepare SSL certificate for NGINX
 
 Create or provide a certificate for https://nginx.org/en/[NGINX] to
 enable SSL for {trento}.
 
 [[option-1-creating-a-self-signed-certificate]]
-==== Create a self-signed certificate
+===== Create a self-signed certificate
 
 . Generate a self-signed certificate:
 +
@@ -615,7 +615,7 @@ systemctl enable --now nginx
 ----
 
 [[option-2-using-lets-encrypt-for-a-signed-certificate-using-packagehub-repository]]
-==== Create a signed certificate with Let's Encrypt using PackageHub repository
+===== Create a signed certificate with Let's Encrypt using PackageHub repository
 
 [NOTE]
 ====
@@ -658,7 +658,7 @@ Certbot certificates are valid for 90 days. Refer to the above link for
 details on how to renew certificates.
 ====
 
-=== Accessing the trento-web UI
+==== Accessing the trento-web UI
 
 Pin the browser to `+https://trento.example.com+`. You should be able to
 login using the credentials specified in the `+ADMIN_USER+` and
