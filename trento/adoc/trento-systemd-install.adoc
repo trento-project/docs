@@ -40,7 +40,7 @@ If you choose not to install Prometheus, set `+CHARTS_ENABLED+` to
 `+false+` in the {trento} web RPM configuration file stored in
 `+/etc/trento/trento-web+`, or when it is provided to the {trento} web
 container. To use an existing Prometheus installation, set `+CHARTS_ENABLED+` to
-`+true+` 
+`+true+`
 ====
 
 [[prometheus-existing-installation, Use existing installation]]
@@ -513,8 +513,23 @@ server {
     ssl_prefer_server_ciphers on;
     ssl_session_cache shared:SSL:10m;
 
-    # Wanda rule
-    location ~ ^/(api/checks|api/v1/checks|api/v2/checks|api/v3/checks|api/groups|api/v1/groups)/  {
+    # Redirect openapi requests from Wanda doc portal
+    location ~ ^/api/(v[0-9]+|latest|all|unversioned)/openapi$ {
+        if ($http_referer ~* "^https?://[^/]+/wanda/") {
+            return 302 /wanda$request_uri;
+        }
+
+        # If not from wanda, proceed to TrentoWeb
+        proxy_http_version 1.1;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Cluster-Client-Ip $remote_addr;
+
+        proxy_pass http://localhost:4000;
+    }
+
+    # Wanda rule for checks, groups, etc.
+    location ~ ^/(api/checks|api/v[0-9]+/checks|api/groups|api/v[0-9]+/groups)/  {
         allow all;
 
         # Proxy Headers
@@ -530,15 +545,45 @@ server {
         proxy_pass http://localhost:4001;
     }
 
+    # Wanda openapi endpoints for all versions
+    location ~ ^/wanda/api/(v[0-9]+|latest|all|unversioned)/openapi {
+        allow all;
+
+        # Proxy Headers
+        proxy_http_version 1.1;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Cluster-Client-Ip $remote_addr;
+
+        proxy_pass http://localhost:4001/api/$1/openapi;
+        proxy_redirect /api/$1/openapi /wanda/api/$1/openapi;
+    }
+
+    # Wanda doc endpoint
+    location /wanda/api/doc {
+        allow all;
+
+        # Proxy Headers
+        proxy_http_version 1.1;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Cluster-Client-Ip $remote_addr;
+
+        proxy_pass http://localhost:4001/api/doc;
+        proxy_redirect /api/doc /wanda/api/doc;
+    }
+
     # Web rule
     location / {
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
+        allow all;
 
-        # The Important Websocket Bits!
+        # Proxy Headers
+        proxy_http_version 1.1;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Cluster-Client-Ip $remote_addr;
+
+        # Important Websocket Bits!
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
 
