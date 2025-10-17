@@ -56,5 +56,5 @@ Similarly, the clusters must have unique authkeys in order to be registered in {
 [[sec-trento-installation-prerequisites]]
 === Installation prerequisites
 
-*  *{trserver}* For a {k8s}-based deployment, you must have access to {suse} public registry for the deployment of {trserver} containers. For a systemd deployment, you must have a registered {sles4sap} 15 (SP3 or higher) distribution. The same applies to a containerized deployment.
+* *{trserver}* For a {k8s}-based deployment, you must have access to {suse} public registry for the deployment of {trserver} containers. For a systemd deployment, you must have a registered {sles4sap} 15 (SP3 or higher) distribution. The same applies to a containerized deployment.
 * *{tragent}s* A registered {sles4sap} 15 (SP3 or higher) distribution.
