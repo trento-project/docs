@@ -1,6 +1,6 @@
 :trento: Trento
 
-== Containerized deployment
+=== Containerized deployment
 :revdate: 2025-08-05
 
 A containerized deployment of {trento} is identical to the systemd
@@ -10,11 +10,9 @@ Docker containers.
 Follow the steps in link:https://www.trento-project.io/docs/user-guide/trento-install-server.html#sec-systemd-deployment[systemd installation], but skip the *Install
 {trento} using RPM packages* step and follow the procedures as described below.
 
-=== Install Trento using Docker
-=== Install Trento using Docker
+==== Install Trento using Docker
 
-==== Install Docker container runtime
-==== Install Docker container runtime
+===== Install Docker container runtime
 
 . Enable the containers module (replace `15.x` with the correct Service Pack version):
 +
