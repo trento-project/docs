@@ -358,6 +358,8 @@ TRENTO_WEB_ORIGIN=trento.example.com
 SECRET_KEY_BASE=some-secret
 ACCESS_TOKEN_ENC_SECRET=some-secret
 REFRESH_TOKEN_ENC_SECRET=some-secret
+CHECKS_SERVER_URL=/wanda
+OAS_SERVER_URL=https://trento.example.com
 ----
 ====
 
@@ -399,6 +401,7 @@ DATABASE_URL=ecto://wanda_user:wanda_password@localhost/wanda
 PORT=4001
 SECRET_KEY_BASE=some-secret
 ACCESS_TOKEN_ENC_SECRET=some-secret
+OAS_SERVER_URL=https://trento.example.com/wanda
 ----
 ====
 
@@ -493,6 +496,19 @@ vim /etc/nginx/conf.d/trento.conf
 ====
 [source,bash]
 ----
+map $http_upgrade $connection_upgrade {
+  default upgrade;
+  '' close;
+}
+
+upstream web {
+  server 127.0.0.1:4000 max_fails=5 fail_timeout=60s;
+}
+
+upstream wanda {
+  server 127.0.0.1:4001 max_fails=5 fail_timeout=60s;
+}
+
 server {
     # Redirect HTTP to HTTPS
     listen 80;
@@ -501,9 +517,8 @@ server {
 }
 
 server {
-    # SSL configuration
-    listen 443 ssl;
     server_name trento.example.com;
+    listen 443 ssl;
 
     ssl_certificate /etc/nginx/ssl/certs/trento.crt;
     ssl_certificate_key /etc/ssl/private/trento.key;
@@ -514,7 +529,7 @@ server {
     ssl_session_cache shared:SSL:10m;
 
     # Wanda rule
-    location ~ ^/(api/checks|api/v1/checks|api/v2/checks|api/v3/checks|api/groups|api/v1/groups)/  {
+    location /wanda/  {
         allow all;
 
         # Proxy Headers
@@ -527,22 +542,26 @@ server {
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
 
-        proxy_pass http://localhost:4001;
+        # Add final slash to replace the location path value by the value in proxy_pass
+        # https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass
+        proxy_pass http://wanda/;
     }
 
     # Web rule
     location / {
+        allow all;
+
+        # Proxy Headers
         proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Cluster-Client-Ip $remote_addr;
 
         # The Important Websocket Bits!
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
 
-        proxy_pass http://localhost:4000;
+        proxy_pass http://web;
     }
 }
 ----
