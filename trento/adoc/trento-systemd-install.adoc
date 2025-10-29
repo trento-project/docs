@@ -634,6 +634,13 @@ zypper refresh
 ----
 . Install Certbot and its NGINX plugin:
 +
+[NOTE]
+====
+Depending on the used Service Pack the available Certbot NGINX plugin package is different.
+Some versions come with `+python311-certbot-nginx+` and others with `+python3-certbot-nginx+`.
+Install the one available in the used Service Pack.
+====
++
 [source,bash]
 ----
 zypper install certbot python311-certbot-nginx
