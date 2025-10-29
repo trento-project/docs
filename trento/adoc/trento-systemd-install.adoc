@@ -636,9 +636,7 @@ zypper refresh
 +
 [NOTE]
 ====
-Depending on the used Service Pack the available Certbot NGINX plugin package is different.
-Some versions come with `+python311-certbot-nginx+` and others with `+python3-certbot-nginx+`.
-Install the one available in the used Service Pack.
+Service Packs include version-specific Certbot NGINX plugin packages, for example `+python311-certbot-nginx+` or `+python3-certbot-nginx+`. Install the package available in the Service Pack you currently use.
 ====
 +
 [source,bash]
