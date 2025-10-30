@@ -358,7 +358,7 @@ TRENTO_WEB_ORIGIN=trento.example.com
 SECRET_KEY_BASE=some-secret
 ACCESS_TOKEN_ENC_SECRET=some-secret
 REFRESH_TOKEN_ENC_SECRET=some-secret
-CHECKS_SERVER_URL=/wanda
+CHECKS_SERVICE_BASE_URL=/wanda
 OAS_SERVER_URL=https://trento.example.com
 ----
 ====
