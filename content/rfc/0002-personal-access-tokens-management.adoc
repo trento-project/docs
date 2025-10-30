@@ -264,6 +264,7 @@ Options in this regard are:
  . use a Wanda generated JWT
  . use basic auth with a shared `username/password` or `client_id/client_secret` pair
  . provide wanda an agent API key
+ . make rpc calls from wanda to web
 
 ===== *Option 1: JWT exchange*
 PROs:
@@ -294,6 +295,7 @@ CONs:
 PROs:
 
  * wanda is treated as a node in the system
+ * we do not need to design and maintain another authn mechanism
 
 CONs:
  
