@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-report-problem]]
 == Reporting an Issue
-:revdate: 2025-06-10
+:revdate: 2025-10-27
 
 
 {suse} customers with registered {sles4sap}{nbsp}15 (SP3 or higher)
@@ -12,14 +12,13 @@ Problems must be reported under {sles4sap}{nbsp}15 and component
 trento.
 
 When opening a support case for {trento}, provide the relevant
-deployment option for {trserver}: {k8s}, systemd or containerized.
+deployment option for {trserver}: {k8s}, systemd or containerized ({docker}-based).
 
 In case of a {k8s} deployment, provide the output of the {trento}
-support plugin and the scenario dump, as explained in section
+support script as explained in section
 <<sec-trento-problemanalysis>>.
 
-In case of a systemd deployment, provide the status and the journal of
-the trento-web and trento-wanda services.
+In case of a systemd deployment, provide the output of the {trento} support plugin, as explained in section <<sec-trento-problemanalysis>>.
 
 In case of a containerized deployment, provide the logs of the
 trento-web and trento-wanda containers. Use `+docker ps+` to retrieve
