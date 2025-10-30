@@ -120,12 +120,14 @@ In case of a deployment on K3s, the descriptions and logs of the {trserver} pods
 ====
 [source,subs="attributes"]
 ----
-{prompt_user}kubectl get pods  
-trento-server-prometheus-server-\*  
-trento-server-postgresql-0  
-trento-server-web-\*  
-trento-server-wanda-\*  
-trento-server-rabbitmq-0
+{prompt_user}kubectl get pods
+  
+NAME                                               READY   STATUS    RESTARTS   AGE
+trento-server-postgresql-0                         1/1     Running   0          87m
+trento-server-prometheus-server-7b5c9474bc-wmv8s   2/2     Running   0          87m
+trento-server-rabbitmq-0                           1/1     Running   0          87m
+trento-server-wanda-67ffbb79dc-7t6xw               1/1     Running   0          87m
+trento-server-web-7df8f65794-vdbhs                 1/1     Running   0          87m
 ----
 ====
 +
