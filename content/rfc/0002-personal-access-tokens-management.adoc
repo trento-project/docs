@@ -246,10 +246,61 @@ Options are:
  . introduce a mechanism for Wanda to validate Personal Access Tokens and user permissions (ie communicate with web's relevant APIs)
  . consider the introduction of a proxy/API gateway that does validate tokens before hitting a resource provider
 
-This section might require an RFC on its own, however the current proposal is to expose a https://www.oauth.com/oauth2-servers/token-introspection-endpoint[token introspection endpoint] from web and have Wanda communicate with it to validate tokens.
+The current proposal is to expose a https://www.oauth.com/oauth2-servers/token-introspection-endpoint[token introspection endpoint] from web and have Wanda communicate with it to validate tokens.
 
 This same endpoint could expose user permissions information, allowing Wanda to make more informed authorization decisions based on fresh data.
 
+==== Token introspection endpoint
+
+As per https://datatracker.ietf.org/doc/html/rfc7662[RFC7662]
+
+[quote,text]
+----
+To prevent token scanning attacks, the endpoint MUST also require some form of authorization to access this endpoint
+----
+
+Options in this regard are:
+
+ . use a Wanda generated JWT
+ . use basic auth with a shared `username/password` or `client_id/client_secret` pair
+ . provide wanda an agent API key
+
+===== *Option 1: JWT exchange*
+PROs:
+
+ * Wanda and web already have JWT support and share `ACCESS_TOKEN_ENC_SECRET` sign/verify secret
+ * no changes are needed on ansible/helm
+ * the token can be very short lived, just for the purpose of the introspection request
+ * does not introduce OAuth terminology, yet, allowing to properly introduce them at due time
+
+CONs:
+ 
+ * wanda and web would _still_ need to share `ACCESS_TOKEN_ENC_SECRET`, an interdependency we may want to remove in the future
+ * when going full OAuth, we may need to consider a grace period where both initial implementation and a possibly new one are supported, unless we agree on a major version bump immediately
+
+Some extra context in https://github.com/trento-project/web/pull/3785#issuecomment-3450214612[this comment]
+
+===== *Option 2: Basic Auth*
+PROs:
+
+ * we get rid of wanda/web interdependency on `ACCESS_TOKEN_ENC_SECRET`, however we exchange that it with a shared `username/password` or `client_id/client_secret` pair
+
+CONs:
+
+ * if we use `client_id/client_secret`, we might introduce terminology recalling OAuth, which may be confusing if we are not fully OAuth compliant yet
+ * requires additional changes to ansible/helm to distribute the shared pair
+
+===== *Option 3: Agent API Key*
+PROs:
+
+ * wanda is treated as a node in the system
+
+CONs:
+ 
+ * requires to semantically promote agent related api keys to something different (with possibly also UI changes, etc)
+ * getting the API key from web at installation time needs web to be up and running before wanda
+ * getting the APi key from web at installation time means retrieving it by calling a specific web's endpoint, which is authenticated via JWT
+    
 == Drawbacks
 
 The main identified drawback revolves around the PAT consistency across services.
