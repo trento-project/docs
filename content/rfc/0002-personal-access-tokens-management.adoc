@@ -265,6 +265,7 @@ Options in this regard are:
  . use basic auth with a shared `username/password` or `client_id/client_secret` pair
  . provide wanda an agent API key
  . make rpc calls from wanda to web
+ . make the introspection endpoint internal only
 
 ===== *Option 1: JWT exchange*
 PROs:
@@ -284,7 +285,7 @@ Some extra context in https://github.com/trento-project/web/pull/3785#issuecomme
 ===== *Option 2: Basic Auth*
 PROs:
 
- * we get rid of wanda/web interdependency on `ACCESS_TOKEN_ENC_SECRET`, however we exchange that it with a shared `username/password` or `client_id/client_secret` pair
+ * we get rid of wanda/web interdependency on `ACCESS_TOKEN_ENC_SECRET`, however we exchange it with a shared `username/password` or `client_id/client_secret` pair
 
 CONs:
 
@@ -302,10 +303,29 @@ CONs:
  * requires to semantically promote agent related api keys to something different (with possibly also UI changes, etc)
  * getting the API key from web at installation time needs web to be up and running before wanda
  * getting the APi key from web at installation time means retrieving it by calling a specific web's endpoint, which is authenticated via JWT
-    
-== Drawbacks
 
-The main identified drawback revolves around the PAT consistency across services.
+===== *Option 4: RPC calls from Wanda to Web*
+PROs:
+
+ * we get rid of wanda/web interdependency on `ACCESS_TOKEN_ENC_SECRET`, however we exchange it with the shared erlang cookie
+ * no new authn mechanism needed
+ * web and wanda become clustered elixir applications
+
+CONs:
+
+ * deviates from the current agreement of having services communicate via HTTP APIs
+ * introduces an integration paradigm we might want discuss deeper upon before adopting it
+
+===== *Option 5: Internal only endpoint*
+PROs:
+ 
+ * we do not need to design and maintain another authn mechanism
+ * we get rid of wanda/web interdependency on `ACCESS_TOKEN_ENC_SECRET`
+ * we take time to properly design and introduce OAuth terminology and flows at a later stage
+
+CONs:
+
+ * if the proxy in front of services is not configured properly, the endpoint could be exposed publicly (ie the customer does not use our provided proxy configuration)
 
 == Alternatives
 
