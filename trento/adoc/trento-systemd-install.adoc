@@ -402,6 +402,7 @@ PORT=4001
 SECRET_KEY_BASE=some-secret
 ACCESS_TOKEN_ENC_SECRET=some-secret
 OAS_SERVER_URL=https://trento.example.com/wanda
+AUTH_SERVER_URL=http://<internal-trento-web-domain>:<internal-trento-web-port> # e.g. http://127.0.0.1:4000
 ----
 ====
 
@@ -549,6 +550,13 @@ server {
 
     # Web rule
     location / {
+        # this endpoint should not be accessible publicly
+        # it is internally used by wanda to introspect access tokens and personal access tokens
+        location /api/session/token/introspect {
+            deny all;
+            return 404;
+        }
+
         allow all;
 
         # Proxy Headers
