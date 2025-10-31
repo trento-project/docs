@@ -1,0 +1,409 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-mcp-config]]
+== {trento} MCP Server Configuration Options
+:revdate: 2025-10-31
+
+This section provides an overview of how to configure the {trento} MCP Server using command-line parameters, configuration files, and environment variables.
+
+[[sec-trento-mcp-config-sources]]
+=== Configuration Sources
+
+The {trento} MCP Server supports multiple configuration sources with the following priority order (highest to lowest):
+
+1. **Command-line flags** - Override all other settings.
+2. **Environment variables** - Useful for containerized deployments.
+3. **Configuration file** - YAML file for persistent settings.
+4. **Built-in defaults** - Fallback values.
+
+[[sec-trento-mcp-config-file]]
+=== Configuration File
+
+You can create a {trento} MCP Server configuration file in the working directory or specify a custom path using the `--config` flag.
+
+The {trento} MCP Server searches for configuration files in the following order:
+
+1. System-wide directory (`/etc/trento/mcp-server-trento` or `/usr/etc/trento/mcp-server-trento`).
+2. Custom path specified with the `--config` flag.
+
+[source,env]
+----
+## Custom paths for API autodiscovery endpoints (comma-separated), used when OAS_PATH is empty and TRENTO_URL is set.
+AUTODISCOVERY_PATHS=/api/all/openapi,/wanda/api/all/openapi
+
+## Enable the health check server.
+ENABLE_HEALTH_CHECK=false
+
+## The HTTP header name used to pass the Trento API key for authentication with the Trento server.
+HEADER_NAME=X-TRENTO-MCP-APIKEY
+
+## The API path used for health checks on target servers.
+HEALTH_API_PATH=/api/healthz
+
+## The port on which the health check server listens for incoming connections.
+HEALTH_PORT=8080
+
+## Comma-separated list of paths to OpenAPI specification files (local or remote URLs).
+## If not provided, the server will attempt autodiscovery using the Trento URL and autodiscovery paths.
+OAS_PATH=http://localhost:4000/api/all/openapi,http://localhost:4001/wanda/api/all/openapi
+
+## The port on which the MCP Server listens for incoming connections.
+PORT=5000
+
+## Comma-separated list of OpenAPI tags to filter which operations are exposed as MCP tools. Only operations with at least one matching tag will be available.
+TAG_FILTER=MCP
+
+## The transport protocol to use for MCP communication. Options: 'streamable' (default) or 'sse'.
+TRANSPORT=streamable
+
+## Target Trento server URL, useful when targeting remote Trento servers. Empty by default.
+TRENTO_URL=
+
+## The logging verbosity level. Options: 'debug', 'info', 'warning', 'error'.
+VERBOSITY=info
+----
+
+==== System-Wide Configuration
+
+For system-wide configuration, place the config file in `/etc/trento/mcp-server-trento`:
+
+[source,console]
+----
+sudo mkdir -p /etc/trento
+sudo tee /etc/trento/mcp-server-trento > /dev/null <<EOF
+TRENTO_URL=https://prod.trento.io
+EOF
+----
+
+Then run the server:
+
+[source,console]
+----
+mcp-server-trento
+----
+
+[[sec-trento-mcp-env-vars]]
+=== Environment Variables
+
+All command-line flags can also be set via environment variables. The environment variable name is constructed by adding the `TRENTO_MCP_` prefix to the configuration key (e.g., `TRENTO_MCP_PORT`).
+
+For list values such as `TRENTO_MCP_OAS_PATH` and `TRENTO_MCP_TAG_FILTER`, provide a comma-separated string.
+
+[[sec-trento-mcp-cli-params]]
+=== Command-Line Parameters
+
+The `mcp-server-trento` binary accepts several command-line flags to configure its behavior. The following table lists all available configuration options, their corresponding flags, environment variables, and default values.
+
+[width="100%",cols="20%,25%,25%,30%",options="header"]
+|===
+|Flag & Config Key |Environment Variable |Default Value |Description
+|`--autodiscovery-paths, -A` |`TRENTO_MCP_AUTODISCOVERY_PATHS` |`/api/all/openapi,/wanda/api/all/openapi` |Custom paths for API autodiscovery.
+|`--config, -c` |`TRENTO_MCP_CONFIG` |(empty) |Configuration file path.
+|`--enable-health-check, -d` |`TRENTO_MCP_ENABLE_HEALTH_CHECK` |`false` |Enable the health check server.
+|`--header-name, -H` |`TRENTO_MCP_HEADER_NAME` |`X-TRENTO-MCP-APIKEY` |The header name used for passing the Trento API key to the MCP server.
+|`--health-api-path, -a` |`TRENTO_MCP_HEALTH_API_PATH` |`/api/healthz` |The API path used for health checks on target servers.
+|`--health-port, -z` |`TRENTO_MCP_HEALTH_PORT` |`8080` |The port on which the health check server runs.
+|`--insecure-skip-tls-verify, -i` |`TRENTO_MCP_INSECURE_SKIP_TLS_VERIFY` |`false` |Skip TLS certificate verification when fetching OpenAPI specifications from HTTPS URLs.
+|`--oas-path, -P` |`TRENTO_MCP_OAS_PATH` |`[]` |Path to OpenAPI specification file(s). Can be specified multiple times.
+|`--port, -p` |`TRENTO_MCP_PORT` |`5000` |The port on which the MCP server runs.
+|`--tag-filter, -f` |`TRENTO_MCP_TAG_FILTER` |`["MCP"]` |Only include operations with at least one of these tags. If empty, all operations are included.
+|`--transport, -t` |`TRENTO_MCP_TRANSPORT` |`streamable` |The protocol to use: "streamable" or "sse".
+|`--trento-url, -u` |`TRENTO_MCP_TRENTO_URL` |(empty) |URL for the target Trento server. Required for autodiscovery if `oas-path` is not set.
+|`--verbosity, -v` |`TRENTO_MCP_VERBOSITY` |`info` |Log level verbosity: debug, info, warning, or error.
+|===
+
+[[sec-trento-mcp-config-examples]]
+=== Configuration Examples
+
+==== Using Configuration File Only
+
+[source,console]
+----
+# Create mcp-server-trento with your settings
+mcp-server-trento
+----
+
+==== Using Environment Variables
+
+[source,console]
+----
+export TRENTO_MCP_PORT=5000
+export TRENTO_MCP_TRENTO_URL=https://prod.trento.io
+export TRENTO_MCP_VERBOSITY=debug
+mcp-server-trento
+----
+
+==== Using Command-Line Flags (Override Everything)
+
+[source,console]
+----
+# Basic usage
+mcp-server-trento --port 9000 --verbosity debug --trento-url https://test.trento.io
+
+# Multiple OpenAPI specifications
+mcp-server-trento --oas-path https://api1.example.com/openapi.json --oas-path https://api2.example.com/openapi.json
+
+# With autodiscovery using custom paths
+mcp-server-trento --trento-url https://trento.example.com --autodiscovery-paths /api/v1/openapi,/wanda/api/v1/openapi
+
+# With health checks enabled
+mcp-server-trento --enable-health-check --health-port 8080 --port 5000
+----
+
+==== Mixed Configuration
+
+[source,console]
+----
+# Set base config via environment
+export TRENTO_MCP_PORT=5000
+export TRENTO_MCP_VERBOSITY=info
+
+# Override specific values via flags
+mcp-server-trento --port 9000 --config /etc/trento/mcp-server-trento
+# Result: port=9000 (from flag), verbosity=info (from env), other settings from config file
+----
+
+==== Docker Container Example
+
+[source,console]
+----
+# Basic container without health checks
+docker run -p 5000:5000 \
+  -e TRENTO_MCP_PORT=5000 \
+  -e TRENTO_MCP_TRENTO_URL=https://prod.trento.io \
+  -v /my/host/example/path:/app/mcp-server-trento \
+  mcp-server-trento
+
+# Container with health checks enabled
+docker run -p 5000:5000 -p 8080:8080 \
+  -e TRENTO_MCP_PORT=5000 \
+  -e TRENTO_MCP_ENABLE_HEALTH_CHECK=true \
+  -e TRENTO_MCP_HEALTH_PORT=8080 \
+  -e TRENTO_MCP_TRENTO_URL=https://prod.trento.io \
+  -v /my/host/example/path:/app/mcp-server-trento \
+  mcp-server-trento
+----
+
+[NOTE]
+====
+**Configuration file location in Docker:** The `-v /my/host/example/path:/app/mcp-server-trento` volume mount maps a config file from your host system (`/my/host/example/path`) to the container's working directory (`/app/mcp-server-trento`).
+
+- Create your config file on the host at `/my/host/example/path` (or any path you prefer).
+- The config file should be named `mcp-server-trento` (no extension).
+- Use the format shown in the "Configuration File" section above.
+- Adjust the host path in the `-v` flag to match where you placed your config file.
+====
+
+==== Kubernetes Deployment Example
+
+[source,yaml]
+----
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-server-trento
+spec:
+  template:
+    spec:
+      containers:
+      - name: mcp-server-trento
+        image: mcp-server-trento:latest
+        env:
+        - name: TRENTO_MCP_PORT
+          value: "5000"
+        - name: TRENTO_MCP_HEALTH_PORT
+          value: "8080"
+        - name: TRENTO_MCP_ENABLE_HEALTH_CHECK
+          value: "true"
+        - name: TRENTO_MCP_TRENTO_URL
+          value: "https://prod.trento.io"
+        - name: TRENTO_MCP_VERBOSITY
+          value: "info"
+        ports:
+        - containerPort: 5000
+          name: mcp
+        - containerPort: 8080
+          name: health
+----
+
+[[sec-trento-mcp-help-validation]]
+=== Help and Validation
+
+You can see all available flags by running:
+
+[source,console]
+----
+mcp-server-trento --help
+----
+
+The server will validate the configuration on startup and log any issues with debug verbosity enabled.
+
+[[sec-trento-mcp-health-checks]]
+=== Health Check Configuration
+
+The {trento} MCP Server includes built-in health check endpoints for monitoring and Kubernetes integration.
+
+[NOTE]
+====
+Health check functionality is disabled by default and must be explicitly enabled using the `--enable-health-check` flag or the `TRENTO_MCP_ENABLE_HEALTH_CHECK` environment variable.
+====
+
+==== Health Check Endpoints
+
+The health check server provides the following endpoints:
+
+* `/livez` - Liveness probe for Kubernetes pod restart decisions.
+* `/readyz` - Readiness probe for traffic routing decisions.
+
+The readiness endpoint performs comprehensive health checks, including:
+
+* `mcp-server` - Validates MCP server connectivity using an MCP client.
+* `api-server` - Verifies connectivity to the configured Trento API server.
+
+==== Enabling Health Checks
+
+[source,console]
+----
+# Enable health checks with default port (8080)
+mcp-server-trento --enable-health-check
+
+# Enable with custom health port
+mcp-server-trento --enable-health-check --health-port 9090
+
+# Using environment variables
+export TRENTO_MCP_ENABLE_HEALTH_CHECK=true
+export TRENTO_MCP_HEALTH_PORT=8080
+mcp-server-trento
+----
+
+==== Kubernetes Health Probes
+
+[source,yaml]
+----
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: mcp-server-trento
+    image: mcp-server-trento:latest
+    env:
+    - name: TRENTO_MCP_ENABLE_HEALTH_CHECK
+      value: "true"
+    - name: TRENTO_MCP_HEALTH_PORT
+      value: "8080"
+    ports:
+    - containerPort: 5000
+      name: mcp
+    - containerPort: 8080
+      name: health
+    livenessProbe:
+      httpGet:
+        path: /livez
+        port: 8080
+      initialDelaySeconds: 30
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /readyz
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 5
+----
+
+==== Testing Health Endpoints
+
+[source,console]
+----
+# Test liveness endpoint
+curl http://localhost:8080/livez
+
+# Test readiness endpoint
+curl http://localhost:8080/readyz
+
+# Expected readiness response format:
+# {"status":"up","checks":{"mcp-server":{"status":"up"},"api-server":{"status":"up"},"api-documentation":{"status":"up"}}}
+
+# Expected liveness response format:
+# {"status":"up"}
+----
+
+[[sec-trento-mcp-troubleshooting]]
+== Troubleshooting
+
+This section provides solutions for common issues when deploying and using the {trento} MCP Server.
+
+=== Connection Issues
+
+* **MCP Server cannot connect to {trento} API**
+** Verify the `TRENTO_URL` or `OAS_PATH` configuration points to accessible endpoints
+** Check network connectivity between the MCP Server and {trento} components
+** Ensure API authentication is properly configured with valid tokens
+
+* **MCP clients cannot connect to MCP Server**
+** Verify the MCP Server is running and listening on the correct port (default: 5000)
+** Check firewall rules allow access to the MCP Server port
+** Ensure the MCP endpoint URL is correctly configured in client applications
+
+=== Authentication Issues
+
+* **API token authentication fails**
+** Verify the Personal Access Token is valid and not expired
+** Ensure the token has the necessary permissions in {trento}
+** Check that the `HEADER_NAME` configuration matches between server and client
+
+* **Token not accepted**
+** Confirm the token was generated from the correct {trento} instance
+** Verify the token format and ensure it includes the "Bearer " prefix if required
+
+=== Configuration Issues
+
+* **OpenAPI specification not found**
+** Check that `TRENTO_URL` or `OAS_PATH` point to valid {trento} API endpoints
+** Verify the {trento} Web and Wanda services are running and accessible
+** Ensure autodiscovery paths are correct if using `TRENTO_URL`
+
+* **Tools not appearing in MCP clients**
+** Check the `TAG_FILTER` configuration - only operations with matching tags are exposed
+** Verify the OpenAPI specifications are accessible and valid
+** Ensure the MCP Server can parse the API documentation
+
+=== Performance Issues
+
+* **Slow response times**
+** Check network latency between MCP Server and {trento} components
+** Review {trento} API performance and database query times
+** Consider enabling debug logging to identify bottlenecks
+
+* **High resource usage**
+** Monitor MCP Server memory and CPU usage
+** Check for memory leaks in long-running processes
+** Consider adjusting logging verbosity to reduce I/O overhead
+
+=== Health Check Issues
+
+* **Health checks failing**
+** Verify health check endpoints are accessible
+** Check that all required services ({trento} API, MCP server) are responding
+** Review health check configuration and timeouts
+
+=== Logging and Debugging
+
+* **Enable debug logging**
+** Set `VERBOSITY=debug` to get detailed logs
+** Check MCP Server logs for error messages and connection attempts
+** Review {trento} component logs for API-related issues
+
+* **Common log messages**
+** "Failed to fetch OpenAPI specification" - Check API endpoint accessibility
+** "Authentication failed" - Verify API token configuration
+** "No tools available" - Check tag filtering and API documentation
+
+=== Getting Help
+
+If you continue to experience issues:
+
+. Check the {trento} MCP Server logs for detailed error messages
+. Verify all configuration values using `mcp-server-trento --help`
+. Test API connectivity directly using curl or similar tools
+. Review the <<sec-trento-mcp-config-examples>> for correct configuration patterns
+. Check the {trento} server logs for API authentication and access issues
