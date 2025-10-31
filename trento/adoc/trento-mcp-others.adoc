@@ -1,0 +1,185 @@
+[[sec-trento-mcp-others]]
+:revdate: 2025-10-31
+=== Integrating the {trento} MCP Server with other MCP Hosts
+
+The {trento} MCP Server can be integrated with any client application that supports the Model Context Protocol (MCP). This allows you to interact with the {trento} API and execute tools defined in the OpenAPI specification through your preferred AI assistant or development tool.
+
+This guide uses Visual Studio Code with GitHub Copilot as the primary example, but the configuration patterns apply to any MCP-compatible host.
+
+==== Prerequisites
+
+Before configuring your MCP Host, ensure you have:
+
+. *A running {trserver} installation* with the {trento} MCP Server component enabled:
+** Follow the <<sec-trento-installing-trentoserver>> to deploy {trserver} and enable the {trento} MCP Server.
+** Note the {trento} MCP Server endpoint URL (e.g., `https://trento.example.com/mcp-server-trento/mcp`).
+
+. *A {trento} API token (Personal Access Token)*:
+** Log in to your {trento} web interface with your username and password.
+** Click on your username in the top-right corner and select *Profile*.
+** Scroll down to the *Personal Access Tokens* section.
+** Click the *Generate Token* button.
+** Enter a descriptive name for the token (e.g., "VS Code MCP Client").
+** Optionally configure an expiration date for the token, or select *Never Expires*.
+** Click the *Generate Token*.
+** *Important:* Copy the generated token immediately and store it securely - it will not be shown again.
+
+.Generate a Personal Access Token in {trento}
+image::generate-pat.png[Generate a Personal Access Token in {trento},width=800]
+
+==== Configuring Your MCP Host
+
+Once you have your {trento} installation ready with the {trento} MCP Server URL and API token, you can configure your MCP Host. The examples below show JSON configuration format, which is used by most MCP Hosts, including VS Code, Claude Desktop, and others.
+
+===== Option 1: Configuration with Prompted Input (Recommended)
+
+This configuration prompts you for your API key when the Host starts, keeping credentials secure and out of configuration files. The `password: true` setting ensures your API key input is masked when you type it.
+
+[NOTE]
+====
+This option is supported by most MCP Hosts, including VS Code. Check your MCP Host's documentation if the prompt feature is not available.
+====
+
+[source,json]
+----
+{
+  "servers": {
+    "trento": {
+      "type": "http",
+      "url": "https://trento.example.com/mcp-server-trento/mcp",
+      "headers": {
+        "X-TRENTO-MCP-APIKEY": "${input:trento-api-key}"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "trento-api-key",
+      "description": "Trento API Key",
+      "password": true
+    }
+  ]
+}
+----
+
+[NOTE]
+====
+Alternatively, you can use this link to install the server directly in VS Code: link:{badge-url}[image:{badge-img}[Install in VS Code]]
+====
+
+===== Option 2: Direct Header Configuration
+
+For MCP Hosts that don't support prompted input, or for testing purposes, you can set your {trento} API key directly in the configuration file.
+
+[WARNING]
+====
+When using this option, ensure your configuration file has appropriate permissions and is not committed to version control systems.
+====
+
+[source,json]
+----
+{
+  "servers": {
+    "trento": {
+      "type": "http",
+      "url": "https://trento.example.com/mcp-server-trento/mcp",
+      "headers": {
+        "X-TRENTO-MCP-APIKEY": "your-actual-trento-api-key-here"
+      }
+    }
+  }
+}
+----
+
+[NOTE]
+====
+Replace `https://trento.example.com/mcp-server-trento/mcp` with your actual {trento} MCP Server endpoint URL from your installation.
+====
+
+===== Client-Specific Notes
+
+* *VS Code*: Configuration is typically stored in `.vscode/settings.json` or in your user settings. The client will remember your API key for the session.
+* *Claude Desktop*: Configuration is usually in `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows).
+* *Other MCP Hosts*: Refer to your client's documentation for the configuration file location. For examples of how other tools integrate with MCP, see the link:https://github.com/github/github-mcp-server/blob/main/docs/installation-guides/README.md[GitHub MCP Server installation guides].
+
+===== General Configuration Notes
+
+* Replace `https://trento.example.com/mcp-server-trento/mcp` with the actual URL where your {trento} MCP Server is accessible:
+  ** For Kubernetes deployments with ingress, use the ingress URL (e.g., `https://trento.example.com/mcp-server-trento/mcp`).
+  ** For local or development setups, use `http://localhost:5000/mcp` (adjust the port as needed).
+  ** If using Server-Sent Events (SSE) transport instead of the default streamable transport, change the path from `/mcp` to `/sse` - The transport type is configured on the {trento} MCP Server using the `TRANSPORT` configuration key or `--transport` flag (see <<sec-trento-mcp-config>>).
+
+* Replace `your-actual-trento-api-key-here` with the API token you generated from your {trento} instance.
+* If you configured a custom header name (using `HEADER_NAME` or `--header-name`), update `X-TRENTO-MCP-APIKEY` accordingly.
+
+===== Troubleshooting
+
+If you encounter issues connecting your MCP Host to the {trento} MCP Server:
+
+. *Connection Errors*:
+** Verify that the {trento} MCP Server URL is correct and accessible from your machine.
+** Check if the {trento} MCP Server is running by reviewing logs from your {trento} installation.
+** Ensure network connectivity and that any required firewall rules are in place.
+
+. *Authentication Errors*:
+** Verify that your API token is valid by testing it directly against your {trento} Server API.
+** Check that the header name matches your server configuration (default: `X-TRENTO-MCP-APIKEY`).
+** Ensure the token has the necessary permissions in {trento}.
+
+. *General Issues*:
+** Check your MCP Host's developer console or logs for detailed error messages:
+*** VS Code: Help → Toggle Developer Tools.
+*** Claude Desktop: Check application logs.
+*** Other clients: Refer to your client's documentation for log locations.
+** Review the {trento} MCP Server logs for connection attempts and errors.
+** Refer to the <<sec-trento-mcp-troubleshooting>> for additional help.
+
+==== Using the {trento} MCP Server
+
+How you use the {trento} MCP Server depends on the specific MCP Host application you're working with. The MCP ecosystem is rapidly evolving, with new hosts and improved user experiences being introduced regularly.
+
+===== Enable the Server and Expose Tools in Your MCP Host
+
+[arabic]
+. Ensure the {trento} MCP Server is configured in your host (see the configuration examples above).
+. Enable the server in your host's MCP settings, if required by the client:
+.. Many hosts provide a *Servers*, *External Tools*, or *MCP* section where you can toggle/enable the server you added.
+. Select or attach the MCP server to your assistant/model/workspace, if your host requires it:
+.. Some hosts let you choose which MCP servers are available per model or project - Make sure the *{trento} MCP Server* is enabled for the target model/session.
+. Start a new chat or session with your assistant and verify that tools are available:
+.. Try a simple action, such as: "List SAP systems", "Show HANA clusters", "What is the health status of my SAP landscape?", or "Are there any critical alerts I need to address?".
+
+For detailed guidance on leveraging MCP capabilities in different tools, refer to the following official documentation:
+
+* link:https://code.visualstudio.com/docs/copilot/customization/mcp-servers[Visual Studio Code with GitHub Copilot - MCP Server Configuration].
+* link:https://docs.claude.com/en/docs/mcp[Claude Desktop - Model Context Protocol Integration].
+* link:https://cursor.com/[Cursor] - AI-powered code editor with MCP support.
+* link:https://cloud.google.com/gemini/docs/codeassist/use-agentic-chat-pair-programmer[Google Cloud Gemini Code Assist - Agentic Chat].
+* link:https://docs.windsurf.com/windsurf/cascade/mcp[Windsurf - Cascade MCP Support].
+
+===== Demo
+
+To see the {trento} MCP Server in action, watch link:https://www.youtube.com/watch?v=7kDVc3YUR-U[this demonstration video].
+
+Find below a few example screenshots from different MCP Hosts using the {trento} MCP Server:
+
+====== Example: Claude Desktop
+
+The Claude Desktop app can attach the {trento} MCP Server and expose its tools directly in conversations. After configuring your server in Claude's MCP settings, start a new chat and look for the available tools.
+
+.Claude Desktop using {trento} MCP Server
+image::example-claude.png[Claude Desktop using {trento} MCP Server,width=900]
+
+====== Example: Visual Studio Code with GitHub Copilot
+
+VS Code lets you register external MCP servers and make their tools available to Copilot Chat. Once configured, start a chat and pick the {trento} MCP Server tools to run common operations.
+
+.Visual Studio Code with GitHub Copilot using {trento} MCP Server
+image::example-copilot.png[VS Code Copilot using {trento} MCP Server,width=900]
+
+==== Additional Resources
+
+* <<sec-trento-installing-trentoserver>> - For deploying and configuring the MCP Server.
+* <<sec-trento-mcp-config>> - For detailed MCP Server configuration reference.
+* https://modelcontextprotocol.io[Model Context Protocol Documentation] - For general MCP information and client compatibility.
