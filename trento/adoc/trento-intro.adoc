@@ -2,21 +2,21 @@ include::product-attributes.adoc[]
 
 [[sec-trento-what]]
 == What is {trento}?
-:revdate: 2025-06-10
+:revdate: 2025-10-31
 
 
 {trento} is the official version of the Trento community project. It is a comprehensive monitoring solution consisting of two main components: the {trserver} and the {tragent}. {trento} provides the following functionality and features:
 
 * A user-friendly reactive Web interface for {sap} Basis administrators.
 * Automated discovery of {pace} clusters using SAPHanaSR classic or angi as well as different fencing mechanisms, including diskless SBD.
-* Automated discovery of SAP systems running on ABAP or JAVA stacks and HANA databases.
+* Automated discovery of {sap} systems running on ABAP or JAVA stacks and HANA databases.
 * Awareness of maintenance situations in a {pace} cluster at cluster, node, or resource level.
 * Configuration validation for {hana} Scale-Up Performance/Cost-optimized, {hana} Scale-out and ASCS/ERS clusters deployed on Azure, AWS, GCP or on-premises bare metal platforms, including KVM and Nutanix.
 * Useful information that offers insights about the execution of configuration checks.
 * Delivery of configuration checks decoupled from core functionality.
 * Email alerting for critical events in the monitored landscape.
 * Integration of saptune into the console and specific configuration checks at host and cluster levels.
-* Information about relevant patches and upgradable packages for registered hosts via integration with SUSE Multi-Linux Manager.
+* Information about relevant patches and upgradable packages for registered hosts via integration with {smlm}.
 * Monitoring of CPU and memory usage at the host level through basic integration with {prometheus}.
 * API-based architecture to facilitate integration with other monitoring tools.
 * Rotating API key to protect communication from the {tragent} to the {trserver}.
@@ -37,3 +37,42 @@ See <<fig-trento-architecture>> for additional details.
 [[fig-trento-architecture]]
 .Architectural overview
 image::trento-high-level-architecture.png[width=80%]
+
+[[sec-trento-mcp-intro]]
+=== AI-Assisted Operations with the {trento} MCP Server (optional)
+
+The {trento} MCP Server extends {trento} with AI-assisted operations by implementing the open link:https://modelcontextprotocol.io/introduction[Model Context Protocol] (MCP). It enables MCP-compatible AI assistants—such as public AI tools like link:https://code.visualstudio.com/[VS Code] with link:https://github.com/features/copilot[GitHub Copilot], link:https://claude.ai/download[Claude Desktop], or link:https://cursor.sh/[Cursor], or private AI platforms like link:https://www.suse.com/products/ai/[{suseai}]—to securely connect to {trento} and execute common monitoring and troubleshooting tasks using natural language.
+
+With the {trento} MCP Server, you can:
+
+* Ask conversational questions such as "What's the overall health of my SAP environment?" or "Show me all SAP systems with critical status."
+* Retrieve cluster and host details on demand (for example, "Show configuration for cluster C1" or "List hosts running HANA").
+* Review checks and execution history to understand configuration drifts or failures.
+* Surface critical alerts that need immediate attention.
+
+==== What is the Model Context Protocol (MCP)?
+
+link:https://modelcontextprotocol.io/introduction[Model Context Protocol] (MCP) is an open standard that allows AI applications to securely connect to external tools and data sources. In the context of {trento}, MCP provides a consistent, secure way for assistants to call {trserver} APIs without manual navigation of the web UI.
+
+==== How the MCP Server fits into {trento}
+
+* It runs alongside the {trserver} (as part of your deployment) and exposes a single HTTP endpoint (path `/mcp`).
+* It automatically discovers the {trserver} APIs and generates MCP tools from the OpenAPI specifications exposed by {trweb} and Wanda.
+* It authenticates to {trserver} using user-scoped Personal Access Tokens (API keys) and forwards requests securely.
+* It's an optional component—{trento} works without it—but unlocks natural-language workflows when enabled.
+
+These clients can be pointed to the MCP endpoint URL and supplied with the appropriate API key header to authenticate against your {trserver}.
+
+==== Using the MCP Server
+
+To get started with the {trento} MCP Server, you need to:
+
+1. Ensure the MCP Server is deployed and running alongside your {trserver}. Refer to the installation guide for details.
+
+2. Configure your MCP-compatible AI assistant to connect to the MCP endpoint.
+
+3. Provide a valid Personal Access Token (API key) for authentication.
+
+Once connected, you can interact with {trento} using natural language commands, such as asking for system health, cluster details, or check results.
+
+For comprehensive instructions, including deployment options and integration with specific AI tools, see <<sec-trento-using-mcp-server>>.
