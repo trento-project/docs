@@ -1,5 +1,8 @@
 [[sec-trento-mcp-others]]
 :revdate: 2025-10-31
+:badge-url: https://vscode.dev/redirect/mcp/install?name=trento&config=%7B%22servers%22%3A%7B%22mcp-server-trento%22%3A%7B%22type%22%3A%22http%22%2C%22url%22%3A%22http%3A//localhost%3A5000/mcp%22%2C%22headers%22%3A%7B%22X-TRENTO-MCP-APIKEY%22%3A%22your-actual-trento-api-key-here%22%7D%7D%7D%7D
+:badge-img: https://img.shields.io/badge/VS_Code-Install_Server-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white
+
 === Integrating the {trento} MCP Server with other MCP Hosts
 
 The {trento} MCP Server can be integrated with any client application that supports the Model Context Protocol (MCP). This allows you to interact with the {trento} API and execute tools defined in the OpenAPI specification through your preferred AI assistant or development tool.
