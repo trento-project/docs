@@ -329,7 +329,7 @@ journalctl -fu trento-web
 ----
 
 [[validate-the-health-status-of-trento-web-and-wanda]]
-==== Check the health status of trento web and wanda
+==== Check the health status of {trweb} and wanda
 
 You can check if {trento} web and wanda services function correctly by
 accessing accessing the `+healthz+` and `+readyz+` API.
@@ -593,3 +593,195 @@ details on how to renew certificates.
 Pin the browser to `+https://trento.example.com+`. You should be able to
 login using the credentials specified in the `+ADMIN_USER+` and
 `+ADMIN_PASSWORD+` environment variables.
+
+[[sec-trento-mcp-server-systemd]]
+==== Installing {trento} MCP Server (Optional)
+
+The {trento} MCP Server provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the Model Context Protocol (MCP). This optional component enables integration with AI tools and assistants.
+
+[NOTE]
+====
+The {trento} MCP Server is an optional component. The core {trserver} functionality works independently without it.
+
+After installation, see <<sec-trento-using-mcp-server>> for instructions on how to connect MCP-compatible AI assistants and tools to your Trento Server.
+====
+
+===== Requirements
+
+* {sles4sap} 15 SP3 or later.
+* A running {trserver} installation (accessible via network).
+* Root or sudo access for installation.
+
+===== Configuration Overview
+
+The {trento} MCP Server requires minimal configuration, but needs to know how to reach your Trento Server. The key configuration parameters are:
+
+* `TRENTO_URL`: The URL where your Trento Server is accessible. This is particularly important when Trento is deployed behind NGINX or other reverse proxies. Use the externally accessible URL (e.g., `https://trento.example.com`) rather than internal service URLs. When set, the server will use this URL for OpenAPI specification autodiscovery.
+
+* `OAS_PATH`: Explicit paths to OpenAPI specification files. Use this when you want to directly specify the location of the API specifications instead of relying on autodiscovery. This is particularly useful when you want to connect to internal services (such as `localhost` or Kubernetes service names) instead of going through a reverse proxy.
+
+===== Installation Steps
+
+. Install the MCP Server package:
++
+====
+[source,bash]
+----
+zypper install mcp-server-trento
+----
+====
++
+. Create the configuration file at `/etc/trento/mcp-server-trento`:
++
+====
+[source,bash]
+----
+cp /etc/trento/mcp-server-trento.example /etc/trento/mcp-server-trento
+----
+====
++
+. Edit the configuration file to point to your {trserver}:
++
+====
+[source,bash]
+----
+nano /etc/trento/mcp-server-trento
+----
+====
++
+Configure the connection to your {trserver}. There are two approaches:
++
+====
+.TRENTO_URL approach (Recommended for most deployments)
+[source,env]
+----
+## Set this to your Trento Server's external/public URL
+## Use this when Trento is behind a reverse proxy (like NGINX) or when accessing from outside the local network
+TRENTO_URL=https://trento.example.com
+PORT=5000
+----
+
+.OAS_PATH approach (For direct internal connections)
+[source,env]
+----
+## Use this when connecting directly to Trento components without going through a reverse proxy
+## Useful when MCP Server runs on the same network as Trento components
+OAS_PATH=http://localhost:4000/api/all/openapi,http://localhost:4001/wanda/api/all/openapi
+PORT=5000
+----
+====
++
+[NOTE]
+====
+**When to use TRENTO_URL:**
+* Trento Server is deployed behind a reverse proxy (NGINX, etc.).
+* MCP Server runs on a different host/network than Trento.
+* You want to use external/public URLs.
+
+**When to use OAS_PATH:**
+* MCP Server runs on the same host as Trento components.
+* You want to connect directly to internal services.
+* You need to bypass reverse proxy configurations.
+
+The TRENTO_URL approach is recommended for most production deployments.
+====
++
+[NOTE]
+====
+The MCP Server's health check HTTP server is primarily intended for Kubernetes environments, where liveness/readiness probes use it. Outside Kubernetes, you can leave it disabled. If you choose to enable it, set `ENABLE_HEALTH_CHECK=true` and `HEALTH_PORT=8080` (or your preferred port) and ensure the port is accessible (see the Firewall Configuration section below).
+====
++
+. Enable and start the MCP Server service:
++
+====
+[source,bash]
+----
+systemctl enable --now mcp-server-trento
+systemctl start mcp-server-trento
+----
+====
++
+. Verify the service is running:
++
+====
+[source,bash]
+----
+systemctl status mcp-server-trento
+----
+====
++
+Expected output:
++
+====
+[source,bash]
+----
+● mcp-server-trento.service - Trento MCP Server service
+     Loaded: loaded (/usr/lib/systemd/system/mcp-server-trento.service; enabled)
+     Active: active (running) since ...
+----
+====
++
+. Check the service logs:
++
+====
+[source,bash]
+----
+journalctl -u mcp-server-trento -f
+----
+====
++
+. The Trento MCP Server should be listening at `http://localhost:5000/mcp` (or `http://localhost:<PORT>/mcp` if you changed the `PORT` setting). If you need remote access, ensure this port is open in your firewall; see <<sec-mcp-systemd-firewall,Firewall Configuration>>.
++
+. If you enabled health checks, verify the endpoints locally:
+
+====
+[source,bash]
+----
+# Note: Replace localhost with the server's IP/hostname if running these commands from a remote machine, and ensure the health port is allowed by your firewall.
+
+# Liveness endpoint:
+curl http://localhost:8080/livez
+
+# Example output:
+# {"info":{"name":"trento-mcp-server","version":"0.1.0"},"status":"up"}
+
+# Readiness endpoint:
+curl http://localhost:8080/readyz
+
+# Example output:
+# {"status":"up","details":{"mcp-server":{"status":"up","timestamp":"2025-10-09T12:11:09.528898849Z"},"wanda-api":{"status":"up","timestamp":"2025-10-09T12:11:09.542078327Z"},"web-api":{"status":"up","timestamp":"2025-10-09T12:11:09.544855047Z"}}}
+----
+====
+
+[[sec-mcp-systemd-firewall]]
+===== Firewall Configuration
+
+If firewalld is running, allow incoming connections to the MCP Server port:
+
+====
+[source,bash]
+----
+firewall-cmd --zone=public --add-port=5000/tcp --permanent
+firewall-cmd --reload
+----
+====
+
+If health checks are enabled, and you want them to be exposed, also allow the health check port:
+
+====
+[source,bash]
+----
+firewall-cmd --zone=public --add-port=8080/tcp --permanent
+firewall-cmd --reload
+----
+====
+
+[NOTE]
+====
+Use the ports you configured. Replace the example values `5000` and `8080` with your actual settings:
+
+- `PORT`: MCP Server listening port (default: 5000).
+- `HEALTH_PORT`: Health check server port (default: 8080).
+
+Adjust all commands and firewall rules accordingly.
+====
