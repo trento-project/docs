@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-requirements]]
 == Requirements
-:revdate: 2025-08-06
+:revdate: 2025-10-31
 
 
 This section describes requirements for the {trserver} and its {tragent}s.
@@ -44,6 +44,12 @@ The hosts must have unique machine identifiers (ids) in order to be registered i
 
 Similarly, the clusters must have unique authkeys in order to be registered in {trento}.
 
+=== {trento} MCP Server requirements (optional)
+
+The {trento} MCP Server is an optional component that enables AI-assisted operations via the link:https://modelcontextprotocol.io/introduction[Model Context Protocol] (MCP). It exposes a single HTTP endpoint that MCP-compatible assistants can use to interact with {trento}.
+
+The MCP Server is lightweight and stateless. No persistent storage required; allocate space for logs as per your logging policy.
+
 [[sec-trento-network-requirements]]
 === Network requirements
 
@@ -52,8 +58,24 @@ Similarly, the clusters must have unique authkeys in order to be registered in {
 * The Prometheus component of the {trserver}, if it exists, must be able to reach the Node Exporter in the {tragent} hosts.
 * The {sap} Basis administrator must access to the Web component of the {trserver} via HTTP (port TCP/80) or via HTTPS (port TCP/443) if SSL is enabled.
 
+==== MCP Server network requirements (optional)
+
+Inbound to the MCP Server:
+
+* TCP/5000 for the MCP endpoint (default, adjustable via `PORT`). The API is exposed under the path `/mcp`
+  ** In {k8s}, expose via Ingress host/path as configured in the Helm chart
+  ** On systemd/container deployments, ensure the firewall allows access on the chosen port
+* Optional: TCP/8080 for health checks when enabled (`ENABLE_HEALTH_CHECK=true`; port adjustable via `HEALTH_PORT`)
+
+Outbound from the MCP Server to {trserver}:
+
+* If using `TRENTO_URL` (recommended): HTTPS to the externally reachable {trserver} URL (for example, behind NGINX)
+* If using `OAS_PATH` (direct internal access): HTTP(S) to the Web and Wanda API endpoints (for example, `http://localhost:4000/api/all/openapi`, `http://localhost:4001/wanda/api/all/openapi`, or the corresponding service names in {k8s}/container networks)
+
+
 [[sec-trento-installation-prerequisites]]
 === Installation prerequisites
 
 * *{trserver}* For a {k8s}-based deployment, you must have access to {suse} public registry for the deployment of {trserver} containers. For a systemd deployment, you must have a registered {sles4sap} 15 (SP4 or higher) or {sles4sap} 16.0 distribution.
 * *{tragent}s* A registered {sles4sap} 15 (SP3 or higher) distribution.
+* *{trento} MCP Server* (optional): a running {trserver} (Web and Wanda components) reachable from the MCP Server, network connectivity from the MCP Server to the {trserver} API endpoints and a Personal Access Token (user-scoped) created in {trweb} to authenticate requests from MCP clients.
