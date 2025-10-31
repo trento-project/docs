@@ -30,12 +30,11 @@ The {trento} MCP Server requires minimal configuration, but needs to know how to
 
 * `OAS_PATH`: Explicit paths to OpenAPI specification files. Use this when you want to directly specify the location of the API specifications instead of relying on autodiscovery. This is particularly useful when you want to connect to internal services (such as `localhost` or Kubernetes service names) instead of going through a reverse proxy.
 
+The {trento} MCP Server can be installed as part of the {trserver} deployment or as a separate component. Refer to the specific deployment method sections above for installation instructions:
 
-include::trento-kubernetes-install.adoc[tag=mcp-k8s-section]
-
-include::trento-systemd-install.adoc[tag=mcp-systemd-section]
-
-include::trento-container-install.adoc[tag=mcp-container-section]
+* <<sec-trento-k8s-deployment>> - Kubernetes deployment with Helm
+* <<sec-systemd-deployment>> - systemd deployment with RPM packages
+* <<sec-container-deployment>> - Container deployment with Docker/Podman
 
 === Configuration Reference
 
