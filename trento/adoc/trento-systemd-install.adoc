@@ -730,7 +730,7 @@ journalctl -u mcp-server-trento -f
 ----
 ====
 +
-. The Trento MCP Server should be listening at `http://localhost:5000/mcp` (or `http://localhost:<PORT>/mcp` if you changed the `PORT` setting). If you need remote access, ensure this port is open in your firewall; see <<sec-mcp-systemd-firewall,Firewall Configuration>>.
+. The Trento MCP Server should be listening at `http://localhost:5000/mcp` (or `http://localhost:<PORT>/mcp` if you changed the `PORT` setting). If you need remote access, ensure this port is open in your firewall; see <<sec-mcp-systemd-firewall>>.
 +
 . If you enabled health checks, verify the endpoints locally:
 
