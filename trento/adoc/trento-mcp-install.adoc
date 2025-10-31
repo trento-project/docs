@@ -1,0 +1,46 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-mcp-install]]
+:revdate: 2025-10-31
+== Installing the {trento} MCP Server
+
+The {trento} MCP Server can be deployed in several ways depending on your infrastructure and requirements. This guide covers three main deployment methods: Kubernetes (using Helm charts), systemd (using RPM packages), and containerized deployment (using Docker/Podman).
+
+=== Prerequisites
+
+Before installing the {trento} MCP Server, ensure you have:
+
+* A running {trserver} installation (Web and Wanda components).
++
+The {trserver} consists of multiple components:
++
+** *Web component*: Provides the user interface and API endpoints for managing SAP systems
+** *Wanda component*: Handles automated checks and compliance validation for SAP landscapes
++
+Both components must be running and accessible for the MCP Server to function properly.
+
+* Network connectivity between the MCP Server and {trserver} components.
+* Access to the {trserver} URL (especially important when deployed behind NGINX or other reverse proxies).
+
+=== Configuration Overview
+
+The {trento} MCP Server requires minimal configuration, but needs to know how to reach your {trserver}. The key configuration parameters are:
+
+* `TRENTO_URL`: The URL where your {trserver} is accessible. This is particularly important when {trento} is deployed behind NGINX or other reverse proxies. Use the externally accessible URL (e.g., `https://trento.example.com`) rather than internal service URLs. When set, the server will use this URL for OpenAPI specification autodiscovery.
+
+* `OAS_PATH`: Explicit paths to OpenAPI specification files. Use this when you want to directly specify the location of the API specifications instead of relying on autodiscovery. This is particularly useful when you want to connect to internal services (such as `localhost` or Kubernetes service names) instead of going through a reverse proxy.
+
+
+include::trento-kubernetes-install.adoc[tag=mcp-k8s-section]
+
+include::trento-systemd-install.adoc[tag=mcp-systemd-section]
+
+include::trento-container-install.adoc[tag=mcp-container-section]
+
+=== Configuration Reference
+
+For detailed configuration options, including command-line parameters, environment variables, configuration file examples, and advanced settings, see <<sec-trento-mcp-config>>.
+
+=== Troubleshooting
+
+For troubleshooting common issues, see <<sec-trento-mcp-troubleshooting>>.
