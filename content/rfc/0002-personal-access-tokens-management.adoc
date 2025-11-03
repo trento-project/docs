@@ -327,6 +327,12 @@ CONs:
 
  * if the proxy in front of services is not configured properly, the endpoint could be exposed publicly (ie the customer does not use our provided proxy configuration)
 
+Proposed option is *Option 5: Internal only endpoint* so that:
+
+ * we can take time to properly design and introduce OAuth terminology and flows at a later stage
+ * contextually get rid of wanda/web interdependency on `ACCESS_TOKEN_ENC_SECRET`
+ * we do not need to design and maintain another authn mechanism
+
 == Alternatives
 
 The following alternatives could be considered in replacement of or as an addition to what mentioned in the RFC:
