@@ -31,7 +31,7 @@ curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bas
 ----
 helm upgrade \
    --install trento-server oci://registry.suse.com/trento/trento-server \
-   --set trento-web.trentoWebOrigin=TRENTO_SERVER_HOSTNAME \
+   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
    --set trento-web.adminUser.password=ADMIN_PASSWORD
 ----
 ====
@@ -43,7 +43,7 @@ When using a Helm version lower than 3.8.0, an experimental flag must be set as 
 ----
 HELM_EXPERIMENTAL_OCI=1 helm upgrade \
    --install trento-server oci://registry.suse.com/trento/trento-server \
-   --set trento-web.trentoWebOrigin=TRENTO_SERVER_HOSTNAME \
+   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
    --set trento-web.adminUser.password=ADMIN_PASSWORD
 ----
 ====
@@ -113,7 +113,7 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 ----
 helm upgrade \
    --install trento-server oci://registry.suse.com/trento/trento-server \
-   --set trento-web.trentoWebOrigin=TRENTO_SERVER_HOSTNAME \
+   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
    --set trento-web.adminUser.password=ADMIN_PASSWORD
 ----
 ====
@@ -124,7 +124,7 @@ When using a Helm version lower than 3.8.0, an experimental flag must be set as 
 ----
 HELM_EXPERIMENTAL_OCI=1 helm upgrade \
    --install trento-server oci://registry.suse.com/trento/trento-server \
-   --set trento-web.trentoWebOrigin=TRENTO_SERVER_HOSTNAME \
+   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
    --set trento-web.adminUser.password=ADMIN_PASSWORD
 ----
 ====
@@ -152,7 +152,7 @@ If you use a multi-node {k8s} cluster, it is possible to deploy {trserver} image
 ----
 HELM_EXPERIMENTAL_OCI=1 helm upgrade \
    --install trento-server oci://registry.suse.com/trento/trento-server \
-   --set trento-web.trentoWebOrigin=TRENTO_SERVER_HOSTNAME \
+   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
    --set trento-web.adminUser.password=ADMIN_PASSWORD \
    --set prometheus.server.nodeSelector.LABEL=VALUE \
    --set postgresql.primary.nodeSelector.LABEL=VALUE \
@@ -199,7 +199,7 @@ The cron rule specifying how frequently the pruning job is performed.
 ----
 helm upgrade \
   --install trento-server oci://registry.suse.com/trento/trento-server \
-  --set trento-web.trentoWebOrigin=TRENTO_SERVER_HOSTNAME \
+  --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
   --set trento-web.adminUser.password=ADMIN_PASSWORD \
   --set trento-web.pruneEventsOlderThan=30 \
   --set trento-web.pruneEventsCronjobSchedule="0 3 * * *"
@@ -243,7 +243,7 @@ The command to enable email alerts is as follows:
 ----
 HELM_EXPERIMENTAL_OCI=1 helm upgrade \
    --install trento-server oci://registry.suse.com/trento/trento-server \
-   --set trento-web.trentoWebOrigin=TRENTO_SERVER_HOSTNAME \
+   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
    --set trento-web.adminUser.password=ADMIN_PASSWORD \
    --set trento-web.alerting.enabled=true \
    --set trento-web.alerting.smtpServer=SMTP_SERVER \
