@@ -402,7 +402,7 @@ PORT=4001
 SECRET_KEY_BASE=some-secret
 ACCESS_TOKEN_ENC_SECRET=some-secret
 OAS_SERVER_URL=https://trento.example.com/wanda
-AUTH_SERVER_URL=http://<internal-trento-web-domain>:<internal-trento-web-port> # e.g. http://127.0.0.1:4000
+AUTH_SERVER_URL=http://localhost:4000
 ----
 ====
 
