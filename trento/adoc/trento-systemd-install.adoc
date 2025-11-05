@@ -2,37 +2,27 @@ include::product-attributes.adoc[]
 
 [[sec-systemd-deployment]]
 === systemd deployment
-:revdate: 2025-08-05
+:revdate: 2025-05-11
 
+A systemd-based installation of the {trento} Server using RPM packages can be performed manually on the latest supported versions of {sles4sap}, from 15 SP4 up to 16. For installations on service packs other than the current one, make sure to update the repository address as described in the relevant notes throughout this guide.
 
-A systemd installation of {trento} Server, based on RPM packages, can be done
-manually using the latest available version of SUSE Linux Enterprise Server for
-SAP Applications. For installations on Service Packs other than the current one,
-update the repository address as indicated in the respective notes provided
-throughout this guide.
+*Supported versions*:
 
-*Supported Service Packs*:
-
-* SP3
-* SP4
-* SP5
-* SP6
-* SP7
+* {sles4sap} 15: SP4–SP7
+* {sles4sap} 16
 
 ==== List of dependencies
 
-* https://www.postgresql.org/[PostgreSQL]
-* https://rabbitmq.com/[RabbitMQ]
 * https://nginx.org/en/[NGINX]
+* https://www.postgresql.org/[PostgreSQL]
 * https://prometheus.io/[Prometheus] (optional)
+* https://rabbitmq.com/[RabbitMQ]
 
 ==== Install {trento} dependencies
 
 ===== Install Prometheus (Optional)
 
-https://prometheus.io/[Prometheus] is not required to run {trento}, but it
-is recommended, as it allows {trento} to display charts for each host with
-useful information about the CPU load and memory.
+https://prometheus.io/[Prometheus] is not required to run {trento}, but it is highly recommended. When enabled, {trento} can display performance charts for each host, showing useful metrics such as CPU load and memory usage.
 
 [NOTE]
 ====
@@ -42,35 +32,31 @@ If you choose not to install Prometheus, set `+CHARTS_ENABLED+` to
 `+true+` 
 ====
 
-[[prometheus-existing-installation, Use existing installation]]
-====== Use existing installation
+====== Choose a Prometheus Setup Option
+
+* <<prometheus-existing-installation, Use an existing Prometheus installation>>  
+* <<prometheus-packagehub, Install Prometheus from the *unsupported* PackageHub repository>>
+
+
+[[prometheus-existing-installation]]
+====== Use an existing Prometheus installation
 
 Minimal required Prometheus version is *2.28.0*.
 
-[[prometheus-packagehub, Install Prometheus using the *unsupported* PackageHub repository]]
-====== Install Prometheus using the *unsupported* PackageHub repository
+[[prometheus-packagehub]]
+====== Install Prometheus from the *unsupported* PackageHub repository
 
-https://packagehub.suse.com/[PackageHub] packages are tested by SUSE,
-but they do not come with the same level of support as the core SLES
-packages. Users should assess the suitability of these packages based on
-their own risk tolerance and support needs.
+Prometheus is available for installation from the SUSE https://packagehub.suse.com/[PackageHub]  repository.
+PackageHub packages are tested by SUSE but are not officially supported as part of the {sles4sap} base product.
 
-. Enable PackageHub repository (replace `15.x` with the correct Service Pack version):
+. Enable the PackageHub repository (replace `x.x` with the version of your operating system, for example `15.7` or `16.0`):
 +
 [source,bash]
 ----
-SUSEConnect --product PackageHub/15.x/x86_64
+SUSEConnect --product PackageHub/x.x/x86_64
 ----
 +
-[NOTE]
-====
-SLE15 SP3 requires a provided Prometheus server. The version available
-through `+SUSEConnect --product PackageHub/15.3/x86_64+` is outdated and
-is not compatible with {trento}'s Prometheus configuration. Refer to
-<<prometheus-existing-installation>> for SLE 15 SP3.
-====
-+
-. Add the Prometheus user/group:
+. Create the Prometheus user and group:
 +
 [source,bash]
 ----
@@ -83,16 +69,9 @@ useradd -s /sbin/nologin --system -g prometheus prometheus
 ----
 zypper in golang-github-prometheus-prometheus
 ----
+. Configure Prometheus for Trento
 +
-[NOTE]
-====
-In case the missing dependency cannot be satisfied, we have already
-added the Prometheus user/group. This makes it safe to proceed with the
-installation by choosing Solution 2: break
-golang-github-prometheus-prometheus
-====
-. Change Prometheus configuration by replacing the configuration at
-`+/etc/prometheus/prometheus.yml+` with:
+Replace or update the existing configuration at +`/etc/prometheus/prometheus.yml`+ with:
 +
 [source,yaml]
 ----
@@ -115,17 +94,16 @@ scrape_configs:
 +
 [NOTE]
 ====
-*localhost:4000* in *url:http://localhost:4000/api/prometheus/targets*
++localhost:4000+ in +http://localhost:4000/api/prometheus/targets+
 refers to the location where {trento} web service is running.
 ====
 . Enable and start the Prometheus service:
 +
 [source,bash]
 ----
-# systemctl enable --now prometheus
+systemctl enable --now prometheus
 ----
-. If firewalld is running, allow Prometheus to be accessible and add an
-exception to firewalld:
+. If firewalld is running, allow Prometheus to be accessible and add an exception to firewalld:
 +
 [source,bash]
 ----
@@ -138,11 +116,16 @@ firewall-cmd --reload
 The current instructions are tested with the following PostgreSQL
 versions:
 
-* *13.9 for SP3*
-* *14.10 for SP4*
-* *15.5 for SP5*
-* *16.9 for SP6*
-* *17.5 for SP7*
+[cols="2,2", options="header"]
+|===
+| {sles4sap} | PostgreSQL Version
+
+| 15 SP4 | 14.10
+| 15 SP5 | 15.5
+| 15 SP6 | 16.9
+| 15 SP7 | 17.5
+| 16.0   | 17.6
+|===
 
 Using a different version of PostgreSQL may require different steps or
 configurations, especially when changing the major number. For more
@@ -207,8 +190,8 @@ databases and users. To do this, add the following to
 +
 [source,bash]
 ----
-host   wanda                      wanda_user    0.0.0.0/0   md5
-host   trento,trento_event_store  trento_user   0.0.0.0/0   md5
+host   wanda                      wanda_user    0.0.0.0/0     scram-sha-256
+host   trento,trento_event_store  trento_user   0.0.0.0/0     scram-sha-256
 ----
 +
 [NOTE]
@@ -291,10 +274,9 @@ rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
 
 ==== Install {trento} using RPM packages
 
-The `+trento-web+` and `+trento-wanda+` packages come in the supported
-SLES4SAP distributions by default.
+The `trento-web` and `trento-wanda` packages are available by default on supported {sles4sap} distributions.
 
-Install {trento} web and wanda:
+Install {trento} web, wanda and checks:
 
 [source,bash]
 ----
@@ -311,18 +293,18 @@ respectively, and examples of how to modify them are available in
 
 [NOTE]
 ====
-You can create the content of the secret variables like
-`+SECRET_KEY_BASE+`, `+ACCESS_TOKEN_ENC_SECRET+` and
-`+REFRESH_TOKEN_ENC_SECRET+` with `+openssl+` running
-`+openssl rand -out /dev/stdout 48 | base64+`
-====
+You can create the content of the secret variables such as
+`SECRET_KEY_BASE`, and `REFRESH_TOKEN_ENC_SECRET` using `openssl`:
 
-[NOTE]
-====
-Depending on how you intend to connect to the console, a working
-hostname, FQDN, or an IP is required in `+TRENTO_WEB_ORIGIN+` for HTTPS.
-Otherwise websockets fail to connect, causing no real-time updates in
-the UI.
+[source,bash]
+----
+openssl rand -out /dev/stdout 48 | base64
+----
+
+Also ensure that a valid hostname, FQDN, or IP address is configured in
+`TRENTO_WEB_ORIGIN` when using HTTPS.
+Otherwise, WebSocket connections will fail, preventing real-time updates
+in the web interface.
 ====
 
 ===== trento-web configuration
@@ -338,12 +320,11 @@ ENABLE_ALERTING=false
 CHARTS_ENABLED=true
 PROMETHEUS_URL=http://localhost:9090
 ADMIN_USER=admin
-ADMIN_PASSWORD=test1234
+ADMIN_PASSWORD=trentodemo
 ENABLE_API_KEY=true
 PORT=4000
 TRENTO_WEB_ORIGIN=trento.example.com
 SECRET_KEY_BASE=some-secret
-ACCESS_TOKEN_ENC_SECRET=some-secret
 REFRESH_TOKEN_ENC_SECRET=some-secret
 CHECKS_SERVICE_BASE_URL=/wanda
 OAS_SERVER_URL=https://trento.example.com
@@ -358,7 +339,7 @@ functionality.
 ====
 
 The
-https://github.com/trento-project/web/blob/main/guides/alerting/alerting.md[alerting
+https://www.trento-project.io/docs/web/Alerting/alerting.html[alerting
 system to receive email notifications] can be enabled by setting
 `+ENABLE_ALERTING+` to `+true+` and adding the following entries:
 
@@ -393,6 +374,39 @@ AUTH_SERVER_URL=http://localhost:4000
 ====
 
 ===== Start the services
+
+===== Start the services
+
+[NOTE]
+====
+In some {sles4sap} environments, SELinux may be enabled and set to *enforcing* mode by default.  
+If {trento} services fail to start or show permission-related errors, check the SELinux status:
+
+[source,bash]
+----
+getenforce
+----
+
+If SELinux is set to *enforcing*, you can switch it to *permissive* mode either temporarily or permanently:
+
+* **Temporary change (until reboot):**
++
+[source,bash]
+----
+setenforce 0
+----
+
+* **Permanent change (persists after reboot):**
++
+Edit +/etc/selinux/config+ and set:
++
+[source]
+----
+SELINUX=permissive
+----
++
+
+====
 
 Enable and start the services:
 
@@ -624,27 +638,21 @@ needs to be adjusted.
 +
 [source,bash]
 ----
-systemctl enable --now nginx
+systemctl restart nginx
 ----
 
 [[option-2-using-lets-encrypt-for-a-signed-certificate-using-packagehub-repository]]
 ===== Create a signed certificate with Let's Encrypt using PackageHub repository
 
-[NOTE]
-====
-Change repository if you use a Service Pack other than SP5. For example:
-`+SUSEConnect --product PackageHub/15.3/x86_64+` for SLE15 SP3,
-`+SUSEConnect --product PackageHub/15.4/x86_64+` for SLE15 SP4. Use
-packages in PackageHub at your own risk.
-====
 
-. Add PackageHub, if it is not already added:
+. Enable the PackageHub repository (replace `x.x` with your OS version, for example `15.7` or `16.0`):
 +
 [source,bash]
 ----
-SUSEConnect --product PackageHub/15.5/x86_64
+SUSEConnect --product PackageHub/x.x/x86_64
 zypper refresh
 ----
++
 . Install Certbot and its NGINX plugin:
 +
 [NOTE]
@@ -667,7 +675,7 @@ instructions for NGINX]
 +
 [source,bash]
 ----
-certbot --nginx -d example.com -d www.example.com
+certbot --nginx -d trento.example.com -d trento.example.com
 ----
 +
 [NOTE]
