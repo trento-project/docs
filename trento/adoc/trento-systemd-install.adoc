@@ -318,10 +318,6 @@ respectively, and examples of how to modify them are available in
 `+/etc/trento/trento-web.example+` and
 `+/etc/trento/trento-wanda.example+`.
 
-*Important: The content of `+SECRET_KEY_BASE+` and
-`+ACCESS_TOKEN_ENC_SECRET+` in both `+trento-web+` and `+trento-wanda+`
-must be the same.*
-
 [NOTE]
 ====
 You can create the content of the secret variables like
@@ -400,7 +396,6 @@ AMQP_URL=amqp://trento_user:trento_user_password@localhost:5672/vhost
 DATABASE_URL=ecto://wanda_user:wanda_password@localhost/wanda
 PORT=4001
 SECRET_KEY_BASE=some-secret
-ACCESS_TOKEN_ENC_SECRET=some-secret
 OAS_SERVER_URL=https://trento.example.com/wanda
 ----
 ====

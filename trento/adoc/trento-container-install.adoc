@@ -101,7 +101,6 @@ docker run -d --name wanda \
     -v trento-checks:/usr/share/trento/checks:ro \
     -e CORS_ORIGIN=localhost \
     -e SECRET_KEY_BASE=$WANDA_SECRET_KEY_BASE \
-    -e ACCESS_TOKEN_ENC_SECRET=$ACCESS_TOKEN_ENC_SECRET \
     -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost \
     -e DATABASE_URL=ecto://wanda_user:wanda_password@host.docker.internal/wanda \
     -e OAS_SERVER_URL=https://trento.example.com/wanda \
