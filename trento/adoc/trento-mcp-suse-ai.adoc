@@ -1,6 +1,4 @@
 :revdate: 2025-10-31
-[[sec-trento-mcp-suse-ai]]
-=== Integrating the {trento} MCP Server with {suseai}
 
 This guide explains how to integrate the {trento} MCP Server with {suseai}, including configuration and deployment instructions.
 
