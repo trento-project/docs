@@ -1,6 +1,4 @@
-[[sec-trento-mcp-others]]
 :revdate: 2025-10-31
-=== Integrating the {trento} MCP Server with other MCP Hosts
 
 The {trento} MCP Server can be integrated with any client application that supports the Model Context Protocol (MCP). This allows you to interact with the {trento} API and execute tools defined in the OpenAPI specification through your preferred AI assistant or development tool.
 
