@@ -9,6 +9,17 @@ The subsection uses the following placeholders:
 * `TRENTO_SERVER_HOSTNAME`: the host name used by the end user to access the console.
 * `ADMIN_PASSWORD`: the password of the default user created during the installation process. It must have at least 8 characters.
 
+[IMPORTANT]
+====
+By default, the provided Helm chart uses link:https://github.com/traefik/traefik[Traefik] as ingress class +
+Main usages are related to:
+
+ * path rewriting
+ * endpoint protection
+
+Find traefik specific usages link:https://github.com/search?q=repo%3Atrento-project%2Fhelm-charts+traefik&type=code[here], and in case another ingress controller is used, please adapt accordingly.
+====
+
 [[sec-trento-install-trentoserver-on-existing-k8s-cluster]]
 ==== Installing {trserver} on an existing {k8s} cluster
 
