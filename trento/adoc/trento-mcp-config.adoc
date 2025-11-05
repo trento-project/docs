@@ -35,7 +35,7 @@ AUTODISCOVERY_PATHS=/api/all/openapi,/wanda/api/all/openapi
 ENABLE_HEALTH_CHECK=false
 
 ## The HTTP header name used to pass the Trento API key for authentication with the Trento server.
-HEADER_NAME=X-TRENTO-MCP-APIKEY
+HEADER_NAME=Authorization
 
 ## The API path used for health checks on target servers.
 HEALTH_API_PATH=/api/healthz
@@ -100,7 +100,7 @@ The `mcp-server-trento` binary accepts several command-line flags to configure i
 |`--autodiscovery-paths, -A` |`TRENTO_MCP_AUTODISCOVERY_PATHS` |`/api/all/openapi,/wanda/api/all/openapi` |Custom paths for API autodiscovery.
 |`--config, -c` |`TRENTO_MCP_CONFIG` |(empty) |Configuration file path.
 |`--enable-health-check, -d` |`TRENTO_MCP_ENABLE_HEALTH_CHECK` |`false` |Enable the health check server.
-|`--header-name, -H` |`TRENTO_MCP_HEADER_NAME` |`X-TRENTO-MCP-APIKEY` |The header name used for passing the Trento API key to the MCP server.
+|`--header-name, -H` |`TRENTO_MCP_HEADER_NAME` |`Authorization` |The header name used for passing the Trento API key to the MCP server.
 |`--health-api-path, -a` |`TRENTO_MCP_HEALTH_API_PATH` |`/api/healthz` |The API path used for health checks on target servers.
 |`--health-port, -z` |`TRENTO_MCP_HEALTH_PORT` |`8080` |The port on which the health check server runs.
 |`--insecure-skip-tls-verify, -i` |`TRENTO_MCP_INSECURE_SKIP_TLS_VERIFY` |`false` |Skip TLS certificate verification when fetching OpenAPI specifications from HTTPS URLs.
