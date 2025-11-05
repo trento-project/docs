@@ -71,7 +71,7 @@ zypper in golang-github-prometheus-prometheus
 ----
 . Configure Prometheus for Trento
 +
-Replace or update the existing configuration at +`/etc/prometheus/prometheus.yml`+ with:
+Replace or update the existing configuration at +/etc/prometheus/prometheus.yml+ with:
 +
 [source,yaml]
 ----
@@ -294,7 +294,7 @@ respectively, and examples of how to modify them are available in
 [NOTE]
 ====
 You can create the content of the secret variables such as
-`SECRET_KEY_BASE`, and `REFRESH_TOKEN_ENC_SECRET` using `openssl`:
+`SECRET_KEY_BASE` and `REFRESH_TOKEN_ENC_SECRET` using `openssl`:
 
 [source,bash]
 ----
@@ -372,8 +372,6 @@ OAS_SERVER_URL=https://trento.example.com/wanda
 AUTH_SERVER_URL=http://localhost:4000
 ----
 ====
-
-===== Start the services
 
 ===== Start the services
 
