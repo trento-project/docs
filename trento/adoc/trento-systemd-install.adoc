@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-systemd-deployment]]
 === systemd deployment
-:revdate: 2025-05-11
+:revdate: 2025-06-11
 
 A systemd-based installation of the {trento} Server using RPM packages can be performed manually on the latest supported versions of {sles4sap}, from 15 SP4 up to 16. For installations on service packs other than the current one, make sure to update the repository address as described in the relevant notes throughout this guide.
 
@@ -462,20 +462,6 @@ correctly, the output should be as follows:
 ----
 ====
 
-[NOTE]
-====
-At this stage, `trento-web` is running and can be accessed directly using its host IP address and configured port.
-
-If `firewalld` is enabled, open the required port to allow direct access:
-
-[source,bash]
-----
-firewall-cmd --zone=public --add-port=9090/tcp --permanent
-firewall-cmd --reload
-----
-
-Alternatively, you can proceed with setting up NGINX to expose {trento} through a public HTTPS URL secured with certificates.
-====
 
 ==== Install and configure NGINX
 
