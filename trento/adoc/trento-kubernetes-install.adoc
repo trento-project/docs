@@ -7,7 +7,13 @@ include::product-attributes.adoc[]
 The subsection uses the following placeholders:
 
 * `TRENTO_SERVER_HOSTNAME`: the host name used by the end user to access the console.
-* `ADMIN_PASSWORD`: the password of the default user created during the installation process. It must have at least 8 characters.
+* `ADMIN_PASSWORD`: the password of the admin user created during the installation process.
++
+The password must be compliant with:
++
+- At least 8 characters
+- Must not contain 3 consecutive repeated numbers or letters (e.g., 111 or aaa)
+- Must not contain 4 consecutive sequential numbers or letters (e.g., 1234, abcd, ABCD)
 
 [IMPORTANT]
 ====

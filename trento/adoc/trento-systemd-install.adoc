@@ -288,13 +288,12 @@ zypper install trento-web trento-wanda
 Both services depend on respective configuration files. They must be
 placed in `+/etc/trento/trento-web+` and `+/etc/trento/trento-wanda+`
 respectively, and examples of how to modify them are available in
-`+/etc/trento/trento-web.example+` and
-`+/etc/trento/trento-wanda.example+`.
+`+/etc/trento/trento-web.example+` and `+/etc/trento/trento-wanda.example+`.
 
 [NOTE]
 ====
 You can create the content of the secret variables such as
-`SECRET_KEY_BASE` and `REFRESH_TOKEN_ENC_SECRET` using `openssl`:
+`SECRET_KEY_BASE`, `ACCESS_TOKEN_ENC_SECRET` and `REFRESH_TOKEN_ENC_SECRET` using `openssl`:
 
 [source,bash]
 ----
@@ -325,23 +324,24 @@ ENABLE_API_KEY=true
 PORT=4000
 TRENTO_WEB_ORIGIN=trento.example.com
 SECRET_KEY_BASE=some-secret
+ACCESS_TOKEN_ENC_SECRET=some-secret
 REFRESH_TOKEN_ENC_SECRET=some-secret
 CHECKS_SERVICE_BASE_URL=/wanda
 OAS_SERVER_URL=https://trento.example.com
 ----
 ====
 
-[NOTE]
-====
-*Note:* Add `+CHARTS_ENABLED=false+` in {trento} web configuration file if
-Prometheus is not installed or you do not want to use {trento}'s charts
-functionality.
-====
+The `ADMIN_PASSWORD` variable must comply with the following rules:
 
-The
-https://www.trento-project.io/docs/web/Alerting/alerting.html[alerting
-system to receive email notifications] can be enabled by setting
-`+ENABLE_ALERTING+` to `+true+` and adding the following entries:
+* At least 8 characters
+* Must not contain 3 consecutive repeated numbers or letters (e.g., 111 or aaa)
+* Must not contain 4 consecutive sequential numbers or letters (e.g., 1234, abcd, ABCD)
+
+The `CHARTS_ENABLED` variable enable {trento} to display performance charts for each host, showing useful metrics such as CPU load and memory usage.
+`CHARTS_ENABLED` *must* be set to `false`, if Prometheus is not installed or you do not want to use {trento}'s charts functionality.
+
+The `ENABLE_ALERTING` enables the 
+https://www.trento-project.io/docs/web/Alerting/alerting.html[alerting system to receive email notifications]. Set `ENABLE_ALERTING` to `true` and add additional variables to the `/etc/trento/trento-web`, to enable the feature.
 
 ====
 [source,bash]
@@ -396,7 +396,7 @@ setenforce 0
 
 * **Permanent change (persists after reboot):**
 +
-Edit +/etc/selinux/config+ and set:
+Edit `/etc/selinux/config` and set:
 +
 [source]
 ----
@@ -460,6 +460,21 @@ correctly, the output should be as follows:
 ----
 {"ready":true}{"database":"pass"}
 ----
+====
+
+[NOTE]
+====
+At this stage, `trento-web` is running and can be accessed directly using its host IP address and configured port.
+
+If `firewalld` is enabled, open the required port to allow direct access:
+
+[source,bash]
+----
+firewall-cmd --zone=public --add-port=9090/tcp --permanent
+firewall-cmd --reload
+----
+
+Alternatively, you can proceed with setting up NGINX to expose {trento} through a public HTTPS URL secured with certificates.
 ====
 
 ==== Install and configure NGINX
