@@ -1,0 +1,53 @@
+[[personal_access_tokens]]
+
+== Personal Access Tokens
+:revdate: 2025-11-05
+
+{trento} allows users to create Personal Access Tokens (PATs) for authentication and authorization purposes in third party integrations with the APIs exposed by its components:
+
+ * link:https://www.trento-project.io/web/swaggerui/[Web]
+ * link:https://www.trento-project.io/wanda/swaggerui/[Wanda]
+
+=== About Personal Access Tokens
+
+Personal Access Tokens are an alternative to using username/password pairs for authentication to {trento} APIs and are intended to access resources on behalf of the token owner.
+
+A Personal Access Token has the same capabilities to access resources and perform actions on those resources that the owner of the token has.
+
+=== Creating a Personal Access Token
+
+After logging in to {trento} Web UI, navigate to your profile by clicking on your username in the top right corner and selecting *Profile* from the dropdown menu.
+
+.profile
+image::trento-web-profile.png[trento-web-profile,scaledwidth=80.0%]
+
+. Click *Generate Token* in the *Personal Access Tokens* section.
+. When prompted, provide a name and an expiration date and click *Generate Token*.
++
+.generate personal access token modal
+image::trento-web-generate-pat.png[trento-web-generate-pat,scaledwidth=80.0%]
+. Copy the generated token starting with `trento_pat_`. This is the only time the token will be displayed in full. If you lose it, you will need to generate a new one.
++
+.generated personal access token
+image::trento-web-generated-pat.png[trento-web-generated-pat,scaledwidth=80.0%]
+
+=== Using a Personal Access Token
+
+Once a Personal Access Token has been created, it can be used to authenticate API requests by including it in the `Authorization` header as a Bearer token.
+
+[source,bash]
+----
+$ curl -X GET "..." -H "Authorization: Bearer trento_pat_<rest_of_token>"
+----
+
+=== Deleting a Personal Access Token
+
+A Personal Access Token can be deleted by clicking its contextual *Delete* button in the *Personal Access Tokens* section of the profile
+
+.personal access tokens section
+image::trento-web-pats-list.png[trento-web-pats-list,scaledwidth=80.0%]
+
+and confirming the deletion when prompted
+
+.delete personal access token modal
+image::trento-web-delete-pat-confirmation.png[trento-web-delete-pat-confirmation,scaledwidth=80.0%]

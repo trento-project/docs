@@ -14,6 +14,7 @@
  ** xref:trento-manage-tags.adoc[Managing tags]
  ** xref:trento-smlm-integration.adoc[Integration with SUSE Multi-Linux Manager]
  ** xref:trento-rotate-api-keys.adoc[Rotating API keys]
+ ** xref:personal-access-tokens.adoc[Personal Access Tokens]
  ** xref:trento-update-trento-server.adoc[Updating Trento Server]
  ** xref:trento-update-trento-agent.adoc[Updating a Trento Agent]
  ** xref:trento-update-trento-checks.adoc[Updating Trento Checks]
