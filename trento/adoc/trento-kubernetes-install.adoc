@@ -364,11 +364,12 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
   --set trento-mcp-server.enabled=true \
   --set trento-mcp-server.ingress.enabled=true \
   --set trento-mcp-server.ingress.hosts[0].host=TRENTO_SERVER_HOSTNAME \
-  --set trento-mcp-server.ingress.hosts[0].paths[0].path=/mcp
+  --set trento-mcp-server.ingress.hosts[0].paths[0].path=/mcp-server-trento \
+  --set trento-mcp-server.ingress.hosts[0].paths[0].pathType=ImplementationSpecific
 ----
 ====
 
-The MCP Server endpoint will be: `https://TRENTO_SERVER_HOSTNAME/mcp`
+The MCP Server endpoint will be: `https://TRENTO_SERVER_HOSTNAME/mcp-server-trento/mcp`
 
 ====== Disabling Tag Filtering
 
@@ -444,7 +445,8 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
   --set trento-mcp-server.enabled=true \
   --set trento-mcp-server.mcpServer.trentoURL=https://trento.example.com \
   --set trento-mcp-server.ingress.hosts[0].host=trento.example.com \
-  --set trento-mcp-server.ingress.hosts[0].paths[0].path=/mcp-server-trento
+  --set trento-mcp-server.ingress.hosts[0].paths[0].path=/mcp-server-trento \
+  --set trento-mcp-server.ingress.hosts[0].paths[0].pathType=ImplementationSpecific
 ----
 ====
 
