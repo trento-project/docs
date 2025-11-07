@@ -48,14 +48,6 @@ container. To use an existing Prometheus installation, set `+CHARTS_ENABLED+` to
 
 Minimal required Prometheus version is *2.28.0*.
 
-If you have a
-https://prometheus.io/docs/prometheus/latest/installation/[existing
-Prometheus server], ensure to set the PROMETHEUS_URL environment
-variable to your Prometheus server's URL as part of the Docker command
-when creating the `+trento-web+` container or configuring the RPM
-packages. Use <<prometheus-packagehub>> as a reference to
-adjust the Prometheus configuration.
-
 [[prometheus-packagehub, Install Prometheus using the *unsupported* PackageHub repository]]
 ====== Install Prometheus using the *unsupported* PackageHub repository
 

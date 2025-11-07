@@ -12,18 +12,13 @@ Problems must be reported under {sles4sap}{nbsp}15 and component
 trento.
 
 When opening a support case for {trento}, provide the relevant
-deployment option for {trserver}: {k8s}, systemd or containerized ({docker}-based).
+deployment option for {trserver}: {k8s}, or systemd rpm installation.
 
 In case of a {k8s} deployment, provide the output of the {trento}
 support script as explained in section
 <<sec-trento-problemanalysis>>.
 
 In case of a systemd deployment, provide the output of the {trento} support plugin, as explained in section <<sec-trento-problemanalysis>>.
-
-In case of a containerized deployment, provide the logs of the
-trento-web and trento-wanda containers. Use `+docker ps+` to retrieve
-the IDs of both containers, then `+docker logs CONTAINER_ID+` to
-retrieve the corresponding logs.
 
 For issues with a particular {tragent}, or a component discovered by a
 particular {tragent}, also provide the following:

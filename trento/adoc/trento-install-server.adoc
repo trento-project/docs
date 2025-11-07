@@ -6,5 +6,4 @@ include::product-attributes.adoc[]
 
 include::trento-kubernetes-install.adoc[]
 include::trento-systemd-install.adoc[]
-include::trento-container-install.adoc[]
 include::trento-ansible-install.adoc[]

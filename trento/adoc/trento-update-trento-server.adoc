@@ -66,11 +66,3 @@ In a system deployment, you can use zypper to update {trserver}:
  systemctl restart trento-wanda     
 ----
 ====
-
-In a containerized deployment, you can use the same Docker commands as
-for the installation. Keep in mind that the volume for the {trento}
-checks already exists, so there is no need to create it. Also, the web
-and wanda containers must be stopped and removed before they can be
-redeployed with the latest version. Also make sure to include in the
-Docker commands any other options that you have enabled after the
-original installation.

@@ -93,44 +93,6 @@ OIDC_CALLBACK_URL=<OIDC_CALLBACK_URL>
 +
 . Restart the application.
 
-==== Enabling OpenID Connect when using Docker images
-
-To enable OIDC when using Docker images, proceed as follows:
-
-[arabic]
-. If `+trento-web+` container is already running stop and delete the
-container before continuing. For that run:
-+
-[source,bash]
-----
-docker stop trento-web
-docker rm trento-web
-----
-. Provide the following environment variables to the Docker container
-via the `+-e+` option:
-+
-[source,bash]
-----
-docker run -d \
--p 4000:4000 \
---name trento-web \
---network trento-net \
---add-host "host.docker.internal:host-gateway" \
-
-...[other settings]...
-
-# Required:
--e ENABLE_OIDC=true \
--e OIDC_CLIENT_ID=<OIDC_CLIENT_ID> \
--e OIDC_CLIENT_SECRET=<OIDC_CLIENT_SECRET> \
--e OIDC_BASE_URL=<OIDC_BASE_URL> \
-
-# Optional:
--e OIDC_CALLBACK_URL=<OIDC_CALLBACK_URL> \
-
-...[other settings]...
-----
-
 ==== Available variables for OpenID Connect
 
 OIDC_CLIENT_ID::
@@ -145,6 +107,7 @@ OIDC_CALLBACK_URL::
   `+https://#{TRENTO_WEB_ORIGIN}/auth/oidc_callback+`)
 
 [[using-oauth-20]]
+
 === Using OAuth 2.0
 
 {trento} integrates with an IDP that uses the OAuth 2 protocol to
@@ -215,48 +178,6 @@ OAUTH2_CALLBACK_URL=<OAUTH2_CALLBACK_URL>
 ====
 +
 . Restart the application.
-
-[[enabling-oauth-20-when-using-docker-images]]
-==== Enabling OAuth 2.0 when using Docker images
-
-To enable OAuth 2.0 when using Docker images, proceed as follows:
-
-[arabic]
-. If `+trento-web+` container is already running stop and delete the
-container before continuing. For that run:
-+
-[source,bash]
-----
-docker stop trento-web
-docker rm trento-web
-----
-. Use the following environment variables to the Docker container via
-the `+-e+` option:
-+
-[source,bash]
-----
-docker run -d \
--p 4000:4000 \
---name trento-web \
---network trento-net \
---add-host "host.docker.internal:host-gateway" \
-
-...[other settings]...
-
--e ENABLE_OAUTH2=true \
--e OAUTH2_CLIENT_ID=<OAUTH2_CLIENT_ID> \
--e OAUTH2_CLIENT_SECRET=<OAUTH2_CLIENT_SECRET> \
--e OAUTH2_BASE_URL=<OAUTH2_BASE_URL> \
--e OAUTH2_AUTHORIZE_URL=<OAUTH2_AUTHORIZE_URL> \
--e OAUTH2_TOKEN_URL=<OAUTH2_TOKEN_URL> \
--e OAUTH2_USER_URL=<OAUTH2_USER_URL> \
-
-# Optional:
--e OAUTH2_SCOPES=<OAUTH2_SCOPES> \
--e OAUTH2_CALLBACK_URL=<OAUTH2_CALLBACK_URL> \
-
-...[other settings]...
-----
 
 [[available-variables-for-oauth-20]]
 ==== Available variables for OAuth 2.0
@@ -495,60 +416,6 @@ SAML_SIGNED_ENVELOPES=<SAML_SIGNED_ENVELOPES>
 ====
 +
 . Restart the application.
-
-==== Enabling SAML when using Docker images
-
-To enable SAML when using Docker images, proceed as follows:
-
-[arabic]
-. If `+trento-web+` container is already running stop and delete the
-container before continuing. For that run:
-+
-[source,bash]
-----
-docker stop trento-web
-docker rm trento-web
-----
-. Use the following environment variables to the Docker container via
-the `+-e+` option:
-+
-[source,bash]
-----
-docker run -d \
--p 4000:4000 \
---name trento-web \
---network trento-net \
---add-host "host.docker.internal:host-gateway" \
-
-...[other settings]...
-
--e ENABLE_SAML=true
--e SAML_IDP_ID=<SAML_IDP_ID> \
--e SAML_SP_ID=<SAML_SP_ID> \
-# Only SAML_METADATA_URL or SAML_METADATA_CONTENT must by provided
--e SAML_METADATA_URL=<SAML_METADATA_URL> \
--e SAML_METADATA_CONTENT=<SAML_METADATA_CONTENT> \
-
-# Optional:
--e SAML_IDP_NAMEID_FORMAT=<SAML_IDP_NAMEID_FORMAT> \
--e SAML_SP_DIR=<SAML_SP_DIR> \
--e SAML_SP_ENTITY_ID=<SAML_SP_ENTITY_ID> \
--e SAML_SP_CONTACT_NAME=<SAML_SP_CONTACT_NAME> \
--e SAML_SP_CONTACT_EMAIL=<SAML_SP_CONTACT_EMAIL> \
--e SAML_SP_ORG_NAME=<SAML_SP_ORG_NAME> \
--e SAML_SP_ORG_DISPLAYNAME=<SAML_SP_ORG_DISPLAYNAME> \
--e SAML_SP_ORG_URL=<SAML_SP_ORG_URL> \
--e SAML_USERNAME_ATTR_NAME=<SAML_USERNAME_ATTR_NAME> \
--e SAML_EMAIL_ATTR_NAME=<SAML_EMAIL_ATTR_NAME> \
--e SAML_FIRSTNAME_ATTR_NAME=<SAML_FIRSTNAME_ATTR_NAME> \
--e SAML_LASTNAME_ATTR_NAME=<SAML_LASTNAME_ATTR_NAME> \
--e SAML_SIGN_REQUESTS=<SAML_SIGN_REQUESTS> \
--e SAML_SIGN_METADATA=<SAML_SIGN_METADATA> \
--e SAML_SIGNED_ASSERTION=<SAML_SIGNED_ASSERTION> \
--e SAML_SIGNED_ENVELOPES=<SAML_SIGNED_ENVELOPES> \
-
-...[other settings]...
-----
 
 ==== Available variables for SAML
 

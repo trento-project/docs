@@ -34,16 +34,3 @@ can use Zypper to update your checks catalog:
 {prompt_sudo}zypper update trento-checks
 ----
 ====
-
-In a containerized deployment, checks are delivered as a container
-image, and you can user Docker to pull the latest version into the
-trento-checks volume created during the installation process:
-
-====
-[source,bash,subs="attributes"]
-----
-{prompt_user}docker run \
--v trento-checks:/usr/share/trento/checks \
-registry.suse.com/trento/trento-checks:latest
-----
-====
