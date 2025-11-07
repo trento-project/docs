@@ -6,7 +6,7 @@ include::product-attributes.adoc[]
 
 
 The procedure to update {trserver} depends on the chosen deployment
-option: {k8s}, systemd, or containerized.
+option: {k8s} or systemd.
 
 Consider the following when performing an update:
 
