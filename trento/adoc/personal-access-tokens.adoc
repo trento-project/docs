@@ -16,6 +16,11 @@ Personal Access Tokens are an alternative to using username/password pairs for a
 
 A Personal Access Token has the same capabilities to access resources and perform actions on those resources that the owner of the token has.
 
+[NOTE]
+====
+If user permissions are changed or the user is deleted or locked, the capabilities of the Personal Access Tokens owned by that user will be affected accordingly.
+====
+
 === Creating a Personal Access Token
 
 After logging in to {trento} Web UI, navigate to your profile by clicking on your username in the top right corner and selecting *Profile* from the dropdown menu.
