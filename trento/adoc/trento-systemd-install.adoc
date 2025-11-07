@@ -71,7 +71,7 @@ zypper in golang-github-prometheus-prometheus
 ----
 . Configure Prometheus for Trento
 +
-Replace or update the existing configuration at +/etc/prometheus/prometheus.yml+ with:
+Replace or update the existing configuration at `/etc/prometheus/prometheus.yml`` with:
 +
 [source,yaml]
 ----
@@ -485,13 +485,7 @@ firewall-cmd --reload
 ----
 systemctl enable --now nginx
 ----
-. Create a configuration file for {trento}:
-+
-[source,bash]
-----
-vim /etc/nginx/conf.d/trento.conf
-----
-. Add the following configuration to `+/etc/nginx/conf.d/trento.conf+`:
+. Create a configuration file for {trento} at `+/etc/nginx/conf.d/trento.conf+`:
 +
 ====
 [source,bash]
