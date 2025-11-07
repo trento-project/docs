@@ -25,17 +25,17 @@ If user permissions are changed or the user is deleted or locked, the capabiliti
 
 After logging in to {trento} Web UI, navigate to your profile by clicking on your username in the top right corner and selecting *Profile* from the dropdown menu.
 
-.profile
+.Profile
 image::trento-web-profile.png[trento-web-profile,scaledwidth=80.0%]
 
 . Click *Generate Token* in the *Personal Access Tokens* section.
 . When prompted, provide a name and an expiration date and click *Generate Token*.
 +
-.generate personal access token modal
+.Generate personal access token modal
 image::trento-web-generate-pat.png[trento-web-generate-pat,scaledwidth=80.0%]
-. Copy the generated token starting with `trento_pat_`. This is the only time the token will be displayed in full. If lost, a new one will need to be generated.
+. Copy the generated token starting with `trento_pat_`. This is the only time the token will be displayed in full. If lost, a new key must be generated.
 +
-.generated personal access token
+.Generated personal access token
 image::trento-web-generated-pat.png[trento-web-generated-pat,scaledwidth=80.0%]
 
 === Using a Personal Access Token
@@ -51,12 +51,12 @@ $ curl -X GET "..." -H "Authorization: Bearer trento_pat_<rest_of_token>"
 
 A Personal Access Token can be deleted by clicking its contextual *Delete* button in the *Personal Access Tokens* section of the profile.
 
-.personal access tokens section
+.Personal access tokens section
 image::trento-web-pats-list.png[trento-web-pats-list,scaledwidth=80.0%]
 
-and confirming the deletion when prompted
+Confirm the deletion
 
-.delete personal access token modal
+.Delete personal access token modal
 image::trento-web-delete-pat-confirmation.png[trento-web-delete-pat-confirmation,scaledwidth=80.0%]
 
 === Notes for user admins
