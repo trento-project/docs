@@ -638,7 +638,13 @@ systemctl restart nginx
 ===== Create a signed certificate with Let's Encrypt using PackageHub repository
 
 
-. Enable the PackageHub repository (replace `x.x` with your OS version, for example `15.7` or `16.0`):
+[NOTE]
+====
+Only available for SLE 15 SP4-SP7, for SLE 16.0 use alternatives or the
+xref:option-1-creating-a-self-signed-certificate[Self-signed certificate option].
+====
+
+. Enable the PackageHub repository (replace `x.x` with your OS version, for example `15.7`):
 +
 [source,bash]
 ----
