@@ -107,7 +107,6 @@ OIDC_CALLBACK_URL::
   `+https://#{TRENTO_WEB_ORIGIN}/auth/oidc_callback+`)
 
 [[using-oauth-20]]
-
 === Using OAuth 2.0
 
 {trento} integrates with an IDP that uses the OAuth 2 protocol to
