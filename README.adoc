@@ -12,9 +12,9 @@ This repository contains the Trento project documentation that does not interest
 
 == Trento docs site
 
-The `trento-docs-site` directory builds the link:https://www.trento-project.io/docs/[Trento project’s unified documentation site] using https://antora.org/[Antora]. Learn more about xref:content/trento-docs-site/README.adoc[the documentation hub here].
+The `trento-docs-site` directory builds the link:https://www.trento-project.io/docs/[Trento project’s unified documentation site] using https://antora.org/[Antora]. Learn more about xref:trento-docs-site/README.adoc[the documentation hub here].
 
 
 == Trento docs site ui
 
-The `trento-docs-site-ui` directory is used to customize and design the layout of the link:https://www.trento-project.io/docs/[Trento docs site]. Learn more about the xref:content/trento-docs-site-ui/README.adoc[ui customization here].
+The `trento-docs-site-ui` directory is used to customize and design the layout of the link:https://www.trento-project.io/docs/[Trento docs site]. Learn more about the xref:trento-docs-site-ui/README.adoc[ui customization here].
