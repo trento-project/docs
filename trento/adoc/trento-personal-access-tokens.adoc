@@ -1,6 +1,6 @@
 include::product-attributes.adoc[]
 
-[[personal_access_tokens]]
+[[sec-trento-personal-access-tokens]]
 
 == Personal Access Tokens
 :revdate: 2025-11-05
