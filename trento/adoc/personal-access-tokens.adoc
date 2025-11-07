@@ -1,3 +1,5 @@
+include::product-attributes.adoc[]
+
 [[personal_access_tokens]]
 
 == Personal Access Tokens
@@ -26,7 +28,7 @@ image::trento-web-profile.png[trento-web-profile,scaledwidth=80.0%]
 +
 .generate personal access token modal
 image::trento-web-generate-pat.png[trento-web-generate-pat,scaledwidth=80.0%]
-. Copy the generated token starting with `trento_pat_`. This is the only time the token will be displayed in full. If you lose it, you will need to generate a new one.
+. Copy the generated token starting with `trento_pat_`. This is the only time the token will be displayed in full. If lost, a new one will need to be generated.
 +
 .generated personal access token
 image::trento-web-generated-pat.png[trento-web-generated-pat,scaledwidth=80.0%]
@@ -51,3 +53,13 @@ and confirming the deletion when prompted
 
 .delete personal access token modal
 image::trento-web-delete-pat-confirmation.png[trento-web-delete-pat-confirmation,scaledwidth=80.0%]
+
+=== Notes for user admins
+
+User admins can delete tokens for other users but cannot create new ones on their behalf.
+
+In order to delete a token for another user, user admins need to:
+
+. navigate to the *Users* page 
+. select a user
+. click a token's contextual *Delete* button in the *Personal Access Tokens* section
