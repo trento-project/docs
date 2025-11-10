@@ -18,7 +18,7 @@ A Personal Access Token has the same capabilities to access resources and perfor
 
 [NOTE]
 ====
-If user permissions are changed or the user is deleted or locked, the capabilities of the Personal Access Tokens owned by that user will be affected accordingly.
+If user permissions are changed or the user is deleted or locked, the capabilities of the Personal Access Tokens owned by that user are affected accordingly.
 ====
 
 === Creating a Personal Access Token
