@@ -100,6 +100,7 @@ docker run -d --name wanda \
     -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost \
     -e DATABASE_URL=ecto://wanda_user:wanda_password@host.docker.internal/wanda \
     -e OAS_SERVER_URL=https://trento.example.com/wanda \
+    -e AUTH_SERVER_URL=http://localhost:4000 \
     --restart always \
     --entrypoint /bin/sh \
     registry.suse.com/trento/trento-wanda:latest \
