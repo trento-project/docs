@@ -4,7 +4,7 @@ include::product-attributes.adoc[]
 === systemd deployment
 :revdate: 2025-06-11
 
-A systemd-based installation of the {trento} Server using RPM packages can be performed manually on the latest supported versions of {sles4sap}, from 15 SP4 up to 16. For installations on service packs other than the current one, make sure to update the repository address as described in the relevant notes throughout this guide.
+A systemd-based installation of the {trserver} using RPM packages can be performed manually on the latest supported versions of {sles4sap}, from 15 SP4 up to 16. For installations on service packs other than the current one, make sure to update the repository URL as described in the relevant notes throughout this guide.
 
 *Supported versions*:
 
@@ -20,56 +20,64 @@ A systemd-based installation of the {trento} Server using RPM packages can be pe
 
 ==== Install {trento} dependencies
 
-===== Install Prometheus (Optional)
+===== Install {prometheus} (Optional)
 
 https://prometheus.io/[Prometheus] is not required to run {trento}, but it is highly recommended. When enabled, {trento} can display performance charts for each host, showing useful metrics such as CPU load and memory usage.
 
 [NOTE]
 ====
-If you choose not to install Prometheus, set `+CHARTS_ENABLED+` to
-`+false+` in the {trento} web RPM configuration file stored in
-`+/etc/trento/trento-web+`. To use an existing Prometheus installation, set `+CHARTS_ENABLED+` to
-`+true+` 
+{prometheus} is optional, but you must configure the chart display setting after installing {trento}.
+After the installation, edit the web configuration file in +/etc/trento/trento-web+
+
+* To disable charts when not using {prometheus}, set +CHARTS_ENABLED+ to +false+.
+* To enable charts using an existing {prometheus}, installation, set +CHARTS_ENABLED+ to +true+.
 ====
 
-====== Choose a Prometheus Setup Option
+====== Choose a {prometheus} Setup Option
 
 * <<prometheus-existing-installation, Use an existing Prometheus installation>>  
 * <<prometheus-packagehub, Install Prometheus from the *unsupported* PackageHub repository>>
 
 
 [[prometheus-existing-installation]]
-====== Use an existing Prometheus installation
+====== Use an existing {prometheus} installation
 
-Minimal required Prometheus version is *2.28.0*.
+Minimal required {prometheus} version is *2.28.0*.
+
+
+If you already have an https://prometheus.io/docs/prometheus/latest/installation/[existing Prometheus server], set the +PROMETHEUS_URL+ environment variable to point to your {prometheus} server URL after the installation of trento-web.
+
+Refer to <<prometheus-packagehub>> for an example of {prometheus} configuration.
+
+---
 
 [[prometheus-packagehub]]
-====== Install Prometheus from the *unsupported* PackageHub repository
+====== Install {prometheus}
 
-Prometheus is available for installation from the SUSE https://packagehub.suse.com/[PackageHub]  repository.
-PackageHub packages are tested by SUSE but are not officially supported as part of the {sles4sap} base product.
+{prometheus} is available for installation from the {suse} https://packagehub.suse.com/[PackageHub]  repository.
+PackageHub packages are tested by {suse} but are not officially supported as part of the {sles4sap} base product.
 
-. Enable the PackageHub repository (replace `x.x` with the version of your operating system, for example `15.7` or `16.0`):
+. Enable the PackageHub repository (replace `x.x` with the version of your operating system, for example `15.7`), if {sles4sap} 15 is used:
 +
 [source,bash]
 ----
 SUSEConnect --product PackageHub/x.x/x86_64
 ----
 +
-. Create the Prometheus user and group:
+. Create the {prometheus} user and group:
 +
 [source,bash]
 ----
 groupadd --system prometheus
 useradd -s /sbin/nologin --system -g prometheus prometheus
 ----
-. Install Prometheus using Zypper:
+. Install {prometheus} using Zypper:
 +
 [source,bash]
 ----
 zypper in golang-github-prometheus-prometheus
 ----
-. Configure Prometheus for Trento
+. Configure {prometheus} for Trento
 +
 Replace or update the existing configuration at `/etc/prometheus/prometheus.yml`` with:
 +
@@ -97,13 +105,13 @@ scrape_configs:
 +localhost:4000+ in +http://localhost:4000/api/prometheus/targets+
 refers to the location where {trento} web service is running.
 ====
-. Enable and start the Prometheus service:
+. Enable and start the {prometheus} service:
 +
 [source,bash]
 ----
 systemctl enable --now prometheus
 ----
-. If firewalld is running, allow Prometheus to be accessible and add an exception to firewalld:
+. If firewalld is running, allow {prometheus} to be accessible and add an exception to firewalld:
 +
 [source,bash]
 ----
@@ -331,14 +339,14 @@ OAS_SERVER_URL=https://trento.example.com
 ----
 ====
 
-The `ADMIN_PASSWORD` variable must comply with the following rules:
-
-* At least 8 characters
-* Must not contain 3 consecutive repeated numbers or letters (e.g., 111 or aaa)
-* Must not contain 4 consecutive sequential numbers or letters (e.g., 1234, abcd, ABCD)
+The `ADMIN_PASSWORD` variable must must meet the following requiements:
+	
+* minimum of 8 characters
+* the password  not contain 3 consecutive identical numbers or letters (for example, 111 or aaa)
+* the password must not contain 4 consecutive  numbers or letters (for example, 1234, abcd, ABCD)
 
 The `CHARTS_ENABLED` variable enable {trento} to display performance charts for each host, showing useful metrics such as CPU load and memory usage.
-`CHARTS_ENABLED` *must* be set to `false`, if Prometheus is not installed or you do not want to use {trento}'s charts functionality.
+`CHARTS_ENABLED` *must* be set to `false`, if {prometheus} is not installed or you do not want to use {trento}'s charts functionality.
 
 The `ENABLE_ALERTING` enables the 
 https://www.trento-project.io/docs/web/Alerting/alerting.html[alerting system to receive email notifications]. Set `ENABLE_ALERTING` to `true` and add additional variables to the `/etc/trento/trento-web`, to enable the feature.
@@ -385,7 +393,7 @@ If {trento} services fail to start or show permission-related errors, check the 
 getenforce
 ----
 
-If SELinux is set to *enforcing*, you can switch it to *permissive* mode either temporarily or permanently:
+If SELinux is set to *enforcing*, switch it to *permissive* mode either temporarily or permanently:
 
 * **Temporary change (until reboot):**
 +
@@ -485,7 +493,7 @@ firewall-cmd --reload
 ----
 systemctl enable --now nginx
 ----
-. Create a configuration file for {trento} at `+/etc/nginx/conf.d/trento.conf+`:
+. Create a `+/etc/nginx/conf.d/trento.conf+` {trento} configuration file:
 +
 ====
 [source,bash]
