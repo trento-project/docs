@@ -2,10 +2,20 @@ include::product-attributes.adoc[]
 
 [[sec-trento-requirements]]
 == Requirements
-:revdate: 2025-10-31
+:revdate: 2025-11-11
 
+This section describes requirements for the {sap}, {trserver}, {trento-mcp} and its {tragent}s.
 
-This section describes requirements for the {trserver} and its {tragent}s.
+[[sec-sap-requirements]]
+=== {sap} requirements
+
+An {sap} system must run on a HANA database to be discovered by {trento}. In addition, the parameter `dbs/hdb/dbname` must be set in the DEFAULT profile of the {sap} system to the correct database (tenant) name.
+
+The agent must be installed in the following locations:
+
+* the host where the ASCS instance is running
+* a host where an application server instance is running
+* all the database hosts
 
 [[sec-trento-server-requirements]]
 === {trserver} requirements
@@ -22,16 +32,13 @@ Running all the {trserver} components requires a minimum of 4 GB of RAM, two CPU
 
 A production-ready {k8s}-based deployment of {trserver} requires {k8s} knowledge. The Helm chart is intended to be used by customers without in-house {k8s} expertise, or as a way to try {trento} with a minimum of effort. However, Helm chart delivers a basic deployment of the {trserver} with all the components running on a single node of the cluster.
 
-[[sec-sap-requirements]]
-=== {sap} requirements
+=== {trento-mcp} requirements 
 
-An {sap} system must run on a HANA database to be discovered by {trento}. In addition, the parameter `dbs/hdb/dbname` must be set in the DEFAULT profile of the {sap} system to the correct database (tenant) name.
+The {trento-mcp} is an optional component that enables AI-assisted operations via the link:https://modelcontextprotocol.io/introduction[Model Context Protocol] (MCP). It exposes a single HTTP endpoint that MCP-compatible assistants can use to interact with {trento}.
 
-The agent must be installed in the following locations:
+The MCP Server is lightweight and stateless. No persistent storage required; allocate space for logs as per your logging policy.
 
-* the host where the ASCS instance is running
-* a host where an application server instance is running
-* all the database hosts
+// QUESTION, what about ai model provider ? 
 
 [[sec-trento-agent-requirements]]
 === {tragent} requirements
@@ -44,21 +51,15 @@ The hosts must have unique machine identifiers (ids) in order to be registered i
 
 Similarly, the clusters must have unique authkeys in order to be registered in {trento}.
 
-=== {trento} MCP Server requirements (optional)
-
-The {trento} MCP Server is an optional component that enables AI-assisted operations via the link:https://modelcontextprotocol.io/introduction[Model Context Protocol] (MCP). It exposes a single HTTP endpoint that MCP-compatible assistants can use to interact with {trento}.
-
-The MCP Server is lightweight and stateless. No persistent storage required; allocate space for logs as per your logging policy.
-
 [[sec-trento-network-requirements]]
-=== Network requirements
+=== Network {trserver} requirements
 
 * The Web component of the {trserver} must be reachable from any {tragent} host via HTTP (port TCP/80) or via HTTPS (port TCP/443) if SSL is enabled.
 * The checks engine component of the {trserver} must be reachable from any {tragent} host via Advanced Message Queuing Protocol or AMQP (port TCP/5672).
 * The Prometheus component of the {trserver}, if it exists, must be able to reach the Node Exporter in the {tragent} hosts.
 * The {sap} Basis administrator must access to the Web component of the {trserver} via HTTP (port TCP/80) or via HTTPS (port TCP/443) if SSL is enabled.
 
-==== MCP Server network requirements (optional)
+=== {trento-mcp} network requirements
 
 Inbound to the MCP Server:
 
@@ -67,12 +68,12 @@ Inbound to the MCP Server:
   ** On systemd/container deployments, ensure the firewall allows access on the chosen port
 * Optional: TCP/8080 for health checks when enabled (`ENABLE_HEALTH_CHECK=true`; port adjustable via `HEALTH_PORT`)
 
-Outbound from the MCP Server to {trserver}:
+//Outbound from the MCP Server to {trserver}:
 
-* If using `TRENTO_URL` (recommended): HTTPS to the externally reachable {trserver} URL (for example, behind NGINX)
-* If using `OAS_PATH` (direct internal access): HTTP(S) to the Web and Wanda API endpoints (for example, `http://localhost:4000/api/all/openapi`, `http://localhost:4001/wanda/api/all/openapi`, or the corresponding service names in {k8s}/container networks)
-
-
+//* If using `TRENTO_URL` (recommended): HTTPS to the externally reachable {trserver} URL (for example, behind NGINX)
+//* If using `OAS_PATH` (direct internal access): HTTP(S) to the Web and Wanda API endpoints (for example, `http://localhost:4000/api/all/openapi`, `http://localhost:4001/wanda/api/all/openapi`, or the corresponding service names in {k8s}/container networks)
+//
+//
 [[sec-trento-installation-prerequisites]]
 === Installation prerequisites
 
