@@ -8,6 +8,7 @@
 :trento:            Trento
 :tragent:           Trento Agent
 :trserver:          Trento Server
+:trento-mcp:        {trento} MCP Server
 :trweb:             Trento Web
 :rancher_k8s_engine: Rancher Kubernetes Engine
 
