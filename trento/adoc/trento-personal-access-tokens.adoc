@@ -33,7 +33,7 @@ image::trento-web-profile.png[trento-web-profile,scaledwidth=80.0%]
 +
 .Generate personal access token modal
 image::trento-web-generate-pat.png[trento-web-generate-pat,scaledwidth=80.0%]
-. Copy the generated token starting with `trento_pat_`. This is the only time the token will be displayed in full. If lost, a new key must be generated.
+. Copy the generated token starting with `trento_pat_`. Keep in mind that the token is shown only once. If you lose the token, you must generate a new one.
 +
 .Generated personal access token
 image::trento-web-generated-pat.png[trento-web-generated-pat,scaledwidth=80.0%]
