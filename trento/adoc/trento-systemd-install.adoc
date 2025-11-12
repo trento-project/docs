@@ -690,7 +690,7 @@ instructions for NGINX]
 +
 [source,bash]
 ----
-certbot --nginx -d trento.example.com -d trento.example.com
+certbot --nginx -d trento.example.com
 ----
 +
 [NOTE]
