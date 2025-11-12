@@ -65,7 +65,7 @@ HELM_EXPERIMENTAL_OCI=1 helm upgrade \
 ----
 ====
 +
-. To verify that the {trserver} installation was successful, open the URL of the {trweb} (`http://TRENTO_SERVER_HOSTNAME`) from a workstation on the {sap} administrator's LAN.
+. To verify that the {trserver} installation was successful, open the URL of the {tr_web} (`http://TRENTO_SERVER_HOSTNAME`) from a workstation on the {sap} administrator's LAN.
 
 [[sec-trento-install-trentoserver-on-k3s]]
 ==== Installing {trserver} on K3s
@@ -158,7 +158,7 @@ watch kubectl get pods
 All pods must be in the ready and running state.
 +
 . Log out of the {trserver} host.
-. To verify that the {trserver} installation was successful, open the URL of the {trweb} (`http://TRENTO_SERVER_HOSTNAME`) from a workstation on the {sap} administrator's LAN.
+. To verify that the {trserver} installation was successful, open the URL of the {tr_web} (`http://TRENTO_SERVER_HOSTNAME`) from a workstation on the {sap} administrator's LAN.
 
 [[sec-trento-deploying-trento-on-selected-nodes]]
 ==== Deploying {trserver} on selected nodes
@@ -347,7 +347,7 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 ----
 ====
 
-The MCP Server will automatically connect to the {trweb} and Wanda internal services within the {k8s} cluster.
+The MCP Server will automatically connect to the {tr_web} and Wanda internal services within the {k8s} cluster.
 
 ===== MCP Server Configuration Options
 

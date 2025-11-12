@@ -210,6 +210,7 @@ include::product-attributes.adoc[]
 :ingress:                    Ingress
 :postgresql:                 PostgreSQL
 :nginx:                      nginx
+:rabbitmq:                   RabbitMQ
 :trivy:                      Trivy
 :valkey:                     Valkey
 :certmanager:                cert-manager
