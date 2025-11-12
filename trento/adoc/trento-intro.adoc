@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-what]]
 == What is {trento}?
-:revdate: 2025-10-31
+:revdate: 2025-11-12
 
 
 {trento} is the official version of the Trento community project. It is a comprehensive monitoring solution consisting of two main components: the {trserver} and the {tragent}. {trento} provides the following functionality and features:
@@ -20,51 +20,56 @@ include::product-attributes.adoc[]
 * Monitoring of CPU and memory usage at the host level through basic integration with {prometheus}.
 * API-based architecture to facilitate integration with other monitoring tools.
 * Rotating API key to protect communication from the {tragent} to the {trserver}.
+* Optional AI-assisted operations to enable natural-language interaction with {trserver}.
 * Housekeeping capabilities.
+
+
+=== Trento Architecture
+
+[[fig-trento-architecture]]
+.Architectural overview
+image::trento-high-level-architecture.png[width=80%]
 
 === {trserver}
 
-The *{trserver}* is an independent, distributed system designed to run on a {k8s} cluster or as a regular systemd stack. The {trserver} provides a Web front-end for user interaction. The {trserver} consists of the following components:
+The {trserver} is an independent, distributed system designed to run on a {k8s} cluster or as a regular systemd stack. It provides both a Web front-end for user interaction and backend APIs for automation and integration with components such as the {tr_mcp}. Together with the optional link:https://modelcontextprotocol.io/docs/getting-started/intro[{tr_mcp}], it enables secure, AI-assisted operations by exposing {trserver} APIs for natural-language interactions with tools like Copilot, Claude, and {suseai}.
 
-* The web component that acts as a control plane responsible for internal and external communications as well as rendering the UI.
-* The checks engine named wanda that orchestrates the execution of configuration checks.
+The {trserver} consists of the following components:
+
+* The {web} component that acts as a control plane responsible for internal and external communications as well as rendering the UI.
+* The checks engine named {wanda} that orchestrates the execution of configuration checks.
+* The {tr_mcp} which provides a secure way to call {trserver} APIs without manual navigation of the web UI.
 * A {postgresql} database for data persistence.
-* The RabbitMQ message broker for communicating between the checks engine and the agents.
+* The {rabbitmq} message broker for communicating between the checks engine and the agents.
 * A {prometheus} instance that retrieves the metrics collected by the {prometheus} node exporter in the registered hosts. This {prometheus} instance is optional in a systemd deployment.
-
-=== {trento-mcp}
-
-The {trento-mcp} extends {trento} with AI-assisted operations by implementing the open link:https://modelcontextprotocol.io/introduction[Model Context Protocol] (MCP),which is an open standard that allows AI applications to securely connect to external tools and data sources. In the context of {trento}, MCP provides a consistent, secure way for assistants to call {trserver} APIs without manual navigation of the web UI.
-
-{trento} MCP Server, enables to:
-
-* Ask conversational questions such as "What's the overall health of my SAP environment?" or "Show me all SAP systems with critical status."
-* Retrieve cluster and host details on demand (for example, "Show configuration for cluster C1" or "List hosts running HANA").
-* Review checks and execution history to understand configuration drifts or failures.
-* Surface critical alerts that need immediate attention.
-
-It enables MCP-compatible AI assistants—such as public AI tools like:
-
-* link:https://code.visualstudio.com/[VS Code] with link:https://github.com/features/copilot[GitHub Copilot]
-* link:https://claude.ai/download[Claude Desktop]
-* link:https://cursor.sh/[Cursor]
-* Private AI platforms like link:https://www.suse.com/products/ai/[{suseai}], to securely connect to {trento}.
 
 === {tragent}
 
 The *{tragent}* is a single background process (`trento-agent`) running on each monitored host of the SAP infrastructure.
 
 
-=== Trento Architecture Overview
-
-[[fig-trento-architecture]]
-.Architectural overview
-image::trento-high-level-architecture.png[width=80%]
-
+// === {trento-mcp}
+// 
+// The {trento-mcp} extends {trento} with AI-assisted operations by implementing the open link:https://modelcontextprotocol.io/introduction[Model Context Protocol] (MCP),which is an open standard that allows AI applications to securely connect to external tools and data sources. In the context of {trento}, MCP provides a consistent, secure way for assistants to call {trserver} APIs without manual navigation of the web UI.
+// 
+// {trento} MCP Server, enables to:
+// 
+// * Ask conversational questions such as "What's the overall health of my SAP environment?" or "Show me all SAP systems with critical status."
+// * Retrieve cluster and host details on demand (for example, "Show configuration for cluster C1" or "List hosts running HANA").
+// * Review checks and execution history to understand configuration drifts or failures.
+// * Surface critical alerts that need immediate attention.
+// 
+// It enables MCP-compatible AI assistants—such as public AI tools like:
+// 
+// * link:https://code.visualstudio.com/[VS Code] with link:https://github.com/features/copilot[GitHub Copilot]
+// * link:https://claude.ai/download[Claude Desktop]
+// * link:https://cursor.sh/[Cursor]
+// * Private AI platforms like link:https://www.suse.com/products/ai/[{suseai}], to securely connect to {trento}.
+// 
 // ==== How the MCP Server fits into {trento}
 // 
 // * It runs alongside the {trserver} (as part of your deployment) and exposes a single HTTP endpoint (path `/mcp`).
-// * It automatically discovers the {trserver} APIs and generates MCP tools from the OpenAPI specifications exposed by {trweb} and Wanda.
+// * It automatically discovers the {trserver} APIs and generates MCP tools from the OpenAPI specifications exposed by {tr_web} and Wanda.
 // * It authenticates to {trserver} using user-scoped Personal Access Tokens (API keys) and forwards requests securely.
 // * It's an optional component—{trento} works without it—but unlocks natural-language workflows when enabled.
 // 
