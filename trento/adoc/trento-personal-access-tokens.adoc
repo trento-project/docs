@@ -23,7 +23,7 @@ If user permissions are changed or the user is deleted or locked, the capabiliti
 
 === Creating a Personal Access Token
 
-After logging in to {trento} Web UI, navigate to your profile by clicking on your username in the top right corner and selecting *Profile* from the dropdown menu.
+Log in to {trento} Web UI, click on your username in the top-right corner, and select *Profile* from the drop-down menu.
 
 .Profile
 image::trento-web-profile.png[trento-web-profile,scaledwidth=80.0%]
