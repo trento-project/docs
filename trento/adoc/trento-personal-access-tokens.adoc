@@ -61,7 +61,7 @@ image::trento-web-delete-pat-confirmation.png[trento-web-delete-pat-confirmation
 
 === Notes for user admins
 
-User admins can delete tokens for other users but cannot create new ones on their behalf.
+User admins can delete tokens for other users. However, admins cannot create new tokens for other users.
 
 In order to delete a token for another user, user admins need to:
 
