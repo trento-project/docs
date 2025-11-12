@@ -10,17 +10,6 @@ include::product-attributes.adoc[]
  * link:https://www.trento-project.io/web/swaggerui/[Web]
  * link:https://www.trento-project.io/wanda/swaggerui/[Wanda]
 
-=== About Personal Access Tokens
-
-Personal Access Tokens are an alternative to using username/password pairs for authentication to {trento} APIs and are intended to access resources on behalf of the token owner.
-
-A Personal Access Token has the same capabilities to access resources and perform actions on those resources that the owner of the token has.
-
-[NOTE]
-====
-If user permissions are changed or the user is deleted or locked, the capabilities of the Personal Access Tokens owned by that user are affected accordingly.
-====
-
 === Creating a Personal Access Token
 
 Log in to {trento} Web UI, click on your username in the top-right corner, and select *Profile* from the drop-down menu.
