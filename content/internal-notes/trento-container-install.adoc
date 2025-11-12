@@ -1,19 +1,17 @@
-include::product-attributes.adoc[]
+:trento: Trento
 
-=== Containerized deployment
-:revdate: 2025-08-05
+== Containerized deployment
 
-
-A containerized deployment of {trserver} is identical to the systemd
+A containerized deployment of {trento} is identical to the systemd
 deployment. However, the web and check engine components are deployed as
 Docker containers.
 
-Follow the steps in <<sec-systemd-deployment>>, but skip the *Install
-Trento using RPM packages* step and follow the procedures as described below.
+Follow the steps in link:https://www.trento-project.io/docs/user-guide/trento-install-server.html#sec-systemd-deployment[systemd installation], but skip the *Install
+{trento} using RPM packages* step and follow the procedures as described below.
 
-==== Install Trento using Docker
+=== Install Trento using Docker
 
-===== Install Docker container runtime
+==== Install Docker container runtime
 
 . Enable the containers module (replace `15.x` with the correct Service Pack version):
 +
@@ -35,9 +33,9 @@ zypper install docker
 systemctl enable --now docker
 ----
 
-===== Create a dedicated Docker network for Trento
+==== Create a dedicated Docker network for {trento}
 
-. Create the Trento Docker network:
+. Create the {trento} Docker network:
 +
 [source,bash]
 ----
@@ -61,7 +59,7 @@ The output should be similar to this (the exact address may vary):
 . Open the _/var/lib/pgsql/data/pg_hba.conf_ file for editing and replace `0.0.0.0/0` with the address returned by the command in the previous step.
 . Restart the PostgreSQL server using the `systemctl restart postgresql` command.
 
-===== Install Trento on Docker
+==== Install {trento} on Docker
 
 . Create secret environment variables:
 +
@@ -104,6 +102,7 @@ docker run -d --name wanda \
     -e AMQP_URL=amqp://trento_user:trento_user_password@host.docker.internal/vhost \
     -e DATABASE_URL=ecto://wanda_user:wanda_password@host.docker.internal/wanda \
     -e OAS_SERVER_URL=https://trento.example.com/wanda \
+    -e AUTH_SERVER_URL=http://localhost:4000 \
     --restart always \
     --entrypoint /bin/sh \
     registry.suse.com/trento/trento-wanda:latest \
@@ -121,7 +120,7 @@ the UI.
 [NOTE]
 ====
 Add `+CHARTS_ENABLED=false+` if Prometheus is not installed, or you do
-not want to use Trento's charts functionality.
+not want to use {trento}'s charts functionality.
 ====
 +
 [source,bash]
