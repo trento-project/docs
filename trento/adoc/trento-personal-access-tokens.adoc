@@ -5,7 +5,7 @@ include::product-attributes.adoc[]
 == Personal Access Tokens
 :revdate: 2025-11-05
 
-{trento} allows users to create Personal Access Tokens (PATs) for authentication and authorization purposes in third party integrations with the APIs exposed by its components:
+{trento} allows users to create Personal Access Tokens (PATs) for authentication and authorization purposes in third-party integrations with the APIs exposed by its components:
 
  * link:https://www.trento-project.io/web/swaggerui/[Web]
  * link:https://www.trento-project.io/wanda/swaggerui/[Wanda]
