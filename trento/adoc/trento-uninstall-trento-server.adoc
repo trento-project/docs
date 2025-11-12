@@ -6,7 +6,7 @@ include::product-attributes.adoc[]
 
 
 The procedure to uninstall the {trserver} depends on the deployment
-type: {k8s}, systemd or containerized. The section covers {k8s}
+type: {k8s} or systemd. The section covers {k8s}
 deployments.
 
 If {trserver} was deployed manually, you need to uninstall it manually.
