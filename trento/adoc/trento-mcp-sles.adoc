@@ -1,3 +1,5 @@
+include::product-attributes.adoc[]
+
 :revdate: 2025-10-31
 
 This guide explains how to connect the {trento} MCP Server to {sles} 16 (SLES 16) using MCPHost, a lightweight CLI tool for the Model Context Protocol (MCP).
