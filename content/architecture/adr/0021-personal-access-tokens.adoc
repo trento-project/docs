@@ -1,0 +1,59 @@
+== 21. Personal Access Tokens
+
+Date: 2025-11-12
+
+=== Status
+
+Accepted
+
+=== Context
+
+Trento offers APIs as a first-class feature, allowing clients to interact programmatically with the platform.
+
+Such APIs are currently authenticated via JWT tokens and a refresh token mechanism is in place to allow users to obtain new tokens when the current ones expire.
+
+While this approach works well for user-interactive scenarios as the web UI, it may not be ideal for programmatic access or third-party integrations, where long-lived tokens are often preferred. +
+See related xref:rfc/0002-personal-access-tokens-management.adoc[RFC 0002] for more details.
+
+Therefore, we need to extend our authentication mechanism to support Personal Access Tokens (PATs) that can be used for API authentication so that:
+
+ * third-party clients can use long lived tokens for authentication
+ * we support MCP integration as a first consumer of this feature
+
+=== Considered Options
+
+ * *Go full OIDC/OAuth2 compliant:* rely on third party libraries to implement a full OIDC/OAuth2 compliant authentication mechanism like https://github.com/malach-it/boruta_auth
+ * *Extend current authnz to support PATs:* build on top of the existing authentication mechanism to support PATs for API authentication
+
+=== Decision
+
+We will extend the current authentication mechanism to support Personal Access Tokens (PATs) for API authentication.
+
+==== PATs management
+
+PATs will be manageable via the web UI and API, allowing users to create, view (only once at creation time), and revoke their tokens.
+
+User administrators will have the ability to revoke other users' PATs.
+
+==== PATs as opaque tokens
+
+PATs will be implemented as opaque tokens, meaning that they will not carry any information. +
+Instead, they will be stored in the database and validated against it during authentication.
+
+Not relying on asymmetrically signed tokens (like JWTs) decouples PATs from trento secrets rotation and simplifies the implementation.
+
+==== Cross service PAT atuthentication
+
+Trento is composed of multiple services, each potentially requiring to authenticate and authorize a presented token.
+
+We will implement Token Introspection as per link:https://datatracker.ietf.org/doc/html/rfc7662[RFC 7662] and make the endpoint reachable only internally (ie blocked from outside access at proxy level).
+
+Wanda will use this endpoint to validate presented tokens (access tokens or PATs) when authenticating API requests.
+
+=== Consequences
+The depicted decision has the following effects:
+
+ * *Improved integrability with Trento APIs:* clients don't need to implement complex token refresh mechanisms, as PATs can be long-lived and easier to manage in automated scenarios.
+ * *Simplification of the MCP integration:* as a first consumer of this new feature, the MCP will benefit from a more straightforward authentication mechanism when interacting with Trento APIs.
+ * *Reduced scope creep:* while going full OIDC/OAuth2 would be a more comprehensive solution, it could be risky doing so just right now considering the timeline constraints.
+ * *Highlight for improvements needed on authnz:* we have clear that our authnz mechanism needs a revamp to make it standard to further improve and simplify integrability with Trento.

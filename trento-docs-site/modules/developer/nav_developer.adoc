@@ -23,6 +23,7 @@
 **** xref:architecture/adr/0018-agent-operations-orchestration.adoc[18. Agent operations orchestration]
 **** xref:architecture/adr/0019-e2e-testing-practices.adoc[19. E2E Testing Practices & Page Object Implementation]
 **** xref:architecture/adr/0020-checks-customization.adoc[20. Checks Customization]
+**** xref:architecture/adr/0021-personal-access-tokens.adoc[21. Personal Access Tokens]
 
 **  xref:coding-standards/README.adoc[Coding standards]
 *** xref:coding-standards/elixir.adoc[Elixir coding standards]
