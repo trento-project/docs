@@ -40,7 +40,7 @@ image::trento-web-generated-pat.png[trento-web-generated-pat,scaledwidth=80.0%]
 
 === Using a Personal Access Token
 
-Once a Personal Access Token has been created, it can be used to authenticate API requests by including it in the `Authorization` header as a Bearer token.
+You can use the created Personal Access Token to authenticate API requests by including it in the `Authorization` header as a Bearer token.
 
 [source,bash]
 ----
