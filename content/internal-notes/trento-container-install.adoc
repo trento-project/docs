@@ -1,4 +1,5 @@
 :trento: Trento
+:trserver: Trento Server
 
 [[sec-container-deployment]]
 === Containerized deployment

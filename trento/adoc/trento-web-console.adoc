@@ -1,11 +1,11 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-use-webconsole]]
-== Using {trweb}
+== Using {tr_web}
 :revdate: 2025-06-10
 
 
-The left sidebar in the {trweb} contains the following entries:
+The left sidebar in the {tr_web} contains the following entries:
 
 * *Dashboard* Determine at a glance the health status of your {sap} environment.
 * *Hosts* Overview of all registered hosts running the {tragent}.
@@ -29,7 +29,7 @@ and stablish the retention time for the entries in the activity log.
 === Getting the global health state
 
 The dashboard allows you to determine at a glance the health status of
-your {sap} environment. It is the main page of the {trweb}, and you
+your {sap} environment. It is the main page of the {tr_web}, and you
 can always switch to it by clicking on Dashboard in the left sidebar.
 
 The health status of a registered {sap} system is the sum of its health
@@ -106,7 +106,7 @@ of the health states.
 To display the lists of registered hosts and their details, proceed as
 follows:
 
-* Log in to the {trweb}.
+* Log in to the {tr_web}.
 * Click the Hosts entry in the left sidebar to show a summary of the
 state for all hosts.
 +
@@ -177,7 +177,7 @@ of the subscription.
 To display a list of all available {pace} clusters and their details,
 proceed as follows:
 
-* Log in to the {trweb}.
+* Log in to the {tr_web}.
 * Click the Clusters entry in the left sidebar to show a state summary
 for all {pace} clusters.
 +
@@ -245,7 +245,7 @@ applicable.
 To display a list of all available SAP Systems and their details,
 proceed as follows:
 
-* Log in to the {trweb}.
+* Log in to the {tr_web}.
 * Click the SAP Systems entry in the left sidebar to show a state
 summary for all {sap} Systems.
 +
@@ -272,7 +272,7 @@ image::trento-web-sapsystemsdetails-view.png[trento-web-sapsystemsdetails-view,s
 To display a list of all available {hana} databases and their details,
 proceed as follows:
 
-* Log in to the {trweb}.
+* Log in to the {tr_web}.
 * Click the HANA databases entry in the left sidebar to show a summary
 of the state for all {hana} databases.
 +
