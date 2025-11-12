@@ -36,7 +36,7 @@ After the installation, edit the web configuration file in +/etc/trento/trento-w
 ====== Choose a {prometheus} Setup Option
 
 * <<prometheus-existing-installation, Use an existing Prometheus installation>>  
-* <<prometheus-unsupported-packagehub, Install Prometheus from the *unsupported* PackageHub repository for {sles4sap} 15.4 and higher>>
+* <<prometheus-unsupported-packagehub, Install Prometheus on {sles4sap} 15.4 and higher>>
 * <<prometheus-supported-packagehub, Install Prometheus on {sles4sap} 16.0>>
 
 
@@ -53,13 +53,13 @@ Refer <<prometheus-config, for an example of {prometheus} configuration>>.
 ---
 
 [[prometheus-unsupported-packagehub]]
-====== Install {prometheus} from PackageHub for {sles4sap} 15.x
+====== Install {prometheus} from PackageHub on {sles4sap} 15.x
 
 {prometheus} is available for installation from the {suse} https://packagehub.suse.com/[PackageHub]  repository.
 PackageHub packages are tested by {suse} but are not officially supported as part of the {sles4sap} base product.
 
-. Enable the PackageHub repository (replace `x.x` with the version of your operating system, for example `15.7`):
-+
+Enable the PackageHub repository (replace `x.x` with the version of your operating system, for example `15.7`):
+
 [source,bash]
 ----
 SUSEConnect --product PackageHub/15.x/x86_64
@@ -68,7 +68,7 @@ zypper refresh
 Proceed with the same steps as in <<prometheus-supported-packagehub, Install Prometheus on {sles4sap} 16.0>>
 
 [[prometheus-supported-packagehub]]
-====== Install supported {prometheus} for {sles4sap} 16.0
+====== Install {prometheus} on {sles4sap} 16.0
 
 
 . Create the {prometheus} user and group:
