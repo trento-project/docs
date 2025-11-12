@@ -29,7 +29,7 @@ Log in to {trento} Web UI, click on your username in the top-right corner, and s
 image::trento-web-profile.png[trento-web-profile,scaledwidth=80.0%]
 
 . Click *Generate Token* in the *Personal Access Tokens* section.
-. When prompted, provide a name and an expiration date and click *Generate Token*.
+. When prompted, provide a name and an expiration date, then click *Generate Token*.
 +
 .Generate personal access token modal
 image::trento-web-generate-pat.png[trento-web-generate-pat,scaledwidth=80.0%]
