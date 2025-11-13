@@ -1,0 +1,214 @@
+include::product-attributes.adoc[]
+
+=== Kubernetes MCP deployment
+:revdate: 2025-11-13
+
+[[sec-trento-mcp-server-k8s]]
+==== Installing {trento} MCP Server (Optional)
+
+The {trento} MCP Server, is an optional component, which provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the Model Context Protocol (MCP). The core {trserver} functionality works independently without it, but the optional {trento} MCP Server component enables integration with AI tools and assistants.
+
+
+===== Prerequisites
+
+Before installing the {trento} MCP Server, ensure you have:
+
+* A running {trserver} installation with the core components Web and Wanda.
++
+** *Web component*: Provides the user interface and API endpoints for managing SAP systems
+** *Wanda component*: Handles automated checks and compliance validation for SAP landscapes
++
+Both components must be running and accessible for the MCP Server to function properly.
+
+===== Configuration Overview
+
+The {trento} MCP Server requires minimal configuration.
+
+The key configuration parameters are:
+
+* `TRENTO_URL`: The URL where your Trento Server is accessible. This is particularly important when Trento is deployed behind NGINX or other reverse proxies. Use the externally accessible URL (e.g., `https://trento.example.com`) rather than internal service URLs. When set, the server will use this URL for OpenAPI specification autodiscovery.
+
+* `OAS_PATH`: Explicit paths to OpenAPI specification files. Use this when you want to directly specify the location of the API specifications instead of relying on autodiscovery. This is particularly useful when you want to connect to internal services (such as `localhost` or Kubernetes service names) instead of going through a reverse proxy.
+
+===== Enabling the MCP Server
+
+When installing the complete {trserver} using Helm, the MCP Server is disabled by default. Enable it by passing `--set trento-mcp-server.enabled=true`:
+
+====
+[source,bash]
+----
+helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
+  --set trento-web.trentoWebOrigin=TRENTO_SERVER_HOSTNAME \
+  --set trento-web.adminUser.password=ADMIN_PASSWORD \
+  --set trento-mcp-server.enabled=true
+----
+====
+
+[NOTE]
+====
+The examples in this guide do not specify a Kubernetes namespace for simplicity. By default, Helm will install to the `default` namespace. For production deployments, create and use a dedicated namespace:
+
+[source,bash]
+----
+kubectl create namespace trento
+helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
+  --namespace trento \
+  --set trento-mcp-server.enabled=true \
+  ...
+----
+====
+
+The MCP Server will automatically connect to the {tr_web} and Wanda internal services within the {k8s} cluster.
+
+===== MCP Server Configuration Options
+
+The {trento} MCP Server Helm chart supports various configuration options:
+
+====== Customize Ingress Path
+
+By default, ingress is enabled. To customize the ingress configuration:
+
+====
+[source,bash]
+----
+helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
+  --set trento-mcp-server.enabled=true \
+  --set trento-mcp-server.ingress.enabled=true \
+  --set trento-mcp-server.ingress.hosts[0].host=TRENTO_SERVER_HOSTNAME \
+  --set trento-mcp-server.ingress.hosts[0].paths[0].path=/mcp-server-trento \
+  --set trento-mcp-server.ingress.hosts[0].paths[0].pathType=ImplementationSpecific
+----
+====
+
+The MCP Server endpoint will be: `https://TRENTO_SERVER_HOSTNAME/mcp-server-trento/mcp`
+
+====== Disabling Tag Filtering
+
+By default, only operations tagged with `MCP` are exposed. To expose all operations and remove tag filtering:
+
+====
+[source,bash]
+----
+helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
+  --set trento-mcp-server.enabled=true \
+  --set trento-mcp-server.mcpServer.tagFilter=[]
+----
+====
+
+[NOTE]
+====
+You can also filter by different tags by setting `--set trento-mcp-server.mcpServer.tagFilter[0]=YourTag`.
+====
+
+====== Adjust Log Verbosity
+
+The default log level is `info`. Adjust it for debugging:
+
+====
+[source,bash]
+----
+helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
+  --set trento-mcp-server.enabled=true \
+  --set trento-mcp-server.mcpServer.verbosity=debug
+----
+====
+
+====== Adjust Resource Limits
+
+For production deployments with different resource requirements:
+
+====
+[source,bash]
+----
+helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
+  --set trento-mcp-server.enabled=true \
+  --set trento-mcp-server.resources.requests.cpu=100m \
+  --set trento-mcp-server.resources.requests.memory=128Mi \
+  --set trento-mcp-server.resources.limits.cpu=1000m \
+  --set trento-mcp-server.resources.limits.memory=1Gi
+----
+====
+
+====== Disabling Health Check Probes
+
+Health check probes are enabled by default. To disable them if needed:
+
+====
+[source,bash]
+----
+helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
+  --set trento-mcp-server.enabled=true \
+  --set trento-mcp-server.livenessProbe.enabled=false \
+  --set trento-mcp-server.readinessProbe.enabled=false
+----
+====
+
+====== Complete Configuration Example
+
+Here is a complete example that configures external access via a custom ingress path:
+
+====
+[source,bash]
+----
+helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
+  --set trento-web.trentoWebOrigin=https://trento.example.com \
+  --set trento-web.adminUser.password=SecurePassword123 \
+  --set trento-mcp-server.enabled=true \
+  --set trento-mcp-server.mcpServer.trentoURL=https://trento.example.com \
+  --set trento-mcp-server.ingress.hosts[0].host=trento.example.com \
+  --set trento-mcp-server.ingress.hosts[0].paths[0].path=/mcp-server-trento \
+  --set trento-mcp-server.ingress.hosts[0].paths[0].pathType=ImplementationSpecific
+----
+====
+
+===== Verifying the MCP Server Installation
+
+. Check that the MCP Server pod is running:
++
+====
+[source,bash]
+----
+kubectl get pods -l app.kubernetes.io/name=mcp-server
+----
+====
++
+Expected output:
++
+====
+[source,bash]
+----
+NAME                                       READY   STATUS    RESTARTS   AGE
+trento-server-mcp-server-xxxxxxxxxx-xxxxx  1/1     Running   0          2m
+----
+====
++
+. Check the logs:
++
+====
+[source,bash]
+----
+kubectl logs -l app.kubernetes.io/name=mcp-server
+----
+====
++
+. If health checks are enabled, verify the health endpoints:
++
+====
+[source,bash]
+----
+# Expose the health check port from the Pod, as it is not exposed as a Kubernetes Service.
+kubectl port-forward --namespace default $(kubectl get pods --namespace default -l app.kubernetes.io/name=mcp-server -o jsonpath="{.items[0].metadata.name}") 8080:8080
+
+# Liveness endpoint:
+curl http://localhost:8080/livez
+
+# Example output:
+# {"info":{"name":"trento-mcp-server","version":"0.1.0"},"status":"up"}
+
+# Readiness endpoint:
+curl http://localhost:8080/readyz
+
+# Example output:
+# {"status":"up","details":{"mcp-server":{"status":"up","timestamp":"2025-10-09T12:11:09.528898849Z"},"wanda-api":{"status":"up","timestamp":"2025-10-09T12:11:09.544855047Z"},"web-api":{"status":"up","timestamp":"2025-10-09T12:11:09.544855047Z"}}}
+----
+====
