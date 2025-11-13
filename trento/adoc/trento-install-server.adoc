@@ -1,7 +1,7 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-installing-trentoserver]]
-== Installing {trserver}
+== Installing {trserver} core components
 :revdate: 2025-10-16
 
 include::trento-kubernetes-install.adoc[]

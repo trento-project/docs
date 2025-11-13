@@ -20,6 +20,8 @@ The agent must be installed in the following locations:
 [[sec-trento-server-requirements]]
 === {trserver} requirements
 
+==== {trserver} core components
+
 Running all the {trserver} components requires a minimum of 4 GB of RAM, two CPU cores and 64 GB of storage. When using K3s, such storage should be provided under `/var/lib/rancher/k3s`.
 
 {trento} is based on event-driven technology. Registered events are stored in a {postgresql} database with a default retention period of 10 days. For each host registered with {trento}, you need to allocate at least 1.5GB of space in the {postgresql} database.
@@ -32,7 +34,7 @@ Running all the {trserver} components requires a minimum of 4 GB of RAM, two CPU
 
 A production-ready {k8s}-based deployment of {trserver} requires {k8s} knowledge. The Helm chart is intended to be used by customers without in-house {k8s} expertise, or as a way to try {trento} with a minimum of effort. However, Helm chart delivers a basic deployment of the {trserver} with all the components running on a single node of the cluster.
 
-==== {tr_mcp} (optional)
+==== {tr_mcp} component(optional)
 
 The {tr_mcp} is an optional component that enables AI-assisted operations via the link:https://modelcontextprotocol.io/introduction[Model Context Protocol] (MCP). It exposes a single HTTP endpoint that MCP-compatible assistants can use to interact with {trento}.
 
@@ -74,6 +76,6 @@ Similarly, the clusters must have unique authkeys in order to be registered in {
 === Installation prerequisites
 
 * *{trserver}* For a {k8s}-based deployment, you must have access to {suse} public registry for the deployment of {trserver} containers. For a systemd deployment, you must have a registered {sles4sap} 15 (SP4 or higher) or {sles4sap} 16.0 distribution.
-* *{tr_mcp}* (optional): running  {tr_web} and  {tr_wanda} components with network connectivity from the MCP Server to the {trserver} API endpoints and a Personal Access Token, created in {tr_web} to authenticate requests from MCP clients.
+* *{tr_mcp}* component (optional): running  {tr_web} and  {tr_wanda} components with network connectivity from the MCP Server to the {trserver} API endpoints and a Personal Access Token, created in {tr_web} to authenticate requests from MCP clients.
 * *{tragent}s* A registered {sles4sap} 15 (SP3 or higher) distribution.
 
