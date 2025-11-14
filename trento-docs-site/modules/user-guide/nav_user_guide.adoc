@@ -3,6 +3,7 @@
  ** xref:trento-lifecycle.adoc[Lifecycle]
  ** xref:trento-requirements.adoc[Requirements]
  ** xref:trento-install-server.adoc[Installing Trento Server]
+ ** xref:trento-mcp-integration.adoc[Integration of Trento Server MCP]
  ** xref:trento-install-agents.adoc[Installing Trento Agents]
  ** xref:trento-integration-prometheus.adoc[Prometheus integration]
  ** xref:trento-user-manage.adoc[User management]
