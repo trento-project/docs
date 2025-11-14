@@ -1,15 +1,15 @@
 include::product-attributes.adoc[]
 
-=== Kubernetes MCP deployment
+==== Kubernetes MCP deployment
 :revdate: 2025-11-13
 
 [[sec-trento-mcp-server-k8s]]
-==== Installing {trento} MCP Server (Optional)
+===== Installing {trento} MCP Server (Optional)
 
 The {trento} MCP Server, is an optional component, which provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the Model Context Protocol (MCP). The core {trserver} functionality works independently without it, but the optional {trento} MCP Server component enables integration with AI tools and assistants.
 
 
-===== Prerequisites
+====== Prerequisites
 
 Before installing the {trento} MCP Server, ensure you have:
 
@@ -20,7 +20,7 @@ Before installing the {trento} MCP Server, ensure you have:
 +
 Both components must be running and accessible for the MCP Server to function properly.
 
-===== Configuration Overview
+====== Configuration Overview
 
 The {trento} MCP Server requires minimal configuration.
 
@@ -30,7 +30,7 @@ The key configuration parameters are:
 
 * `OAS_PATH`: Explicit paths to OpenAPI specification files. Use this when you want to directly specify the location of the API specifications instead of relying on autodiscovery. This is particularly useful when you want to connect to internal services (such as `localhost` or Kubernetes service names) instead of going through a reverse proxy.
 
-===== Enabling the MCP Server
+====== Enabling the MCP Server
 
 When installing the complete {trserver} using Helm, the MCP Server is disabled by default. Enable it by passing `--set trento-mcp-server.enabled=true`:
 
@@ -60,7 +60,7 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 
 The MCP Server will automatically connect to the {tr_web} and Wanda internal services within the {k8s} cluster.
 
-===== MCP Server Configuration Options
+====== MCP Server Configuration Options
 
 The {trento} MCP Server Helm chart supports various configuration options:
 
@@ -161,7 +161,7 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 ----
 ====
 
-===== Verifying the MCP Server Installation
+====== Verifying the MCP Server Installation
 
 . Check that the MCP Server pod is running:
 +

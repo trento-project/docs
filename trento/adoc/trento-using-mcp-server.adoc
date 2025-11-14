@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-using-mcp-server]]
 :revdate: 2025-10-31
-== Using the {trento} MCP Server
+=== Using the {trento} MCP Server
 
 The {trento} MCP Server enables AI-assisted operations by implementing the link:https://modelcontextprotocol.io/introduction[Model Context Protocol] (MCP). This allows MCP-compatible assistants to connect to {trento} and perform monitoring and troubleshooting tasks using natural language.
 
@@ -13,14 +13,7 @@ This section provides comprehensive documentation for deploying and using the {t
 
 Integration guides for different MCP hosts and environments:
 
-[[sec-trento-mcp-sles]]
-=== Integrating the {trento} MCP Server with SLES 16
+
 include::trento-mcp-sles.adoc[]
-
-[[sec-trento-mcp-suse-ai]]
-=== Integrating the {trento} MCP Server with {suseai}
 include::trento-mcp-suse-ai.adoc[]
-
-[[sec-trento-mcp-others]]
-=== Integrating the {trento} MCP Server with other MCP Hosts
 include::trento-mcp-others.adoc[]
