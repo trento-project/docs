@@ -1,0 +1,11 @@
+include::product-attributes.adoc[]
+
+
+[[sec-trento-mcp-integration]]
+:revdate: 2025-10-31
+
+== Integration with Trento Server MCP 
+
+include::trento-mcp-install.adoc[]
+include::trento-mcp-config.adoc[]
+include::trento-using-mcp-server.adoc[]
