@@ -1,6 +1,8 @@
 include::product-attributes.adoc[]
 
 :revdate: 2025-10-31
+[[sec-trento-mcp-sles]]
+==== Integrating the {trento} MCP Server with SLES 16
 
 This guide explains how to connect the {trento} MCP Server to {sles} 16 (SLES 16) using MCPHost, a lightweight CLI tool for the Model Context Protocol (MCP).
 
@@ -8,7 +10,7 @@ SLES 16 is designed for modern, AI-powered workloads and agentic applications. I
 
 As the MCP ecosystem expands, more MCP hosts and integrations will be available for SLES and SLES for SAP, installable and updatable with `zypper`. This guide focuses on MCPHost for its simplicity and compatibility with remote MCP servers like {trento}.
 
-==== Prerequisites
+===== Prerequisites
 
 Before configuring your MCP Host, ensure you have:
 
@@ -34,7 +36,7 @@ Before configuring your MCP Host, ensure you have:
 .Generate a Personal Access Token in {trento}
 image::generate-pat.png[Generate a Personal Access Token in {trento},width=800]
 
-==== Install MCPHost on SLES 16
+===== Install MCPHost on SLES 16
 
 MCPHost is available as a package on SLES 16 and can be installed using the standard SUSE package manager. This ensures you get a version tested for your platform, with automatic updates and dependency management.
 
@@ -57,7 +59,7 @@ mcphost --version
 
 If you see the version and copyright, MCPHost is installed correctly and ready for configuration.
 
-==== Configure MCPHost
+===== Configure MCPHost
 
 Refer to the official https://github.com/mark3labs/mcphost#installation[MCPHost documentation] for comprehensive configuration details. This section focuses on adding the {trento} MCP Server to your system.
 
@@ -108,7 +110,7 @@ provider-api-key: "${env://GOOGLE_API_KEY}"
 This configuration uses the `GOOGLE_API_KEY` environment variable you exported earlier.
 ====
 
-==== Run MCPHost and use {trento} Tools
+===== Run MCPHost and use {trento} Tools
 
 [arabic]
 . Start MCPHost:
@@ -146,7 +148,7 @@ image::mcphost-initial.png[MCPHost initial screen, width=900]
 .Example MCPHost session querying {trento} about SAP systems
 image::example-mcphost.png[Example MCPHost session with {trento},width=900]
 
-==== Troubleshooting
+===== Troubleshooting
 
 If you encounter issues connecting MCPHost to the {trento} MCP Server:
 
@@ -173,7 +175,7 @@ If you encounter issues connecting MCPHost to the {trento} MCP Server:
 ** Verify that your configuration file exists at `~/.mcphost.yml` and has correct YAML syntax.
 ** Refer to the <<sec-trento-mcp-troubleshooting>> for additional help.
 
-==== Additional Resources
+===== Additional Resources
 
 * https://github.com/mark3labs/mcphost#configuration-file-support[MCPHost Configuration Documentation] - For comprehensive MCPHost configuration details.
 * <<sec-trento-installing-trentoserver>> - For deploying and configuring the MCP Server.

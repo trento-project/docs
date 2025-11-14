@@ -2,11 +2,11 @@ include::product-attributes.adoc[]
 
 [[sec-trento-mcp-install]]
 :revdate: 2025-10-31
-== Installing Trento Server MCP component
+=== Installing Trento Server MCP component
 
 The {trento} MCP Server can be deployed in several ways depending on your infrastructure and requirements.
 
-=== Prerequisites MCP Server
+==== Prerequisites MCP Server
 
 Before installing the {trento} MCP Server, ensure you have, both components must be running and be accessible for the MCP Server to function properly.
 

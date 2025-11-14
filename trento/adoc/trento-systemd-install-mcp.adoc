@@ -1,10 +1,10 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-mcp-server-systemd]]
-=== systemd MCP deployment 
+==== systemd MCP deployment 
 
 
-==== Installing {trento} MCP Server (Optional)
+===== Installing {trento} MCP Server (Optional)
 
 The {trento} MCP Server provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the Model Context Protocol (MCP). This optional component enables integration with AI tools and assistants.
 
@@ -15,13 +15,13 @@ The {trento} MCP Server is an optional component. The core {trserver} functional
 After installation, see <<sec-trento-using-mcp-server>> for instructions on how to connect MCP-compatible AI assistants and tools to your Trento Server.
 ====
 
-===== Requirements
+====== Requirements
 
 * {sles4sap} 15 SP3 or later.
 * A running {trserver} installation (accessible via network).
 * Root or sudo access for installation.
 
-===== Configuration Overview
+====== Configuration Overview
 
 The {trento} MCP Server requires minimal configuration, but needs to know how to reach your Trento Server. The key configuration parameters are:
 
@@ -29,7 +29,7 @@ The {trento} MCP Server requires minimal configuration, but needs to know how to
 
 * `OAS_PATH`: Explicit paths to OpenAPI specification files. Use this when you want to directly specify the location of the API specifications instead of relying on autodiscovery. This is particularly useful when you want to connect to internal services (such as `localhost` or Kubernetes service names) instead of going through a reverse proxy.
 
-===== Installation Steps
+====== Installation Steps
 
 . Install the MCP Server package:
 +
@@ -157,7 +157,7 @@ curl http://localhost:8080/readyz
 ====
 
 [[sec-mcp-systemd-firewall]]
-===== Firewall Configuration
+====== Firewall Configuration
 
 If firewalld is running, allow incoming connections to the MCP Server port:
 
