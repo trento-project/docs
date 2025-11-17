@@ -87,7 +87,7 @@ The *{tragent}* is a single background process (`trento-agent`) running on each 
 // 
 // Once connected, you can interact with {trento} using natural language commands, such as asking for system health, cluster details, or check results.
 // 
-// For comprehensive instructions, including deployment options and integration with specific AI tools, see <<sec-trento-using-mcp-server>>.
+// For comprehensive instructions, including deployment options and integration with specific AI tools, see <<sec-trento-mcp-how-to-use>>.
 // 
 
 
