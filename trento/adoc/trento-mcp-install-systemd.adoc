@@ -1,27 +1,19 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-mcp-server-systemd]]
-==== systemd MCP deployment 
+==== systemd {tr_mcp} deployment
 
+A systemd-based installation of the {tr_mcp} using RPM packages can be performed manually on the latest supported versions of {sles4sap}, from 15 SP4 up to 16.0. For installations on service packs other than the current one, make sure to update the repository URL as described in the relevant notes throughout this guide.
 
-===== Installing {trento} MCP Server (Optional)
+*Supported versions*:
 
-The {trento} MCP Server provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the Model Context Protocol (MCP). This optional component enables integration with AI tools and assistants.
+* {sles4sap} 15: SP4–SP7
+* {sles4sap} 16.0
 
-[NOTE]
-====
+===== Installing {trento} MCP Server
+
 The {trento} MCP Server is an optional component. The core {trserver} functionality works independently without it.
-
-After installation, see <<sec-trento-using-mcp-server>> for instructions on how to connect MCP-compatible AI assistants and tools to your Trento Server.
-====
-
-====== Requirements
-
-* {sles4sap} 15 SP3 or later.
-* A running {trserver} installation (accessible via network).
-* Root or sudo access for installation.
-
-====== Configuration Overview
+After installation, see <<sec-trento-mcp-how-to-use>> for instructions on how to connect MCP-compatible AI assistants and tools to your Trento Server.
 
 The {trento} MCP Server requires minimal configuration, but needs to know how to reach your Trento Server. The key configuration parameters are:
 
@@ -54,7 +46,7 @@ cp /etc/trento/mcp-server-trento.example /etc/trento/mcp-server-trento
 ====
 [source,bash]
 ----
-nano /etc/trento/mcp-server-trento
+vim /etc/trento/mcp-server-trento
 ----
 ====
 +
