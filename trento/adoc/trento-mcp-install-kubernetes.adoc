@@ -1,26 +1,11 @@
 include::product-attributes.adoc[]
 
-==== Kubernetes MCP deployment
-:revdate: 2025-11-13
 
 [[sec-trento-mcp-server-k8s]]
-===== Installing {trento} MCP Server (Optional)
+==== Kubernetes MCP deployment
+:revdate: 2025-11-17  
 
-The {trento} MCP Server, is an optional component, which provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the Model Context Protocol (MCP). The core {trserver} functionality works independently without it, but the optional {trento} MCP Server component enables integration with AI tools and assistants.
-
-
-====== Prerequisites
-
-Before installing the {trento} MCP Server, ensure you have:
-
-* A running {trserver} installation with the core components Web and Wanda.
-+
-** *Web component*: Provides the user interface and API endpoints for managing SAP systems
-** *Wanda component*: Handles automated checks and compliance validation for SAP landscapes
-+
-Both components must be running and accessible for the MCP Server to function properly.
-
-====== Configuration Overview
+===== Configuration Overview
 
 The {trento} MCP Server requires minimal configuration.
 
@@ -30,7 +15,7 @@ The key configuration parameters are:
 
 * `OAS_PATH`: Explicit paths to OpenAPI specification files. Use this when you want to directly specify the location of the API specifications instead of relying on autodiscovery. This is particularly useful when you want to connect to internal services (such as `localhost` or Kubernetes service names) instead of going through a reverse proxy.
 
-====== Enabling the MCP Server
+===== Enabling the MCP Server
 
 When installing the complete {trserver} using Helm, the MCP Server is disabled by default. Enable it by passing `--set trento-mcp-server.enabled=true`:
 
@@ -60,11 +45,11 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 
 The MCP Server will automatically connect to the {tr_web} and Wanda internal services within the {k8s} cluster.
 
-====== MCP Server Configuration Options
+===== MCP Server Configuration Options
 
 The {trento} MCP Server Helm chart supports various configuration options:
 
-====== Customize Ingress Path
+===== Customize Ingress Path
 
 By default, ingress is enabled. To customize the ingress configuration:
 
@@ -82,7 +67,7 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 
 The MCP Server endpoint will be: `https://TRENTO_SERVER_HOSTNAME/mcp-server-trento/mcp`
 
-====== Disabling Tag Filtering
+===== Disabling Tag Filtering
 
 By default, only operations tagged with `MCP` are exposed. To expose all operations and remove tag filtering:
 
@@ -100,7 +85,7 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 You can also filter by different tags by setting `--set trento-mcp-server.mcpServer.tagFilter[0]=YourTag`.
 ====
 
-====== Adjust Log Verbosity
+===== Adjust Log Verbosity
 
 The default log level is `info`. Adjust it for debugging:
 
@@ -113,7 +98,7 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 ----
 ====
 
-====== Adjust Resource Limits
+===== Adjust Resource Limits
 
 For production deployments with different resource requirements:
 
@@ -129,7 +114,7 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 ----
 ====
 
-====== Disabling Health Check Probes
+===== Disabling Health Check Probes
 
 Health check probes are enabled by default. To disable them if needed:
 
@@ -143,7 +128,7 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 ----
 ====
 
-====== Complete Configuration Example
+===== Complete Configuration Example
 
 Here is a complete example that configures external access via a custom ingress path:
 
@@ -161,7 +146,7 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 ----
 ====
 
-====== Verifying the MCP Server Installation
+===== Verifying the MCP Server Installation
 
 . Check that the MCP Server pod is running:
 +
