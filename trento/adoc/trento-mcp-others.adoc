@@ -46,15 +46,15 @@ This option is supported by most MCP Hosts, including VS Code. Check your MCP Ho
       "type": "http",
       "url": "https://trento.example.com/mcp-server-trento/mcp",
       "headers": {
-        "Authorization": "${input:trento-api-key}"
+        "Authorization": "${input:trento-pat}"
       }
     }
   },
   "inputs": [
     {
       "type": "promptString",
-      "id": "trento-api-key",
-      "description": "Trento API Key",
+      "id": "trento-pat",
+      "description": "Trento Personal Access Token",
       "password": true
     }
   ]
@@ -78,7 +78,7 @@ When using this option, ensure your configuration file has appropriate permissio
       "type": "http",
       "url": "https://trento.example.com/mcp-server-trento/mcp",
       "headers": {
-        "Authorization": "your-actual-trento-api-key-here"
+        "Authorization": "your-trento-pat"
       }
     }
   }
@@ -103,7 +103,7 @@ Replace `https://trento.example.com/mcp-server-trento/mcp` with your actual {tre
   ** For local or development setups, use `http://localhost:5000/mcp` (adjust the port as needed).
   ** If using Server-Sent Events (SSE) transport instead of the default streamable transport, change the path from `/mcp` to `/sse` - The transport type is configured on the {trento} MCP Server using the `TRANSPORT` configuration key or `--transport` flag (see <<sec-trento-mcp-config>>).
 
-* Replace `your-actual-trento-api-key-here` with the API token you generated from your {trento} instance.
+* Replace `your-trento-pat` with the API token you generated from your {trento} instance.
 * If you configured a custom header name (using `HEADER_NAME` or `--header-name`), update `Authorization` accordingly.
 
 ===== Troubleshooting
