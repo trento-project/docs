@@ -1,17 +1,28 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-mcp-install]]
-:revdate: 2025-10-31
-=== Installing Trento Server MCP component
+:revdate: 2025-11-17
+=== Installing {tr_mcp}
 
-The {trento} MCP Server can be deployed in several ways depending on your infrastructure and requirements.
+The {tr_mcp} can be deployed in several ways depending on your infrastructure and requirements.
+
+Supported installation methods: 
+
+* <<sec-trento-mcp-server-k8s,{k8s} deployment>>
+* <<sec-trento-mcp-server-systemd, systemd MCP deployment >>
 
 ==== Prerequisites MCP Server
 
-Before installing the {trento} MCP Server, ensure you have, both components must be running and be accessible for the MCP Server to function properly.
+Before installing the {trento} MCP Server, both {tr_web} and {tr_wanda} components must be running and be accessible for the MCP Server
+to function properly.
 
 * Network connectivity between the MCP Server and {trserver} components.
 * Access to the {trserver} URL (important when deployed behind NGINX).
+
+include::trento-mcp-install-kubernetes.adoc[]
+include::trento-mcp-install-systemd.adoc[]
+
+
 
 // === Configuration Overview
 // 
@@ -27,7 +38,3 @@ Before installing the {trento} MCP Server, ensure you have, both components must
 // * <<sec-systemd-deployment>> - systemd deployment with RPM packages
 // * <<sec-container-deployment>> - Container deployment with Docker/Podman
 
-
-
-include::trento-kubernetes-install-mcp.adoc[]
-include::trento-systemd-install-mcp.adoc[]

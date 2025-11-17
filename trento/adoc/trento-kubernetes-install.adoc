@@ -292,7 +292,7 @@ Additional steps are required on the Agent side.
 // ====
 // The {trento} MCP Server is an optional component. The core {trserver} functionality works independently without it.
 // 
-// After installation, see <<sec-trento-using-mcp-server>> for instructions on how to connect MCP-compatible AI assistants and tools to your Trento Server.
+// After installation, see <<sec-trento-mcp-how-to-use>> for instructions on how to connect MCP-compatible AI assistants and tools to your Trento Server.
 // ====
 // 
 // ===== Prerequisites
