@@ -11,7 +11,7 @@ Easy way to locally preview documentation changes without installing repository 
 
 . **Start the Preview**
 +
-Navigate to the root directory of the repository and run the following command. This starts the build process inside a container:
+To start the build process inside a container, navigate to the root directory of the repository and run the following command:
 +
 [source,bash]
 ----
