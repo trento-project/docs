@@ -10,18 +10,7 @@ A systemd-based installation of the {tr_mcp} using RPM packages can be performed
 * {sles4sap} 15: SP4–SP7
 * {sles4sap} 16.0
 
-===== Installing {trento} MCP Server
-
-The {trento} MCP Server is an optional component. The core {trserver} functionality works independently without it.
-After installation, see <<sec-trento-mcp-how-to-use>> for instructions on how to connect MCP-compatible AI assistants and tools to your Trento Server.
-
-The {trento} MCP Server requires minimal configuration, but needs to know how to reach your Trento Server. The key configuration parameters are:
-
-* `TRENTO_URL`: The URL where your Trento Server is accessible. This is particularly important when Trento is deployed behind NGINX or other reverse proxies. Use the externally accessible URL (e.g., `https://trento.example.com`) rather than internal service URLs. When set, the server will use this URL for OpenAPI specification autodiscovery.
-
-* `OAS_PATH`: Explicit paths to OpenAPI specification files. Use this when you want to directly specify the location of the API specifications instead of relying on autodiscovery. This is particularly useful when you want to connect to internal services (such as `localhost` or Kubernetes service names) instead of going through a reverse proxy.
-
-====== Installation Steps
+===== Installing {tr_mcp} using RPM packages
 
 . Install the MCP Server package:
 +
@@ -83,7 +72,7 @@ PORT=5000
 +
 [NOTE]
 ====
-The MCP Server's health check HTTP server is primarily intended for Kubernetes environments, where liveness/readiness probes use it. Outside Kubernetes, you can leave it disabled. If you choose to enable it, set `ENABLE_HEALTH_CHECK=true` and `HEALTH_PORT=8080` (or your preferred port) and ensure the port is accessible (see the Firewall Configuration section below).
+The MCP Server's health check HTTP server is primarily intended for Kubernetes environments, where liveness/readiness probes use it. Outside Kubernetes, you can leave it disabled. If you choose to enable it, set `ENABLE_HEALTH_CHECK=true` and `HEALTH_PORT=8080` and ensure the port is accessible.
 ====
 +
 . Enable and start the MCP Server service:
@@ -125,7 +114,14 @@ journalctl -u mcp-server-trento -f
 ----
 ====
 +
-. The Trento MCP Server should be listening at `http://localhost:5000/mcp` (or `http://localhost:<PORT>/mcp` if you changed the `PORT` setting). If you need remote access, ensure this port is open in your firewall; see <<sec-mcp-systemd-firewall>>.
+. The Trento MCP Server should be listening at `http://localhost:5000/mcp`.
+If firewalld is running, allow {tr_mcp} to be accessible and add an exception to firewalld:
++
+[source,bash]
+----
+firewall-cmd --zone=public --add-port=5000/tcp --permanent
+firewall-cmd --reload
+----
 +
 . If you enabled health checks, verify the endpoints locally:
 
@@ -147,20 +143,6 @@ curl http://localhost:8080/readyz
 # {"status":"up","details":{"mcp-server":{"status":"up","timestamp":"2025-10-09T12:11:09.528898849Z"},"wanda-api":{"status":"up","timestamp":"2025-10-09T12:11:09.542078327Z"},"web-api":{"status":"up","timestamp":"2025-10-09T12:11:09.544855047Z"}}}
 ----
 ====
-
-[[sec-mcp-systemd-firewall]]
-====== Firewall Configuration
-
-If firewalld is running, allow incoming connections to the MCP Server port:
-
-====
-[source,bash]
-----
-firewall-cmd --zone=public --add-port=5000/tcp --permanent
-firewall-cmd --reload
-----
-====
-
 If health checks are enabled, and you want them to be exposed, also allow the health check port:
 
 ====
@@ -171,12 +153,3 @@ firewall-cmd --reload
 ----
 ====
 
-[NOTE]
-====
-Use the ports you configured. Replace the example values `5000` and `8080` with your actual settings:
-
-- `PORT`: MCP Server listening port (default: 5000).
-- `HEALTH_PORT`: Health check server port (default: 8080).
-
-Adjust all commands and firewall rules accordingly.
-====
