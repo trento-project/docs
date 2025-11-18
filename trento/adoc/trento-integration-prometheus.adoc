@@ -1,41 +1,76 @@
-
 == Prometheus integration
 
 Prometheus Server is a component of Trento Server, responsible for pulling the metrics about Memory and CPU utilization collected by the node-exporter in the agent hosts and serving them to the web component, which in turn renders the metrics as dynamic graphical charts in the details view of the registered hosts.
 
 === Requirements
-The node-exporter must be installed and running in the agent hosts and Prometheus Server must be able to reach the agent hosts at the IP address and port that the node-exporter is bound to. 
 
-The user can customize the IP address and port that Prometheus Server uses to reach the node-exporter by setting parameter node-exporter-target with value <ip_address>:<port> in the agent configuration file.
+The node-exporter must be installed and running in the agent hosts and Prometheus Server must be able to reach the agent hosts at the IP address and port that the node-exporter is bound to.
+
+The user can customize the IP address and port that Prometheus Server uses to reach the node-exporter by setting parameter `node-exporter-target` with value `<ip_address>:<port>` in the agent configuration file.
 
 If the parameter is not set, Prometheus Server will use the lowest ipv4 address discovered in the host with default port 9100.
 
 === Kubernetes deployment
-When using the Helm chart to deploy Trento Server on a Kubernetes cluster, an image of Prometheus Server is deployed automatically. No further actions are required by the user, other than ensuring that it can reach the node-exporter in the agent hosts. 
-In a Kubernetes cluster with multiple nodes, the user can select on which node to deploy Prometheus Server by adding the following flag to the helm installation command: 
+
+When using the Helm chart to deploy Trento Server on a Kubernetes cluster, an image of Prometheus Server is deployed automatically. No further actions are required by the user, other than ensuring that it can reach the node-exporter in the agent hosts.
+
+In a Kubernetes cluster with multiple nodes, the user can select on which node to deploy Prometheus Server by adding the following flag to the helm installation command:
+
+[source,bash]
+----
 --set prometheus.server.nodeSelector.LABEL=<value>
-Where <value> is the label assigned to the node where the user wants Prometheus Server to be deployed.
-Systemd deployment
+----
+
+Where `<value>` is the label assigned to the node where the user wants Prometheus Server to be deployed.
+
+=== Systemd deployment
+
 In a systemd deployment of Trento Server you can choose between using an existing installation of Prometheus Server, installing a dedicated Prometheus Server instance from PackageHub or not using Prometheus Server at all.
 
-=== Use an existing installation
-If you have an existing Prometheus server installation that you want to use with Trento Server, you must set CHARTS_ENABLED=true and PROMETHEUS_URL pointing to the right address and port in the trento-web configuration file. Then you need to restart the trento-web service.
+==== Use an existing installation
+
+If you have an existing Prometheus server installation that you want to use with Trento Server, you must set `CHARTS_ENABLED=true` and `PROMETHEUS_URL` pointing to the right address and port in the trento-web configuration file. Then you need to restart the trento-web service.
+
 The minimal Prometheus Server version required is 2.28.0.
-Use the section Install Prometheus Server from PackageHub as a reference to adjust the Prometheus Server configuration.
-Install Prometheus Server from PackageHub
+
+Use the section <<Install Prometheus Server from PackageHub>> as a reference to adjust the Prometheus Server configuration.
+
+==== Install Prometheus Server from PackageHub
+
 PackageHub packages are tested by SUSE, but they do not come with the same level of support as the core SLES packages. Users should assess the suitability of these packages based on their own risk tolerance and support needs.
-Enable PackageHub repository (replace 15.x with the correct Service Pack version):
+
+. Enable PackageHub repository (replace 15.x with the correct Service Pack version):
++
+[source,bash]
+----
 SUSEConnect --product PackageHub/15.x/x86_64
-Add the Prometheus user/group:
+----
+
+. Add the Prometheus user/group:
++
+[source,bash]
+----
 groupadd --system prometheus
 useradd -s /sbin/nologin --system -g prometheus prometheus
-Install Prometheus using Zypper:
+----
+
+. Install Prometheus using Zypper:
++
+[source,bash]
+----
 zypper in golang-github-prometheus-prometheus
-Note: In case the missing dependency cannot be satisfied, we have already added the Prometheus user/group. This makes it safe to proceed with the installation by choosing Solution 2: break golang-github-prometheus-prometheus
-Change Prometheus configuration by replacing the configuration at /etc/prometheus/prometheus.yml with:
+----
++
+NOTE: In case the missing dependency cannot be satisfied, we have already added the Prometheus user/group. This makes it safe to proceed with the installation by choosing Solution 2: break golang-github-prometheus-prometheus
+
+. Change Prometheus configuration by replacing the configuration at `/etc/prometheus/prometheus.yml` with:
++
+[source,yaml]
+----
 global:
   scrape_interval: 30s
   evaluation_interval: 10s
+
 scrape_configs:
   - job_name: "http_sd_hosts"
     honor_timestamps: true
@@ -43,23 +78,38 @@ scrape_configs:
     scrape_timeout: 30s
     scheme: http
     follow_redirects: true
-    Http_sd_configs:
+    http_sd_configs:
       - follow_redirects: true
         refresh_interval: 1m
         url: http://localhost:4000/api/prometheus/targets
-Note: the value of the url parameter above assumes that the trento-web service is running in the same host as Prometheus Server.
-Enable and start the Prometheus service:
+----
++
+NOTE: the value of the `url` parameter above assumes that the trento-web service is running in the same host as Prometheus Server.
+
+. Enable and start the Prometheus service:
++
+[source,bash]
+----
 systemctl enable --now prometheus
-If firewalld is running, allow Prometheus to be accessible and add an exception to firewalld:
+----
+
+. If firewalld is running, allow Prometheus to be accessible and add an exception to firewalld:
++
+[source,bash]
+----
 firewall-cmd --zone=public --add-port=9090/tcp --permanent
 firewall-cmd --reload
+----
 
-Set CHARTS_ENABLED=true and PROMETHEUS_URL=http://localhost:9090 in the trento-web configuration file and restart the trento-web service.
+. Set `CHARTS_ENABLED=true` and `PROMETHEUS_URL=http://localhost:9090` in the trento-web configuration file and restart the trento-web service.
++
+[source,bash]
+----
 systemctl restart trento-web
-Note: the value of the PROMETHEUS_URL parameter above assumes that the trento-web service is running in the same host as Prometheus Server.
+----
++
+NOTE: the value of the `PROMETHEUS_URL` parameter above assumes that the trento-web service is running in the same host as Prometheus Server.
 
-=== Not using Prometheus Server
+==== Not using Prometheus Server
 
-If you decide not to use Prometheus Server in your Trento installation, you must disable graphical charts in the UI by setting CHARTS_ENABLED=false in the trento-web configuration file. 
-
-
+If you decide not to use Prometheus Server in your Trento installation, you must disable graphical charts in the UI by setting `CHARTS_ENABLED=false` in the trento-web configuration file.
