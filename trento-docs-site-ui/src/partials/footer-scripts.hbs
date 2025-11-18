@@ -3,3 +3,13 @@
 {{#if env.SITE_SEARCH_PROVIDER}}
 {{> search-scripts}}
 {{/if}}
+<script>
+    function toggleSearch() {
+        var searchField = document.getElementById('search-wrapper');
+        if(searchField.classList.contains('hidden')) {
+            searchField.classList.remove('hidden');
+        } else {
+            searchField.classList.add('hidden');
+        }
+    }
+</script>
