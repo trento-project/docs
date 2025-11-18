@@ -4,6 +4,7 @@
  ** xref:trento-requirements.adoc[Requirements]
  ** xref:trento-install-server.adoc[Installing Trento Server]
  ** xref:trento-install-agents.adoc[Installing Trento Agents]
+ ** xref:trento-integration-prometheus.adoc[Prometheus integration]
  ** xref:trento-user-manage.adoc[User management]
  ** xref:trento-sso-integration.adoc[Single Sign-On integration]
  ** xref:trento-activity-log.adoc[Activity Log]
