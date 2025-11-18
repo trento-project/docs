@@ -15,117 +15,9 @@ A systemd-based installation of the {trserver} using RPM packages can be perform
 
 * https://nginx.org/en/[NGINX]
 * https://www.postgresql.org/[PostgreSQL]
-* https://prometheus.io/[Prometheus] (optional)
 * https://rabbitmq.com/[RabbitMQ]
 
 ==== Install {trento} dependencies
-
-===== Install {prometheus} (Optional)
-
-https://prometheus.io/[Prometheus] is not required to run {trento}, but it is highly recommended. When enabled, {trento} can display performance charts for each host, showing useful metrics such as CPU load and memory usage.
-
-[NOTE]
-====
-{prometheus} is optional, but you must configure the chart display setting after installing {trento}.
-After the installation, edit the web configuration file in +/etc/trento/trento-web+
-
-* To disable charts when not using {prometheus}, set +CHARTS_ENABLED+ to +false+.
-* To enable charts using an existing {prometheus}, installation, set +CHARTS_ENABLED+ to +true+.
-====
-
-====== Choose a {prometheus} Setup Option
-
-* <<prometheus-existing-installation, Use an existing Prometheus installation>>  
-* <<prometheus-unsupported-packagehub, Install Prometheus on {sles4sap} 15.4 and higher>>
-* <<prometheus-supported-packagehub, Install Prometheus on {sles4sap} 16.0>>
-
-
-[[prometheus-existing-installation]]
-====== Use an existing {prometheus} installation
-
-Minimal required {prometheus} version is *2.28.0*.
-
-
-If you already have an https://prometheus.io/docs/prometheus/latest/installation/[existing Prometheus server], set the +PROMETHEUS_URL+ environment variable to point to your {prometheus} server URL after the installation of trento-web.
-
-Refer <<prometheus-config, for an example of {prometheus} configuration>>.
-
----
-
-[[prometheus-unsupported-packagehub]]
-====== Install {prometheus} from PackageHub on {sles4sap} 15.x
-
-{prometheus} is available for installation from the {suse} https://packagehub.suse.com/[PackageHub]  repository.
-PackageHub packages are tested by {suse} but are not officially supported as part of the {sles4sap} base product.
-
-Enable the PackageHub repository (replace `x.x` with the version of your operating system, for example `15.7`):
-
-[source,bash]
-----
-SUSEConnect --product PackageHub/15.x/x86_64
-zypper refresh
-----
-Proceed with the same steps as in <<prometheus-supported-packagehub, Install Prometheus on {sles4sap} 16.0>>
-
-[[prometheus-supported-packagehub]]
-====== Install {prometheus} on {sles4sap} 16.0
-
-
-. Create the {prometheus} user and group:
-+
-[source,bash]
-----
-groupadd --system prometheus
-useradd -s /sbin/nologin --system -g prometheus prometheus
-----
-. Install {prometheus} using Zypper:
-+
-[source,bash]
-----
-zypper install golang-github-prometheus-prometheus
-----
-. Configure {prometheus} for Trento
-+
-Replace or update the existing configuration at `/etc/prometheus/prometheus.yml`` with:
-+
-[[prometheus-config]]
-[source,yaml]
-----
-global:
-  scrape_interval: 30s
-  evaluation_interval: 10s
-
-scrape_configs:
-  - job_name: "http_sd_hosts"
-    honor_timestamps: true
-    scrape_interval: 30s
-    scrape_timeout: 30s
-    scheme: http
-    follow_redirects: true
-    http_sd_configs:
-      - follow_redirects: true
-        refresh_interval: 1m
-        url: http://localhost:4000/api/prometheus/targets
-----
-+
-[NOTE]
-====
-+localhost:4000+ in +http://localhost:4000/api/prometheus/targets+
-refers to the location where {trento} web service is running.
-====
-. Enable and start the {prometheus} service:
-+
-[source,bash]
-----
-systemctl enable --now prometheus
-----
-. If firewalld is running, allow {prometheus} to be accessible and add an exception to firewalld:
-+
-[source,bash]
-----
-firewall-cmd --zone=public --add-port=9090/tcp --permanent
-firewall-cmd --reload
-----
 
 ===== Install PostgreSQL
 
@@ -332,8 +224,7 @@ AMQP_URL=amqp://trento_user:trento_user_password@localhost:5672/vhost
 DATABASE_URL=ecto://trento_user:web_password@localhost/trento
 EVENTSTORE_URL=ecto://trento_user:web_password@localhost/trento_event_store
 ENABLE_ALERTING=false
-CHARTS_ENABLED=true
-PROMETHEUS_URL=http://localhost:9090
+CHARTS_ENABLED=false
 ADMIN_USER=admin
 ADMIN_PASSWORD=trentodemo
 ENABLE_API_KEY=true
@@ -353,8 +244,6 @@ The `ADMIN_PASSWORD` variable must must meet the following requiements:
 * the password  not contain 3 consecutive identical numbers or letters (for example, 111 or aaa)
 * the password must not contain 4 consecutive  numbers or letters (for example, 1234, abcd, ABCD)
 
-The `CHARTS_ENABLED` variable enable {trento} to display performance charts for each host, showing useful metrics such as CPU load and memory usage.
-`CHARTS_ENABLED` *must* be set to `false`, if {prometheus} is not installed or you do not want to use {trento}'s charts functionality.
 
 The `ENABLE_ALERTING` enables the 
 https://www.trento-project.io/docs/web/Alerting/alerting.html[alerting system to receive email notifications]. Set `ENABLE_ALERTING` to `true` and add additional variables to the `/etc/trento/trento-web`, to enable the feature.
