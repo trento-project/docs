@@ -1,0 +1,37 @@
+== Local Documentation Preview with Docker
+
+Easy way to locally preview documentation changes without installing repository dependencies (like Node.js or Antora) on your host machine. You only need Docker or Podman.
+
+=== Prerequisites
+
+* Docker Engine (or Podman) installed.
+* Docker Compose installed.
+
+=== Workflow
+
+. **Start the Preview**
++
+Navigate to the root directory of the repository and run the following command. This starts the build process inside a container:
++
+[source,bash]
+----
+docker compose up
+----
++
+
+
+. **Check the Docs**
++
+Once the build is complete and the server starts, open your browser and navigate to:
++
+http://localhost:3000
+
+. **Review and Rebuild**
++
+The container builds the site and serves it. To view new changes:
++
+* Stop the container (press `Ctrl+C`).
+* Make your changes to the source files.
+* Run `docker compose up` again.
++
+The container will rebuild the documentation with your new changes for preview.

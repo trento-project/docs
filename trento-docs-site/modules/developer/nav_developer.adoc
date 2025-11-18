@@ -41,6 +41,7 @@
 
 ** Trento Documentation Page
 *** xref:trento-docs-site/README.adoc[Documentation Page]
+*** xref:trento-docs-site/preview-docs-with-docker.adoc[Local Documentation Preview with Docker]
 *** xref:trento-docs-site/contribution-upstream/components-nav-guide.adoc[Component Documentation Navigation Guide]
 *** xref:trento-docs-site/collaboration-docs-team/docs-git-workflow.adoc[Git Workflow for Trento Documentation]
 *** xref:trento-docs-site-ui/README.adoc[Documentation Page UI]
