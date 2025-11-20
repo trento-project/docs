@@ -28,7 +28,7 @@ The *{trserver}* is an independent, distributed system designed to run on a {k8s
 * The checks engine named wanda that orchestrates the execution of configuration checks.
 * A {postgresql} database for data persistence.
 * The RabbitMQ message broker for communicating between the checks engine and the agents.
-* A {prometheus} instance that retrieves the metrics collected by the {prometheus} node exporter in the registered hosts.
+* A {prometheus} instance that retrieves the metrics collected by the {prometheus} node exporter in the registered hosts. This {prometheus} instance is optional in the case of a systemd deployment.
 
 The *{tragent}* is a single background process (`trento-agent`) running on each monitored host of the SAP infrastructure.
 

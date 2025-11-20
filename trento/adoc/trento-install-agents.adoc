@@ -97,3 +97,4 @@ openssl x509 -in mycert.crt -out mycert.pem -outform PEM
 ----
 ====
 . Repeat this procedure on all SAP hosts that you want to monitor.
+
