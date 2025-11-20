@@ -23,7 +23,10 @@ When using the {helm} chart to deploy {trserver} on a {kube} cluster, an image o
 
 In a {kube} cluster with multiple nodes, the user can select on which node to deploy {prometheus} Server by adding the following flag to the {helm} installation command:
 
- `--set prometheus.server.nodeSelector.LABEL=<value>`
+[source,bash]
+----
+--set prometheus.server.nodeSelector.LABEL=<value>
+----
 
 Where `<value>` is the label assigned to the node where the user wants {prometheus} Server to be deployed.
 
