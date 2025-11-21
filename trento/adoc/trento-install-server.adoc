@@ -15,6 +15,7 @@ Unsupported installation methods:
 
 * <<sec-ansible-deployment,{k8s} Automated deployment with Ansible>>
 
+include::partials/supported-versions.adoc[]
 
 include::trento-kubernetes-install.adoc[]
 include::trento-systemd-install.adoc[]
