@@ -1,0 +1,4 @@
+*Supported versions*:
+
+* {sles4sap} 15: SP4–SP7
+* {sles4sap} 16.0
