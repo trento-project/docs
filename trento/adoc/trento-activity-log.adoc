@@ -74,10 +74,11 @@ triggered by a user action.
 
 For example, the host clean-up operation de-registers the database
 instance, de-registers the database itself, and then de-registers the host.
-All these entires are displayed chronologically, when you view the host clean
-up entry in the Activity Log.
+These correlated entries are displayed in a linked, linear view, when you navigate
+to the host clean-up entry modal in the Activity Log and then click the link in 
+the Related Events section named **Show Events**.
 
-The following categories of Activity Log entries are linked together:
+The following categories of Activity Log entries provide a view of linked or related events:
 
 . entries caused by de-registration of hosts
 . entries caused by API key re-generation
