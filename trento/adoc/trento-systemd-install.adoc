@@ -6,11 +6,6 @@ include::product-attributes.adoc[]
 
 A systemd-based installation of the {trserver} using RPM packages can be performed manually on the latest supported versions of {sles4sap}, from 15 SP4 up to 16. For installations on service packs other than the current one, make sure to update the repository URL as described in the relevant notes throughout this guide.
 
-*Supported versions*:
-
-* {sles4sap} 15: SP4–SP7
-* {sles4sap} 16.0
-
 ==== List of dependencies
 
 * https://nginx.org/en/[NGINX]

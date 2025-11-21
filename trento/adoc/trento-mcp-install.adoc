@@ -6,6 +6,8 @@ include::product-attributes.adoc[]
 
 The {tr_mcp} can be deployed in several ways depending on your infrastructure and requirements.
 
+include::partials/supported-versions.adoc[]
+
 Supported installation methods: 
 
 * <<sec-trento-mcp-server-k8s,{k8s} deployment>>
@@ -21,20 +23,3 @@ to function properly.
 
 include::trento-mcp-install-kubernetes.adoc[]
 include::trento-mcp-install-systemd.adoc[]
-
-
-
-// === Configuration Overview
-// 
-// The {trento} MCP Server requires minimal configuration, but needs to know how to reach your {trserver}. The key configuration parameters are:
-// 
-// * `TRENTO_URL`: The URL where your {trserver} is accessible. This is particularly important when {trento} is deployed behind NGINX or other reverse proxies. Use the externally accessible URL (e.g., `https://trento.example.com`) rather than internal service URLs. When set, the server will use this URL for OpenAPI specification autodiscovery.
-// 
-// * `OAS_PATH`: Explicit paths to OpenAPI specification files. Use this when you want to directly specify the location of the API specifications instead of relying on autodiscovery. This is particularly useful when you want to connect to internal services (such as `localhost` or Kubernetes service names) instead of going through a reverse proxy.
-// 
-// The {trento} MCP Server can be installed as part of the {trserver} deployment or as a separate component. Refer to the specific deployment method sections above for installation instructions:
-// 
-// * <<sec-trento-k8s-deployment>> - Kubernetes deployment with Helm
-// * <<sec-systemd-deployment>> - systemd deployment with RPM packages
-// * <<sec-container-deployment>> - Container deployment with Docker/Podman
-

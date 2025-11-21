@@ -6,7 +6,7 @@ include::product-attributes.adoc[]
 
 == Integration with Trento Server MCP 
 
-The {trento} MCP Server, is an optional component, which provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the Model Context Protocol (MCP). The core {trserver} functionality works independently without it, but the {trento} MCP Server component enables integration with AI tools and assistants.
+The {trento} MCP Server, is an optional component, which provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the link:https://modelcontextprotocol.io/introduction[Model Context Protocol] (MCP). The core {trserver} functionality works independently without it, but the {trento} MCP Server component enable the option to handle common monitoring and troubleshooting tasks by using natural language.
 
 include::trento-mcp-install.adoc[]
 include::trento-mcp-config.adoc[]
