@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-mcp-how-to-use]]
 :revdate: 2025-10-31
-=== Using the {trento} MCP Server
+=== Using the {tr_mcp}
 
 The {trento} MCP Server enables AI-assisted operations by implementing the link:https://modelcontextprotocol.io/introduction[Model Context Protocol] (MCP). This allows MCP-compatible assistants to connect to {trento} and perform monitoring and troubleshooting tasks using natural language.
 

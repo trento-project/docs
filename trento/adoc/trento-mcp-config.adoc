@@ -1,7 +1,7 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-mcp-config]]
-=== Configure {trento} MCP Server
+=== Configure {tr_mcp}
 :revdate: 2025-10-31
 
 This section provides an overview of how to configure the {trento} MCP Server using command-line parameters, configuration files, and environment variables.
