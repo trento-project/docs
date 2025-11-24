@@ -197,9 +197,9 @@ e859c07888ca   registry.suse.com/trento/trento-wanda:1.2.0   "/bin/sh -c '/app/b
 Both containers must run and listen on the specified ports.
 
 [[sec-trento-mcp-server-container]]
-==== Installing {trento} MCP Server (Optional)
+==== Installing {tr_mcp}
 
-The {trento} MCP Server provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the Model Context Protocol (MCP). This optional component enables integration with AI tools and assistants.After installation, see <<sec-trento-mcp-how-to-use>> for instructions on how to connect MCP-compatible AI assistants and tools to your Trento Server.
+The {tr_mcp} provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the Model Context Protocol (MCP). This optional component enables integration with AI tools and assistants.After installation, see <<sec-trento-mcp-how-to-use>> for instructions on how to connect MCP-compatible AI assistants and tools to your Trento Server.
 
 ===== Requirements
 
@@ -209,7 +209,7 @@ The {trento} MCP Server provides AI-assisted management capabilities for your SA
 
 ===== Configuration Overview
 
-The {trento} MCP Server requires minimal configuration, but needs to know how to reach your Trento Server. The key configuration parameters are:
+The {tr_mcp} requires minimal configuration, but needs to know how to reach your Trento Server. The key configuration parameters are:
 
 * `TRENTO_MCP_TRENTO_URL`: The URL where your Trento Server is accessible. This is particularly important when Trento is deployed behind NGINX or other reverse proxies. Use the externally accessible URL (e.g., `https://trento.example.com`) rather than internal service URLs. When set, the server will use this URL for OpenAPI specification autodiscovery.
 

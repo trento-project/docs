@@ -275,20 +275,20 @@ Additional steps are required on the Agent side.
 // toms 2022-09-14: which steps?
 
 // [[sec-trento-mcp-server-k8s]]
-// ==== Installing {trento} MCP Server (Optional)
+// ==== Installing {tr_mcp} (Optional)
 // 
-// The {trento} MCP Server provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the Model Context Protocol (MCP). This optional component enables integration with AI tools and assistants.
+// The {tr_mcp} provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the Model Context Protocol (MCP). This optional component enables integration with AI tools and assistants.
 // 
 // [NOTE]
 // ====
-// The {trento} MCP Server is an optional component. The core {trserver} functionality works independently without it.
+// The {tr_mcp} is an optional component. The core {trserver} functionality works independently without it.
 // 
 // After installation, see <<sec-trento-mcp-how-to-use>> for instructions on how to connect MCP-compatible AI assistants and tools to your Trento Server.
 // ====
 // 
 // ===== Prerequisites
 // 
-// Before installing the {trento} MCP Server, ensure you have:
+// Before installing the {tr_mcp}, ensure you have:
 // 
 // * A running {trserver} installation (Web and Wanda components).
 // +
@@ -304,7 +304,7 @@ Additional steps are required on the Agent side.
 // 
 // ===== Configuration Overview
 // 
-// The {trento} MCP Server requires minimal configuration, but needs to know how to reach your Trento Server. The key configuration parameters are:
+// The {tr_mcp} requires minimal configuration, but needs to know how to reach your Trento Server. The key configuration parameters are:
 // 
 // * `TRENTO_URL`: The URL where your Trento Server is accessible. This is particularly important when Trento is deployed behind NGINX or other reverse proxies. Use the externally accessible URL (e.g., `https://trento.example.com`) rather than internal service URLs. When set, the server will use this URL for OpenAPI specification autodiscovery.
 // 
@@ -342,7 +342,7 @@ Additional steps are required on the Agent side.
 // 
 // ===== MCP Server Configuration Options
 // 
-// The {trento} MCP Server Helm chart supports various configuration options:
+// The {tr_mcp} Helm chart supports various configuration options:
 // 
 // ====== Customize Ingress Path
 // 

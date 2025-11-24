@@ -15,7 +15,7 @@ Supported installation methods:
 
 ==== Prerequisites MCP Server
 
-Before installing the {trento} MCP Server, both {tr_web} and {tr_wanda} components must be running and be accessible for the MCP Server
+Before installing the {tr_mcp}, both {tr_web} and {tr_wanda} components must be running and be accessible for the MCP Server
 to function properly.
 
 * Network connectivity between the MCP Server and {trserver} components.

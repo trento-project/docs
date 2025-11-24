@@ -1,10 +1,10 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-mcp-others]]
-==== Integrating the {trento} MCP Server with other MCP Hosts
+==== Integrating the {tr_mcp} with other MCP Hosts
 :revdate: 2025-10-31
 
-The {trento} MCP Server can be integrated with any client application that supports the Model Context Protocol (MCP). This allows you to interact with the {trento} API and execute tools defined in the OpenAPI specification through your preferred AI assistant or development tool.
+The {tr_mcp} can be integrated with any client application that supports the Model Context Protocol (MCP). This allows you to interact with the {trento} API and execute tools defined in the OpenAPI specification through your preferred AI assistant or development tool.
 
 This guide uses Visual Studio Code with GitHub Copilot as the primary example, but the configuration patterns apply to any MCP-compatible host.
 
@@ -12,9 +12,9 @@ This guide uses Visual Studio Code with GitHub Copilot as the primary example, b
 
 Before configuring your MCP Host, ensure you have:
 
-. *A running {trserver} installation* with the {trento} MCP Server component enabled:
-** Follow the <<sec-trento-installing-trentoserver>> to deploy {trserver} and enable the {trento} MCP Server.
-** Note the {trento} MCP Server endpoint URL (e.g., `https://trento.example.com/mcp-server-trento/mcp`).
+. *A running {trserver} installation* with the {tr_mcp} component enabled:
+** Follow the <<sec-trento-installing-trentoserver>> to deploy {trserver} and enable the {tr_mcp}.
+** Note the {tr_mcp} endpoint URL (e.g., `https://trento.example.com/mcp-server-trento/mcp`).
 
 . *A {trento} API token (Personal Access Token)*:
 ** Log in to your {trento} web interface with your username and password.
@@ -31,7 +31,7 @@ image::generate-pat.png[Generate a Personal Access Token in {trento},width=800]
 
 ===== Configuring Your MCP Host
 
-Once you have your {trento} installation ready with the {trento} MCP Server URL and API token, you can configure your MCP Host. The examples below show JSON configuration format, which is used by most MCP Hosts, including VS Code, Claude Desktop, and others.
+Once you have your {trento} installation ready with the {tr_mcp} URL and API token, you can configure your MCP Host. The examples below show JSON configuration format, which is used by most MCP Hosts, including VS Code, Claude Desktop, and others.
 
 ====== Option 1: Configuration with Prompted Input (Recommended)
 
@@ -91,7 +91,7 @@ When using this option, ensure your configuration file has appropriate permissio
 
 [NOTE]
 ====
-Replace `https://trento.example.com/mcp-server-trento/mcp` with your actual {trento} MCP Server endpoint URL from your installation.
+Replace `https://trento.example.com/mcp-server-trento/mcp` with your actual {tr_mcp} endpoint URL from your installation.
 ====
 
 ====== Client-Specific Notes
@@ -102,21 +102,21 @@ Replace `https://trento.example.com/mcp-server-trento/mcp` with your actual {tre
 
 ====== General Configuration Notes
 
-* Replace `https://trento.example.com/mcp-server-trento/mcp` with the actual URL where your {trento} MCP Server is accessible:
+* Replace `https://trento.example.com/mcp-server-trento/mcp` with the actual URL where your {tr_mcp} is accessible:
   ** For Kubernetes deployments with ingress, use the ingress URL (e.g., `https://trento.example.com/mcp-server-trento/mcp`).
   ** For local or development setups, use `http://localhost:5000/mcp` (adjust the port as needed).
-  ** If using Server-Sent Events (SSE) transport instead of the default streamable transport, change the path from `/mcp` to `/sse` - The transport type is configured on the {trento} MCP Server using the `TRANSPORT` configuration key or `--transport` flag (see <<sec-trento-mcp-config>>).
+  ** If using Server-Sent Events (SSE) transport instead of the default streamable transport, change the path from `/mcp` to `/sse` - The transport type is configured on the {tr_mcp} using the `TRANSPORT` configuration key or `--transport` flag (see <<sec-trento-mcp-config>>).
 
 * Replace `your-actual-trento-api-key-here` with the API token you generated from your {trento} instance.
 * If you configured a custom header name (using `HEADER_NAME` or `--header-name`), update `Authorization` accordingly.
 
 ===== Troubleshooting
 
-If you encounter issues connecting your MCP Host to the {trento} MCP Server:
+If you encounter issues connecting your MCP Host to the {tr_mcp}:
 
 . *Connection Errors*:
-** Verify that the {trento} MCP Server URL is correct and accessible from your machine.
-** Check if the {trento} MCP Server is running by reviewing logs from your {trento} installation.
+** Verify that the {tr_mcp} URL is correct and accessible from your machine.
+** Check if the {tr_mcp} is running by reviewing logs from your {trento} installation.
 ** Ensure network connectivity and that any required firewall rules are in place.
 
 . *Authentication Errors*:
@@ -129,21 +129,21 @@ If you encounter issues connecting your MCP Host to the {trento} MCP Server:
 *** VS Code: Help → Toggle Developer Tools.
 *** Claude Desktop: Check application logs.
 *** Other clients: Refer to your client's documentation for log locations.
-** Review the {trento} MCP Server logs for connection attempts and errors.
+** Review the {tr_mcp} logs for connection attempts and errors.
 ** Refer to the <<sec-trento-mcp-troubleshooting>> for additional help.
 
-===== Using the {trento} MCP Server
+===== Using the {tr_mcp}
 
-How you use the {trento} MCP Server depends on the specific MCP Host application you're working with. The MCP ecosystem is rapidly evolving, with new hosts and improved user experiences being introduced regularly.
+How you use the {tr_mcp} depends on the specific MCP Host application you're working with. The MCP ecosystem is rapidly evolving, with new hosts and improved user experiences being introduced regularly.
 
 ====== Enable the Server and Expose Tools in Your MCP Host
 
 [arabic]
-. Ensure the {trento} MCP Server is configured in your host (see the configuration examples above).
+. Ensure the {tr_mcp} is configured in your host (see the configuration examples above).
 . Enable the server in your host's MCP settings, if required by the client:
 .. Many hosts provide a *Servers*, *External Tools*, or *MCP* section where you can toggle/enable the server you added.
 . Select or attach the MCP server to your assistant/model/workspace, if your host requires it:
-.. Some hosts let you choose which MCP servers are available per model or project - Make sure the *{trento} MCP Server* is enabled for the target model/session.
+.. Some hosts let you choose which MCP servers are available per model or project - Make sure the *{tr_mcp}* is enabled for the target model/session.
 . Start a new chat or session with your assistant and verify that tools are available:
 .. Try a simple action, such as: "List SAP systems", "Show HANA clusters", "What is the health status of my SAP landscape?", or "Are there any critical alerts I need to address?".
 
@@ -157,23 +157,23 @@ For detailed guidance on leveraging MCP capabilities in different tools, refer t
 
 ====== Demo
 
-To see the {trento} MCP Server in action, watch link:https://www.youtube.com/watch?v=7kDVc3YUR-U[this demonstration video].
+To see the {tr_mcp} in action, watch link:https://www.youtube.com/watch?v=7kDVc3YUR-U[this demonstration video].
 
-Find below a few example screenshots from different MCP Hosts using the {trento} MCP Server:
+Find below a few example screenshots from different MCP Hosts using the {tr_mcp}:
 
 ====== Example: Claude Desktop
 
-The Claude Desktop app can attach the {trento} MCP Server and expose its tools directly in conversations. After configuring your server in Claude's MCP settings, start a new chat and look for the available tools.
+The Claude Desktop app can attach the {tr_mcp} and expose its tools directly in conversations. After configuring your server in Claude's MCP settings, start a new chat and look for the available tools.
 
-.Claude Desktop using {trento} MCP Server
-image::example-claude.png[Claude Desktop using {trento} MCP Server,width=900]
+.Claude Desktop using {tr_mcp}
+image::example-claude.png[Claude Desktop using {tr_mcp},width=900]
 
 ====== Example: Visual Studio Code with GitHub Copilot
 
-VS Code lets you register external MCP servers and make their tools available to Copilot Chat. Once configured, start a chat and pick the {trento} MCP Server tools to run common operations.
+VS Code lets you register external MCP servers and make their tools available to Copilot Chat. Once configured, start a chat and pick the {tr_mcp} tools to run common operations.
 
-.Visual Studio Code with GitHub Copilot using {trento} MCP Server
-image::example-copilot.png[VS Code Copilot using {trento} MCP Server,width=900]
+.Visual Studio Code with GitHub Copilot using {tr_mcp}
+image::example-copilot.png[VS Code Copilot using {tr_mcp},width=900]
 
 ===== Additional Resources
 

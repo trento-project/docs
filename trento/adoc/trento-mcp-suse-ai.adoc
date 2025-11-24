@@ -2,15 +2,15 @@ include::product-attributes.adoc[]
 
 :revdate: 2025-10-31
 [[sec-trento-mcp-suse-ai]]
-==== Integrating the {trento} MCP Server with {suseai}
+==== Integrating the {tr_mcp} with {suseai}
 
-This guide explains how to integrate the {trento} MCP Server with {suseai}, including configuration and deployment instructions.
+This guide explains how to integrate the {tr_mcp} with {suseai}, including configuration and deployment instructions.
 
 ===== Getting Started with {suseai}
 
 {suseai} is a platform that allows you to deploy and manage AI models and applications in a {kube} environment. It provides tools for model management, deployment, and integration with various AI frameworks.
 
-Refer to the official https://documentation.suse.com/suse-ai/1.0/[{suseai} documentation] for detailed information. This guide focuses on deploying the {trento} MCP Server with {suseai}, specifically using Ollama and Open Web UI. Always refer to the latest instructions in the https://documentation.suse.com/suse-ai/1.0/html/AI-deployment-intro/index.html[{suseai} deployment guide] for the most accurate and up-to-date information.
+Refer to the official https://documentation.suse.com/suse-ai/1.0/[{suseai} documentation] for detailed information. This guide focuses on deploying the {tr_mcp} with {suseai}, specifically using Ollama and Open Web UI. Always refer to the latest instructions in the https://documentation.suse.com/suse-ai/1.0/html/AI-deployment-intro/index.html[{suseai} deployment guide] for the most accurate and up-to-date information.
 
 ===== Prerequisites
 
@@ -125,9 +125,9 @@ Once you have the Ollama model running on Google Cloud Run, you can add it to Op
 . Add a new Ollama connection with the URL of your deployed model (e.g., `https://qwen3-8b-<project-id>.<region>.run.app`).
 . Navigate to the *Models* section, click *Manage Models*, select the Ollama connection you just created, and pull the `Qwen3:8b` model.
 
-===== Deploying the {trento} MCP Server
+===== Deploying the {tr_mcp}
 
-To deploy the {trento} MCP Server in your {suseai} cluster, install it via the {trento} Server Helm chart. Follow the step-by-step instructions in <<sec-trento-mcp-server-k8s>>. The {trento} MCP Server is packaged as a sub-chart and can be enabled during the {trento} Server installation.
+To deploy the {tr_mcp} in your {suseai} cluster, install it via the {trento} Server Helm chart. Follow the step-by-step instructions in <<sec-trento-mcp-server-k8s>>. The {tr_mcp} is packaged as a sub-chart and can be enabled during the {trento} Server installation.
 
 For chart sources and values, see the link:https://github.com/trento-project/helm-charts[{trento} helm-charts repository].
 
@@ -145,13 +145,13 @@ Once {trento} is installed, ensure you have created a *{trento} API token (Perso
 .Generate a Personal Access Token in {trento}
 image::generate-pat.png[Generate a Personal Access Token in {trento},width=800]
 
-===== Adding the {trento} MCP Server to Open Web UI
+===== Adding the {tr_mcp} to Open Web UI
 
 Open Web UI includes native support for the Model Context Protocol (MCP). With this integration, Open Web UI connects to MCP servers from the backend, allowing you to safely use an internal {kube} Service DNS name without exposing the service publicly.
 
 Refer to the official Open Web UI MCP feature guide for screenshots and advanced options: https://docs.openwebui.com/features/mcp[Open Web UI with MCP].
 
-===== Add the {trento} MCP Server in Open Web UI
+===== Add the {tr_mcp} in Open Web UI
 
 [arabic]
 . Open *Admin Settings* and go to *External Tools*.
@@ -162,24 +162,24 @@ Refer to the official Open Web UI MCP feature guide for screenshots and advanced
 .. *Auth*: `<TOKEN>` (the token you generated in the {trento} console)
 . Click *Save*.
 
-.Open Web UI - Add the {trento} MCP Server as a tool
-image::owui-add-tool.png[Add the {trento} MCP Server as a tool,width=600]
+.Open Web UI - Add the {tr_mcp} as a tool
+image::owui-add-tool.png[Add the {tr_mcp} as a tool,width=600]
 
-===== Enable the {trento} MCP Server for a Model
+===== Enable the {tr_mcp} for a Model
 
 [arabic]
 . Go to *Models*, select *Manage Models*, and open your target model (e.g., `Qwen3:8b`).
-. In the *Tools* or *MCP Servers* section, enable/select `{trento} MCP Server` for this model. This makes the {trento} tools available to any user of that model in Open Web UI.
+. In the *Tools* or *MCP Servers* section, enable/select `{tr_mcp}` for this model. This makes the {trento} tools available to any user of that model in Open Web UI.
 . Verify the integration:
 .. Start a new chat with the enabled model
-.. Confirm that tools from `{trento} MCP Server` are available and can be invoked (for example, try listing SAP systems)
+.. Confirm that tools from `{tr_mcp}` are available and can be invoked (for example, try listing SAP systems)
 
-.Open Web UI - Enable {trento} MCP Server for a model
-image::owui-add-model.png[Enable {trento} MCP Server for model,width=600]
+.Open Web UI - Enable {tr_mcp} for a model
+image::owui-add-model.png[Enable {tr_mcp} for model,width=600]
 
-===== Using the {trento} MCP Server
+===== Using the {tr_mcp}
 
-Once the {trento} MCP Server is configured and enabled for your model, you can start using it to interact with your SAP systems through natural language conversations.
+Once the {tr_mcp} is configured and enabled for your model, you can start using it to interact with your SAP systems through natural language conversations.
 
 [arabic]
 . Navigate to the Open Web UI main screen and select your configured model (e.g., `Qwen3:8b`) from the model selector.
@@ -192,10 +192,10 @@ Once the {trento} MCP Server is configured and enabled for your model, you can s
 .. "Show me all hosts running {sap} applications"
 .. "Get details about the latest check execution results"
 
-The AI model will use the {trento} MCP Server tools to query your {trento} installation and provide detailed, contextual responses about your SAP infrastructure.
+The AI model will use the {tr_mcp} tools to query your {trento} installation and provide detailed, contextual responses about your SAP infrastructure.
 
-.Open Web UI - Using {trento} MCP Server in conversations
-image::example-suseai.png[Using {trento} MCP Server in Open Web UI,width=900]
+.Open Web UI - Using {tr_mcp} in conversations
+image::example-suseai.png[Using {tr_mcp} in Open Web UI,width=900]
 
 ===== Additional Resources
 
