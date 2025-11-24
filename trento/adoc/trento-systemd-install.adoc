@@ -324,12 +324,12 @@ journalctl -fu trento-web
 ----
 
 [[validate-the-health-status-of-trento-web-and-wanda]]
-==== Check the health status of trento web and wanda
+==== Check the health status of {tr_web} and {tr_wanda}
 
-You can check if {trento} web and wanda services function correctly by
+You can check if {tr_web} and {tr_wanda} services function correctly by
 accessing accessing the `+healthz+` and `+readyz+` API.
 
-. Check {trento} web health status using `+curl+`:
+. Check {tr_web} health status using `+curl+`:
 +
 [source,bash]
 ----
