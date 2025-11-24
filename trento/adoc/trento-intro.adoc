@@ -52,7 +52,7 @@ The *{tragent}* is a single background process (`trento-agent`) running on each 
 // 
 // The {trento-mcp} extends {trento} with AI-assisted operations by implementing the open link:https://modelcontextprotocol.io/introduction[Model Context Protocol] (MCP),which is an open standard that allows AI applications to securely connect to external tools and data sources. In the context of {trento}, MCP provides a consistent, secure way for assistants to call {trserver} APIs without manual navigation of the web UI.
 // 
-// {trento} MCP Server, enables to:
+// {tr_mcp}, enables to:
 // 
 // * Ask conversational questions such as "What's the overall health of my SAP environment?" or "Show me all SAP systems with critical status."
 // * Retrieve cluster and host details on demand (for example, "Show configuration for cluster C1" or "List hosts running HANA").
@@ -77,7 +77,7 @@ The *{tragent}* is a single background process (`trento-agent`) running on each 
 // 
 // ==== Using the MCP Server
 // 
-// To get started with the {trento} MCP Server, you need to:
+// To get started with the {tr_mcp}, you need to:
 // 
 // 1. Ensure the MCP Server is deployed and running alongside your {trserver}. Refer to the installation guide for details.
 // 

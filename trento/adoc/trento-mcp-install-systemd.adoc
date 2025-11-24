@@ -38,7 +38,7 @@ Example configuration:
 [source,env]
 ----
 AUTODISCOVERY_PATHS=/api/all/openapi,/wanda/api/all/openapi
-ENABLE_HEALTH_CHECK=true
+ENABLE_HEALTH_CHECK=false
 HEADER_NAME=Authorization
 HEALTH_API_PATH=/api/healthz
 HEALTH_PORT=8080
