@@ -4,12 +4,12 @@ include::product-attributes.adoc[]
 === Configure {tr_mcp}
 :revdate: 2025-10-31
 
-This section provides an overview of how to configure the {trento} MCP Server using command-line parameters, configuration files, and environment variables.
+This section provides an overview of how to configure the {tr_mcp} using command-line parameters, configuration files, and environment variables.
 
 [[sec-trento-mcp-config-sources]]
 ==== Configuration Sources
 
-The {trento} MCP Server supports multiple configuration sources with the following priority order (highest to lowest):
+The {tr_mcp} supports multiple configuration sources with the following priority order (highest to lowest):
 
 1. **Command-line flags** - Override all other settings.
 2. **Environment variables** - Useful for containerized deployments.

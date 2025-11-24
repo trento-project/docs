@@ -34,7 +34,7 @@ Running all the {trserver} components requires a minimum of 4 GB of RAM, two CPU
 
 A production-ready {k8s}-based deployment of {trserver} requires {k8s} knowledge. The Helm chart is intended to be used by customers without in-house {k8s} expertise, or as a way to try {trento} with a minimum of effort. However, Helm chart delivers a basic deployment of the {trserver} with all the components running on a single node of the cluster.
 
-==== {tr_mcp} component(optional)
+==== {tr_mcp} component
 
 The {tr_mcp} is an optional component that enables AI-assisted operations via the link:https://modelcontextprotocol.io/introduction[Model Context Protocol] (MCP). It exposes a single HTTP endpoint that MCP-compatible assistants can use to interact with {trento}.
 
