@@ -32,32 +32,36 @@ cp /etc/trento/mcp-server-trento.example /etc/trento/mcp-server-trento
 vim /etc/trento/mcp-server-trento
 ----
 +
-A typical configuration might look like this:
+
+Example configuration:
 +
 [source,env]
 ----
 AUTODISCOVERY_PATHS=/api/all/openapi,/wanda/api/all/openapi
-ENABLE_HEALTH_CHECK=false
+ENABLE_HEALTH_CHECK=true
 HEADER_NAME=Authorization
 HEALTH_API_PATH=/api/healthz
 HEALTH_PORT=8080
-OAS_PATH=
+# OAS_PATH=http://trento.example.com/api/all/openapi,http://trento.example.com/wanda/api/all/openapi
 PORT=5000
 TAG_FILTER=MCP
 TRANSPORT=streamable
 TRENTO_URL=https://trento.example.com
 VERBOSITY=info
+INSECURE_SKIP_TLS_VERIFY=false
 ----
 
-====== Configure the connection to {trserver}
+[%hardbreaks]
+Configure the MCP Server using either `TRENTO_URL` or `OAS_PATH`.
+If `OAS_PATH` is left empty, the server automatically discovers the APIs from the Trento server using `TRENTO_URL`.
+If `OAS_PATH` is set, it takes precedence and `TRENTO_URL` is ignored.
 
-Configure how the MCP Server connects to your {trserver}. There are two main approaches:
-
-**When to use `TRENTO_URL`**:
+**Use `TRENTO_URL` when:**
 
 * {trserver} is deployed behind a reverse proxy (NGINX, etc.).
-* MCP Server runs on a different host or network than {trserver}.
+* The MCP Server runs on a different host or network than {trserver}.
 * You want to use external or public URLs.
+* You prefer automatic API autodiscovery (recommended for production).
 
 Example:
 
@@ -67,12 +71,10 @@ TRENTO_URL=https://trento.example.com
 PORT=5000
 ----
 
-The `TRENTO_URL` approach is recommended for most production deployments.
+**Use `OAS_PATH` when:**
 
-**When to use `OAS_PATH`**:
-
-* MCP Server runs on the same host as the {tr_web} and Wanda components.
-* You want to connect directly to internal services.
+* The MCP Server runs on the same host as the {tr_web} and Wanda components.
+* You want to connect directly to internal services without autodiscovery.
 * You need to bypass reverse proxy configurations.
 
 Example:
@@ -83,15 +85,10 @@ OAS_PATH=http://localhost:4000/api/all/openapi,http://localhost:4001/wanda/api/a
 PORT=5000
 ----
 
-[NOTE]
-====
-The MCP Server's health check HTTP server is primarily intended for Kubernetes environments, where liveness and readiness probes use it. Outside Kubernetes, you can leave it disabled. If you choose to enable it, set `ENABLE_HEALTH_CHECK=true` and `HEALTH_PORT=8080` and ensure the port is accessible.
-====
-
 ====== Start the {tr_mcp} service
 
-. Enable and start the MCP Server service:
-+
+Enable and start the MCP Server service:
+
 [source,bash]
 ----
 systemctl enable --now mcp-server-trento

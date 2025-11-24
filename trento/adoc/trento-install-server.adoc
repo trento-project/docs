@@ -9,7 +9,7 @@ The {trserver}, is a core component which can be deployed in several ways depend
 Supported installation methods: 
 
 * <<sec-trento-k8s-deployment,{k8s} deployment>>
-* <<sec-systemd-deployment, systemd MCP deployment >>
+* <<sec-systemd-deployment, systemd RPM deployment >>
 
 Unsupported installation methods: 
 
