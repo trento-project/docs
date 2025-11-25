@@ -89,7 +89,7 @@ scrape_configs:
         url: http://localhost:4000/api/prometheus/targets
 ----
 +
-Note: the value of the url parameter above assumes that the {trweb} service is running in the same host as {prometheus} Server.
+Note: the value of the `url` parameter above assumes that the {trweb} service is running in the same host as {prometheus} Server.
 
 . Enable and start the {prometheus} service:
 +
