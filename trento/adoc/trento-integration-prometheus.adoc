@@ -8,7 +8,7 @@ include::product-attributes.adoc[]
 
 The `node-exporter` must be installed and running in the agent hosts and {prometheus} Server must be able to reach the agent hosts at the IP address and port that the `node-exporter` is bound to.
 
-The user can customize the IP address and port that {prometheus} Server uses to reach the `node-exporter` by setting parameter `node-exporter-target` with value `<ip_address>:<port>` in the agent configuration file.
+The IP address and port that {prometheus} Server uses to reach the `node-exporter` can be changed by setting parameter `node-exporter-target` with value `<ip_address>:<port>` in the agent configuration file.
 
 If the parameter is not set, {prometheus} Server will use the lowest ipv4 address discovered in the host with default port 9100.
 
