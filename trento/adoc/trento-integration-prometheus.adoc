@@ -16,7 +16,7 @@ If the parameter is not set, {prometheus} Server uses the lowest IPv4 address di
 
 When using the {helm} chart to deploy {trserver} on a {kube} cluster, an image of {prometheus} Server is deployed automatically. No further actions are required by the user, other than ensuring that it can reach the `node-exporter` in the agent hosts.
 
-In a {kube} cluster with multiple nodes, the user can select on which node to deploy {prometheus} Server by adding the following flag to the {helm} installation command:
+In a {kube} cluster with multiple nodes, the user can select on which node to deploy the {prometheus} Server by adding the following flag to the {helm} installation command:
 
 [source,bash]
 ----
