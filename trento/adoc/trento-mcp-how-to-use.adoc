@@ -2,18 +2,10 @@ include::product-attributes.adoc[]
 
 [[sec-trento-mcp-how-to-use]]
 :revdate: 2025-10-31
-=== Using the {tr_mcp}
+=== Using the {tr_mcp} with an {mcp_host}
 
-The {tr_mcp} enables AI-assisted operations by implementing the link:https://modelcontextprotocol.io/introduction[Model Context Protocol] (MCP). This allows MCP-compatible assistants to connect to {trento} and perform monitoring and troubleshooting tasks using natural language.
+The {tr_mcp} enables AI-assisted operation, this allows MCP-compatible assistants to connect to {trento} and perform monitoring and troubleshooting tasks using natural language.
 
-This section provides comprehensive documentation for deploying and using the {tr_mcp}:
-
-* <<sec-trento-mcp-install>> - Complete installation guide covering all deployment methods
-* <<sec-trento-mcp-config>> - Detailed configuration options and examples
-
-Integration guides for different MCP hosts and environments:
-
-
-include::trento-mcp-sles.adoc[]
-include::trento-mcp-suse-ai.adoc[]
-include::trento-mcp-others.adoc[]
+include::trento-mcp-host-sles.adoc[]
+// include::trento-mcp-host-others.adoc[]
+// include::trento-mcp-suse-ai.adoc[]

@@ -1,8 +1,8 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-mcp-others]]
-==== Integrating the {tr_mcp} with other MCP Hosts
-:revdate: 2025-10-31
+==== Integrating the {tr_mcp} with other {mcp_host}
+:revdate: 2025-11-25
 
 The {tr_mcp} can be integrated with any client application that supports the Model Context Protocol (MCP). This allows you to interact with the {trento} API and execute tools defined in the OpenAPI specification through your preferred AI assistant or development tool.
 
@@ -14,7 +14,7 @@ Before configuring your MCP Host, ensure you have:
 
 . *A running {trserver} installation* with the {tr_mcp} component enabled:
 ** Follow the <<sec-trento-installing-trentoserver>> to deploy {trserver} and enable the {tr_mcp}.
-** Note the {tr_mcp} endpoint URL (e.g., `https://trento.example.com/mcp-server-trento/mcp`).
+** Note the {tr_mcp} endpoint URL (e.g., `{tr_mcp_url_https}`).
 
 . *A {trento} API token (Personal Access Token)*:
 ** Log in to your {trento} web interface with your username and password.
@@ -48,7 +48,7 @@ This option is supported by most MCP Hosts, including VS Code. Check your MCP Ho
   "servers": {
     "trento": {
       "type": "http",
-      "url": "https://trento.example.com/mcp-server-trento/mcp",
+      "url": "{https://trento.example.com/mcp-server-trento/mcp}",
       "headers": {
         "Authorization": "${input:trento-api-key}"
       }
@@ -73,7 +73,7 @@ For MCP Hosts that don't support prompted input, or for testing purposes, you ca
 ====
 When using this option, ensure your configuration file has appropriate permissions and is not committed to version control systems.
 ====
-
+// if {tr_mcp_url_https} changes, update url too
 [source,json]
 ----
 {
@@ -91,7 +91,7 @@ When using this option, ensure your configuration file has appropriate permissio
 
 [NOTE]
 ====
-Replace `https://trento.example.com/mcp-server-trento/mcp` with your actual {tr_mcp} endpoint URL from your installation.
+Replace `{tr_mcp_url_https}` with your actual {tr_mcp} endpoint URL from your installation.
 ====
 
 ====== Client-Specific Notes
@@ -102,8 +102,8 @@ Replace `https://trento.example.com/mcp-server-trento/mcp` with your actual {tr_
 
 ====== General Configuration Notes
 
-* Replace `https://trento.example.com/mcp-server-trento/mcp` with the actual URL where your {tr_mcp} is accessible:
-  ** For Kubernetes deployments with ingress, use the ingress URL (e.g., `https://trento.example.com/mcp-server-trento/mcp`).
+* Replace `{tr_mcp_url_https}` with the actual URL where your {tr_mcp} is accessible:
+  ** For Kubernetes deployments with ingress, use the ingress URL (e.g., `{tr_mcp_url_https}`).
   ** For local or development setups, use `http://localhost:5000/mcp` (adjust the port as needed).
   ** If using Server-Sent Events (SSE) transport instead of the default streamable transport, change the path from `/mcp` to `/sse` - The transport type is configured on the {tr_mcp} using the `TRANSPORT` configuration key or `--transport` flag (see <<sec-trento-mcp-config>>).
 
@@ -175,8 +175,4 @@ VS Code lets you register external MCP servers and make their tools available to
 .Visual Studio Code with GitHub Copilot using {tr_mcp}
 image::example-copilot.png[VS Code Copilot using {tr_mcp},width=900]
 
-===== Additional Resources
 
-* <<sec-trento-installing-trentoserver>> - For deploying and configuring the MCP Server.
-* <<sec-trento-mcp-config>> - For detailed MCP Server configuration reference.
-* https://modelcontextprotocol.io[Model Context Protocol Documentation] - For general MCP information and client compatibility.
