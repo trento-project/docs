@@ -1,5 +1,6 @@
 :trento: Trento
 :trserver: Trento Server
+:tr_mcp: Trento MCP Server
 
 [[sec-container-deployment]]
 === Containerized deployment

@@ -2,19 +2,23 @@
 // This file can be edited downstream
 
 // PRODUCT NAME AND VERSIONS
-:productname:        PRODUCT
-:productnameshort:   ACRONYM
-:productnumber:      X.Y
-:trento:             Trento
-:tragent:            Trento Agent
-:trserver:           Trento Server
-:web:                Web
-:tr_web:             Trento {web}
-:wanda:              Wanda
-:tr_wanda:           Trento {wanda}
-:mcp:                MCP Server
-:tr_mcp:             Trento {mcp}
-:rancher_k8s_engine: Rancher Kubernetes Engine
+:productname:         PRODUCT
+:productnameshort:    ACRONYM
+:productnumber:       X.Y
+:trento:              Trento
+:tragent:             Trento Agent
+:trserver:            Trento Server
+:web:                 Web
+:tr_web:              Trento {web}
+:wanda:               Wanda
+:tr_wanda:            Trento {wanda}
+:mcp:                 MCP Server
+:tr_mcp:              Trento {mcp}
+:rancher_k8s_engine:  Rancher Kubernetes Engine
+:tr_server_url:       trento.example.com
+:tr_server_url_https: https://trento.example.com
+:tr_mcp_url_https:    https://trento.example.com/mcp-server-trento/mcp
+:mcp_host:            MCPHost
 
 // PROJECT REPOSITORY URL
 :repo-url:          https://github.com/SUSE/doc-[PRODUCT]
