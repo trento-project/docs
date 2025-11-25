@@ -1,0 +1,120 @@
+include::product-attributes.adoc[]
+
+== {prometheus} integration
+
+{prometheus} Server is a {trserver} component responsible for pulling  the Memory and CPU utilization metrics collected by the `node-exporter` in the agent hosts and serving them to the web component. The web component renders the metrics as dynamic graphical charts in the details view of the registered hosts.
+
+=== Requirements
+
+The `node-exporter` must be installed and running in the agent hosts and {prometheus} Server must be able to reach the agent hosts at the IP address and port that the `node-exporter` is bound to.
+
+The IP address and port that {prometheus} Server uses to reach the `node-exporter` can be changed by setting parameter `node-exporter-target` with value `<ip_address>:<port>` in the agent configuration file.
+
+If the parameter is not set, {prometheus} Server uses the lowest IPv4 address discovered in the host with default port 9100.
+
+=== {kube} deployment
+
+When using the {helm} chart to deploy {trserver} on a {kube} cluster, an image of {prometheus} Server is deployed automatically. No further actions are required by the user, other than ensuring that it can reach the `node-exporter` in the agent hosts.
+
+In a {kube} cluster with multiple nodes, the user can select on which node to deploy the {prometheus} Server by adding the following flag to the {helm} installation command:
+
+[source,bash]
+----
+--set prometheus.server.nodeSelector.LABEL=<value>
+----
+
+Where `<value>` is the label assigned to the node where the user wants {prometheus} Server to be deployed.
+
+=== {systemd} deployment
+
+In a {systemd} deployment of {trserver}, you can choose between using an existing installation of {prometheus} Server, installing a dedicated {prometheus} Server instance, or not using {prometheus} Server at all.
+
+==== Use an existing installation
+
+If you already have an existing {prometheus} Server that you want to use with {trserver}, you must set `CHARTS_ENABLED=true` and `PROMETHEUS_URL` pointing to the right address and port in the {trweb} configuration file. You must restart restart the {trweb} service to enable the changes.
+
+The lowest required {prometheus} Server version is 2.28.0.
+
+Use the section Install {prometheus} on {sles4sap} 16.0 as a reference to adjust the {prometheus} Server configuration.
+
+==== Install {prometheus} Server from {ph} on {sles4sap} 15.x
+
+{ph} packages are tested by {suse} but are not officially supported as part of the {sles4sap} base product. Users should assess the suitability of these packages based on their own risk tolerance and support needs.
+
+Enable the {ph} repository (replace `15.x` with the version of your operating system, for example 15.7):
+
+[source,bash]
+----
+SUSEConnect --product PackageHub/15.x/x86_64
+zypper refresh
+----
+
+Now proceed with the same steps as in Install {prometheus} on {sles4sap} 16.0.
+
+==== Install {prometheus} on {sles4sap} 16.0
+
+. Create the {prometheus} user and group:
++
+[source,bash]
+----
+groupadd --system prometheus
+useradd -s /sbin/nologin --system -g prometheus prometheus
+----
+
+. Install {prometheus} using {zypper}:
++
+[source,bash]
+----
+zypper in golang-github-prometheus-prometheus
+----
+
+. Configure {prometheus} for {trento} by replacing or updating the existing configuration at `/etc/prometheus/prometheus.yml` with:
++
+[source,yaml]
+----
+global:
+  scrape_interval: 30s
+  evaluation_interval: 10s
+
+scrape_configs:
+  - job_name: "http_sd_hosts"
+    honor_timestamps: true
+    scrape_interval: 30s
+    scrape_timeout: 30s
+    scheme: http
+    follow_redirects: true
+    http_sd_configs:
+      - follow_redirects: true
+        refresh_interval: 1m
+        url: http://localhost:4000/api/prometheus/targets
+----
++
+Note: the value of the `url` parameter above assumes that the {trweb} service is running in the same host as {prometheus} Server.
+
+. Enable and start the {prometheus} service:
++
+[source,bash]
+----
+systemctl enable --now prometheus
+----
+
+. If {firewalld} is running, allow {prometheus} to be accessible and add an exception to {firewalld}:
++
+[source,bash]
+----
+firewall-cmd --zone=public --add-port=9090/tcp --permanent
+firewall-cmd --reload
+----
+
+. Set `CHARTS_ENABLED=true` and `PROMETHEUS_URL=http://localhost:9090` in the {trweb} configuration file and restart the {trweb} service.
++
+[source,bash]
+----
+systemctl restart trento-web
+----
++
+Note: the value of the `PROMETHEUS_URL` parameter above assumes that the {trweb} service is running in the same host as {prometheus} Server.
+
+==== Not using {prometheus} Server
+
+If you decide not to use {prometheus} Server in your {trento} installation, you must disable graphical charts in the UI by setting `CHARTS_ENABLED=false` in the {trweb} configuration file.
