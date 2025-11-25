@@ -27,7 +27,7 @@ Where `<value>` is the label assigned to the node where the user wants {promethe
 
 === {systemd} deployment
 
-In a {systemd} deployment of {trserver} you can choose between using an existing installation of {prometheus} Server, installing a dedicated {prometheus} Server instance or not using {prometheus} Server at all.
+In a {systemd} deployment of {trserver}, you can choose between using an existing installation of {prometheus} Server, installing a dedicated {prometheus} Server instance, or not using {prometheus} Server at all.
 
 ==== Use an existing installation
 
