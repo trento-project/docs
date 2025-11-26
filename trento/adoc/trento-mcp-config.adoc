@@ -99,7 +99,7 @@ The `mcp-server-trento` binary accepts several command-line flags to configure i
 Basic usage with custom port, verbosity, and target URL:
 [source,console]
 ----
-mcp-server-trento --port 9000 --verbosity debug --trento-url {tr_server_url_https}
+mcp-server-trento --port 9000 --verbosity debug --trento-url https://trento.example.com
 ----
 
 [para]
@@ -113,7 +113,7 @@ mcp-server-trento --oas-path https://api1.example.com/openapi.json --oas-path ht
 Autodiscovery with custom paths:
 [source,console]
 ----
-mcp-server-trento --trento-url {tr_server_url_https}--autodiscovery-paths /api/v1/openapi,/wanda/api/v1/openapi
+mcp-server-trento --trento-url https://trento.example.com --autodiscovery-paths /api/v1/openapi,/wanda/api/v1/openapi
 ----
 
 [para]
