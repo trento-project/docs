@@ -10,120 +10,12 @@ This guide explains how to integrate the {tr_mcp} with {suseai}, including confi
 
 {suseai} is a platform that allows you to deploy and manage AI models and applications in a {kube} environment. It provides tools for model management, deployment, and integration with various AI frameworks.
 
-Refer to the official https://documentation.suse.com/suse-ai/1.0/[{suseai} documentation] for detailed information. This guide focuses on deploying the {tr_mcp} with {suseai}, specifically using Ollama and Open Web UI. Always refer to the latest instructions in the https://documentation.suse.com/suse-ai/1.0/html/AI-deployment-intro/index.html[{suseai} deployment guide] for the most accurate and up-to-date information.
-
-===== Prerequisites
-
-This guide assumes:
-
-* A {kube} cluster set up and running (with an ingress controller and cert-manager installed).
-* Access to the {suse} Application Collection.
-
-When running Ollama models, this guide assumes you have one of the following:
-
-* A {kube} cluster with sufficient resources (GPU, memory, etc.).
-* A cloud provider and enough permissions to deploy Ollama models remotely.
-
-===== Limitations
-
-Deploying the entire {suseai} stack requires significant resources, especially for running Ollama models. Alternatively, you can deploy only Open Web UI and connect it to an Ollama instance running elsewhere. This guide uses this approach: on-premises Open Web UI with Ollama running on a remote server (e.g., Google Cloud).
-
-===== Getting the Artifacts from SUSE Application Collection
-
-You need access to the SUSE Application Collection and proper entitlements to download the required artifacts. Always refer to the https://docs.apps.rancher.io/get-started/authentication/[SUSE Application Collection documentation] for the latest instructions on authentication and access. This guide assumes you have the necessary credentials and permissions.
-
-[NOTE]
-====
+Refer to the official https://documentation.suse.com/suse-ai/1.0/[{suseai} documentation] for detailed information. Always refer to the latest instructions in the https://documentation.suse.com/suse-ai/1.0/html/AI-deployment-intro/index.html[{suseai} deployment guide] for the most accurate and up-to-date information.
 To run the entire stack, you can also use the https://github.com/SUSE/suse-ai-deployer[{suseai} Deployer Helm Chart].
-====
-
-[arabic]
-. Log in to the {suse} Application Collection:
-+
-[source,console]
-----
-# Replace placeholders with your actual credentials
-helm registry login dp.apps.rancher.io/charts -u <REPLACE_WITH_YOUR_USERNAME@apps.rancher.io> -p <REPLACE_WITH_YOUR_PASSWORD>
-----
-
-. Create a namespace for {suseai}:
-+
-[source,console]
-----
-kubectl create namespace suse-ai
-----
-
-. Create a {kube} Pull Secret (`application-collection`) for the {suse} Application Collection:
-
-+
-[source,console]
-----
-# Replace placeholders with your actual credentials
-kubectl create -n suse-ai secret docker-registry application-collection \
-  --docker-server=dp.apps.rancher.io \
-  --docker-username=<REPLACE_WITH_YOUR_USERNAME@apps.rancher.io> \
-  --docker-password=<REPLACE_WITH_YOUR_PASSWORD>
-----
 
 ===== Install Open Web UI
 
-This section describes how to install the Open Web UI, which provides a user-friendly interface for interacting with AI models.
-
-[arabic]
-. Create a link:https://github.com/trento-project/mcp-server/blob/main/docs/examples/values.openwebui.yaml[values.openwebui.yaml] file with the values for Open Web UI.
-
-[arabic]
-. Install Open Web UI using Helm with the values file (`values.openwebui.yaml`) created above:
-+
-[NOTE]
-====
-You must have `cert-manager` properly installed, and an ingress controller is required. If you don't have an ingress controller, you may need to adjust the {kube} services configuration.
-====
-+
-
-[source,console]
-----
-helm -n suse-ai upgrade --install open-webui oci://dp.apps.rancher.io/charts/open-webui -f values.openwebui.yaml
-----
-
-===== Deploying a Model with Ollama Remotely
-
-If your infrastructure does not have sufficient resources to run Ollama models, you can deploy them on a remote server, such as Google Cloud Run.
-
-This section describes how to deploy the https://ollama.com/library/qwen3:8b[`Qwen3:8b`] model using Ollama on Google Cloud Run. This guide assumes you have a Google Cloud account and the necessary permissions to deploy applications on Google Cloud Run.
-
-[NOTE]
-====
-Always refer to the https://cloud.google.com/run/docs/tutorials/gpu-gemma-with-ollama[official Google Cloud documentation] for the most accurate and up-to-date information.
-====
-
-[arabic]
-. Create a link:https://github.com/trento-project/mcp-server/blob/main/docs/examples/Dockerfile[Dockerfile] for the Ollama model.
-
-[arabic]
-. In the same directory as the `Dockerfile`, run the following command to build the Docker image:
-
-[source,console]
-----
-gcloud run deploy qwen3-8b --source . --concurrency 4 --cpu 8 --set-env-vars OLLAMA_NUM_PARALLEL=4 --gpu 1 --gpu-type nvidia-l4 --max-instances 1 --memory 32Gi --no-allow-unauthenticated --no-cpu-throttling --no-gpu-zonal-redundancy --timeout=600
-----
-
-+
-[NOTE]
-====
-To make requests, you need to either allow unauthenticated requests or use a service account with the necessary permissions. Refer to the https://cloud.google.com/run/docs/authenticating/service-to-service[Google Cloud Run documentation] for information on setting up service accounts and permissions.
-====
-+
-After deployment, you will have a Google Cloud Run service running the `Qwen3:8b` model, accessible via a URL provided by Google Cloud Run (e.g., `https://qwen3-8b-<project-id>.<region>.run.app`).
-
-===== Adding the Remote Model to Open Web UI
-
-Once you have the Ollama model running on Google Cloud Run, you can add it to Open Web UI for easy access.
-
-[arabic]
-. Navigate to the Open Web UI settings page (e.g., `suse-ai.example.com/admin/settings`) and go to the *Connections* section.
-. Add a new Ollama connection with the URL of your deployed model (e.g., `https://qwen3-8b-<project-id>.<region>.run.app`).
-. Navigate to the *Models* section, click *Manage Models*, select the Ollama connection you just created, and pull the `Qwen3:8b` model.
+Refer to the official https://documentation.suse.com/suse-ai/1.0/html/openwebui-using/index.html[Open Web UI documentation]
 
 ===== Deploying the {tr_mcp}
 
@@ -131,7 +23,11 @@ To deploy the {tr_mcp} in your {suseai} cluster, install it via the {trento} Ser
 
 For chart sources and values, see the link:https://github.com/trento-project/helm-charts[{trento} helm-charts repository].
 
-Once {trento} is installed, ensure you have created a *{trento} API token (Personal Access Token)*:
+===== Add {tr_mcp} to Open Web UI
+
+Open Web UI includes native support for the Model Context Protocol (MCP). With this integration, Open Web UI connects to MCP servers from the backend, allowing you to safely use an internal {kube} Service DNS name without exposing the service publicly.
+
+======  Created a Personal Access Token
 
 ** Log in to your {trento} web interface with your username and password.
 ** Click on your username in the top-right corner and select *Profile*.
@@ -140,18 +36,12 @@ Once {trento} is installed, ensure you have created a *{trento} API token (Perso
 ** Enter a descriptive name for the token (e.g., "MCP Client").
 ** Optionally configure an expiration date for the token, or select *Never Expires*.
 ** Click *Generate Token*.
-** *Important:* Copy the generated token immediately and store it securely - it will not be shown again.
+** *Important:* Copy the generated token immediately and store it securely — it will not be shown again.
 
 .Generate a Personal Access Token in {trento}
 image::generate-pat.png[Generate a Personal Access Token in {trento},width=800]
 
-===== Adding the {tr_mcp} to Open Web UI
-
-Open Web UI includes native support for the Model Context Protocol (MCP). With this integration, Open Web UI connects to MCP servers from the backend, allowing you to safely use an internal {kube} Service DNS name without exposing the service publicly.
-
-Refer to the official Open Web UI MCP feature guide for screenshots and advanced options: https://docs.openwebui.com/features/mcp[Open Web UI with MCP].
-
-===== Add the {tr_mcp} in Open Web UI
+====== Enable {tr_mcp} in Open Web UI
 
 [arabic]
 . Open *Admin Settings* and go to *External Tools*.
@@ -162,43 +52,19 @@ Refer to the official Open Web UI MCP feature guide for screenshots and advanced
 .. *Auth*: `<TOKEN>` (the token you generated in the {trento} console)
 . Click *Save*.
 
-.Open Web UI - Add the {tr_mcp} as a tool
+.Open Web UI — Add the {tr_mcp} as a tool
 image::owui-add-tool.png[Add the {tr_mcp} as a tool,width=600]
 
 ===== Enable the {tr_mcp} for a Model
 
 [arabic]
-. Go to *Models*, select *Manage Models*, and open your target model (e.g., `Qwen3:8b`).
+. Go to *Models*, select *Manage Models*, and open your target model.
 . In the *Tools* or *MCP Servers* section, enable/select `{tr_mcp}` for this model. This makes the {trento} tools available to any user of that model in Open Web UI.
 . Verify the integration:
 .. Start a new chat with the enabled model
 .. Confirm that tools from `{tr_mcp}` are available and can be invoked (for example, try listing SAP systems)
 
-.Open Web UI - Enable {tr_mcp} for a model
+.Open Web UI — Enable {tr_mcp} for a model
 image::owui-add-model.png[Enable {tr_mcp} for model,width=600]
 
-===== Using the {tr_mcp}
-
-Once the {tr_mcp} is configured and enabled for your model, you can start using it to interact with your SAP systems through natural language conversations.
-
-[arabic]
-. Navigate to the Open Web UI main screen and select your configured model (e.g., `Qwen3:8b`) from the model selector.
-. Start a new chat session with the model.
-. Ask questions about your SAP landscape using natural language:
-.. "List all {sap} systems in my environment"
-.. "Show me the health status of my HANA clusters"
-.. "Are there any critical alerts I need to address?"
-.. "What {sap} systems are currently running?"
-.. "Show me all hosts running {sap} applications"
-.. "Get details about the latest check execution results"
-
 The AI model will use the {tr_mcp} tools to query your {trento} installation and provide detailed, contextual responses about your SAP infrastructure.
-
-.Open Web UI - Using {tr_mcp} in conversations
-image::example-suseai.png[Using {tr_mcp} in Open Web UI,width=900]
-
-===== Additional Resources
-
-* <<sec-trento-installing-trentoserver>> - For deploying and configuring the MCP Server.
-* <<sec-trento-mcp-config>> - For detailed MCP Server configuration reference.
-* https://modelcontextprotocol.io[Model Context Protocol Documentation] - For general MCP information and client compatibility.

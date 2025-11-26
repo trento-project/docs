@@ -14,7 +14,6 @@
 :tr_wanda:            Trento {wanda}
 :mcp:                 MCP Server
 :tr_mcp:              Trento {mcp}
-:rancher_k8s_engine:  Rancher Kubernetes Engine
 :tr_server_url:       trento.example.com
 :tr_server_url_https: https://trento.example.com
 :tr_mcp_url_https:    https://trento.example.com/mcp-server-trento/mcp
