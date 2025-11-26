@@ -4,8 +4,9 @@ include::product-attributes.adoc[]
 :revdate: 2025-10-31
 === Using the {tr_mcp} with an {mcp_host}
 
-The {tr_mcp} enables AI-assisted operation, this allows MCP-compatible assistants to connect to {trento} and perform monitoring and troubleshooting tasks using natural language.
+The {tr_mcp} enables AI-assisted operation, this allows MCP-compatible assistants to connect to {trento} and perform monitoring and troubleshooting tasks using natural language. See <<sec-trento-mcp-sles,{mcp_host} on SLES>> or <<sec-trento-mcp-others,Using alternative {mcp_host} clients>> for details.
+
 
 include::trento-mcp-host-sles.adoc[]
-// include::trento-mcp-host-others.adoc[]
+include::trento-mcp-host-others.adoc[]
 // include::trento-mcp-suse-ai.adoc[]
