@@ -1,0 +1,14 @@
+include::../product-attributes.adoc[]
+
+===== Prerequisites
+
+To configure your MCP Host, ensure you have:
+
+* An LLM provider and credentials.
+** Public hosted options, such as Google Gemini, OpenAI, etc.
+** Private/on-premises option, such as {suseai}.
+* *A running {trserver} installation* with the {tr_mcp} component enabled.
+* *A {trento} Personal Access Token* generated in {tr_web} Profile view.
++
+.Generate a Personal Access Token in {trento}
+image::generate-pat.png[Generate a Personal Access Token in {trento},width=800]
