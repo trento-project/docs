@@ -32,7 +32,7 @@ image::trento-high-level-architecture.png[width=80%]
 
 === {trserver}
 
-The {trserver} is an independent, distributed system designed to run on a {k8s} cluster or as a regular systemd stack. It provides both a Web front-end for user interaction and backend APIs for automation and integration with components such as the {tr_mcp}. Together with the optional link:https://modelcontextprotocol.io/docs/getting-started/intro[{tr_mcp}], it enables secure, AI-assisted operations by exposing {trserver} APIs for natural-language interactions with tools like Copilot, Claude, and {suseai}.
+The {trserver} is an independent, distributed system designed to run on a {k8s} cluster or as a regular systemd stack. It provides both a Web front-end for user interaction and backend APIs for automation and integration with components such as the {tr_mcp}. Together with the optional link:https://modelcontextprotocol.io/docs/getting-started/intro[{tr_mcp}], it enables secure, AI-assisted operations by exposing {trserver} APIs for natural-language interactions with tools like {mcp_host}, Copilot, Claude, and {suseai}.
 
 The {trserver} consists of the following components:
 
