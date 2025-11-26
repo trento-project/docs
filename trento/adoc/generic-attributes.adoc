@@ -65,6 +65,7 @@ include::product-attributes.adoc[]
 :rancherprime:               {suse} Rancher Prime
 :rancher:                    {rancherprime}
 :ranchelemental:             {rancherprime}: OS Manager
+:rancher_k8s_engine:         Rancher Kubernetes Engine
 :ailibrary:                  AI Library
 :suseaisuite:                {suse} AI Suite
 :suseai:                     {suse} AI
