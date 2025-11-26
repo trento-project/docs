@@ -1,7 +1,7 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-mcp-config]]
-=== Configure {tr_mcp} with the command-line
+=== Configure {tr_mcp}
 :revdate: 2025-11-24
 
 This section provides an overview of how to configure the {tr_mcp} using command-line parameters, environmental variables and configuration files.
@@ -337,5 +337,4 @@ If you continue to experience issues:
 . Check the {tr_mcp} logs for detailed error messages
 . Verify all configuration values using `mcp-server-trento --help`
 . Test API connectivity directly using curl or similar tools
-. Review the <<sec-trento-mcp-config-examples>> for correct configuration patterns
 . Check the {trento} server logs for API authentication and access issues
