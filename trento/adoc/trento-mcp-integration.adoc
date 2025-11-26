@@ -4,7 +4,7 @@ include::product-attributes.adoc[]
 [[sec-trento-mcp-integration]]
 :revdate: 2025-10-31
 
-== Integration with Trento Server MCP 
+== Integration with {tr_mcp}
 
 The {tr_mcp}, is an optional component, which provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the link:https://modelcontextprotocol.io/introduction[Model Context Protocol] (MCP). The core {trserver} functionality works independently without it, but the {tr_mcp} component enable the option to handle common monitoring and troubleshooting tasks by using natural language.
 

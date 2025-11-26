@@ -13,12 +13,12 @@ Supported installation methods:
 * <<sec-trento-mcp-server-k8s,{k8s} deployment>>
 * <<sec-trento-mcp-server-systemd, systemd MCP deployment >>
 
-==== Prerequisites MCP Server
+==== Prerequisites {tr_mcp}
 
-Before installing the {tr_mcp}, both {tr_web} and {tr_wanda} components must be running and be accessible for the MCP Server
+Before installing the {tr_mcp}, both {tr_web} and {tr_wanda} components must be running and be accessible for the {tr_mcp}
 to function properly.
 
-* Network connectivity between the MCP Server and {trserver} components.
+* Network connectivity between the {tr_mcp} and {trserver} components.
 * Access to the {trserver} URL (important when deployed behind NGINX).
 
 include::trento-mcp-install-kubernetes.adoc[]
