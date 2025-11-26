@@ -43,7 +43,7 @@ The `mcp-server-trento` binary accepts several command-line flags to configure i
 |`--header-name, -H`
 |`TRENTO_MCP_HEADER_NAME`
 |`Authorization`
-|Header name used to pass the Trento API key to the MCP server.
+|Header name used to pass the {trento} API key to the {tr_mcp}.
 
 |`--health-api-path, -a`
 |`TRENTO_MCP_HEALTH_API_PATH`
@@ -68,7 +68,7 @@ The `mcp-server-trento` binary accepts several command-line flags to configure i
 |`--port, -p`
 |`TRENTO_MCP_PORT`
 |`5000`
-|Port where the MCP server runs.
+|Port where the {tr_mcp} runs.
 
 |`--tag-filter, -f`
 |`TRENTO_MCP_TAG_FILTER`
@@ -83,7 +83,7 @@ The `mcp-server-trento` binary accepts several command-line flags to configure i
 |`--trento-url, -u`
 |`TRENTO_MCP_TRENTO_URL`
 |(empty)
-|Target Trento server URL. Required for autodiscovery if OAS path is not set.
+|Target {trento} server URL. Required for autodiscovery if OAS path is not set.
 
 |`--verbosity, -v`
 |`TRENTO_MCP_VERBOSITY`
@@ -186,8 +186,8 @@ The health check server provides the following endpoints:
 
 The readiness endpoint performs comprehensive health checks, including:
 
-* `mcp-server` - Validates MCP server connectivity using an MCP client.
-* `api-server` - Verifies connectivity to the configured Trento API server.
+* `mcp-server` - Validates {tr_mcp} connectivity using an MCP client.
+* `api-server` - Verifies connectivity to the configured {trento} API server.
 
 ===== Enable Health Checks with the command-line
 
@@ -266,15 +266,15 @@ This section provides solutions for common issues when deploying and using the {
 
 ===== Connection Issues
 
-* **MCP Server cannot connect to {trento} API**
+* **{tr_mcp} cannot connect to {trento} API**
 ** Verify the `TRENTO_URL` or `OAS_PATH` configuration points to accessible endpoints
-** Check network connectivity between the MCP Server and {trento} components
+** Check network connectivity between the {tr_mcp} and {trento} components
 ** Ensure API authentication is properly configured with valid tokens
 
-* **MCP clients cannot connect to MCP Server**
-** Verify the MCP Server is running and listening on the correct port (default: 5000)
-** Check firewall rules allow access to the MCP Server port
-** Ensure the MCP endpoint URL is correctly configured in client applications
+* **MCP clients cannot connect to {tr_mcp}**
+** Verify the {tr_mcp} is running and listening on the correct port (default: 5000)
+** Check firewall rules allow access to the {tr_mcp} port
+** Ensure the {tr_mcp} endpoint URL is correctly configured in client applications
 
 ===== Authentication Issues
 
@@ -291,23 +291,23 @@ This section provides solutions for common issues when deploying and using the {
 
 * **OpenAPI specification not found**
 ** Check that `TRENTO_URL` or `OAS_PATH` point to valid {trento} API endpoints
-** Verify the {trento} Web and Wanda services are running and accessible
+** Verify the {tr_web} and {tr_wanda} services are running and accessible
 ** Ensure autodiscovery paths are correct if using `TRENTO_URL`
 
 * **Tools not appearing in MCP clients**
 ** Check the `TAG_FILTER` configuration - only operations with matching tags are exposed
 ** Verify the OpenAPI specifications are accessible and valid
-** Ensure the MCP Server can parse the API documentation
+** Ensure the {tr_mcp} can parse the API documentation
 
 ===== Performance Issues
 
 * **Slow response times**
-** Check network latency between MCP Server and {trento} components
+** Check network latency between {tr_mcp} and {trento} components
 ** Review {trento} API performance and database query times
 ** Consider enabling debug logging to identify bottlenecks
 
 * **High resource usage**
-** Monitor MCP Server memory and CPU usage
+** Monitor {tr_mcp} memory and CPU usage
 ** Check for memory leaks in long-running processes
 ** Consider adjusting logging verbosity to reduce I/O overhead
 
@@ -315,14 +315,14 @@ This section provides solutions for common issues when deploying and using the {
 
 * **Health checks failing**
 ** Verify health check endpoints are accessible
-** Check that all required services ({trento} API, MCP server) are responding
+** Check that all required services ({trento} API, {tr_mcp}) are responding
 ** Review health check configuration and timeouts
 
 ===== Logging and Debugging
 
 * **Enable debug logging**
 ** Set `VERBOSITY=debug` to get detailed logs
-** Check MCP Server logs for error messages and connection attempts
+** Check {tr_mcp} logs for error messages and connection attempts
 ** Review {trento} component logs for API-related issues
 
 * **Common log messages**

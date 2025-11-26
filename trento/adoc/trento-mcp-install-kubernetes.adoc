@@ -2,14 +2,14 @@ include::product-attributes.adoc[]
 
 
 [[sec-trento-mcp-server-k8s]]
-==== Kubernetes MCP deployment
+==== {k8s} {tr_mcp} deployment
 :revdate: 2025-11-17
 
 include::partials/kubernetes-placeholders.adoc[]
 
-===== Enabling the MCP Server
+===== Enable the {tr_mcp}
 
-When installing the complete {trserver} using Helm, the MCP Server is disabled by default. Enable it by passing `--set trento-mcp-server.enabled=true`:
+When installing the complete {trserver} using {helm}, the {tr_mcp} is disabled by default. Enable it by passing `--set trento-mcp-server.enabled=true`:
 
 ====
 [source,bash]
@@ -23,7 +23,7 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 
 [NOTE]
 ====
-The examples in this guide do not specify a Kubernetes namespace for simplicity. By default, Helm will install to the `default` namespace. 
+The examples in this guide do not specify a Kubernetes namespace for simplicity. By default, {helm} will install to the `default` namespace. 
 
 For production deployments, create and use a dedicated namespace.
 
@@ -38,11 +38,11 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 ----
 ====
 
-The MCP Server will automatically connect to the {tr_web} and Wanda internal services within the {k8s} cluster.
+The {tr_mcp} will automatically connect to the {tr_web} and {tr_wanda} internal services within the {k8s} cluster.
 
-===== Verifying the MCP Server Installation
+===== Verify the {tr_mcp} installation
 
-. Check that the MCP Server Pod is running:
+. Check that the {tr_mcp} Pod is running:
 +
 [source,bash]
 ----
@@ -64,7 +64,7 @@ trento-server-mcp-server-xxxxxxxxxx-xxxxx  1/1     Running   0          2m
 kubectl logs -l app.kubernetes.io/name=mcp-server
 ----
 
-. Check the MCP Server health endpoints:
+. Check the {tr_mcp} health endpoints:
 +
 [source,bash]
 ----
@@ -97,9 +97,9 @@ Example output:
 {"status":"up","details":{"mcp-server":{"status":"up","timestamp":"2025-10-09T12:11:09.528898849Z"},"wanda-api":{"status":"up","timestamp":"2025-10-09T12:11:09.544855047Z"},"web-api":{"status":"up","timestamp":"2025-10-09T12:11:09.544855047Z"}}}
 ----
 
-===== {tr_mcp} Helm Configuration Options
+===== {tr_mcp} {helm} configuration options
 
-The {tr_mcp} Helm chart supports various configuration options:
+The {tr_mcp} {helm} chart supports various configuration options:
 
 * <<mcp-customize-ingress-path,Customize Ingress Path>>
 * <<mcp-disabling-tag-filtering,Disabling Tag Filtering>>
@@ -127,7 +127,7 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 ----
 ====
 
-The MCP Server endpoint will be: `https://TRENTO_SERVER_HOSTNAME/mcp-server-trento/mcp`
+The {tr_mcp} endpoint will be: `https://TRENTO_SERVER_HOSTNAME/mcp-server-trento/mcp`
 
 [[mcp-disabling-tag-filtering]]
 ====== Disabling Tag Filtering

@@ -1,6 +1,6 @@
 include::product-attributes.adoc[]
 
-:revdate: 2025-10-31
+:revdate: 2025-11-27
 [[sec-trento-mcp-suse-ai]]
 ==== Integrating the {tr_mcp} with {suseai}
 
@@ -11,21 +11,21 @@ This guide explains how to integrate the {tr_mcp} with {suseai}, including confi
 {suseai} is a platform that allows you to deploy and manage AI models and applications in a {kube} environment. It provides tools for model management, deployment, and integration with various AI frameworks.
 
 Refer to the official https://documentation.suse.com/suse-ai/1.0/[{suseai} documentation] for detailed information. Always refer to the latest instructions in the https://documentation.suse.com/suse-ai/1.0/html/AI-deployment-intro/index.html[{suseai} deployment guide] for the most accurate and up-to-date information.
-To run the entire stack, you can also use the https://github.com/SUSE/suse-ai-deployer[{suseai} Deployer Helm Chart].
+To run the entire stack, you can also use the https://github.com/SUSE/suse-ai-deployer[{suseai} Deployer {helm} chart].
 
-===== Install Open Web UI
+===== Install {owui}
 
-Refer to the official https://documentation.suse.com/suse-ai/1.0/html/openwebui-using/index.html[Open Web UI documentation]
+Refer to the official https://documentation.suse.com/suse-ai/1.0/html/openwebui-using/index.html[{owui} documentation]
 
 ===== Deploying the {tr_mcp}
 
-To deploy the {tr_mcp} in your {suseai} cluster, install it via the {trento} Server Helm chart. Follow the step-by-step instructions in <<sec-trento-mcp-server-k8s>>. The {tr_mcp} is packaged as a sub-chart and can be enabled during the {trento} Server installation.
+To deploy the {tr_mcp} in your {suseai} cluster, install it via the {trento} Server {helm} chart. Follow the step-by-step instructions in <<sec-trento-mcp-server-k8s>>. The {tr_mcp} is packaged as a sub-chart and can be enabled during the {trento} Server installation.
 
 For chart sources and values, see the link:https://github.com/trento-project/helm-charts[{trento} helm-charts repository].
 
-===== Add {tr_mcp} to Open Web UI
+===== Add {tr_mcp} to {owui}
 
-Open Web UI includes native support for the Model Context Protocol (MCP). With this integration, Open Web UI connects to MCP servers from the backend, allowing you to safely use an internal {kube} Service DNS name without exposing the service publicly.
+{owui} includes native support for the Model Context Protocol (MCP). With this integration, {owui} connects to MCP servers from the backend, allowing you to safely use an internal {kube} Service DNS name without exposing the service publicly.
 
 ======  Created a Personal Access Token
 
@@ -41,7 +41,7 @@ Open Web UI includes native support for the Model Context Protocol (MCP). With t
 .Generate a Personal Access Token in {trento}
 image::generate-pat.png[Generate a Personal Access Token in {trento},width=800]
 
-====== Enable {tr_mcp} in Open Web UI
+====== Enable {tr_mcp} in {owui}
 
 [arabic]
 . Open *Admin Settings* and go to *External Tools*.
@@ -52,19 +52,19 @@ image::generate-pat.png[Generate a Personal Access Token in {trento},width=800]
 .. *Auth*: `<TOKEN>` (the token you generated in the {trento} console)
 . Click *Save*.
 
-.Open Web UI — Add the {tr_mcp} as a tool
+.{owui} — Add the {tr_mcp} as a tool
 image::owui-add-tool.png[Add the {tr_mcp} as a tool,width=600]
 
 ===== Enable the {tr_mcp} for a Model
 
 [arabic]
 . Go to *Models*, select *Manage Models*, and open your target model.
-. In the *Tools* or *MCP Servers* section, enable/select `{tr_mcp}` for this model. This makes the {trento} tools available to any user of that model in Open Web UI.
+. In the *Tools* or *MCP Servers* section, enable/select `{tr_mcp}` for this model. This makes the {trento} tools available to any user of that model in {owui}.
 . Verify the integration:
 .. Start a new chat with the enabled model
 .. Confirm that tools from `{tr_mcp}` are available and can be invoked (for example, try listing SAP systems)
 
-.Open Web UI — Enable {tr_mcp} for a model
+.{owui} — Enable {tr_mcp} for a model
 image::owui-add-model.png[Enable {tr_mcp} for model,width=600]
 
 The AI model will use the {tr_mcp} tools to query your {trento} installation and provide detailed, contextual responses about your SAP infrastructure.
