@@ -108,6 +108,9 @@ ext:
       - dir: trento-docs-site/build/tmp_components/mcp-server/docs
         files: ['**/*.adoc', '!README.adoc']
         into: modules/mcp-server/pages
+      - dir: trento-docs-site/build/tmp_components/mcp-server/docs/images
+        files: '**/*.{png,jpg,jpeg,svg,gif}'
+        into: modules/mcp-server/images/
     ## Trento Photofinish https://github.com/trento-project/photofinish
     - scan:
       - dir: trento-docs-site/build/tmp_components/photofinish
