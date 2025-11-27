@@ -11,7 +11,7 @@ Operations in {trento} are ruled by four principles:
 
 IMPORTANT: Internal policies are meant to prevent the user from carrying out basic operational mistakes but can not guarantee that an operation will cause no damage to the environment. The ultimate responsibility of executing an operation falls with the user.
 
-Every operation request generates an entry in the activity log with a specific activity type. Following a successful operation request, {trento} tries to execute the operation. The completion of the operation, whether successful or not, is also recorded in the activity log with activity type Operation Completed and correlated to the request entry (include reference to the Activity Log section). When an operation is not successful, {trento} restores the original state by rolling back the operation.
+Every operation request generates an entry in the activity log with a specific activity type. Following a successful operation request, {trento} tries to execute the operation. The completion of the operation, whether successful or not, is also recorded in the activity log with activity type Operation Completed and correlated to the request entry (see <<sec-activity-log>> for details). When an operation is not successful, {trento} restores the original state by rolling back the operation.
 
 To prevent an endless execution in situations where, for example, an agent is not responding, every operation is time constrained by an internal timeout. Once the internal timeout is hit, the operation execution resets.
 
