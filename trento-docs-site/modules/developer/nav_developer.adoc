@@ -35,9 +35,11 @@
 ** Internal Notes
 *** xref:internal-notes/pr-env-ssl-certificate-setup.adoc[SSL Certificate creation and setup Guide for Pull Request Environments]
 *** xref:internal-notes/release.adoc[Release Process]
+*** xref:internal-notes/trento-container-install.adoc[Containerized deployment]
 
 ** Trento Documentation Page
 *** xref:trento-docs-site/README.adoc[Documentation Page]
+*** xref:trento-docs-site/preview-docs-with-docker.adoc[Local Documentation Preview with Docker]
 *** xref:trento-docs-site/contribution-upstream/components-nav-guide.adoc[Component Documentation Navigation Guide]
 *** xref:trento-docs-site/collaboration-docs-team/docs-git-workflow.adoc[Git Workflow for Trento Documentation]
 *** xref:trento-docs-site-ui/README.adoc[Documentation Page UI]

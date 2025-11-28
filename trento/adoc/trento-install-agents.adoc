@@ -45,7 +45,7 @@ amqp://trento:trento@TRENTO_SERVER_HOSTNAME:5672/. If the default
 RabbitMQ username and password (`+trento:trento+`) were updated using
 Helm, the parameter must use a user-defined value.
 +
-In a systemd or containerized deployment, the correct value is
+In a systemd deployment, the correct value is
 `+amqp://TRENTO_USER:TRENTO_USER_PASSWORD@TRENTO_SERVER_HOSTNAME:5672/vhost+`.
 If `+TRENTO_USER+` and `+TRENTO_USER_PASSWORD+` have been replaced with
 custom values, you must use them.
