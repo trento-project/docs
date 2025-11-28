@@ -1,0 +1,156 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-mcp-server-systemd]]
+==== systemd {tr_mcp} deployment
+
+A systemd-based installation of the {tr_mcp} using RPM packages can be performed manually on the latest supported versions of {sles4sap}, from 15 SP4 up to 16.0. For installations on service packs other than the current one, make sure to update the repository URL as described in the relevant notes throughout this guide.
+
+include::partials/supported-versions.adoc[]
+
+===== Installing {tr_mcp} using RPM packages
+
+. Install the {tr_mcp} package:
++
+[source,bash]
+----
+zypper install mcp-server-trento
+----
+
+====== Configure {tr_mcp}
+
+. Create the {tr_mcp} configuration file at +/etc/trento/mcp-server-trento+ by copying the example:
++
+[source,bash]
+----
+cp /etc/trento/mcp-server-trento.example /etc/trento/mcp-server-trento
+----
++
+. Edit the configuration file to point to your {trserver}:
++
+[source,bash]
+----
+vim /etc/trento/mcp-server-trento
+----
++
+
+Example configuration:
++
+[source,env]
+----
+AUTODISCOVERY_PATHS=/api/all/openapi,/wanda/api/all/openapi
+ENABLE_HEALTH_CHECK=false
+HEADER_NAME=Authorization
+HEALTH_API_PATH=/api/healthz
+HEALTH_PORT=8080
+# OAS_PATH=http://trento.example.com/api/all/openapi,http://trento.example.com/wanda/api/all/openapi
+PORT=5000
+TAG_FILTER=MCP
+TRANSPORT=streamable
+TRENTO_URL=https://trento.example.com
+VERBOSITY=info
+INSECURE_SKIP_TLS_VERIFY=false
+----
+
+[%hardbreaks]
+Configure the {tr_mcp} using either `TRENTO_URL` or `OAS_PATH`.
+If `OAS_PATH` is left empty, the {tr_mcp} automatically discovers the APIs from the {trserver} using `TRENTO_URL`.
+If `OAS_PATH` is set, it takes precedence and `TRENTO_URL` is ignored.
+
+**Use `TRENTO_URL` when:**
+
+* {trserver} is deployed behind a reverse proxy (NGINX, etc.).
+* The {tr_mcp} runs on a different host or network than {trserver}.
+* You want to use external or public URLs.
+* You prefer automatic API autodiscovery (recommended for production).
+
+Example:
+
+[source,env]
+----
+TRENTO_URL=https://trento.example.com
+PORT=5000
+----
+
+**Use `OAS_PATH` when:**
+
+* The {tr_mcp} runs on the same host as the {tr_web} and {tr_wanda} components.
+* You want to connect directly to internal services without autodiscovery.
+* You need to bypass reverse proxy configurations.
+
+Example:
+
+[source,env]
+----
+OAS_PATH=http://localhost:4000/api/all/openapi,http://localhost:4001/wanda/api/all/openapi
+PORT=5000
+----
+
+====== Start the {tr_mcp} service
+
+Enable and start the {tr_mcp} service:
+
+[source,bash]
+----
+systemctl enable --now mcp-server-trento
+----
+
+====== Verify the {tr_mcp} service
+
+. Verify the service is running:
++
+[source,bash]
+----
+systemctl status mcp-server-trento
+----
++
+Expected output:
++
+[source,bash]
+----
+● mcp-server-trento.service - Trento MCP Server service
+     Loaded: loaded (/usr/lib/systemd/system/mcp-server-trento.service; enabled)
+     Active: active (running) since ...
+----
++
+. Check the service logs:
++
+[source,bash]
+----
+journalctl -u mcp-server-trento -f
+----
++
+. If firewalld is running, allow {tr_mcp} to be accessible and add an exception to firewalld:
++
+[source,bash]
+----
+firewall-cmd --zone=public --add-port=5000/tcp --permanent
+firewall-cmd --reload
+----
++
+. If you enabled health checks and want to expose them, also allow the health check port:
++
+[source,bash]
+----
+firewall-cmd --zone=public --add-port=8080/tcp --permanent
+firewall-cmd --reload
+----
++
+. If you enabled health checks, verify the endpoints locally:
++
+[source,bash]
+----
+# Note: Replace localhost with the server's IP/hostname if running these commands from a remote machine,
+# and ensure the health port is allowed by your firewall.
+
+# Liveness endpoint:
+curl http://localhost:8080/livez
+
+# Example output:
+# {"info":{"name":"trento-mcp-server","version":"0.1.0"},"status":"up"}
+
+# Readiness endpoint:
+curl http://localhost:8080/readyz
+
+# Example output:
+# {"status":"up","details":{"mcp-server":{"status":"up","timestamp":"2025-10-09T12:11:09.528898849Z"},"wanda-api":{"status":"up","timestamp":"2025-10-09T12:11:09.542078327Z"},"web-api":{"status":"up","timestamp":"2025-10-09T12:11:09.544855047Z"}}}
+----

@@ -2,18 +2,9 @@ include::product-attributes.adoc[]
 
 [[sec-trento-k8s-deployment]]
 === {k8s} deployment
-:revdate: 2025-10-16
+:revdate: 2025-10-31
 
-The subsection uses the following placeholders:
-
-* `TRENTO_SERVER_HOSTNAME`: the host name used by the end user to access the console.
-* `ADMIN_PASSWORD`: the password of the admin user created during the installation process.
-+
-The password must meet the following requirements:
-+
-- minimum length of 8 characters
-- the password must not contain 3 identical numbers or letters in a row (for example, 111 or aaa)
-- the password must not contain 4 sequential numbers or letters (for example, 1234, abcd, ABCD)
+include::partials/kubernetes-placeholders.adoc[]
 
 [IMPORTANT]
 ====
@@ -65,7 +56,7 @@ HELM_EXPERIMENTAL_OCI=1 helm upgrade \
 ----
 ====
 +
-. To verify that the {trserver} installation was successful, open the URL of the {trweb} (`http://TRENTO_SERVER_HOSTNAME`) from a workstation on the {sap} administrator's LAN.
+. To verify that the {trserver} installation was successful, open the URL of the {tr_web} (`http://TRENTO_SERVER_HOSTNAME`) from a workstation on the {sap} administrator's LAN.
 
 [[sec-trento-install-trentoserver-on-k3s]]
 ==== Installing {trserver} on K3s
@@ -158,7 +149,7 @@ watch kubectl get pods
 All pods must be in the ready and running state.
 +
 . Log out of the {trserver} host.
-. To verify that the {trserver} installation was successful, open the URL of the {trweb} (`http://TRENTO_SERVER_HOSTNAME`) from a workstation on the {sap} administrator's LAN.
+. To verify that the {trserver} installation was successful, open the URL of the {tr_web} (`http://TRENTO_SERVER_HOSTNAME`) from a workstation on the {sap} administrator's LAN.
 
 [[sec-trento-deploying-trento-on-selected-nodes]]
 ==== Deploying {trserver} on selected nodes
