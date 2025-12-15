@@ -4,18 +4,12 @@ include::product-attributes.adoc[]
 == Installing {trserver}
 :revdate: 2025-11-17
 
-The {trserver}, is a core component which can be deployed in several ways depending on your infrastructure and requirements.
+{trserver} can be deployed in different ways depending on your infrastructure and requirements.
 
-Supported installation methods: 
+Supported deployment methods: 
 
 * <<sec-trento-k8s-deployment,{k8s} deployment>>
 * <<sec-systemd-deployment, systemd RPM deployment >>
-
-Unsupported installation methods: 
-
-* <<sec-ansible-deployment,{k8s} Automated deployment with Ansible>>
-
-include::partials/supported-versions.adoc[]
 
 include::trento-kubernetes-install.adoc[]
 include::trento-systemd-install.adoc[]

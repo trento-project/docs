@@ -11,7 +11,7 @@ of duties in the {trento} interface and ensures that only authorized
 users with the right permissions can access it.
 
 User management actions are performed in the Users view in the left-hand
-side panel of the {tr_web}.
+side panel of the Trento UI.
 
 By default, a newly created user is granted display access rights except
 for the Users view. Where available, a user with default access can

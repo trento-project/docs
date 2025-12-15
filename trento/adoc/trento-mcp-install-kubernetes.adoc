@@ -2,20 +2,20 @@ include::product-attributes.adoc[]
 
 
 [[sec-trento-mcp-server-k8s]]
-==== {k8s} {tr_mcp} deployment
+==== {k8s} deployment of {tr_mcp}
 :revdate: 2025-11-17
 
 include::partials/kubernetes-placeholders.adoc[]
 
 ===== Enable the {tr_mcp}
 
-When installing the complete {trserver} using {helm}, the {tr_mcp} is disabled by default. Enable it by passing `--set trento-mcp-server.enabled=true`:
+When installing {trserver} following the instructions in <<sec-trento-k8s-deployment>>, the {tr_mcp} is disabled by default. Enable it by passing `--set trento-mcp-server.enabled=true`:
 
 ====
 [source,bash]
 ----
 helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
-  --set trento-web.trentoWebOrigin=TRENTO_SERVER_HOSTNAME \
+  --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
   --set trento-web.adminUser.password=ADMIN_PASSWORD \
   --set trento-mcp-server.enabled=true
 ----
@@ -74,6 +74,7 @@ kubectl port-forward --namespace default \
   8080:8080
 ----
 +
+While the previous command is running, execute:
 [source,bash]
 ----
 # Liveness endpoint:
@@ -111,13 +112,13 @@ The {tr_mcp} {helm} chart supports various configuration options:
 ====== Customize Ingress Path
 
 By default, ingress is enabled.
-To customize the ingress configuration:
+To customize the ingress configuration in a basic K3s installation:
 
 ====
 [source,bash]
 ----
 helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
-  --set trento-web.trentoWebOrigin=TRENTO_SERVER_HOSTNAME \
+  --set global.trentoWeb.origin==TRENTO_SERVER_HOSTNAME \
   --set trento-web.adminUser.password=ADMIN_PASSWORD \
   --set trento-mcp-server.enabled=true \
   --set trento-mcp-server.ingress.enabled=true \
@@ -129,27 +130,6 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 
 The {tr_mcp} endpoint will be: `https://TRENTO_SERVER_HOSTNAME/mcp-server-trento/mcp`
 
-[[mcp-disabling-tag-filtering]]
-====== Disabling Tag Filtering
-
-By default, only operations tagged with `MCP` are exposed. To expose all operations and remove tag filtering:
-
-====
-[source,bash]
-----
-helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
-  --set trento-web.trentoWebOrigin=TRENTO_SERVER_HOSTNAME \
-  --set trento-web.adminUser.password=ADMIN_PASSWORD \
-  --set trento-mcp-server.enabled=true \
-  --set trento-mcp-server.mcpServer.tagFilter=[]
-----
-====
-
-[NOTE]
-====
-You can also filter by different tags by setting `--set trento-mcp-server.mcpServer.tagFilter[0]=YourTag`.
-====
-
 [[mcp-adjust-log-verbosity]]
 ====== Adjust Log Verbosity
 
@@ -159,7 +139,7 @@ The default log level is `info`. Adjust it for debugging:
 [source,bash]
 ----
 helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
-  --set trento-web.trentoWebOrigin=TRENTO_SERVER_HOSTNAME \
+  --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
   --set trento-web.adminUser.password=ADMIN_PASSWORD \
   --set trento-mcp-server.enabled=true \
   --set trento-mcp-server.mcpServer.verbosity=debug
@@ -175,7 +155,7 @@ For production deployments with different resource requirements:
 [source,bash]
 ----
 helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
-  --set trento-web.trentoWebOrigin=TRENTO_SERVER_HOSTNAME \
+  --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
   --set trento-web.adminUser.password=ADMIN_PASSWORD \
   --set trento-mcp-server.enabled=true \
   --set trento-mcp-server.resources.requests.cpu=100m \
@@ -194,7 +174,7 @@ Health check probes are enabled by default. To disable them if needed:
 [source,bash]
 ----
 helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
-  --set trento-web.trentoWebOrigin=TRENTO_SERVER_HOSTNAME \
+  --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
   --set trento-web.adminUser.password=ADMIN_PASSWORD \
   --set trento-mcp-server.enabled=true \
   --set trento-mcp-server.livenessProbe.enabled=false \
@@ -211,7 +191,7 @@ Complete example that configures external access via a custom ingress path:
 [source,bash]
 ----
 helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
-  --set trento-web.trentoWebOrigin=https://trento.example.com \
+  --set global.trentoWeb.origin=https://trento.example.com \
   --set trento-web.adminUser.password=SecurePassword123 \
   --set trento-mcp-server.enabled=true \
   --set trento-mcp-server.mcpServer.trentoURL=https://trento.example.com \
