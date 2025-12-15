@@ -4,126 +4,80 @@ include::product-attributes.adoc[]
 === Configure {tr_mcp}
 :revdate: 2025-11-24
 
-This section provides an overview of how to configure the {tr_mcp} using command-line parameters, environmental variables and configuration files.
+This section provides an overview of how to configure the {tr_mcp}.
 
-[[sec-trento-mcp-config-sources]]
-==== Configuration Sources
+* <<sec-trento-mcp-kubernetes-config,{k8s} configuration>>
+* <<sec-trento-mcp-systemd-config, systemd RPM deployment >>
 
-The {tr_mcp} supports multiple configuration sources with the following priority order (highest to lowest):
+[[sec-trento-mcp-kubernetes-config]]
+==== Kubernetes Deployment
 
-1. **Command-line flags** - Overrides the current settings.
-2. **Environment variables** - Used for containerized deployments.
-3. **Configuration file** - Persistent settings configuration.
-4. **Built-in defaults** - Fallback values.
-
-[[sec-trento-mcp-cli-params]]
-==== Command-Line Parameters
-
-The `mcp-server-trento` binary accepts several command-line flags to configure its behavior. The following table lists all available configuration options, their corresponding flags, environment variables, and default values.
+[[sec-trento-mcp-kubernetes-config-sources]]
+===== Configuration Overview
 
 [width="100%",options="header"]
 |===
-|Flag and Config Key |Environment Variable |Default Value |Description
+|Environment Variable |Default Value |Description
 
-|`--autodiscovery-paths, -A`
 |`TRENTO_MCP_AUTODISCOVERY_PATHS`
 |`/api/all/openapi,/wanda/api/all/openapi`
 |Custom paths for API autodiscovery.
 
-|`--config, -c`
-|`TRENTO_MCP_CONFIG`
-|(empty)
-|Configuration file path.
-
-|`--enable-health-check, -d`
 |`TRENTO_MCP_ENABLE_HEALTH_CHECK`
 |`false`
 |Enable the health check server.
 
-|`--header-name, -H`
 |`TRENTO_MCP_HEADER_NAME`
 |`Authorization`
 |Header name used to pass the {trento} API key to the {tr_mcp}.
 
-|`--health-api-path, -a`
 |`TRENTO_MCP_HEALTH_API_PATH`
 |`/api/healthz`
 |API path used for health checks on target servers.
 
-|`--health-port, -z`
 |`TRENTO_MCP_HEALTH_PORT`
 |`8080`
 |Port where the health check server runs.
 
-|`--insecure-skip-tls-verify, -i`
 |`TRENTO_MCP_INSECURE_SKIP_TLS_VERIFY`
 |`false`
 |Skip TLS certificate verification when fetching OAS specs from HTTPS.
 
-|`--oas-path, -P`
 |`TRENTO_MCP_OAS_PATH`
 |`[]`
 |Path(s) to OpenAPI specification file(s). Can be set multiple times.
 
-|`--port, -p`
 |`TRENTO_MCP_PORT`
 |`5000`
 |Port where the {tr_mcp} runs.
 
-|`--tag-filter, -f`
 |`TRENTO_MCP_TAG_FILTER`
 |`["MCP"]`
 |Only include operations that contain one of these tags.
 
-|`--transport, -t`
 |`TRENTO_MCP_TRANSPORT`
 |`streamable`
 |Protocol to use: `streamable` or `sse`.
 
-|`--trento-url, -u`
 |`TRENTO_MCP_TRENTO_URL`
 |(empty)
 |Target {trento} server URL. Required for autodiscovery if OAS path is not set.
 
-|`--verbosity, -v`
 |`TRENTO_MCP_VERBOSITY`
 |`info`
 |Log level: `debug`, `info`, `warning`, or `error`.
 |===
 
-===== Configure {tr_mcp} with Command-Line Flags
 
-{tr_mcp} allows to override the configuration by using the command line flags. This changes are not persistent and are lost after a reboot, in order to make these changes persistent, update `/etc/trento/mcp-server-trento` config.
+===== Configuration Sources Kubernetes
 
-[para]
-Basic usage with custom port, verbosity, and target URL:
-[source,console]
-----
-mcp-server-trento --port 9000 --verbosity debug --trento-url https://trento.example.com
-----
+The {tr_mcp} supports multiple configuration sources with the following priority order (highest to lowest):
 
-[para]
-Using multiple OpenAPI specifications:
-[source,console]
-----
-mcp-server-trento --oas-path https://api1.example.com/openapi.json --oas-path https://api2.example.com/openapi.json
-----
-
-[para]
-Autodiscovery with custom paths:
-[source,console]
-----
-mcp-server-trento --trento-url https://trento.example.com --autodiscovery-paths /api/v1/openapi,/wanda/api/v1/openapi
-----
-
-[para]
-Enable health checks on a custom port:
-[source,console]
-----
-mcp-server-trento --enable-health-check --health-port 8080 --port 5000
-----
+1. **Environment variables** - Used for containerized deployments.
+2. **Built-in defaults** - Fallback values.
 
 ===== Kubernetes Deployment Example
+
 
 [source,yaml]
 ----
@@ -155,6 +109,122 @@ spec:
           name: health
 ----
 
+[[sec-trento-mcp-systemd-config]]
+==== Systemd Deployment
+
+[[sec-trento-mcp-systemd-config-sources]]
+===== Configuration Sources
+
+The {tr_mcp} supports multiple configuration sources with the following priority order (highest to lowest):
+
+1. **Command-line flags** - Overrides the current settings.
+2. **Configuration file** - Persistent settings configuration.
+
+===== Configuration Overview
+
+The `mcp-server-trento` binary accepts several command-line flags to configure its behavior. The following table lists all available configuration options, their corresponding flags, configuration variables, and default values.
+
+[width="100%",options="header"]
+|===
+|Flag| Config Variable |Default Value |Description
+
+|`--autodiscovery-paths, -A`
+|`AUTODISCOVERY_PATHS`
+|`/api/all/openapi,/wanda/api/all/openapi`
+|Custom paths for API autodiscovery.
+
+|`--config, -c`
+|(empty)
+|(empty)
+|Configuration file path.
+
+|`--enable-health-check, -d`
+|`ENABLE_HEALTH_CHECK`
+|`false`
+|Enable the health check server.
+
+|`--header-name, -H`
+|`HEADER_NAME`
+|`Authorization`
+|Header name used to pass the {trento} API key to the {tr_mcp}.
+
+|`--health-api-path, -a`
+|`HEALTH_API_PATH`
+|`/api/healthz`
+|API path used for health checks on target servers.
+
+|`--health-port, -z`
+|`HEALTH_PORT`
+|`8080`
+|Port where the health check server runs.
+
+|`--insecure-skip-tls-verify, -i`
+|`INSECURE_SKIP_TLS_VERIFY`
+|`false`
+|Skip TLS certificate verification when fetching OAS specs from HTTPS.
+
+|`--oas-path, -P`
+|`OAS_PATH`
+|`[]`
+|Path(s) to OpenAPI specification file(s). Can be set multiple times.
+
+|`--port, -p`
+|`PORT`
+|`5000`
+|Port where the {tr_mcp} runs.
+
+|`--tag-filter, -f`
+|`TAG_FILTER`
+|`["MCP"]`
+|Only include operations that contain one of these tags.
+
+|`--transport, -t`
+|`streamable`
+|Protocol to use: `streamable` or `sse`.
+
+|`--trento-url, -u`
+|`TRENTO_URL`
+|(empty)
+|Target {trento} server URL. Required for autodiscovery if OAS path is not set.
+
+|`--verbosity, -v`
+|`VERBOSITY`
+|`info`
+|Log level: `debug`, `info`, `warning`, or `error`.
+|===
+
+===== Configure {tr_mcp} with Command-Line Flags
+
+{tr_mcp} allows you to override configuration settings using command-line flags for temporary changes. These overrides are not persistent and are lost when the process stops or the system is rebooted. To make configuration changes permanent for the systemd service, update `/etc/trento/mcp-server-trento`.
+
+[para]
+Basic usage with custom port, verbosity, and target URL:
+[source,console]
+----
+mcp-server-trento --port 9000 --verbosity debug --trento-url https://trento.example.com
+----
+
+[para]
+Using multiple OpenAPI specifications:
+[source,console]
+----
+mcp-server-trento --oas-path https://api1.example.com/openapi.json --oas-path https://api2.example.com/openapi.json
+----
+
+[para]
+Autodiscovery with custom paths:
+[source,console]
+----
+mcp-server-trento --trento-url https://trento.example.com --autodiscovery-paths /api/v1/openapi,/wanda/api/v1/openapi
+----
+
+[para]
+Enable health checks on a custom port:
+[source,console]
+----
+mcp-server-trento --enable-health-check --health-port 8080 --port 5000
+----
+
 [[sec-trento-mcp-help-validation]]
 ==== Help and Validation
 
@@ -168,9 +238,9 @@ mcp-server-trento --help
 The server will validate the configuration on startup and log any issues with debug verbosity enabled.
 
 [[sec-trento-mcp-health-checks]]
-==== Health Check Configuration
+==== Health Check Configuration systemd deployment
 
-The {tr_mcp} includes built-in health check endpoints for monitoring and Kubernetes integration.
+The {tr_mcp} includes built-in health check endpoints for systemd and Kubernetes integration.
 
 [NOTE]
 ====
@@ -189,7 +259,7 @@ The readiness endpoint performs comprehensive health checks, including:
 * `mcp-server` - Validates {tr_mcp} connectivity using an MCP client.
 * `api-server` - Verifies connectivity to the configured {trento} API server.
 
-===== Enable Health Checks with the command-line
+===== Enable Health Checks with the command-line for systemd deployment
 
 [source,console]
 ----
@@ -198,48 +268,7 @@ mcp-server-trento --enable-health-check
 
 [source,console]
 ----
-mcp-server-trento --enable-health-check --health-port 9090
-----
-
-[source,console]
-----
-export TRENTO_MCP_ENABLE_HEALTH_CHECK=true
-export TRENTO_MCP_HEALTH_PORT=8080
-mcp-server-trento
-----
-
-===== Enable Kubernetes Health Checks Probes
-
-[source,yaml]
-----
-apiVersion: v1
-kind: Pod
-spec:
-  containers:
-  - name: mcp-server-trento
-    image: mcp-server-trento:latest
-    env:
-    - name: TRENTO_MCP_ENABLE_HEALTH_CHECK
-      value: "true"
-    - name: TRENTO_MCP_HEALTH_PORT
-      value: "8080"
-    ports:
-    - containerPort: 5000
-      name: mcp
-    - containerPort: 8080
-      name: health
-    livenessProbe:
-      httpGet:
-        path: /livez
-        port: 8080
-      initialDelaySeconds: 30
-      periodSeconds: 10
-    readinessProbe:
-      httpGet:
-        path: /readyz
-        port: 8080
-      initialDelaySeconds: 5
-      periodSeconds: 5
+mcp-server-trento --enable-health-check --health-port 8080
 ----
 
 ====== Testing Health Endpoints
