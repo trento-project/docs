@@ -3,7 +3,7 @@ include::product-attributes.adoc[]
 [[sec-trento-mcp-server-systemd]]
 ==== systemd {tr_mcp} deployment
 
-A systemd-based installation of the {tr_mcp} using RPM packages can be performed manually on the latest supported versions of {sles4sap}, from 15 SP4 up to 16.0. For installations on service packs other than the current one, make sure to update the repository URL as described in the relevant notes throughout this guide.
+A systemd-based installation of the {tr_mcp} using RPM packages can be performed manually on the latest supported versions of {sles4sap}.
 
 include::partials/supported-versions.adoc[]
 
@@ -16,9 +16,9 @@ include::partials/supported-versions.adoc[]
 zypper install mcp-server-trento
 ----
 
-====== Configure {tr_mcp}
+===== Configure {tr_mcp}
 
-. Create the {tr_mcp} configuration file at +/etc/trento/mcp-server-trento+ by copying the example:
+. Create the {tr_mcp} configuration file +/etc/trento/mcp-server-trento+ by copying the example:
 +
 [source,bash]
 ----
@@ -56,34 +56,20 @@ Configure the {tr_mcp} using either `TRENTO_URL` or `OAS_PATH`.
 If `OAS_PATH` is left empty, the {tr_mcp} automatically discovers the APIs from the {trserver} using `TRENTO_URL`.
 If `OAS_PATH` is set, it takes precedence and `TRENTO_URL` is ignored.
 
-**Use `TRENTO_URL` when:**
+**Use `TRENTO_URL` when one or more of the following conditions apply:**
 
 * {trserver} is deployed behind a reverse proxy (NGINX, etc.).
 * The {tr_mcp} runs on a different host or network than {trserver}.
 * You want to use external or public URLs.
-* You prefer automatic API autodiscovery (recommended for production).
+* You prefer automatic API autodiscovery.
 
-Example:
 
-[source,env]
-----
-TRENTO_URL=https://trento.example.com
-PORT=5000
-----
 
-**Use `OAS_PATH` when:**
+**Use `OAS_PATH` when one or more of the following conditions apply:**
 
-* The {tr_mcp} runs on the same host as the {tr_web} and {tr_wanda} components.
 * You want to connect directly to internal services without autodiscovery.
 * You need to bypass reverse proxy configurations.
 
-Example:
-
-[source,env]
-----
-OAS_PATH=http://localhost:4000/api/all/openapi,http://localhost:4001/wanda/api/all/openapi
-PORT=5000
-----
 
 ====== Start the {tr_mcp} service
 
@@ -94,7 +80,7 @@ Enable and start the {tr_mcp} service:
 systemctl enable --now mcp-server-trento
 ----
 
-====== Verify the {tr_mcp} service
+===== Verify the {tr_mcp} service
 
 . Verify the service is running:
 +

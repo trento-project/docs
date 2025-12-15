@@ -2,8 +2,6 @@ include::../product-attributes.adoc[]
 
 ===== Prerequisites
 
-To configure your MCP Host, ensure you have:
-
 * An LLM provider and credentials.
 ** Public hosted options, such as Google Gemini, OpenAI, etc.
 ** Private/on-premises option, such as {suseai}.

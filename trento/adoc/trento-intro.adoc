@@ -37,10 +37,10 @@ The {trserver} is an independent, distributed system designed to run on a {k8s} 
 The {trserver} consists of the following components:
 
 * The {web} component that acts as a control plane responsible for internal and external communications as well as rendering the UI.
-* The checks engine named {wanda} that orchestrates the execution of configuration checks.
+* The orchestration engine named {wanda} that orchestrates the execution of compliance checks and operations.
 * The {tr_mcp} which provides a secure way to call {trserver} APIs without manual navigation of the web UI.
 * A {postgresql} database for data persistence.
-* The {rabbitmq} message broker for communicating between the checks engine and the agents.
+* The {rabbitmq} message broker for communication between the orchestration engine and the agents.
 * A {prometheus} instance that retrieves the metrics collected by the {prometheus} node exporter in the registered hosts. This {prometheus} instance is optional in a systemd deployment.
 
 === {tragent}

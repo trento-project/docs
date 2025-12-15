@@ -200,7 +200,7 @@ Both containers must run and listen on the specified ports.
 [[sec-trento-mcp-server-container]]
 ==== Installing {tr_mcp}
 
-The {tr_mcp} provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the Model Context Protocol (MCP). This optional component enables integration with AI tools and assistants.After installation, see <<sec-trento-mcp-how-to-use>> for instructions on how to connect MCP-compatible AI assistants and tools to your Trento Server.
+The {tr_mcp} provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the Model Context Protocol (MCP). This optional component enables integration with AI tools and assistants. After installation, see <<sec-trento-mcp-how-to-use>> for instructions on how to connect MCP-compatible AI assistants and tools to your Trento Server.
 
 ===== Requirements
 

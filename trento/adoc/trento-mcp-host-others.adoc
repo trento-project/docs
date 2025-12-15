@@ -1,27 +1,31 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-mcp-others]]
-==== Integrating the {tr_mcp} with other {mcp_host}s
+==== Integrating the {tr_mcp} with other clients
 :revdate: 2025-11-25
 
 The {tr_mcp} can be integrated with any client application that supports the Model Context Protocol. This allows interaction with the {trento} API and execute tools defined in the OpenAPI specification through your preferred AI assistant or development tool.
 
 This guide uses Visual Studio Code with GitHub Copilot as the primary example, but the configuration patterns apply to any MCP-compatible host.
 
+===== Prerequisites
+	
+To configure your client, ensure you have:
+
 include::partials/mcp-host-prerequisites.adoc[]
 
-===== Configuring Your MCP Host
+===== Configuring Your Client
 
-Once you have your {trserver} installation ready with the {tr_mcp} URL and API token, you can configure the MCP Host. The examples below show JSON configuration format, which is used by most MCP Hosts, including VS Code, Claude Desktop, and others.
+Once you have your {trserver} installation ready with the {tr_mcp} URL and API token, you can configure the MCP Server client. The examples below show JSON configuration format, which is used by most MCP Server clients, including VS Code, Claude Desktop, and others.
 
 
 ====== Option 1: Configuration with Prompted Input
 
-This configuration prompts you for your API key when the Host starts, keeping credentials secure and out of configuration files. The `password: true` setting ensures your API key input is masked when you type it.
+This configuration prompts you for your personal access token when the client starts, keeping credentials secure and out of configuration files. The `password: true` setting ensures your personal access token input is masked when you type it.
 
 [NOTE]
 ====
-This option is supported by most MCP Hosts, including VS Code. Check your MCP Host's documentation if the prompt feature is not available.
+This option is supported by most clients, including VS Code. Check your client's documentation if the prompt feature is not available.
 ====
 
 [source,json]
@@ -32,14 +36,14 @@ This option is supported by most MCP Hosts, including VS Code. Check your MCP Ho
       "type": "http",
       "url": "{https://trento.example.com/mcp-server-trento/mcp}",
       "headers": {
-        "Authorization": "${input:trento-api-key}"
+        "Authorization": "${input:trento-personal-access-token}"
       }
     }
   },
   "inputs": [
     {
       "type": "promptString",
-      "id": "trento-api-key",
+      "id": "trento-personal-access-token",
       "description": "Trento API Key",
       "password": true
     }
@@ -49,7 +53,7 @@ This option is supported by most MCP Hosts, including VS Code. Check your MCP Ho
 
 ====== Option 2: Direct Header Configuration
 
-For {mcp_host}s that don't support prompted input, or for testing purposes, set your {trento} API key directly in the configuration file.
+For clients that don't support prompted input, or for testing purposes, set your {trento} personal access token directly in the configuration file.
 
 [WARNING]
 ====
@@ -64,7 +68,7 @@ When using this option, ensure your configuration file has appropriate permissio
       "type": "http",
       "url": "https://trento.example.com/mcp-server-trento/mcp",
       "headers": {
-        "Authorization": "your-actual-trento-api-key-here"
+        "Authorization": "trento-personal-access-token"
       }
     }
   }
@@ -76,7 +80,7 @@ When using this option, ensure your configuration file has appropriate permissio
 Replace `{tr_mcp_url_https}` with your actual {tr_mcp} endpoint URL from your installation.
 ====
 
-====== MCP Client Options
+====== Client Options
 
 For detailed guidance on leveraging MCP capabilities in different tools, refer to the following official documentation:
 

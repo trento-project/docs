@@ -6,7 +6,7 @@ include::product-attributes.adoc[]
 
 The {tr_mcp} enables AI-assisted operation, allowing MCP-compatible assistants to connect to {trento} for monitoring and troubleshooting using natural language. See <<sec-trento-mcp-sles,{mcp_host} on SLES>> or <<sec-trento-mcp-others,Using alternative {mcp_host} clients>> for details.
 
-Alternatively, you can use the <<sec-trento-mcp-suse-ai,{tr_mcp} with the SUSE AI route>>.
+Alternatively, you can use <<sec-trento-mcp-suse-ai,{tr_mcp} with SUSE AI>>.
 
 include::trento-mcp-host-sles.adoc[]
 include::trento-mcp-host-others.adoc[]
