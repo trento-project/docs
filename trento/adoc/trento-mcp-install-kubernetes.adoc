@@ -103,7 +103,6 @@ Example output:
 The {tr_mcp} {helm} chart supports various configuration options:
 
 * <<mcp-customize-ingress-path,Customize Ingress Path>>
-* <<mcp-disabling-tag-filtering,Disabling Tag Filtering>>
 * <<mcp-adjust-log-verbosity,Adjust Log Verbosity>>
 * <<mcp-adjust-resource-limits,Adjust Resource Limits>>
 * <<mcp-disabling-health-check-probes,Disabling Health Check Probes>>
