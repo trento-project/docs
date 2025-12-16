@@ -21,8 +21,6 @@ Refer to the official https://documentation.suse.com/suse-ai/1.0/html/openwebui-
 
 To deploy the {tr_mcp} in your {suseai} cluster, install it via the {trento} Server {helm} chart. Follow the step-by-step instructions in <<sec-trento-mcp-server-k8s>>. The {tr_mcp} is packaged as a sub-chart and can be enabled during the {trento} Server installation.
 
-For chart sources and values, see the link:https://github.com/trento-project/helm-charts[{trento} helm-charts repository].
-
 ===== Add {tr_mcp} to {owui}
 
 {owui} includes native support for the Model Context Protocol (MCP). With this integration, {owui} connects to MCP servers from the backend, allowing you to safely use an internal {kube} Service DNS name without exposing the service publicly.
