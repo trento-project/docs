@@ -17,6 +17,11 @@
 :tr_server_url:       trento.example.com
 :tr_server_url_https: https://trento.example.com
 :tr_mcp_url_https:    https://trento.example.com/mcp-server-trento/mcp
+:tr_mcp_binary:        mcp-server-trento
+:tr_mcp_config_file:   /etc/trento/mcp-server-trento
+:tr_mcp_default_port:  5000
+:tr_mcp_health_port:   8080
+:tr_mcp_health_api_path: /api/healthz
 :mcp_host:            MCPHost
 
 // PROJECT REPOSITORY URL
@@ -36,4 +41,3 @@
 :license: Creative Commons Attribution-ShareAlike 4.0 International
 :license-acronym: CC-BY-SA 4.0
 :license-url: https://creativecommons.org/licenses/by-sa/4.0/legalcode
-
