@@ -48,7 +48,7 @@ image::generate-pat.png[Generate a Personal Access Token in {trento},width=800]
 . Click *Add Server*.
 . Set *Type* to `MCP (Streamable HTTP)`.
 . Enter your Server URL and authentication details:
-.. *Server URL* (example): `http://trento-server-mcp-server.suse-ai.svc.cluster.local:5000/mcp`
+.. *Server URL* (example): `http://trento-server-mcp-server.suse-ai.svc.cluster.local:{tr_mcp_default_port}/mcp`
 .. *Auth*: `<TOKEN>` (the token you generated in the {trento} console)
 . Click *Save*.
 

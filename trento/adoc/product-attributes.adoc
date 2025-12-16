@@ -17,6 +17,7 @@
 :tr_server_url:       trento.example.com
 :tr_server_url_https: https://trento.example.com
 :tr_mcp_url_https:    https://trento.example.com/mcp-server-trento/mcp
+:tr_mcp_ingress_path: /mcp-server-trento
 :tr_mcp_binary:        mcp-server-trento
 :tr_mcp_config_file:   /etc/trento/mcp-server-trento
 :tr_mcp_default_port:  5000
