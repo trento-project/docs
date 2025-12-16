@@ -36,20 +36,19 @@ mcphost --version
 ===== Configure MCPHost
 
 MCPHost reads its configuration from several locations; one common location is `~/.mcphost.yml`. Create `~/.mcphost.yml` with the following content:
-//Attention, https://trento.example.com/mcp-server-trento/mcp is the variable {tr_mcp_url_https}, don't forget to update it it the config if it changes.
-[source,yaml]
+[source,yaml,subs="attributes"]
 ----
 mcpServers:
   trento-mcp-server:
     type: "remote"
-    url:  https://trento.example.com/mcp-server-trento/mcp
+    url: {tr_mcp_url_https}
     headers:
       - "Authorization: Bearer ${env://TRENTO_PAT}"
 ----
 
 * Replace `{tr_mcp_url_https}` with the actual URL where your {tr_mcp} is accessible:
   ** For Kubernetes deployments with ingress, use the ingress URL (e.g., `{tr_mcp_url_https}`).
-  ** For local or development setups, use `http://localhost:5000/mcp` (adjust the port as needed).
+  ** For local or development setups, use `http://localhost:{tr_mcp_default_port}/mcp` (adjust the port as needed).
   ** The transport type is configured on the {tr_mcp}, if using Server-Sent Events (SSE) transport instead of the default streamable transport, change the path from `/mcp` to `/sse`.
 * If you configured a custom header name (using `HEADER_NAME` or `--header-name`), update `Authorization` accordingly.
 
@@ -71,7 +70,7 @@ export TRENTO_PAT=<your-trento-personal-access-token>
 Configure remote LLM models directly in your {mcp_host} configuration.
 For example, to use Google Gemini as your model provider:
 
-[source,yaml]
+[source,yaml,subs="attributes"]
 ----
 model: "google:gemini-2.5-flash"
 provider-url: "https://generativelanguage.googleapis.com/v1beta/openai/"
@@ -79,9 +78,9 @@ provider-api-key: "${env://GOOGLE_API_KEY}"
 mcpServers:
   mcp-server-trento:
     type: "remote"
-    url: https://trento.example.com/mcp-server-trento/mcp
+    url: {tr_mcp_url_https}
     headers:
-      - "Authorization: Bearer ${env://TRENTO_PAT}
+      - "Authorization: Bearer ${env://TRENTO_PAT}"
 ----
 ====
 

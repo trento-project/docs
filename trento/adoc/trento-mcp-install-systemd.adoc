@@ -11,42 +11,42 @@ include::partials/supported-versions.adoc[]
 
 . Install the {tr_mcp} package:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-zypper install mcp-server-trento
+zypper install {tr_mcp_binary}
 ----
 
 ===== Configure {tr_mcp}
 
-. Create the {tr_mcp} configuration file +/etc/trento/mcp-server-trento+ by copying the example:
+. Create the {tr_mcp} configuration file `{tr_mcp_config_file}` by copying the example:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-cp /etc/trento/mcp-server-trento.example /etc/trento/mcp-server-trento
+cp {tr_mcp_config_file}.example {tr_mcp_config_file}
 ----
 +
 . Edit the configuration file to point to your {trserver}:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-vim /etc/trento/mcp-server-trento
+vim {tr_mcp_config_file}
 ----
 +
 
 Example configuration:
 +
-[source,env]
+[source,env,subs="attributes"]
 ----
 AUTODISCOVERY_PATHS=/api/all/openapi,/wanda/api/all/openapi
 ENABLE_HEALTH_CHECK=false
 HEADER_NAME=Authorization
-HEALTH_API_PATH=/api/healthz
-HEALTH_PORT=8080
-# OAS_PATH=http://trento.example.com/api/all/openapi,http://trento.example.com/wanda/api/all/openapi
-PORT=5000
+HEALTH_API_PATH={tr_mcp_health_api_path}
+HEALTH_PORT={tr_mcp_health_port}
+# OAS_PATH={tr_server_url_https}/api/all/openapi,{tr_server_url_https}/wanda/api/all/openapi
+PORT={tr_mcp_default_port}
 TAG_FILTER=MCP
 TRANSPORT=streamable
-TRENTO_URL=https://trento.example.com
+TRENTO_URL={tr_server_url_https}
 VERBOSITY=info
 INSECURE_SKIP_TLS_VERIFY=false
 ----
@@ -75,67 +75,67 @@ If `OAS_PATH` is set, it takes precedence and `TRENTO_URL` is ignored.
 
 Enable and start the {tr_mcp} service:
 
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-systemctl enable --now mcp-server-trento
+systemctl enable --now {tr_mcp_binary}
 ----
 
 ===== Verify the {tr_mcp} service
 
 . Verify the service is running:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-systemctl status mcp-server-trento
+systemctl status {tr_mcp_binary}
 ----
 +
 Expected output:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-● mcp-server-trento.service - Trento MCP Server service
-     Loaded: loaded (/usr/lib/systemd/system/mcp-server-trento.service; enabled)
+● {tr_mcp_binary}.service - {tr_mcp} service
+     Loaded: loaded (/usr/lib/systemd/system/{tr_mcp_binary}.service; enabled)
      Active: active (running) since ...
 ----
 +
 . Check the service logs:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-journalctl -u mcp-server-trento -f
+journalctl -u {tr_mcp_binary} -f
 ----
 +
 . If firewalld is running, allow {tr_mcp} to be accessible and add an exception to firewalld:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-firewall-cmd --zone=public --add-port=5000/tcp --permanent
+firewall-cmd --zone=public --add-port={tr_mcp_default_port}/tcp --permanent
 firewall-cmd --reload
 ----
 +
 . If you enabled health checks and want to expose them, also allow the health check port:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-firewall-cmd --zone=public --add-port=8080/tcp --permanent
+firewall-cmd --zone=public --add-port={tr_mcp_health_port}/tcp --permanent
 firewall-cmd --reload
 ----
 +
 . If you enabled health checks, verify the endpoints locally:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
 # Note: Replace localhost with the server's IP/hostname if running these commands from a remote machine,
 # and ensure the health port is allowed by your firewall.
 
 # Liveness endpoint:
-curl http://localhost:8080/livez
+curl http://localhost:{tr_mcp_health_port}/livez
 
 # Example output:
 # {"info":{"name":"trento-mcp-server","version":"0.1.0"},"status":"up"}
 
 # Readiness endpoint:
-curl http://localhost:8080/readyz
+curl http://localhost:{tr_mcp_health_port}/readyz
 
 # Example output:
 # {"status":"up","details":{"mcp-server":{"status":"up","timestamp":"2025-10-09T12:11:09.528898849Z"},"wanda-api":{"status":"up","timestamp":"2025-10-09T12:11:09.542078327Z"},"web-api":{"status":"up","timestamp":"2025-10-09T12:11:09.544855047Z"}}}

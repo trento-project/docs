@@ -28,13 +28,13 @@ This configuration prompts you for your personal access token when the client st
 This option is supported by most clients, including VS Code. Check your client's documentation if the prompt feature is not available.
 ====
 
-[source,json]
+[source,json,subs="attributes"]
 ----
 {
   "servers": {
     "trento": {
       "type": "http",
-      "url": "{https://trento.example.com/mcp-server-trento/mcp}",
+      "url": "{tr_mcp_url_https}",
       "headers": {
         "Authorization": "${input:trento-personal-access-token}"
       }
@@ -44,7 +44,7 @@ This option is supported by most clients, including VS Code. Check your client's
     {
       "type": "promptString",
       "id": "trento-personal-access-token",
-      "description": "Trento API Key",
+      "description": "{trento} API key",
       "password": true
     }
   ]
@@ -59,14 +59,13 @@ For clients that don't support prompted input, or for testing purposes, set your
 ====
 When using this option, ensure your configuration file has appropriate permissions and is not committed to version control systems.
 ====
-// if {tr_mcp_url_https} changes, update url too
-[source,json]
+[source,json,subs="attributes"]
 ----
 {
   "servers": {
     "trento": {
       "type": "http",
-      "url": "https://trento.example.com/mcp-server-trento/mcp",
+      "url": "{tr_mcp_url_https}",
       "headers": {
         "Authorization": "trento-personal-access-token"
       }

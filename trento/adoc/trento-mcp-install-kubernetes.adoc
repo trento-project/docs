@@ -76,16 +76,16 @@ kubectl port-forward --namespace default \
 +
 While the previous command is running, execute:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
 # Liveness endpoint:
-curl http://localhost:8080/livez
+curl http://localhost:{tr_mcp_health_port}/livez
 ----
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
 # Readiness endpoint:
-curl http://localhost:8080/readyz
+curl http://localhost:{tr_mcp_health_port}/readyz
 ----
 +
 Example output:
@@ -115,20 +115,20 @@ By default, ingress is enabled.
 To customize the ingress configuration in a basic K3s installation:
 
 ====
-[source,bash]
+[source,bash,subs="attributes"]
 ----
 helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
-  --set global.trentoWeb.origin==TRENTO_SERVER_HOSTNAME \
+  --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
   --set trento-web.adminUser.password=ADMIN_PASSWORD \
   --set trento-mcp-server.enabled=true \
   --set trento-mcp-server.ingress.enabled=true \
   --set trento-mcp-server.ingress.hosts[0].host=TRENTO_SERVER_HOSTNAME \
-  --set trento-mcp-server.ingress.hosts[0].paths[0].path=/mcp-server-trento \
+  --set trento-mcp-server.ingress.hosts[0].paths[0].path={tr_mcp_ingress_path} \
   --set trento-mcp-server.ingress.hosts[0].paths[0].pathType=ImplementationSpecific
 ----
 ====
 
-The {tr_mcp} endpoint will be: `https://TRENTO_SERVER_HOSTNAME/mcp-server-trento/mcp`
+The {tr_mcp} endpoint will be: `https://TRENTO_SERVER_HOSTNAME{tr_mcp_ingress_path}/mcp`
 
 [[mcp-adjust-log-verbosity]]
 ====== Adjust Log Verbosity
@@ -188,15 +188,15 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 Complete example that configures external access via a custom ingress path:
 
 ====
-[source,bash]
+[source,bash,subs="attributes"]
 ----
 helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
-  --set global.trentoWeb.origin=https://trento.example.com \
+  --set global.trentoWeb.origin={tr_server_url_https} \
   --set trento-web.adminUser.password=SecurePassword123 \
   --set trento-mcp-server.enabled=true \
-  --set trento-mcp-server.mcpServer.trentoURL=https://trento.example.com \
-  --set trento-mcp-server.ingress.hosts[0].host=trento.example.com \
-  --set trento-mcp-server.ingress.hosts[0].paths[0].path=/mcp-server-trento \
+  --set trento-mcp-server.mcpServer.trentoURL={tr_server_url_https} \
+  --set trento-mcp-server.ingress.hosts[0].host={tr_server_url} \
+  --set trento-mcp-server.ingress.hosts[0].paths[0].path={tr_mcp_ingress_path} \
   --set trento-mcp-server.ingress.hosts[0].paths[0].pathType=ImplementationSpecific
 ----
 ====
