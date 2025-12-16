@@ -29,7 +29,7 @@ Find traefik specific usages link:https://github.com/search?q=repo%3Atrento-proj
 [[sec-trento-install-trentoserver-on-existing-k8s-cluster]]
 ==== Installing {trserver} on an existing {k8s} cluster
 
-{trserver} consists of a several components delivered as container images and intended for deployment on a {k8s} cluster. A manual production-ready deployment of these components requires {k8s} knowledge. Customers without in-house {k8s} expertise and who want to try {trento} with a minimum of effort, can use the {trento} Helm chart. This approach automates the deployment of all the required components on a single {k8s} cluster node. You can use the {trento} Helm chart to install {trserver} on a existing {k8s} cluster as follows:
+{trserver} consists of a several components delivered as container images and intended for deployment on a {k8s} cluster. A manual production-ready deployment of these components requires {k8s} knowledge. Customers without in-house {k8s} expertise and those who want to try {trento} with a minimum of effort, can use the {trento} Helm chart. This approach automates the deployment of all the required components on a single {k8s} cluster node. You can use the {trento} Helm chart to install {trserver} on a existing {k8s} cluster as follows:
 
 . Install Helm:
 +
@@ -70,7 +70,7 @@ HELM_EXPERIMENTAL_OCI=1 helm upgrade \
 [[sec-trento-install-trentoserver-on-k3s]]
 ==== Installing {trserver} on K3s
 
-If you do not have a {k8s} cluster, or have one but do not want to use it for {trento}, {suse} Rancher's K3s provides an alternative. To deploy {trserver} on K3s, you need a small server or VM (see <<sec-trento-server-requirements>> for minimum requirements) and follow steps in <<pro-trento-manually-installing>>.
+If you do not have a {k8s} cluster, or you have one but you do not want to use it for {trento}, you can use {suse} Rancher's K3s as an alternative. To deploy {trserver} on K3s, you need a server or VM (see <<sec-trento-server-requirements>> for minimum requirements) and follow steps in <<pro-trento-manually-installing>>.
 
 [IMPORTANT]
 ====
@@ -252,7 +252,7 @@ Password to access SMTP server
 Sender email for alert notifications
 
 `ALERTING_RECIPIENT`::
-Recipient email for alert notifications.
+Email address to receive alert notifications.
 
 The command to enable email alerts is as follows:
 
