@@ -16,7 +16,6 @@ Running all the {trserver} components requires a minimum of 4 GB of RAM, two CPU
 
 {trserver} supports different deployment scenarios: {k8s} and systemd. A {k8s}-based deployment of {trserver} is cloud-native and OS-agnostic. It can be performed on the following services:
 
-* RKE1 ({rancher_k8s_engine} version 1)
 * RKE2
 * a {k8s} service in a cloud provider
 * any other CNCF-certified {k8s} running on x86_64 architecture
@@ -56,5 +55,5 @@ Similarly, the clusters must have unique authkeys in order to be registered in {
 [[sec-trento-installation-prerequisites]]
 === Installation prerequisites
 
-* *{trserver}* For a {k8s}-based deployment, you must have access to {suse} public registry for the deployment of {trserver} containers. For a systemd deployment, you must have a registered {sles4sap} 15 (SP4 or higher) or {sles4sap} 16.0 distribution.
+* *{trserver}* For a {k8s}-based deployment, you must have access to {suse} public registry for the deployment of {trserver} containers. For a systemd deployment, you must have a registered {sles4sap} 15 (SP3 or higher) distribution.
 * *{tragent}s* A registered {sles4sap} 15 (SP3 or higher) distribution.
