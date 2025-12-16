@@ -75,6 +75,7 @@ kubectl port-forward --namespace default \
 ----
 +
 While the previous command is running, execute:
++
 [source,bash]
 ----
 # Liveness endpoint:
