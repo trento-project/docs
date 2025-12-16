@@ -229,7 +229,7 @@ Enable health checks on a custom port:
 ----
 
 [[sec-trento-mcp-help-validation]]
-==== Help and Validation
+===== Help and Validation
 
 You can see all available flags by running:
 
