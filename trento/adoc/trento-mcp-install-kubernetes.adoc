@@ -21,23 +21,6 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 ----
 ====
 
-[NOTE]
-====
-The examples in this guide do not specify a Kubernetes namespace for simplicity. By default, {helm} will install to the `default` namespace. 
-
-For production deployments, create and use a dedicated namespace.
-
-Example:
-[source,bash]
-----
-kubectl create namespace trento
-helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
-  --namespace trento \
-  --set trento-mcp-server.enabled=true \
-  ...
-----
-====
-
 The {tr_mcp} will automatically connect to the {tr_web} and {tr_wanda} internal services within the {k8s} cluster.
 
 ===== Verify the {tr_mcp} installation

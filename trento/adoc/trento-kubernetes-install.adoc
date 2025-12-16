@@ -22,6 +22,24 @@ Find traefik specific usages link:https://github.com/search?q=repo%3Atrento-proj
 
 {trserver} consists of a several components delivered as container images and intended for deployment on a {k8s} cluster. A manual production-ready deployment of these components requires {k8s} knowledge. Customers without in-house {k8s} expertise and those who want to try {trento} with a minimum of effort, can use the {trento} Helm chart. This approach automates the deployment of all the required components on a single {k8s} cluster node. You can use the {trento} Helm chart to install {trserver} on a existing {k8s} cluster as follows:
 
+[NOTE]
+====
+The examples in this section do not specify a {k8s} namespace for simplicity. By default, {helm} installs to the `default` namespace.
+
+For production deployments, create and use a dedicated namespace.
+
+Example:
+[source,bash]
+----
+kubectl create namespace trento
+helm upgrade \
+   --install trento-server oci://registry.suse.com/trento/trento-server \
+   --namespace trento \
+   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
+   --set trento-web.adminUser.password=ADMIN_PASSWORD
+----
+====
+
 . Install Helm:
 +
 ====
