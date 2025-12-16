@@ -69,7 +69,7 @@ older than the specified retention time are deleted every day at
 midnight (UTC timezone).
 
 The correlation functionality of the Activity Log links related events together,
-offering a chronological, linear view of a chain of events in a multi-step workflows
+offering a chronological, linear view of a chain of events in multi-step workflows
 triggered by a user action.
 
 For example, the host clean-up operation de-registers the database
@@ -83,4 +83,4 @@ The following categories of Activity Log entries provide a view of linked or rel
 . entries caused by de-registration of hosts
 . entries caused by API key re-generation
 . entries caused by SMLM settings save/update
-. entries caused by host and cluster operations
+. entries caused by host, cluster and {sap} operations
