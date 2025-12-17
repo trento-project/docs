@@ -12,7 +12,7 @@ include::product-attributes.adoc[]
 +
 Delivery mechanism::: RPM package for {sles4sap} 15 SP3 and newer.
 
-Supported runtime::: Supported in {sles4sap} 15 SP4 and newer, on x86_64 and ppc64le architectures.
+Supported runtime::: Supported in {sles4sap} 15 SP3 and newer, on x86_64 and ppc64le architectures.
 
 // Variable List for trserver
 {trserver}::
