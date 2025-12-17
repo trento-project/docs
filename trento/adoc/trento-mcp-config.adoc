@@ -6,11 +6,11 @@ include::product-attributes.adoc[]
 
 This section provides an overview of how to configure the {tr_mcp} depending on the deployment method.
 
-* <<sec-trento-mcp-kubernetes-config,{k8s} configuration>>
-* <<sec-trento-mcp-systemd-config,systemd RPM deployment>>
+* <<sec-trento-mcp-kubernetes-config,Configuration in a {k8s} deployment>>
+* <<sec-trento-mcp-systemd-config,Configuration in systemd RPM deployment>>
 
 [[sec-trento-mcp-kubernetes-config]]
-==== {k8s} Deployment Configuration
+==== Configuration in a {k8s} deployment
 
 ===== Configuration Sources
 
@@ -198,7 +198,7 @@ The `{tr_mcp_binary}` binary accepts several command-line flags to configure its
 
 ===== Configure {tr_mcp} with Command-Line Flags
 
-{tr_mcp} allows you to override configuration settings using command-line flags for temporary changes. These overrides are not persistent and are lost when the process stops or the system is rebooted. To make configuration changes permanent for the systemd service, update `{tr_mcp_config_file}`.
+{tr_mcp} allows you to override configuration settings using command-line flags for temporary changes. These overrides are not persistent and are lost when the process stops or the system is rebooted. To make configuration changes permanent for the systemd service, update `{tr_mcp_config_file}` and restart the service.
 
 [para]
 Basic usage with custom port, verbosity, and target URL:
