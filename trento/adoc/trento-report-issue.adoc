@@ -5,7 +5,7 @@ include::product-attributes.adoc[]
 :revdate: 2025-10-27
 
 
-{suse} customers with registered {sles4sap}{nbsp}15 (SP4 or higher) or {sles4sap} 16.0
+{suse} customers with registered {sles4sap}{nbsp}15 (SP3 or higher)
 distributions can report {trento} issues either directly in the {scc}
 or through the corresponding vendor, depending on their licensing model.
 Problems must be reported under {sles4sap}{nbsp}15 and component
@@ -18,7 +18,7 @@ In case of a {k8s} deployment, provide the output of the {trento}
 support script as explained in section
 <<sec-trento-problemanalysis>>.
 
-In case of a systemd deployment, provide the output of the {trento} support plugin, as explained in section <<sec-trento-problemanalysis>>.
+In case of a systemd deployment, provide the output of the {trento} supportconfig plugin, as explained in section <<sec-trento-problemanalysis>>.
 
 For issues with a particular {tragent}, or a component discovered by a
 particular {tragent}, also provide the following:
