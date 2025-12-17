@@ -6,7 +6,7 @@ include::product-attributes.adoc[]
 
 == MCP Integration
 
-The {tr_mcp} is an optional component which provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the link:https://modelcontextprotocol.io/introduction[Model Context Protocol] (MCP). The core {trserver} functionality works independently without it, but the {tr_mcp} component enables the option to handle common monitoring and troubleshooting tasks by using natural language with the Large Language Model (LLM) of your choice
+The {tr_mcp} is an optional component which provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the link:https://modelcontextprotocol.io/introduction[Model Context Protocol] (MCP). The core {trserver} functionality works independently without it, but the {tr_mcp} component enables the option to handle common monitoring and troubleshooting tasks by using natural language with the Large Language Model (LLM) of your choice.
 
 include::trento-mcp-install.adoc[]
 include::trento-mcp-config.adoc[]
