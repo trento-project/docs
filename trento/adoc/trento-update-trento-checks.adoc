@@ -11,7 +11,7 @@ catalog in their setup whenever updates to existing checks and new
 checks are released, without waiting for a new version release cycle.
 
 The procedure of updating the configuration checks depends on the
-{trserver} deployment type: {k8s}, systemd or containerized.
+{trserver} deployment type: {k8s} or systemd.
 
 In a {k8s} deployment, checks are delivered as a container image, and
 you can use Helm with the following options to pull the latest image:
@@ -32,18 +32,5 @@ can use Zypper to update your checks catalog:
 ----
 {prompt_sudo}zypper ref
 {prompt_sudo}zypper update trento-checks
-----
-====
-
-In a containerized deployment, checks are delivered as a container
-image, and you can user Docker to pull the latest version into the
-trento-checks volume created during the installation process:
-
-====
-[source,bash,subs="attributes"]
-----
-{prompt_user}docker run \
--v trento-checks:/usr/share/trento/checks \
-registry.suse.com/trento/trento-checks:latest
 ----
 ====

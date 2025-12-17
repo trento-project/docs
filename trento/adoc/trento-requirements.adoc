@@ -14,9 +14,8 @@ Running all the {trserver} components requires a minimum of 4 GB of RAM, two CPU
 
 {trento} is based on event-driven technology. Registered events are stored in a {postgresql} database with a default retention period of 10 days. For each host registered with {trento}, you need to allocate at least 1.5GB of space in the {postgresql} database.
 
-{trserver} supports different deployment scenarios: {k8s}, systemd, and containers. A {k8s}-based deployment of {trserver} is cloud-native and OS-agnostic. It can be performed on the following services:
+{trserver} supports different deployment scenarios: {k8s} and systemd. A {k8s}-based deployment of {trserver} is cloud-native and OS-agnostic. It can be performed on the following services:
 
-* RKE1 ({rancher_k8s_engine} version 1)
 * RKE2
 * a {k8s} service in a cloud provider
 * any other CNCF-certified {k8s} running on x86_64 architecture
@@ -56,5 +55,5 @@ Similarly, the clusters must have unique authkeys in order to be registered in {
 [[sec-trento-installation-prerequisites]]
 === Installation prerequisites
 
-*  *{trserver}* For a {k8s}-based deployment, you must have access to {suse} public registry for the deployment of {trserver} containers. For a systemd deployment, you must have a registered {sles4sap} 15 (SP3 or higher) distribution. The same applies to a containerized deployment.
+* *{trserver}* For a {k8s}-based deployment, you must have access to {suse} public registry for the deployment of {trserver} containers. For a systemd deployment, you must have a registered {sles4sap} 15 (SP3 or higher) distribution.
 * *{tragent}s* A registered {sles4sap} 15 (SP3 or higher) distribution.

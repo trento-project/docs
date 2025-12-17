@@ -1,0 +1,18 @@
+services:
+  trento-docs:
+    image: node:20-bullseye
+    volumes:
+      - .:/workspace:z
+      - trento-docs-node_modules:/workspace/trento-docs-site/node_modules
+    working_dir: /workspace/trento-docs-site
+    command: >
+      bash -lc "
+        npm install --no-save antora http-server &&
+        npx antora antora-playbook.yml &&
+        npx http-server build/trento-docs-site-public/ -c-1 -p 3000
+      "
+    ports:
+      - "3000:3000"
+
+volumes:
+  trento-docs-node_modules:
