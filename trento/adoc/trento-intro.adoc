@@ -20,7 +20,7 @@ include::product-attributes.adoc[]
 * Monitoring of CPU and memory usage at the host level through basic integration with {prometheus}.
 * API-based architecture to facilitate integration with other monitoring tools.
 * Rotating API key to protect communication from the {tragent} to the {trserver}.
-* Optional AI-assisted operations to enable natural-language interaction with {trserver}.
+* AI assistance via Model Context Protocol (MCP) integration.
 * Housekeeping capabilities.
 
 

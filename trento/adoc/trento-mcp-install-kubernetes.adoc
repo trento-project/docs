@@ -104,7 +104,6 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
   --set trento-web.adminUser.password=ADMIN_PASSWORD \
   --set trento-mcp-server.enabled=true \
-  --set trento-mcp-server.ingress.enabled=true \
   --set trento-mcp-server.ingress.hosts[0].host=TRENTO_SERVER_HOSTNAME \
   --set trento-mcp-server.ingress.hosts[0].paths[0].path={tr_mcp_ingress_path} \
   --set trento-mcp-server.ingress.hosts[0].paths[0].pathType=ImplementationSpecific
