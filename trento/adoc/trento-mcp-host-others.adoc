@@ -4,19 +4,19 @@ include::product-attributes.adoc[]
 ==== Integrating the {tr_mcp} with other clients
 :revdate: 2025-11-25
 
-The {tr_mcp} can be integrated with any client application that supports the Model Context Protocol. This allows interaction with the {trento} API and execute tools defined in the OpenAPI specification through your preferred AI assistant or development tool.
+The {tr_mcp} can be integrated with any client application that supports the Model Context Protocol. This makes it possible to interact with the {trento} API and execute tools defined in the OpenAPI specification through your preferred AI assistant or development tool.
 
-This guide uses Visual Studio Code with GitHub Copilot as the primary example, but the configuration patterns apply to any MCP-compatible host.
+This guide uses Visual Studio Code with GitHub Copilot as an example, but the configuration procedures apply to any MCP-compatible client.
 
 ===== Prerequisites
 	
-To configure your client, ensure you have:
+To configure your client, make sure that you have the following:
 
 include::partials/mcp-host-prerequisites.adoc[]
 
 ===== Configuring Your Client
 
-Once you have your {trserver} installation ready with the {tr_mcp} URL and API token, you can configure the MCP Server client. The examples below show JSON configuration format, which is used by most MCP Server clients, including VS Code, Claude Desktop, and others.
+Once you have your {trserver} installation ready with the {tr_mcp} URL and API token, you can configure the MCP Server client. The examples below show JSON configuration format used by most MCP Server clients, including VS Code, Claude Desktop, and others.
 
 
 ====== Option 1: Configuration with Prompted Input
