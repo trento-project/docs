@@ -1,5 +1,5 @@
 * API specifications
-** OpenApi
+** OpenAPI Specifications
 *** https://www.trento-project.io/web/swaggerui/[Web]
 *** https://www.trento-project.io/wanda/swaggerui/[Wanda]
 ** Elixir Modules
