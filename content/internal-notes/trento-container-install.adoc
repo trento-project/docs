@@ -200,7 +200,7 @@ Both containers must run and listen on the specified ports.
 [[sec-trento-mcp-server-container]]
 ==== Installing {tr_mcp}
 
-The {tr_mcp} provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the Model Context Protocol (MCP). This optional component enables integration with AI tools and assistants. After installation, see <<sec-trento-mcp-how-to-use>> for instructions on how to connect MCP-compatible AI assistants and tools to your Trento Server.
+The {tr_mcp} provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the Model Context Protocol (MCP). This optional component enables integration with AI tools and assistants. After installation {tr_mcp}, see <<sec-trento-mcp-how-to-use>> for instructions on how to connect MCP-compatible AI assistants and tools to your Trento Server.
 
 ===== Requirements
 
@@ -210,9 +210,9 @@ The {tr_mcp} provides AI-assisted management capabilities for your SAP landscape
 
 ===== Configuration Overview
 
-The {tr_mcp} requires minimal configuration, but needs to know how to reach your Trento Server. The key configuration parameters are:
+The {tr_mcp} must be configured to work with your {trserver}. The key configuration parameters are:
 
-* `TRENTO_MCP_TRENTO_URL`: The URL where your Trento Server is accessible. This is particularly important when Trento is deployed behind NGINX or other reverse proxies. Use the externally accessible URL (e.g., `https://trento.example.com`) rather than internal service URLs. When set, the server will use this URL for OpenAPI specification autodiscovery.
+* `TRENTO_MCP_TRENTO_URL`: The URL where your {trserver} is accessible. This is particularly important when Trento is deployed behind NGINX or other reverse proxies. Use the externally accessible URL (for example, `https://trento.example.com`) instead of internal service URLs. When set, the server will use this URL for OpenAPI specification autodiscovery.
 
 * `TRENTO_MCP_OAS_PATH`: Explicit paths to OpenAPI specification files. Use this when you want to directly specify the location of the API specifications instead of relying on autodiscovery. This is particularly useful when you want to connect to internal services (such as `localhost` or Kubernetes service names) instead of going through a reverse proxy.
 
