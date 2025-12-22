@@ -1,0 +1,909 @@
+= RFC: SLES 16 System Metrics Support via Grafana Alloy
+:author: Trento Engineering Team
+:revdate: December 2025
+:revnumber: 2.2
+:toc: left
+:toclevels: 3
+:icons: font
+:source-highlighter: highlight.js
+
+[width="100%",cols="<18%,<82%"]
+|===
+|Feature Name |System Metrics Support via Grafana Alloy
+|Start Date |Dec 22nd, 2025
+|Category |Architecture, Monitoring
+|PR |https://github.com/trento-project/docs/pull/126
+|Status |Draft
+|===
+
+== Summary
+
+This RFC proposes an approach to enable real-time system monitoring (CPU, memory) on SLES 16 hosts by integrating with Grafana Alloy, replacing the `node_exporter`-based solution currently used on SLES 15. The solution ensures both SLES 15 and SLES 16 are supported simultaneously, with conditional packaging and systemd configuration based on the target OS.
+
+== Goals
+
+* **Maintain user experience parity**: Trento users should have the same seamless monitoring experience on SLES 16 as on SLES 15; this considering both agent installation and server-side metrics consumption
+* **Support both SLES versions**: Trento must support both scenarios concurrently, as many customers will have mixed environments
+* **Non-invasive integration**: Trento-specific configuration should not interfere with existing Alloy configurations
+* **User control over configuration**: Users maintain full control over where and how Alloy configuration is deployed
+
+== Context
+
+=== Current Architecture: `node_exporter`-based
+
+Trento currently achieves real-time system monitoring through the following architecture:
+
+* Each monitored host runs a `node_exporter` instance
+* The `node_exporter` runs as a systemd unit
+* The Trento Agent declares the `node_exporter` as a systemd dependency (`Wants=` and `After=`)
+* Prometheus queries Trento Web to retrieve the list of `node_exporter` endpoint for the hosts to monitor
+* Prometheus pulls metrics from each `node_exporter` endpoint
+* Users do not need to manually configure or interact with the `node_exporter`
+
+This approach provides a seamless, zero-configuration experience for Trento users.
+
+=== Incoming Architecture: `alloy`-based
+
+SUSE Linux Enterprise Server 16 no longer ships the `node_exporter` package. Instead, SLES 16 adopts Grafana Alloy as the preferred telemetry collection agent.
+
+Grafana Alloy is an OpenTelemetry Collector distribution that includes built-in Prometheus pipelines. Unlike `node_exporter`, which exposes metrics for Prometheus to pull, Alloy can push metrics directly to a Prometheus-compatible endpoint using `prometheus.remote_write`.
+
+== Detailed Design
+
+=== Overview
+
+* The Trento Agent provides an explicit command (`trento-agent generate alloy`) to produce Alloy configuration
+* The generated configuration is printed to stdout, giving users full control over deployment
+* Two separate systemd unit files will be created: one for SLES 15 (using `node_exporter`) and one for SLES 16 (using `alloy`); the appropriate unit will be installed based on the target OS during RPM installation
+* On `alloy`-based systems, metrics will be pushed to Prometheus; Trento Web can continue to query Prometheus for metrics as before
+
+=== High-Level Architecture
+
+[mermaid]
+----
+flowchart TB
+    subgraph SERVER["TRENTO SERVER"]
+        WEB["Trento Web"]
+        subgraph EDGE["Edge (nginx/Ingress)"]
+            TLS["TLS Termination"]
+            AUTH["Authentication"]
+        end
+    end
+
+    subgraph PROM["Prometheus"]
+        RW["Remote Write Receiver"]
+    end
+
+    subgraph SLES15["SLES 15 HOST"]
+        NE15["prometheus-node_exporter<br/>(systemd)"]
+        TA15["Trento Agent<br/>(metrics_provider: node_exporter)"]
+    end
+
+    subgraph SLES16["SLES 16 HOST"]
+        ALLOY["Grafana Alloy<br/>(systemd)"]
+        TA16["Trento Agent<br/>(metrics_provider: alloy)"]
+    end
+
+    PROM -->|"pull"| NE15
+    ALLOY -->|"push (HTTPS)"| EDGE
+    EDGE -->|"proxy"| RW
+    TA15 -->|"discovery"| WEB
+    TA16 -->|"discovery"| WEB
+    WEB -->|"query"| PROM
+
+    style SERVER fill:#e1f5fe
+    style SLES15 fill:#fff3e0
+    style SLES16 fill:#e8f5e9
+    style PROM fill:#bbdefb
+    style EDGE fill:#ffecb3
+----
+
+=== Host Configuration
+
+This section covers all configuration required on the monitored hosts (SLES 15 and SLES 16).
+
+==== Alloy Configuration Generation Command
+
+The Trento Agent provides an explicit command to generate the Alloy configuration. The agent does **not** write the configuration file directly; instead, it outputs the configuration to stdout, allowing users to review and deploy it as appropriate for their environment.
+
+===== Command Syntax
+
+[source,bash]
+----
+trento-agent generate alloy [options]
+----
+
+===== Command Options
+
+Options can be passed as command-line flags, environment variables, or via the configuration file (following the standard Trento agent configuration patterns).
+
+[cols="2,2,1,3"]
+|===
+|Flag |Environment Variable |Required |Description
+
+|`--prometheus-url`
+|`TRENTO_PROMETHEUS_URL`
+|Yes
+|The Prometheus remote write endpoint URL
+
+|`--prometheus-auth`
+|`TRENTO_PROMETHEUS_AUTH`
+|No
+|Authentication method: `none`, `basic`, `bearer`, `mtls` (default: `bearer`)
+
+|`--prometheus-auth-username`
+|`TRENTO_PROMETHEUS_AUTH_USERNAME`
+|No
+|Username for basic authentication
+
+|`--prometheus-auth-password`
+|`TRENTO_PROMETHEUS_AUTH_PASSWORD`
+|No
+|Password for basic authentication
+
+|`--prometheus-auth-bearer-token`
+|`TRENTO_PROMETHEUS_AUTH_BEARER_TOKEN`
+|No
+|Bearer token for bearer authentication
+
+|`--prometheus-tls-ca-cert`
+|`TRENTO_PROMETHEUS_TLS_CA_CERT`
+|No
+|Path to CA certificate file for TLS verification
+
+|`--prometheus-tls-client-cert`
+|`TRENTO_PROMETHEUS_TLS_CLIENT_CERT`
+|No
+|Path to client certificate file for mTLS authentication
+
+|`--prometheus-tls-client-key`
+|`TRENTO_PROMETHEUS_TLS_CLIENT_KEY`
+|No
+|Path to client private key file for mTLS authentication
+
+|`--scrape-interval`
+|`TRENTO_SCRAPE_INTERVAL`
+|No
+|Metrics scrape interval (default: `15s`)
+
+|`--force-agent-id`
+|`TRENTO_FORCE_AGENT_ID`
+|No
+|Override the automatically determined agent ID (use only for development/testing)
+|===
+
+NOTE: The `agent-id` is automatically determined by the agent using the same mechanism as the `start` command. It can be overridden with `--force-agent-id` for development and testing purposes, but this should not be used in production.
+
+===== Configuration File
+
+Options can also be specified in the Trento agent configuration file:
+
+[source,yaml]
+----
+# /etc/trento/agent.yaml
+
+api-key: <api-key-generated-from-the-server>
+server-url: https://localhost
+facts-service-url: amqp://guest:guest@localhost:5672
+
+# Alloy configuration options
+prometheus-url: https://trento.example.com/api/v1/write
+scrape-interval: 15s
+
+# Authentication for Prometheus remote write endpoint
+# Supported values: none, basic, bearer, mtls
+# Default: bearer
+prometheus-auth: bearer
+prometheus-auth-bearer-token: <token>
+
+# Alternative: Basic authentication
+# prometheus-auth: basic
+# prometheus-auth-username: trento
+# prometheus-auth-password: <password>
+
+# Alternative: mTLS authentication
+# prometheus-auth: mtls
+# prometheus-tls-ca-cert: /etc/trento/certs/ca.crt
+# prometheus-tls-client-cert: /etc/trento/certs/client.crt
+# prometheus-tls-client-key: /etc/trento/certs/client.key
+----
+
+===== Usage Examples
+
+.Print configuration to stdout (using config file)
+[source,bash]
+----
+trento-agent generate alloy
+----
+
+.Print configuration to stdout (using flags)
+[source,bash]
+----
+trento-agent generate alloy \
+  --prometheus-url "https://trento.example.com/api/v1/write"
+----
+
+.With bearer token authentication (default)
+[source,bash]
+----
+trento-agent generate alloy \
+  --prometheus-url "https://trento.example.com/api/v1/write" \
+  --prometheus-auth bearer \
+  --prometheus-auth-bearer-token "my-secret-token"
+----
+
+.With basic authentication
+[source,bash]
+----
+trento-agent generate alloy \
+  --prometheus-url "https://trento.example.com/api/v1/write" \
+  --prometheus-auth basic \
+  --prometheus-auth-username trento \
+  --prometheus-auth-password "secret"
+----
+
+.With mTLS authentication
+[source,bash]
+----
+trento-agent generate alloy \
+  --prometheus-url "https://trento.example.com/api/v1/write" \
+  --prometheus-auth mtls \
+  --prometheus-tls-ca-cert /etc/trento/certs/ca.crt \
+  --prometheus-tls-client-cert /etc/trento/certs/client.crt \
+  --prometheus-tls-client-key /etc/trento/certs/client.key
+----
+
+.Print configuration to stdout (using environment variables)
+[source,bash]
+----
+TRENTO_PROMETHEUS_URL="https://trento.example.com/api/v1/write" \
+TRENTO_PROMETHEUS_AUTH="bearer" \
+TRENTO_PROMETHEUS_AUTH_BEARER_TOKEN="my-secret-token" \
+  trento-agent generate alloy
+----
+
+.Pipe to file with correct ownership
+[source,bash]
+----
+trento-agent generate alloy \
+  | sudo tee /etc/alloy/config.d/trento.alloy > /dev/null
+
+sudo chown alloy:alloy /etc/alloy/config.d/trento.alloy
+sudo chmod 640 /etc/alloy/config.d/trento.alloy
+sudo systemctl reload alloy
+----
+
+===== Implementation
+
+[source,go]
+----
+// cmd/generate_alloy.go
+
+package cmd
+
+import (
+    "embed"
+    "fmt"
+    "os"
+    "text/template"
+    
+    "github.com/spf13/cobra"
+    "github.com/spf13/viper"
+)
+
+//go:embed templates/trento.alloy.tmpl
+var alloyTemplate string
+
+type AlloyConfigData struct {
+    AgentID        string
+    PrometheusURL  string
+    ScrapeInterval string
+    
+    // Authentication
+    AuthMethod      string // "none", "basic", "bearer", or "mtls"
+    AuthUsername    string // for basic auth
+    AuthPassword    string // for basic auth
+    AuthBearerToken string // for bearer auth
+    
+    // TLS
+    TLSCACert     string // CA certificate path
+    TLSClientCert string // Client certificate path (for mTLS)
+    TLSClientKey  string // Client key path (for mTLS)
+}
+
+var generateAlloyCmd = &cobra.Command{
+    Use:   "alloy",
+    Short: "Generate Alloy configuration for Trento metrics collection",
+    Long: `Generate a Grafana Alloy configuration file for collecting system metrics
+and pushing them to the Trento server's Prometheus endpoint.
+
+The configuration is printed to stdout. Pipe the output to your preferred 
+location or use shell redirection to save to a file.
+
+Options can be provided via command-line flags, environment variables 
+(TRENTO_ prefix), or the configuration file.`,
+    RunE: runGenerateAlloy,
+}
+
+func runGenerateAlloy(cmd *cobra.Command, args []string) error {
+    prometheusURL := viper.GetString("prometheus-url")
+    scrapeInterval := viper.GetString("scrape-interval")
+    authMethod := viper.GetString("prometheus-auth")
+    
+    // Agent ID is determined automatically, same as in 'start' command
+    agentID, err := getAgentID()
+    if err != nil {
+        return fmt.Errorf("failed to determine agent ID: %w", err)
+    }
+    
+    // Allow override for development/testing (hidden flag)
+    if forceID := viper.GetString("force-agent-id"); forceID != "" {
+        agentID = forceID
+    }
+    
+    if prometheusURL == "" {
+        return fmt.Errorf("prometheus-url is required")
+    }
+    
+    data := AlloyConfigData{
+        AgentID:        agentID,
+        PrometheusURL:  prometheusURL,
+        ScrapeInterval: scrapeInterval,
+        AuthMethod:     authMethod,
+        TLSCACert:      viper.GetString("prometheus-tls-ca-cert"),
+    }
+    
+    // Validate and populate auth configuration based on method
+    switch authMethod {
+    case "none":
+        // No additional configuration needed
+    case "basic":
+        data.AuthUsername = viper.GetString("prometheus-auth-username")
+        data.AuthPassword = viper.GetString("prometheus-auth-password")
+        if data.AuthUsername == "" || data.AuthPassword == "" {
+            return fmt.Errorf("prometheus-auth-username and prometheus-auth-password are required for basic authentication")
+        }
+    case "bearer":
+        data.AuthBearerToken = viper.GetString("prometheus-auth-bearer-token")
+        if data.AuthBearerToken == "" {
+            return fmt.Errorf("prometheus-auth-bearer-token is required for bearer authentication")
+        }
+    case "mtls":
+        data.TLSClientCert = viper.GetString("prometheus-tls-client-cert")
+        data.TLSClientKey = viper.GetString("prometheus-tls-client-key")
+        if data.TLSClientCert == "" || data.TLSClientKey == "" {
+            return fmt.Errorf("prometheus-tls-client-cert and prometheus-tls-client-key are required for mTLS authentication")
+        }
+    default:
+        return fmt.Errorf("unsupported authentication method: %s (supported: none, basic, bearer, mtls)", authMethod)
+    }
+    
+    tmpl, err := template.New("alloy").Parse(alloyTemplate)
+    if err != nil {
+        return fmt.Errorf("failed to parse template: %w", err)
+    }
+    
+    return tmpl.Execute(os.Stdout, data)
+}
+
+func init() {
+    generateCmd.AddCommand(generateAlloyCmd)
+    
+    generateAlloyCmd.Flags().String("prometheus-url", "", "Prometheus remote write URL")
+    generateAlloyCmd.Flags().String("prometheus-auth", "bearer", "Authentication method: none, basic, bearer, mtls")
+    generateAlloyCmd.Flags().String("prometheus-auth-username", "", "Username for basic authentication")
+    generateAlloyCmd.Flags().String("prometheus-auth-password", "", "Password for basic authentication")
+    generateAlloyCmd.Flags().String("prometheus-auth-bearer-token", "", "Bearer token for bearer authentication")
+    generateAlloyCmd.Flags().String("prometheus-tls-ca-cert", "", "Path to CA certificate for TLS verification")
+    generateAlloyCmd.Flags().String("prometheus-tls-client-cert", "", "Path to client certificate for mTLS")
+    generateAlloyCmd.Flags().String("prometheus-tls-client-key", "", "Path to client key for mTLS")
+    generateAlloyCmd.Flags().String("scrape-interval", "15s", "Metrics scrape interval")
+    generateAlloyCmd.Flags().String("force-agent-id", "", "Override agent ID (development only)")
+    generateAlloyCmd.Flags().MarkHidden("force-agent-id")
+    
+    // Bind flags to viper for config file support
+    viper.BindPFlag("prometheus-url", generateAlloyCmd.Flags().Lookup("prometheus-url"))
+    viper.BindPFlag("prometheus-auth", generateAlloyCmd.Flags().Lookup("prometheus-auth"))
+    viper.BindPFlag("prometheus-auth-username", generateAlloyCmd.Flags().Lookup("prometheus-auth-username"))
+    viper.BindPFlag("prometheus-auth-password", generateAlloyCmd.Flags().Lookup("prometheus-auth-password"))
+    viper.BindPFlag("prometheus-auth-bearer-token", generateAlloyCmd.Flags().Lookup("prometheus-auth-bearer-token"))
+    viper.BindPFlag("prometheus-tls-ca-cert", generateAlloyCmd.Flags().Lookup("prometheus-tls-ca-cert"))
+    viper.BindPFlag("prometheus-tls-client-cert", generateAlloyCmd.Flags().Lookup("prometheus-tls-client-cert"))
+    viper.BindPFlag("prometheus-tls-client-key", generateAlloyCmd.Flags().Lookup("prometheus-tls-client-key"))
+    viper.BindPFlag("scrape-interval", generateAlloyCmd.Flags().Lookup("scrape-interval"))
+    viper.BindPFlag("force-agent-id", generateAlloyCmd.Flags().Lookup("force-agent-id"))
+}
+----
+
+==== Systemd Unit Files
+
+Two separate systemd unit files are required to support both `node_exporter`-based and `alloy`-based systems.
+
+===== Using `node_exporter` (`packaging/systemd/trento-agent.service`)
+
+[source,ini]
+----
+[Unit]
+Description=Trento agent service
+Wants=prometheus-node_exporter.service
+After=prometheus-node_exporter.service
+
+[Service]
+ExecStart=/usr/bin/trento-agent start
+Type=simple
+User=root
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+----
+
+===== Using `alloy` (`packaging/systemd/trento-agent-alloy.service`)
+
+[source,ini]
+----
+[Unit]
+Description=Trento agent service
+Wants=alloy.service
+After=alloy.service
+
+[Service]
+ExecStartPre=/usr/share/trento/configure-alloy.sh
+ExecStart=/usr/bin/trento-agent start
+Type=simple
+User=root
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+----
+
+NOTE: The `ExecStartPre` directive runs the `configure-alloy.sh` script, which generates and deploys the Alloy configuration before starting the agent. The script reads `prometheus-url` and other options from the configuration file (`/etc/trento/agent.yaml`). The `agent-id` is automatically determined.
+
+===== Alloy Configuration Script (`packaging/scripts/configure-alloy.sh`)
+
+The script handles Alloy configuration generation, file permissions, and service reload:
+
+[source,bash]
+----
+#!/bin/bash
+# configure-alloy.sh - Generate and deploy Trento Alloy configuration
+#
+# This script is executed by systemd before starting the trento-agent service.
+# It generates the Alloy configuration, sets appropriate permissions, and
+# reloads the Alloy service.
+
+set -euo pipefail
+
+ALLOY_CONFIG_DIR="/etc/alloy/config.d"
+ALLOY_CONFIG_FILE="${ALLOY_CONFIG_DIR}/trento.alloy"
+ALLOY_USER="alloy"
+ALLOY_GROUP="alloy"
+
+# Ensure the config directory exists
+mkdir -p "${ALLOY_CONFIG_DIR}"
+
+# Generate the Alloy configuration
+/usr/bin/trento-agent generate alloy > "${ALLOY_CONFIG_FILE}"
+
+# Set ownership and permissions
+chown "${ALLOY_USER}:${ALLOY_GROUP}" "${ALLOY_CONFIG_FILE}"
+chmod 640 "${ALLOY_CONFIG_FILE}"
+
+# Reload Alloy to pick up the new configuration
+systemctl reload alloy
+
+echo "Trento Alloy configuration deployed to ${ALLOY_CONFIG_FILE}"
+----
+
+===== Configuration File Requirements
+
+For the `alloy`-based systemd unit to work, the configuration file must include the `prometheus-url` option. Authentication settings are required for production deployments (bearer token is the default):
+
+[source,yaml]
+----
+# /etc/trento/agent.yaml
+
+api-key: <api-key-generated-from-the-server>
+server-url: https://trento.example.com
+facts-service-url: amqp://guest:guest@localhost:5672
+
+# Required for alloy-based systems
+prometheus-url: https://trento.example.com/api/v1/write
+scrape-interval: 15s  # optional, defaults to 15s
+
+# Authentication (bearer is the default)
+prometheus-auth: bearer
+prometheus-auth-bearer-token: <token>
+----
+
+WARNING: The configuration file contains sensitive credentials. Ensure it has appropriate permissions (`chmod 600 /etc/trento/agent.yaml`).
+
+===== Alternative: Manual Configuration Deployment
+
+For environments where automatic configuration deployment is not desired, users can use a simpler systemd unit and deploy the configuration manually:
+
+[source,ini]
+----
+[Unit]
+Description=Trento agent service
+Wants=alloy.service
+After=alloy.service
+
+[Service]
+ExecStart=/usr/bin/trento-agent start
+Type=simple
+User=root
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+----
+
+In this case, users must manually run the `trento-agent generate alloy` command and deploy the configuration before starting the service.
+
+==== Open Build Service Packaging
+
+The RPM spec file conditionally installs the appropriate systemd unit and supporting scripts based on the target SLES version using OBS macros.
+
+.RPM Spec `%install` Section
+[source,spec]
+----
+%install
+
+# Install the binary
+install -D -m 0755 %{binaryname} "%{buildroot}%{_bindir}/%{binaryname}"
+
+# Install the appropriate systemd unit based on SLES version
+%if 0%{?sle_version} >= 160000
+# SLES 16 and later: use Alloy-based service
+install -D -m 0644 packaging/systemd/trento-agent-alloy.service \
+    %{buildroot}%{_unitdir}/trento-agent.service
+# Install the Alloy configuration script
+install -D -m 0755 packaging/scripts/configure-alloy.sh \
+    %{buildroot}%{_datadir}/trento/configure-alloy.sh
+%else
+# SLES 15 and earlier: use node_exporter-based service
+install -D -m 0644 packaging/systemd/trento-agent.service \
+    %{buildroot}%{_unitdir}/trento-agent.service
+%endif
+----
+
+.RPM Spec `%files` Section
+[source,spec]
+----
+%files
+%{_bindir}/%{binaryname}
+%{_unitdir}/trento-agent.service
+%if 0%{?sle_version} >= 160000
+%{_datadir}/trento/configure-alloy.sh
+%endif
+----
+
+NOTE: The `sle_version` macro is provided by OBS and contains the SLES version as an integer (e.g., `150000` for SLES 15, `160000` for SLES 16). The `configure-alloy.sh` script is only installed on SLES 16 and later.
+
+==== Alloy Configuration Directory Strategy
+
+On SLES 16, Trento uses Alloy's directory-based configuration loading:
+
+[source]
+----
+/etc/alloy/
+├── config.alloy          # Main Alloy config (user/system managed)
+└── config.d/
+    └── trento.alloy      # Trento-managed configuration (generated by trento-agent)
+----
+
+==== Alloy Configuration Template
+
+The Alloy configuration is embedded in the Trento Agent binary as a Go template. The template conditionally includes authentication blocks based on the configured authentication method.
+
+.Embedded Go Template (`internal/agent/templates/trento.alloy.tmpl`)
+[source,alloy]
+----
+// =============================================================================
+// Trento System Metrics Configuration
+// Generated by: trento-agent generate alloy
+// Agent ID: {{ .AgentID }}
+//
+// This file is managed by Trento. Manual changes may be overwritten.
+// =============================================================================
+
+// Collect system metrics (CPU, memory, etc.) using the built-in unix exporter
+prometheus.exporter.unix "trento_system" {
+    set_collectors = [
+        "cpu",
+        "cpufreq",
+        "loadavg",
+        "meminfo",
+        "filesystem",
+        "netdev",
+        "uname",
+    ]
+}
+
+// Relabel metrics for Trento identification
+discovery.relabel "trento_system" {
+    targets = prometheus.exporter.unix.trento_system.targets
+
+    rule {
+        target_label = "agentID"
+        replacement  = "{{ .AgentID }}"
+    }
+}
+
+// Scrape the system metrics
+prometheus.scrape "trento_system" {
+    targets         = discovery.relabel.trento_system.output
+    forward_to      = [prometheus.remote_write.trento.receiver]
+    scrape_interval = "{{ .ScrapeInterval }}"
+}
+
+// Push metrics to Trento server's Prometheus endpoint
+prometheus.remote_write "trento" {
+    endpoint {
+        url = "{{ .PrometheusURL }}"
+{{- if eq .AuthMethod "basic" }}
+
+        basic_auth {
+            username = "{{ .AuthUsername }}"
+            password = "{{ .AuthPassword }}"
+        }
+{{- else if eq .AuthMethod "bearer" }}
+
+        bearer_token = "{{ .AuthBearerToken }}"
+{{- end }}
+
+        tls_config {
+            insecure_skip_verify = false
+{{- if .TLSCACert }}
+            ca_file = "{{ .TLSCACert }}"
+{{- end }}
+{{- if eq .AuthMethod "mtls" }}
+            cert_file = "{{ .TLSClientCert }}"
+            key_file  = "{{ .TLSClientKey }}"
+{{- end }}
+        }
+    }
+}
+----
+
+IMPORTANT: The `agentID` label is critical for correlating metrics with specific Trento-managed hosts. This label MUST be present on all metrics pushed to the Trento server.
+
+
+=== Trento Server Modifications
+
+This section covers modifications required on the Trento Server to support both node_exporter and Alloy-based hosts.
+
+==== Host Discovery Workflow
+
+The host discovery workflow must be updated to accept hosts that declare their metrics provider type. Each host will exclusively use either `node_exporter`-based or `alloy`-based.
+
+===== Host Discovery Payload
+
+The host discovery payload is extended:
+
+----
+TBD
+----
+
+==== Prometheus Targets API
+
+Currently, the endpoint returns all the hosts with their `node_exporter` endpoints. It must be updated to filter out `alloy`-based hosts.
+
+=== Prometheus Configuration
+
+This section covers Prometheus configuration required on the Trento Server to accept push-based metrics from Alloy.
+
+==== Enable Remote Write Receiver
+
+Prometheus must be configured to accept remote write requests from Alloy agents.
+
+===== Configuration Option
+
+Add to `prometheus.yml`:
+
+[source,yaml]
+----
+# Enable remote write receiver for Alloy-based hosts
+remote_write_receiver:
+  enable: true
+----
+
+===== Command Line Option
+
+Alternatively, start Prometheus with:
+
+[source,bash]
+----
+prometheus --web.enable-remote-write-receiver
+----
+
+IMPORTANT: **Prometheus configuration is not impacted by the authentication method nor TLS management.** They are both handled at the edge (reverse proxy or Kubernetes Ingress), not by Prometheus itself. Prometheus only needs to enable the remote write receiver; all TLS termination and credential validation happens at the edge layer. See the Authentication section for more details.
+
+
+=== Authentication
+
+Authentication for the Prometheus remote write endpoint is handled at the **edge layer** (reverse proxy or Kubernetes Ingress), not by Prometheus itself. Such a separation of concerns provides better security and flexibility for the users to choose their preferred authentication method.
+
+==== Supported Client Authentication Methods
+
+The Trento agent can generate Alloy configurations for the following authentication methods. The edge layer must be configured to validate these credentials.
+
+[cols="1,2"]
+|===
+|Method |`prometheus-auth` value 
+
+|None
+|`none`
+
+|Bearer Token
+|`bearer`
+
+|Basic Authentication
+|`basic`
+
+|Mutual TLS (mTLS)
+|`mtls`
+|===
+
+
+When `prometheus-auth` is set to `none`, the generated Alloy configuration will not include any authentication blocks. This is suitable only for:
+
+* Development/testing environments
+* Fully isolated networks with no external access
+
+WARNING: Running without authentication in production is not recommended. Anyone with network access could push arbitrary metrics to Prometheus.
+
+==== Trento Out-of-the-Box Installations
+
+For Trento's provided installation methods, bearer token authentication is pre-configured:
+
+* **systemd deployments**: nginx is configured with bearer token validation
+* **Helm deployments**: Kubernetes Ingress is configured with bearer token validation
+
+== Handling Edge Cases
+
+=== SLES 15 SP7
+
+SLES 15 SP7 introduces Grafana Alloy as an optional package. The Trento Agent must continue using `node_exporter` on SLES 15 systems, regardless of Alloy availability.
+
+SLES 15 SP7 users that wish to use Alloy must manually configure it outside of Trento's management. We must document this scenario accordingly.
+
+=== Alloy Already Running with Existing Configuration
+
+When Alloy is already running with user-defined configuration:
+
+* The Trento configuration file is added to the `config.d/` directory
+* Alloy configuration is reloaded via `systemctl reload`
+* Alloy merges all `*.alloy` files from the directory
+
+IMPORTANT: Component names must be unique across all configuration files. The Trento configuration uses the `trento_` prefix to avoid conflicts:
+
+* `prometheus.exporter.unix "trento_system"`
+* `prometheus.scrape "trento_system"`
+* `prometheus.remote_write "trento"`
+
+=== Alloy Not Installed on `alloy`-based Systems
+
+If Alloy is not installed on an `alloy`-based system, the systemd unit will fail to start due to missing `alloy.service` dependency.
+
+=== Configuration Conflicts
+
+If the Trento configuration conflicts with existing user configuration:
+
+* Alloy will fail to load and report an error
+* The Trento Agent should detect this failure and log actionable information
+* Users may need to review and adjust their existing configuration
+
+=== Configuration Regeneration
+
+The Trento configuration should be regenerated when:
+
+* The Prometheus endpoint URL changes
+* The agent is upgraded to a new version with template changes
+
+Users can regenerate the configuration by running:
+
+[source,bash]
+----
+trento-agent generate alloy > /etc/alloy/config.d/trento.alloy
+chown alloy:alloy /etc/alloy/config.d/trento.alloy
+systemctl reload alloy
+----
+
+If using the systemd unit with `ExecStartPre`, restarting the service will automatically regenerate the configuration:
+
+[source,bash]
+----
+systemctl restart trento-agent
+----
+
+=== Removing Trento Agent from `alloy`-based Systems
+
+When Trento agent is uninstalled:
+
+* Remove `/etc/alloy/config.d/trento.alloy`
+* Reload Alloy configuration
+* Alloy continues operating with remaining configurations
+
+This cleanup should be handled in the RPM `%postun` scriptlet:
+
+[source,spec]
+----
+%postun
+%if 0%{?sle_version} >= 160000
+rm -f /etc/alloy/config.d/trento.alloy
+systemctl reload alloy 2>/dev/null || true
+%endif
+%systemd_postun_with_restart trento-agent.service
+----
+
+== Open Questions
+
+=== Should we provide both automatic and manual deployment options?
+
+The RFC proposes using `ExecStartPre` in the systemd unit to automatically generate and deploy the configuration. Alternatively, we could require manual deployment only.
+
+* **Automatic (ExecStartPre)**: Better user experience, but less control
+* **Manual only**: More explicit, users must understand the process
+
+Recommendation: Provide the automatic option as default, with documentation for manual deployment.
+
+== Summary of Changes
+[cols="20,20,60"]
+|===
+|Action |Target |Description
+
+|Add CLI command
+|Trento Agent
+|Implement "trento-agent generate alloy" to render the Alloy configuration to stdout using agent state, flags, environment and config file.
+
+|Change host discovery payload
+|Trento Agent
+|Extend host discovery payload to include metrics provider type (node_exporter or alloy).
+
+|Change agent configuration file
+|Trento Agent
+|Add options for Prometheus remote write URL, authentication method and credentials.
+
+|Conditional systemd unit install
+|Trento Agent (rpm)
+|Install trento-agent-alloy.service for SLES 16+ and trento-agent.service (node_exporter) for SLES 15 and earlier using sle_version macro.
+
+|Install configure-alloy.sh script
+|Trento Agent (rpm)
+|Install configure-alloy.sh to /usr/share/trento/ for SLES 16+. Script generates /etc/alloy/config.d/trento.alloy, sets alloy:alloy ownership and 0640 permissions, then reloads alloy.
+
+|Prometheus remote write enablement
+|Trento helm chart / nginx config
+|Enable Prometheus remote_write_receiver and route TLS/auth termination to the edge (nginx/Ingress) so Alloy can push metrics securely.
+
+|Prometheus remote write auth
+|Trento helm chart / nginx config
+|Configure nginx/Ingress to validate bearer tokens (default) for Prometheus remote write endpoint.
+
+|Discovery and targets API update
+|Trento Web
+|Extend host discovery payload to include metrics provider type and update targets API to filter out alloy-based hosts from node_exporter lists.
+
+|Uninstall cleanup
+|RPM %postun scriptlet
+|Remove /etc/alloy/config.d/trento.alloy and reload alloy on uninstall for SLES 16+ (best-effort).
+
+|Documentation and guidance
+|Docs repository
+|Document usage examples, security recommendations (avoid none in production), SLES 15 SP7 behavior, conflict handling and regeneration steps.
+|===
+
+
+== References
+
+* https://grafana.com/docs/alloy/latest/[Grafana Alloy Documentation]
+* https://grafana.com/docs/alloy/latest/reference/components/prometheus/prometheus.exporter.unix/[prometheus.exporter.unix Component]
+* https://grafana.com/docs/alloy/latest/reference/components/prometheus/prometheus.remote_write/[prometheus.remote_write Component]
+* https://kubernetes.github.io/ingress-nginx/examples/auth/client-certs/[nginx Ingress Client Certificate Authentication]
+* https://nginx.org/en/docs/http/ngx_http_ssl_module.html[nginx SSL Module]
