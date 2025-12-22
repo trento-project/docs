@@ -1,0 +1,364 @@
+== 1. System Metrics Support via Grafana Alloy
+
+[width="100%",cols="<18%,<82%",]
+|===
+|Feature Name | Personal Access Tokens Management and Authentication
+|Start Date | Dec 22nd, 2025
+|Category | Architecture, Monitoring
+|PR | https://github.com/trento-project/docs/pull/126
+|Status | Approved
+|===
+
+
+== Summary
+
+This RFC proposes an approach to enable real-time system monitoring (CPU, memory) on SLES 16 hosts by integrating with Grafana Alloy, replacing the `node_exporter`-based solution currently used on SLES 15. The solution ensures both SLES 15 and SLES 16 are supported simultaneously, with conditional packaging and systemd configuration based on the target OS.
+
+== Goals
+
+* **Maintain user experience parity**: Trento users should have the same seamless monitoring experience on SLES 16 as on SLES 15; this considering both agent installation and server-side metrics consumption
+* **Support both SLES versions**: Trento must support both scenarios concurrently, as many customers will have mixed environments
+* **Non-invasive integration**: Trento-specific configuration should not interfere with existing Alloy configurations
+
+== Context
+
+=== Current Architecture: `node_exporter`-based
+
+Trento currently achieves real-time system monitoring through the following architecture:
+
+* Each monitored host runs a `node_exporter` instance
+* The `node_exporter` runs as a systemd unit
+* The Trento Agent declares the `node_exporter` as a systemd dependency (`Wants=` and `After=`)
+* Prometheus queries Trento Web to retrieve the list of `node_exporter` endpoint for the hosts to monitor
+* Prometheus pulls metrics from each `node_exporter` endpoint
+* Users do not need to manually configure or interact with the `node_exporter`
+
+This approach provides a seamless, zero-configuration experience for Trento users.
+
+=== Incoming Architecture: `alloy`-based
+
+SUSE Linux Enterprise Server 16 no longer ships the `node_exporter` package. Instead, SLES 16 adopts Grafana Alloy as the preferred telemetry collection agent.
+
+Grafana Alloy is an OpenTelemetry Collector distribution that includes built-in Prometheus pipelines. Unlike `node_exporter`, which exposes metrics for Prometheus to pull, Alloy can push metrics directly to a Prometheus-compatible endpoint using `prometheus.remote_write`.
+
+
+== Detailed Design
+
+=== Overview
+
+* On `alloy`-based systems, the Trento Agent will install a Trento-specific Alloy configuration file that can be loaded alongside any existing user configuration
+* Two separate systemd unit files will be created: one for SLES 15 (using `node_exporter`) and one for SLES 16 (using `alloy`); the appropriate unit will be installed based on the target OS during RPM installation
+* On `alloy`-based systems, metrics will be pushed to Prometheus; Trento Web can continue to query Prometheus for metrics as before
+
+=== High-Level Architecture
+
+[mermaid]
+----
+flowchart TB
+    subgraph SERVER["TRENTO SERVER"]
+        subgraph PROM["Prometheus"]
+            PULL["Pull Endpoint"]
+            PUSH["Remote Write Receiver"]
+        end
+        WEB["Trento Web"]
+    end
+
+    subgraph SLES15["SLES 15 HOST"]
+        NE15["prometheus-node_exporter<br/>(systemd)"]
+        TA15["Trento Agent<br/>(metrics_provider: node_exporter)"]
+    end
+
+    subgraph SLES16["SLES 16 HOST"]
+        ALLOY["Grafana Alloy<br/>(systemd)"]
+        TA16["Trento Agent<br/>(metrics_provider: alloy)"]
+    end
+
+    PULL -->|"pull"| NE15
+    ALLOY -->|"push (TLS)"| PUSH
+    TA15 -->|"discovery"| WEB
+    TA16 -->|"discovery"| WEB
+    WEB --> PROM
+
+    style SERVER fill:#e1f5fe
+    style SLES15 fill:#fff3e0
+    style SLES16 fill:#e8f5e9
+    style PROM fill:#bbdefb
+----
+
+=== Host Configuration
+
+This section covers all configuration required on the monitored hosts (SLES 15 and SLES 16).
+
+==== Systemd Unit Files
+
+Two separate systemd unit files are required to support both `node_exporter`-based and `alloy`-based systems:
+
+.Using `node_exporter` Unit File (`packaging/systemd/trento-agent.service`)
+[source,ini]
+----
+[Unit]
+Description=Trento agent service
+Wants=prometheus-node_exporter.service
+After=prometheus-node_exporter.service
+
+[Service]
+ExecStart=/usr/bin/trento-agent start
+Type=simple
+User=root
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+----
+
+.Using `alloy` Unit File (`packaging/systemd/trento-agent-alloy.service`)
+[source,ini]
+----
+[Unit]
+Description=Trento agent service
+Wants=alloy.service
+After=alloy.service
+
+[Service]
+ExecStart=/usr/bin/trento-agent start
+Type=simple
+User=root
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+----
+
+==== Open Build Service Packaging
+
+The RPM spec file conditionally installs the appropriate systemd unit based on the target SLES version using OBS macros.
+
+.RPM Spec `%install` Section
+[source,spec]
+----
+%install
+
+# Install the binary
+install -D -m 0755 %{binaryname} "%{buildroot}%{_bindir}/%{binaryname}"
+
+# Install the appropriate systemd unit based on SLES version
+%if 0%{?sle_version} >= 160000
+# SLES 16 and later: use Alloy-based service
+install -D -m 0644 packaging/systemd/trento-agent-alloy.service \
+    %{buildroot}%{_unitdir}/trento-agent.service
+%else
+# SLES 15 and earlier: use node_exporter-based service
+install -D -m 0644 packaging/systemd/trento-agent.service \
+    %{buildroot}%{_unitdir}/trento-agent.service
+%endif
+----
+
+NOTE: The `sle_version` macro is provided by OBS and contains the SLES version as an integer (e.g., `150000` for SLES 15, `160000` for SLES 16).
+
+==== Alloy Configuration Directory Strategy
+
+On SLES 16, Trento uses Alloy's directory-based configuration loading:
+
+[source]
+----
+/etc/alloy/
+├── config.alloy          # Main Alloy config (user/system managed)
+└── config.d/
+    └── trento.alloy      # Trento-managed configuration (generated at runtime)
+----
+
+==== Alloy Configuration Template
+
+The Alloy configuration is embedded in the Trento Agent binary as a Go template, with `agentID` injected at runtime.
+
+
+.Embedded Go Template (`internal/agent/templates/trento.alloy.tmpl`)
+[source,alloy]
+----
+
+// Collect system metrics (CPU, memory, etc.) using the built-in node_exporter
+prometheus.exporter.unix "trento_system" {
+    set_collectors = [
+        "cpu",
+        "cpufreq",
+        "loadavg",
+        "meminfo",
+        "filesystem",
+        "netdev",
+        "uname",
+    ]
+}
+
+// Relabel metrics for Trento identification
+discovery.relabel "trento_system" {
+    targets = prometheus.exporter.unix.trento_system.targets
+
+    rule {
+        target_label = "agentID"
+        replacement  = "{{ .AgentID }}"
+    }
+}
+
+// Scrape the system metrics
+prometheus.scrape "trento_system" {
+    targets         = discovery.relabel.trento_system.output
+    forward_to      = [prometheus.remote_write.trento.receiver]
+    scrape_interval = "{{ .ScrapeInterval }}"
+}
+
+// Push metrics to Trento server's Prometheus endpoint
+prometheus.remote_write "trento" {
+    endpoint {
+        url = "{{ .PrometheusURL }}"
+        
+        tls_config {
+            insecure_skip_verify = false
+        }
+    }
+}
+----
+
+IMPORTANT: The `agentID` label is critical for correlating metrics with specific Trento-managed hosts. This label MUST be present on all metrics pushed to the Trento server.
+
+==== Trento Agent Integration
+
+The agent's `start` command handles Alloy configuration deployment on SLES 16 systems.
+
+==== File Permissions
+
+Since the Trento Agent runs as `root` and Alloy runs as the `alloy` user:
+
+[cols="1,1,1,2"]
+|===
+|Path |Owner |Mode |Notes
+
+|`/etc/alloy/config.d/`
+|`root:root`
+|`0755`
+|Created by Trento agent if not existing
+
+|`/etc/alloy/config.d/trento.alloy`
+|`alloy:alloy`
+|`0640`
+|Readable by Alloy, not world-readable
+|===
+
+
+=== Trento Server Modifications
+
+This section covers modifications required on the Trento Server to support both node_exporter and Alloy-based hosts.
+
+==== Host Discovery Workflow
+
+The host discovery workflow must be updated to accept hosts that declare their metrics provider type. Each host will exclusively use either `node_exporter`-based or `alloy`-based.
+
+
+===== Host Discovery Payload
+
+The host discovery payload is extended:
+
+----
+TBD
+----
+
+===== Prometheus Targets API
+
+Currently, the endpoint returns all the hosts with their `node_exporter` endpoints. It must be updated to filter out `alloy`-based hosts.
+
+=== Prometheus Configuration
+
+This section covers Prometheus configuration required on the Trento Server to accept push-based metrics from Alloy.
+
+==== Enable Remote Write Receiver
+
+Prometheus must be configured to accept remote write requests from Alloy agents.
+
+===== Configuration Option
+
+Add to `prometheus.yml`:
+
+[source,yaml]
+----
+# Enable remote write receiver for Alloy-based hosts
+remote_write_receiver:
+  enable: true
+----
+
+===== Command Line Option
+
+Alternatively, start Prometheus with:
+
+[source,bash]
+----
+prometheus --web.enable-remote-write-receiver
+----
+
+==== TLS Configuration
+
+For production deployments, the remote write endpoint MUST be secured with TLS. Users using an existing Prometheus installation must configure TLS termination accordingly.
+
+For users that install Prometheus via the provided Trento installation methods, we must update the installation depending on the deployment method:
+
+* for Kubernetes deployments, update the Ingress TLS configuration so that Prometheus incoming traffic is secured with TLS
+* for systemd deployments, serve the Prometheus web interface over HTTPS using the existing Trento Web reverse proxy setup
+
+==== Authentication
+
+TBD: Decide if authentication is required for the remote write endpoint.
+
+== Handling Edge Cases
+
+=== SLES 15 SP7
+
+SLES 15 SP7 introduces Grafana Alloy as an optional package. The Trento Agent must continue using `node_exporter` on SLES 15 systems, regardless of Alloy availability.
+
+SLES 15 SP7 users that wish to use Alloy, they must manually configure it outside of Trento's management. We must document this scenario accordingly.
+
+=== Alloy Already Running with Existing Configuration
+
+When Alloy is already running with user-defined configuration:
+
+* The Trento configuration file is added to the `config.d/` directory
+* Alloy configuration is reloaded via `systemctl reload`
+* Alloy merges all `*.alloy` files from the directory
+
+IMPORTANT: Component names must be unique across all configuration files. The Trento configuration uses the `trento_` prefix to avoid conflicts:
+
+* `prometheus.exporter.unix "trento_system"`
+* `prometheus.scrape "trento_system"`
+* `prometheus.remote_write "trento"`
+
+=== Alloy Not Installed on `alloy`-based Systems
+
+If Alloy is not installed on an `alloy`-based system, the systemd unit will fail to start due to missing `alloy.service` dependency.
+
+=== Configuration Conflicts
+
+If the Trento configuration conflicts with existing user configuration:
+
+* Alloy will fail to load and report an error
+* The Trento Agent should detect this failure and log actionable information
+* Users may need to review and adjust their existing configuration
+
+=== Configuration Regeneration
+
+The Trento configuration should be regenerated when:
+
+* The Prometheus endpoint URL changes
+* The agent is upgraded to a new version with template changes
+
+The agent should detect these scenarios and regenerate the configuration file accordingly.
+
+=== Removing Trento agent from `alloy`-based Systems
+
+When Trento agent is uninstalled:
+
+* Remove `/etc/alloy/config.d/trento.alloy`
+* Reload Alloy configuration
+* Alloy continues operating with remaining configurations
+
+This cleanup should be handled in the RPM `%postun` scriptlet.
+
+
