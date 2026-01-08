@@ -1,7 +1,7 @@
 include::product-attributes.adoc[]
 
-:revdate: 2025-11-27
 [[sec-trento-mcp-suse-ai]]
+:revdate: 2026-01-08
 ==== Integrating the {tr_mcp} with {suseai}
 
 This guide explains how to integrate the {tr_mcp} with {suseai}, including configuration and deployment instructions.

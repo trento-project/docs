@@ -1,6 +1,6 @@
 include::product-attributes.adoc[]
 
-:revdate: 2025-11-25
+:revdate: 2026-01-08
 [[sec-trento-mcp-sles]]
 ==== Integrating the {tr_mcp} with {mcp_host}
 

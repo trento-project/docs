@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-mcp-others]]
 ==== Integrating the {tr_mcp} with other clients
-:revdate: 2025-11-25
+:revdate: 2026-01-08
 
 The {tr_mcp} can be integrated with any client application that supports the Model Context Protocol. This makes it possible to interact with the {trento} API and execute tools defined in the OpenAPI specification through your preferred AI assistant or development tool.
 

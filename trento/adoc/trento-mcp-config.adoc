@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-mcp-config]]
 === Configuring {tr_mcp}
-:revdate: 2025-11-24
+:revdate: 2026-01-08
 
 This section provides an overview of how to configure the {tr_mcp} depending on the deployment method.
 

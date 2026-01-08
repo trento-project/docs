@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-k8s-deployment]]
 === {k8s} deployment
-:revdate: 2025-10-31
+:revdate: 2026-01-08
 
 include::partials/kubernetes-placeholders.adoc[]
 

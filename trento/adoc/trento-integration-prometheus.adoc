@@ -1,5 +1,6 @@
 include::product-attributes.adoc[]
 
+:revdate: 2026-01-08
 == {prometheus} integration
 
 {prometheus} Server is a {trserver} component responsible for pulling  the Memory and CPU utilization metrics collected by the `node-exporter` in the agent hosts and serving them to the web component. The web component renders the metrics as dynamic graphical charts in the details view of the registered hosts.

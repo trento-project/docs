@@ -1,5 +1,6 @@
 include::../product-attributes.adoc[]
 
+:revdate: 2026-01-08
 ===== Prerequisites
 
 * An LLM provider and credentials.

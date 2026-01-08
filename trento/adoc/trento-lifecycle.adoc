@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-lifecycle]]
 == Lifecycle
-:revdate: 2025-07-03
+:revdate: 2026-01-08
 
 
 {trento} is part of {sles4sap}. {trento}'s two main components have the following product lifecycles:

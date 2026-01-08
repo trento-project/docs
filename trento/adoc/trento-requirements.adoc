@@ -2,11 +2,9 @@ include::product-attributes.adoc[]
 
 [[sec-trento-requirements]]
 == Requirements
-:revdate: 2025-11-11
+:revdate: 2026-01-08
 
 This section describes requirements for the {trserver} and its {tragent}s, as well as the {sap} systems and clusters that we want to monitor in the backend environment. 
-
-
 
 [[sec-trento-server-requirements]]
 === {trserver} requirements
