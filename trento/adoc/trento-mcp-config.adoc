@@ -1,7 +1,7 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-mcp-config]]
-=== Configure {tr_mcp}
+=== Configuring {tr_mcp}
 :revdate: 2025-11-24
 
 This section provides an overview of how to configure the {tr_mcp} depending on the deployment method.

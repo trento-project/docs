@@ -96,7 +96,7 @@ mcphost
 +
 [TIP]
 ====
-If no servers appear on startup, confirm your configuration file exists at `~/.mcphost.yml`  and that your environment variables are exported in the same shell session.
+If no servers appear on startup, confirm your configuration file exists at `~/.mcphost.yml` and that your environment variables are exported in the same shell session.
 ====
 . Verify the connection to {trento} and basic status:
 +

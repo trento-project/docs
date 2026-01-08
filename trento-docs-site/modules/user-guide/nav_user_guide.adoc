@@ -6,7 +6,7 @@
  ** xref:trento-install-agents.adoc[Installing Trento Agents]
  ** xref:trento-mcp-integration.adoc[MCP Integration]
  *** xref:trento-mcp-install.adoc[Installing Trento MCP Server]
- *** xref:trento-mcp-config.adoc[ConfiguringTrento MCP Server]
+ *** xref:trento-mcp-config.adoc[Configuring Trento MCP Server]
  *** xref:trento-mcp-how-to-use.adoc[Using the Trento MCP Server]
  ** xref:trento-integration-prometheus.adoc[Prometheus integration]
  ** xref:trento-user-manage.adoc[User management]
