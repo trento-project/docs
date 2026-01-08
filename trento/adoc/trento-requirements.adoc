@@ -42,7 +42,7 @@ Similarly, the clusters must have unique authkeys in order to be registered in {
 ** If the {tr_mcp} is installed and enabled:
 *** For a {k8s} deployment, from the MCP client to the {trserver} ingress at TCP/80 or TCP/443. Internally, the MCP Server Pod uses TCP/{tr_mcp_default_port} and TCP/8080 if the health check is enabled.
 *** For a systemd deployment, from the user network to {tr_mcp} at TCP/{tr_mcp_default_port}.
-** Optionally: from the user network to {trserver} at ports TCP/4000, TCP/4001 and TCP/8080 (health checks for web, wanda and MCP, respectively).
+** Optionally: From the user network to {trserver} at ports TCP/4000, TCP/4001 and TCP/8080 (health checks for web, wanda and MCP, respectively).
 ** From Prometheus server, when it exists, to each {tragent} host at the port used by the Node Exporter.
 
 [[sec-trento-installation-prerequisites]]
