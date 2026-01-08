@@ -59,7 +59,14 @@ Grafana Alloy is an OpenTelemetry Collector distribution that includes built-in 
 
 === High-Level Architecture
 
-[mermaid]
+ifdef::env-github[]
+:MERMAID: source, mermaid
+endif::[]
+ifndef::env-github[]
+:MERMAID: mermaid
+endif::[]
+
+[{MERMAID}]
 ----
 flowchart TB
     subgraph SERVER["TRENTO SERVER"]
