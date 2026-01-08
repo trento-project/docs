@@ -4,7 +4,7 @@
 
 [[sec-container-deployment]]
 === Containerized deployment
-:revdate: 2025-10-31
+:revdate: 2026-01-08
 
 A containerized deployment of {trento} is identical to the systemd
 deployment. However, the web and check engine components are deployed as
