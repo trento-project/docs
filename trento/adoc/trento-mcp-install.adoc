@@ -4,12 +4,12 @@ include::product-attributes.adoc[]
 :revdate: 2026-01-08
 === Installing {tr_mcp}
 
-The {tr_mcp} can be deployed in several ways depending on your infrastructure and requirements.
+The {tr_mcp} can be deployed in different ways depending on your infrastructure and requirements.
 
 Supported installation methods: 
 
 * <<sec-trento-mcp-server-k8s,{k8s} deployment>>
-* <<sec-trento-mcp-server-systemd,systemd {tr_mcp} deployment>>
+* <<sec-trento-mcp-server-systemd,systemd deployment>>
 
 ==== Prerequisites {tr_mcp}
 

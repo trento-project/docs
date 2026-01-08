@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-mcp-server-systemd]]
 :revdate: 2026-01-08
-==== systemd {tr_mcp} deployment
+==== systemd deployment
 
 A systemd-based installation of the {tr_mcp} using RPM packages can be performed manually on the latest supported versions of {sles4sap}.
 
