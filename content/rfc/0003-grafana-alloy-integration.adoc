@@ -1,11 +1,4 @@
 = RFC: SLES 16 System Metrics Support via Grafana Alloy
-:author: Trento Engineering Team
-:revdate: December 2025
-:revnumber: 2.2
-:toc: left
-:toclevels: 3
-:icons: font
-:source-highlighter: highlight.js
 
 [width="100%",cols="<18%,<82%"]
 |===
