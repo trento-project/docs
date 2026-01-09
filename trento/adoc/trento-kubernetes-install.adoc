@@ -2,18 +2,9 @@ include::product-attributes.adoc[]
 
 [[sec-trento-k8s-deployment]]
 === {k8s} deployment
-:revdate: 2025-10-16
+:revdate: 2026-01-08
 
-The subsection uses the following placeholders:
-
-* `TRENTO_SERVER_HOSTNAME`: the host name used by the end user to access the console.
-* `ADMIN_PASSWORD`: the password of the admin user created during the installation process.
-+
-The password must meet the following requirements:
-+
-- minimum length of 8 characters
-- the password must not contain 3 identical numbers or letters in a row (for example, 111 or aaa)
-- the password must not contain 4 sequential numbers or letters (for example, 1234, abcd, ABCD)
+include::partials/kubernetes-placeholders.adoc[]
 
 [IMPORTANT]
 ====
@@ -30,6 +21,24 @@ Find traefik specific usages link:https://github.com/search?q=repo%3Atrento-proj
 ==== Installing {trserver} on an existing {k8s} cluster
 
 {trserver} consists of a several components delivered as container images and intended for deployment on a {k8s} cluster. A manual production-ready deployment of these components requires {k8s} knowledge. Customers without in-house {k8s} expertise and those who want to try {trento} with a minimum of effort, can use the {trento} Helm chart. This approach automates the deployment of all the required components on a single {k8s} cluster node. You can use the {trento} Helm chart to install {trserver} on a existing {k8s} cluster as follows:
+
+[NOTE]
+====
+The examples in this section do not specify a {k8s} namespace for simplicity. By default, {helm} installs to the `default` namespace.
+
+For production deployments, create and use a dedicated namespace.
+
+Example:
+[source,bash]
+----
+kubectl create namespace trento
+helm upgrade \
+   --install trento-server oci://registry.suse.com/trento/trento-server \
+   --namespace trento \
+   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
+   --set trento-web.adminUser.password=ADMIN_PASSWORD
+----
+====
 
 . Install Helm:
 +
@@ -65,7 +74,7 @@ HELM_EXPERIMENTAL_OCI=1 helm upgrade \
 ----
 ====
 +
-. To verify that the {trserver} installation was successful, open the URL of the {trweb} (`http://TRENTO_SERVER_HOSTNAME`) from a workstation on the {sap} administrator's LAN.
+. To verify that the {trserver} installation was successful, open the URL of the {tr_web} (`http://TRENTO_SERVER_HOSTNAME`) from a workstation on the {sap} administrator's LAN.
 
 [[sec-trento-install-trentoserver-on-k3s]]
 ==== Installing {trserver} on K3s
@@ -158,7 +167,7 @@ watch kubectl get pods
 All pods must be in the ready and running state.
 +
 . Log out of the {trserver} host.
-. To verify that the {trserver} installation was successful, open the URL of the {trweb} (`http://TRENTO_SERVER_HOSTNAME`) from a workstation on the {sap} administrator's LAN.
+. To verify that the {trserver} installation was successful, open the URL of the {tr_web} (`http://TRENTO_SERVER_HOSTNAME`) from a workstation on the {sap} administrator's LAN.
 
 [[sec-trento-deploying-trento-on-selected-nodes]]
 ==== Deploying {trserver} on selected nodes

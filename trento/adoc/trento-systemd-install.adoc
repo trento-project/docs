@@ -6,11 +6,6 @@ include::product-attributes.adoc[]
 
 A systemd-based installation of the {trserver} using RPM packages can be performed manually on the latest supported versions of {sles4sap}, from 15 SP4 up to 16. For installations on service packs other than the current one, make sure to update the repository URL as described in the relevant notes throughout this guide.
 
-*Supported versions*:
-
-* {sles4sap} 15: SP4–SP7
-* {sles4sap} 16.0
-
 ==== List of dependencies
 
 * https://nginx.org/en/[NGINX]
@@ -329,12 +324,12 @@ journalctl -fu trento-web
 ----
 
 [[validate-the-health-status-of-trento-web-and-wanda]]
-==== Check the health status of trento web and wanda
+==== Check the health status of {tr_web} and {tr_wanda}
 
-You can check if {trento} web and wanda services function correctly by
+You can check if {tr_web} and {tr_wanda} services function correctly by
 accessing accessing the `+healthz+` and `+readyz+` API.
 
-. Check {trento} web health status using `+curl+`:
+. Check {tr_web} health status using `+curl+`:
 +
 [source,bash]
 ----

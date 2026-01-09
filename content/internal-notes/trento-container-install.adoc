@@ -1,6 +1,10 @@
 :trento: Trento
+:trserver: Trento Server
+:tr_mcp: Trento MCP Server
 
-== Containerized deployment
+[[sec-container-deployment]]
+=== Containerized deployment
+:revdate: 2026-01-08
 
 A containerized deployment of {trento} is identical to the systemd
 deployment. However, the web and check engine components are deployed as
@@ -192,3 +196,221 @@ e859c07888ca   registry.suse.com/trento/trento-wanda:1.2.0   "/bin/sh -c '/app/b
 ----
 +
 Both containers must run and listen on the specified ports.
+
+[[sec-trento-mcp-server-container]]
+==== Installing {tr_mcp}
+
+The {tr_mcp} provides AI-assisted management capabilities for your SAP landscape by exposing {trento} functionality through the Model Context Protocol (MCP). This optional component enables integration with AI tools and assistants. After the installation of {tr_mcp}, see <<sec-trento-mcp-how-to-use>> for instructions on how to connect MCP-compatible AI assistants and tools to your Trento Server.
+
+===== Requirements
+
+* Docker or Podman container runtime
+* A running {trserver} installation (accessible via network)
+* Sufficient disk space for container images and logs
+
+===== Configuration Overview
+
+The {tr_mcp} must be configured to work with your {trserver}. The key configuration parameters are:
+
+* `TRENTO_MCP_TRENTO_URL`: The URL where your {trserver} is accessible. This is particularly important when Trento is deployed behind NGINX or other reverse proxies. Use the externally accessible URL (for example, `https://trento.example.com`) instead of internal service URLs. When set, the server will use this URL for OpenAPI specification autodiscovery.
+
+* `TRENTO_MCP_OAS_PATH`: Explicit paths to OpenAPI specification files. Use this when you want to directly specify the location of the API specifications instead of relying on autodiscovery. This is particularly useful when you want to connect to internal services (such as `localhost` or Kubernetes service names) instead of going through a reverse proxy.
+
+* `TRENTO_MCP_TAG_FILTER`: Filter which API operations to expose based on tags. Default is "MCP" to only expose operations specifically tagged for MCP usage.
+
+* `TRENTO_MCP_VERBOSITY`: Logging verbosity level (debug, info, warn, error). Default is "info".
+
+* `TRENTO_MCP_PORT`: Port on which the MCP Server listens. Default is 5000.
+
+* `TRENTO_MCP_ENABLE_HEALTH_CHECK`: Enable/disable health check HTTP server. Default is false.
+
+* `TRENTO_MCP_HEALTH_PORT`: Port for health check server. Default is 8080.
+
+===== Container Image
+
+The official container image is available at:
+
+====
+[source,text]
+----
+registry.suse.com/trento/mcp-server-trento:latest
+----
+====
+
+===== Basic Docker Deployment
+
+For a basic deployment connecting to a running {trserver}:
+
+====
+[source,bash]
+----
+docker run -d \
+  --name mcp-server-trento \
+  -p 5000:5000 \
+  -e TRENTO_MCP_TRENTO_URL=https://trento.example.com \
+  -e TRENTO_MCP_TAG_FILTER=MCP \
+  -e TRENTO_MCP_VERBOSITY=info \
+  --restart unless-stopped \
+  registry.suse.com/trento/mcp-server-trento:latest
+----
+====
+
+[IMPORTANT]
+====
+Replace `https://trento.example.com` with your actual {trserver} URL.
+====
+
+===== Advanced Docker Configuration
+
+For more control over the MCP Server behavior, use additional environment variables:
+
+====
+[source,bash]
+----
+docker run -d \
+  --name mcp-server-trento \
+  -p 5000:5000 \
+  -p 8080:8080 \
+  -e TRENTO_MCP_TRENTO_URL=https://trento.example.com \
+  -e TRENTO_MCP_PORT=5000 \
+  -e TRENTO_MCP_TAG_FILTER=MCP \
+  -e TRENTO_MCP_VERBOSITY=debug \
+  -e TRENTO_MCP_ENABLE_HEALTH_CHECK=true \
+  -e TRENTO_MCP_HEALTH_PORT=8080 \
+  --restart unless-stopped \
+  registry.suse.com/trento/mcp-server-trento:latest
+----
+====
+
+[NOTE]
+====
+The MCP Server's health check HTTP server is primarily intended for Kubernetes environments, where liveness/readiness probes use it. For Docker deployments, you can leave health checks disabled unless you need them for monitoring. If enabled, expose the health port (default 8080) as shown above.
+====
+
+===== Network Integration with Trento Components
+
+If running {trento} components in containers on the same host, use Docker networks:
+
+====
+[source,bash]
+----
+# Run the MCP Server connected to the trento-net network
+docker run -d \
+  --name mcp-server-trento \
+  --network trento-net \
+  -p 5000:5000 \
+  -e TRENTO_MCP_OAS_PATH=http://trento-web:4000/api/all/openapi,http://trento-wanda:4000/wanda/api/all/openapi \
+  -e TRENTO_MCP_TAG_FILTER=MCP \
+  -e TRENTO_MCP_VERBOSITY=info \
+  --restart unless-stopped \
+  registry.suse.com/trento/mcp-server-trento:latest
+----
+====
+
+[NOTE]
+====
+When using Docker networks with internal service names (e.g., `http://trento-web:4000`), ensure the MCP Server container can resolve and reach these hostnames. For external access through NGINX, use the externally accessible URL with `TRENTO_MCP_TRENTO_URL` instead.
+====
+
+===== Docker Compose Deployment
+
+For a complete deployment with Docker Compose, add the following to your `docker-compose.yml` file:
+
+====
+[source,yaml]
+----
+services:
+  mcp-server-trento:
+    image: registry.suse.com/trento/mcp-server-trento:latest
+    container_name: mcp-server-trento
+    ports:
+      - "5000:5000"
+      - "8080:8080"
+    environment:
+      TRENTO_MCP_TRENTO_URL: https://trento.example.com
+      TRENTO_MCP_PORT: 5000
+      TRENTO_MCP_TAG_FILTER: MCP
+      TRENTO_MCP_ENABLE_HEALTH_CHECK: true
+      TRENTO_MCP_HEALTH_PORT: 8080
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/localhost/8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+----
+====
+
+Start the service:
+
+====
+[source,bash]
+----
+docker-compose up -d mcp-server-trento
+----
+====
+
+===== Verifying the MCP Server Installation
+
+. Check that the container is running:
++
+====
+[source,bash]
+----
+docker ps | grep mcp-server-trento
+----
+====
++
+Expected output should show the container in "Up" status.
++
+. Check the container logs:
++
+====
+[source,bash]
+----
+docker logs mcp-server-trento
+----
+====
++
+Expected output should show successful connection to {trserver} and OpenAPI specification loading:
++
+====
+[source,bash]
+----
+2025-10-31 17:31:20 INFO the MCP server has been created mcp.name=mcp-server-trento mcp.version=devel
+...
+2025-10-31 17:31:21 INFO the MCP server mcp-server-trento has 39 registered tools
+2025-10-31 17:31:21 INFO the MCP server is listening server.address=:5000 server.transport=streamable
+----
+====
++
+. Test the MCP Server endpoint:
++
+====
+[source,bash]
+----
+curl http://localhost:5000/mcp
+----
+====
++
+Expected output should show the MCP protocol handshake information.
++
+. If health checks are enabled, verify the endpoints:
++
+====
+[source,bash]
+----
+# Liveness endpoint:
+curl http://localhost:8080/livez
+
+# Example output:
+# {"info":{"name":"trento-mcp-server","version":"0.1.0"},"status":"up"}
+
+# Readiness endpoint:
+curl http://localhost:8080/readyz
+
+# Example output:
+# {"status":"up","details":{"mcp-server":{"status":"up","timestamp":"2025-10-09T12:11:09.528898849Z"},"wanda-api":{"status":"up","timestamp":"2025-10-09T12:11:09.542078327Z"},"web-api":{"status":"up","timestamp":"2025-10-09T12:11:09.544855047Z"}}}
+----
+====

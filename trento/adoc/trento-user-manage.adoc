@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-user-management]]
 == User management
-:revdate: 2025-06-10
+:revdate: 2026-01-08
 
 
 {trento} provides a local permission-based user management feature with
@@ -11,7 +11,7 @@ of duties in the {trento} interface and ensures that only authorized
 users with the right permissions can access it.
 
 User management actions are performed in the Users view in the left-hand
-side panel of the {trweb}.
+side panel of the {trento} UI.
 
 By default, a newly created user is granted display access rights except
 for the Users view. Where available, a user with default access can
