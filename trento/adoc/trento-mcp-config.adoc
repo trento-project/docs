@@ -396,7 +396,7 @@ If you continue to experience issues:
 
 . Check the {tr_mcp} logs for detailed error messages
 . Verify configuration values:
-.. For systemd/RPM deployments, use `{tr_mcp_binary} --help`
+.. For systemd deployments, use `{tr_mcp_binary} --help`
 .. For {k8s} deployments, run {helm} with `--render-subchart-notes` to view the rendered {tr_mcp} settings
 . Test API connectivity directly using curl or similar tools
 . Check the {trento} server logs for API authentication and access issues

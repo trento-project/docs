@@ -9,7 +9,7 @@ include::product-attributes.adoc[]
 Supported deployment methods: 
 
 * <<sec-trento-k8s-deployment,{k8s} deployment>>
-* <<sec-systemd-deployment, systemd RPM deployment >>
+* <<sec-systemd-deployment, systemd deployment >>
 
 include::trento-kubernetes-install.adoc[]
 include::trento-systemd-install.adoc[]
