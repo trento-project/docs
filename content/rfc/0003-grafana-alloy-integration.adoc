@@ -22,6 +22,10 @@ This RFC proposes an approach to enable real-time system monitoring (CPU, memory
 
 == Context
 
+=== What are these metrics used for?
+
+Trento collects real-time system metrics (CPU, memory, etc.) from monitored hosts to provide insights into resource utilization and performance. Trento uses the metrics collected by Prometheus to render CPU and Memory usage charts in the host detail view; such data is fetched just-in-time from the Prometheus server and is not stored nor integrated into host's state for alerting or health evaluation.
+
 === Current Architecture: `node_exporter`-based
 
 Trento currently achieves real-time system monitoring through the following architecture:
@@ -35,7 +39,7 @@ Trento currently achieves real-time system monitoring through the following arch
 
 This approach provides a seamless, zero-configuration experience for Trento users.
 
-=== Incoming Architecture: `alloy`-based
+=== Incoming Architecture: `alloy`-based 
 
 SUSE Linux Enterprise Server 16 no longer ships the `node_exporter` package. Instead, SLES 16 adopts Grafana Alloy as the preferred telemetry collection agent.
 
@@ -756,7 +760,6 @@ Recommendation: Provide the automatic option as default, with documentation for 
 |Docs repository
 |Document usage examples, security recommendations (avoid none in production), SLES 15 SP7 behavior, conflict handling and regeneration steps.
 |===
-
 
 == References
 
