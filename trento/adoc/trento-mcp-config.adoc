@@ -7,7 +7,7 @@ include::product-attributes.adoc[]
 This section provides an overview of how to configure the {tr_mcp} depending on the deployment method.
 
 * <<sec-trento-mcp-kubernetes-config,Configuration in a {k8s} deployment>>
-* <<sec-trento-mcp-systemd-config,Configuration in systemd RPM deployment>>
+* <<sec-trento-mcp-systemd-config,Configuration in an RPM systemd deployment>>
 
 [[sec-trento-mcp-kubernetes-config]]
 ==== Configuration in a {k8s} deployment
