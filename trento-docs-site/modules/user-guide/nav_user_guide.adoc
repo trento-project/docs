@@ -15,6 +15,7 @@
  ** xref:trento-checks.adoc[Performing configuration checks]
  ** xref:trento-checks-customization.adoc[Checks Customization]
  ** xref:trento-web-console.adoc[Using Trento Web]
+ ** xref:trento-operations.adoc[Operations]
  ** xref:trento-housekeeping.adoc[Housekeeping]
  ** xref:trento-manage-tags.adoc[Managing tags]
  ** xref:trento-smlm-integration.adoc[Integration with SUSE Multi-Linux Manager]
