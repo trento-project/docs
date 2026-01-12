@@ -546,10 +546,21 @@ The host discovery workflow must be updated to accept hosts that declare their m
 
 ===== Host Discovery Payload
 
-The host discovery payload is extended:
+There is the need to differentiate between `node_exporter`-based and `alloy`-based hosts in the discovery payload sent by the Trento Agent.
+For the sake of keeping compatibility with existing installations, the payload will be extended by adding fields only instead of changing existing ones.
 
+Specifically, the `prometheus_mode` field is added providing the mode the agent is expecting to operate; Trento server can interpret a missing field as `pull` mode, and that is safe for existing installations.
+
+The field `prometheus_targets` is kept for backward compatibility, too. It can be used by `alloy`-based hosts to provide the configured Prometheus endpoint URL(s) (it is not strictly required, but Trento can show this information as a host configuration detail).
+
+
+[source,json]
 ----
-TBD
+{
+    [...]
+    "prometheus_targets": [prometheus-url] | [...host reachable urls],
+    "prometheus_mode": "push" | "pull",
+}
 ----
 
 ==== Prometheus Targets API
