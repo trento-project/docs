@@ -771,6 +771,13 @@ Recommendation: Provide the automatic option as default, with documentation for 
 |Document usage examples, security recommendations (avoid none in production), SLES 15 SP7 behavior, conflict handling and regeneration steps.
 |===
 
+== Appendix: keep the configuraiton consistent
+There are some possibilities to leverage Trento's features to help user keeping the Alloy configuration consistent with the server settings, for example:
+* Have a Trento Check to periodically verify that the Alloy configuration matches the expected settings (e.g., Prometheus URL, authentication method)
+* Use Trento operations to configure/reconfigure the Alloy settings remotely
+
+Such possibilities are out of the scope of this RFC, but can be considered for future improvements.
+
 == References
 
 * https://grafana.com/docs/alloy/latest/[Grafana Alloy Documentation]
