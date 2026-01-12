@@ -373,7 +373,7 @@ server-url: https://trento.example.com
 facts-service-url: amqp://guest:guest@localhost:5672
 
 # Required for alloy-based systems
-prometheus-url: https://trento.example.com/api/v1/write
+prometheus-url: https://prometheus-url/ # reverse-proxied via nginx/Ingress
 scrape-interval: 15s  # optional, defaults to 15s
 
 # Authentication (bearer is the default)
@@ -507,7 +507,7 @@ prometheus.scrape "trento_system" {
 // Push metrics to Trento server's Prometheus endpoint
 prometheus.remote_write "trento" {
     endpoint {
-        url = "{{ .PrometheusURL }}"
+        url = "{{ .PrometheusURL }}/api/v1/write"
 {{- if eq .AuthMethod "basic" }}
 
         basic_auth {
@@ -566,13 +566,12 @@ Prometheus must be configured to accept remote write requests from Alloy agents.
 
 ===== Configuration Option
 
-Add to `prometheus.yml`:
+Run prometheus with the `web.enable-remote-write-receiver` option enabled.
+See https://prometheus.io/docs/specs/prw/remote_write_spec_2_0/
 
-[source,yaml]
+[source,sh]
 ----
-# Enable remote write receiver for Alloy-based hosts
-remote_write_receiver:
-  enable: true
+prometheus --web.enable-remote-write-receiver
 ----
 
 ===== Command Line Option
