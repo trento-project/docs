@@ -537,13 +537,6 @@ systemctl restart nginx
 [[option-2-using-lets-encrypt-for-a-signed-certificate-using-packagehub-repository]]
 ===== Create a signed certificate with Let's Encrypt using PackageHub repository
 
-
-[NOTE]
-====
-Only available for SLE 15 SP4-SP7, for SLE 16.0 use alternatives or the
-xref:option-1-creating-a-self-signed-certificate[Self-signed certificate option].
-====
-
 . Enable the PackageHub repository (replace `x.x` with your OS version, for example `15.7`):
 +
 [source,bash]
@@ -556,7 +549,7 @@ zypper refresh
 +
 [NOTE]
 ====
-Service Packs include version-specific Certbot NGINX plugin packages, for example `+python311-certbot-nginx+` or `+python3-certbot-nginx+`. Install the package available in the Service Pack you currently use.
+Service Packs include version-specific Certbot NGINX plugin packages, for example `+python311-certbot-nginx+`, `+python313-certbot-nginx+` or `+python3-certbot-nginx+`. Install the package available in the Service Pack you currently use.
 ====
 +
 [source,bash]
