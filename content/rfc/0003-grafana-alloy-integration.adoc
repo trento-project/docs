@@ -440,12 +440,12 @@ install -D -m 0644 packaging/systemd/trento-agent.service \
 %files
 %{_bindir}/%{binaryname}
 %{_unitdir}/trento-agent.service
-%if 0%{?sle_version} >= 160000
+%if 0%{?suse_version} >= 160000
 %{_datadir}/trento/configure-alloy.sh
 %endif
 ----
 
-NOTE: The `sle_version` macro is provided by OBS and contains the SLES version as an integer (e.g., `150000` for SLES 15, `160000` for SLES 16). The `configure-alloy.sh` script is only installed on SLES 16 and later.
+NOTE: The `suse_version` and `sle_version` macros are provided by OBS and contain the SLES version as an integer (e.g., `150000` for SLES 15, `1600` for SLES 16). As per documentation, _SLES 16 currently doesn't use the sle_version macro_. See https://en.opensuse.org/openSUSE:Build_Service_cross_distribution_howto
 
 ==== Alloy Configuration Directory Strategy
 
