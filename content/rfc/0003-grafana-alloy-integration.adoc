@@ -187,11 +187,11 @@ Options can also be specified in the Trento agent configuration file:
 # /etc/trento/agent.yaml
 
 api-key: <api-key-generated-from-the-server>
-server-url: https://localhost
+server-url: https://trento.example.com
 facts-service-url: amqp://guest:guest@localhost:5672
 
 # Alloy configuration options
-prometheus-url: https://trento.example.com/api/v1/write
+prometheus-url: https://prometheus-url/api/v1/write
 scrape-interval: 15s
 
 # Authentication for Prometheus remote write endpoint
@@ -440,7 +440,7 @@ install -D -m 0644 packaging/systemd/trento-agent.service \
 %files
 %{_bindir}/%{binaryname}
 %{_unitdir}/trento-agent.service
-%if 0%{?suse_version} >= 160000
+%if 0%{?suse_version} >= 1600
 %{_datadir}/trento/configure-alloy.sh
 %endif
 ----
