@@ -279,9 +279,75 @@ sudo systemctl reload alloy
 
 ==== Systemd Unit Files
 
-Two separate systemd unit files are required to support both `node_exporter`-based and `alloy`-based systems.
+===== Proposed Solution: Single Unit File Without Dependencies
 
-===== Using `node_exporter` (`packaging/systemd/trento-agent.service`)
+A single systemd unit file is used for both `node_exporter`-based and `alloy`-based systems, with no explicit service dependencies.
+
+[source,ini]
+----
+[Unit]
+Description=Trento agent service
+
+[Service]
+ExecStart=/usr/bin/trento-agent start
+Type=simple
+User=root
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+----
+
+With this approach:
+
+Users will take care of their own configurations and service management for `node_exporter` or `alloy` depending on the target platform. We can provide dedicated Trento Checks to ensure the proper setup as well as documentation to guide users through the process.
+
+Users deploy the Alloy configuration manually on SLES 16:
+
+[source,bash]
+----
+# Generate and deploy Alloy configuration
+trento-agent generate alloy > /etc/alloy/config.d/trento.alloy
+chown alloy:alloy /etc/alloy/config.d/trento.alloy
+chmod 640 /etc/alloy/config.d/trento.alloy
+
+# Start or reload Alloy
+systemctl start alloy
+systemctl reload alloy
+
+# Start Trento agent
+systemctl start trento-agent
+----
+
+===== Configuration File Requirements
+
+For `alloy`-based systems, the configuration file must include the `prometheus-url` option. Authentication settings are required for production deployments (bearer token is the default):
+
+[source,yaml]
+----
+# /etc/trento/agent.yaml
+
+api-key: <api-key-generated-from-the-server>
+server-url: https://trento.example.com
+facts-service-url: amqp://guest:guest@localhost:5672
+
+# Required for alloy-based systems
+prometheus-url: https://prometheus-url/ # reverse-proxied via nginx/Ingress
+scrape-interval: 15s  # optional, defaults to 15s
+
+# Authentication (bearer is the default)
+prometheus-auth: bearer
+prometheus-auth-bearer-token: <token>
+----
+
+WARNING: The configuration file contains sensitive credentials. Ensure it has appropriate permissions (`chmod 600 /etc/trento/agent.yaml`).
+
+===== Alternative Solution: Conditional Unit Files With Automatic Dependency Management
+
+For environments where automatic dependency management and configuration deployment are desired, two separate systemd unit files can be used based on the target platform.
+
+====== Using `node_exporter` (`packaging/systemd/trento-agent.service`)
 
 [source,ini]
 ----
@@ -301,7 +367,7 @@ RestartSec=5
 WantedBy=multi-user.target
 ----
 
-===== Using `alloy` (`packaging/systemd/trento-agent-alloy.service`)
+====== Using `alloy` (`packaging/systemd/trento-agent-alloy.service`)
 
 [source,ini]
 ----
@@ -324,7 +390,7 @@ WantedBy=multi-user.target
 
 NOTE: The `ExecStartPre` directive runs the `configure-alloy.sh` script, which generates and deploys the Alloy configuration before starting the agent. The script reads `prometheus-url` and other options from the configuration file (`/etc/trento/agent.yaml`). The `agent-id` is automatically determined.
 
-===== Alloy Configuration Script (`packaging/scripts/configure-alloy.sh`)
+====== Alloy Configuration Script (`packaging/scripts/configure-alloy.sh`)
 
 The script handles Alloy configuration generation, file permissions, and service reload:
 
@@ -360,56 +426,36 @@ systemctl reload alloy
 echo "Trento Alloy configuration deployed to ${ALLOY_CONFIG_FILE}"
 ----
 
-===== Configuration File Requirements
-
-For the `alloy`-based systemd unit to work, the configuration file must include the `prometheus-url` option. Authentication settings are required for production deployments (bearer token is the default):
-
-[source,yaml]
-----
-# /etc/trento/agent.yaml
-
-api-key: <api-key-generated-from-the-server>
-server-url: https://trento.example.com
-facts-service-url: amqp://guest:guest@localhost:5672
-
-# Required for alloy-based systems
-prometheus-url: https://prometheus-url/ # reverse-proxied via nginx/Ingress
-scrape-interval: 15s  # optional, defaults to 15s
-
-# Authentication (bearer is the default)
-prometheus-auth: bearer
-prometheus-auth-bearer-token: <token>
-----
-
-WARNING: The configuration file contains sensitive credentials. Ensure it has appropriate permissions (`chmod 600 /etc/trento/agent.yaml`).
-
-===== Alternative: Manual Configuration Deployment
-
-For environments where automatic configuration deployment is not desired, users can use a simpler systemd unit and deploy the configuration manually:
-
-[source,ini]
-----
-[Unit]
-Description=Trento agent service
-Wants=alloy.service
-After=alloy.service
-
-[Service]
-ExecStart=/usr/bin/trento-agent start
-Type=simple
-User=root
-Restart=on-failure
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-----
-
-In this case, users must manually run the `trento-agent generate alloy` command and deploy the configuration before starting the service.
-
 ==== Open Build Service Packaging
 
-The RPM spec file conditionally installs the appropriate systemd unit and supporting scripts based on the target SLES version using OBS macros.
+===== Proposed Solution: Single Unit File Installation
+
+The RPM spec file installs a single systemd unit file for all SLES versions (as it is now, no modifications needed).
+
+.RPM Spec `%install` Section
+[source,spec]
+----
+%install
+
+# Install the binary
+install -D -m 0755 %{binaryname} "%{buildroot}%{_bindir}/%{binaryname}"
+
+# Install the systemd unit (same for all versions)
+install -D -m 0644 packaging/systemd/trento-agent.service \
+    %{buildroot}%{_unitdir}/trento-agent.service
+----
+
+.RPM Spec `%files` Section
+[source,spec]
+----
+%files
+%{_bindir}/%{binaryname}
+%{_unitdir}/trento-agent.service
+----
+
+===== Alternative Solution: Conditional Installation Based on SLES Version
+
+For the alternative approach with automatic dependency management, the RPM spec file conditionally installs the appropriate systemd unit and supporting scripts based on the target SLES version using OBS macros.
 
 .RPM Spec `%install` Section
 [source,spec]
@@ -661,7 +707,9 @@ IMPORTANT: Component names must be unique across all configuration files. The Tr
 
 === Alloy Not Installed on `alloy`-based Systems
 
-If Alloy is not installed on an `alloy`-based system, the systemd unit will fail to start due to missing `alloy.service` dependency.
+With the proposed solution (single unit file without dependencies), the Trento Agent will start successfully even if Alloy is not installed or not running. However, system metrics will not be available until Alloy is properly installed and configured.
+
+With the alternative solution (conditional unit files with dependencies), the systemd unit will fail to start due to missing `alloy.service` dependency, clearly indicating the requirement for Alloy to be installed and running.
 
 === Configuration Conflicts
 
@@ -678,7 +726,7 @@ The Trento configuration should be regenerated when:
 * The Prometheus endpoint URL changes
 * The agent is upgraded to a new version with template changes
 
-Users can regenerate the configuration by running:
+With the proposed solution (manual deployment), users regenerate the configuration by running:
 
 [source,bash]
 ----
@@ -687,7 +735,7 @@ chown alloy:alloy /etc/alloy/config.d/trento.alloy
 systemctl reload alloy
 ----
 
-If using the systemd unit with `ExecStartPre`, restarting the service will automatically regenerate the configuration:
+With the alternative solution (systemd unit with `ExecStartPre`), restarting the service will automatically regenerate the configuration:
 
 [source,bash]
 ----
@@ -716,14 +764,15 @@ systemctl reload alloy 2>/dev/null || true
 
 == Open Questions
 
-=== Should we provide both automatic and manual deployment options?
+=== Which approach should be implemented?
 
-The RFC proposes using `ExecStartPre` in the systemd unit to automatically generate and deploy the configuration. Alternatively, we could require manual deployment only.
+The RFC presents two approaches:
 
-* **Automatic (ExecStartPre)**: Better user experience, but less control
-* **Manual only**: More explicit, users must understand the process
+* **Proposed Solution (Manual deployment)**: Single unit file with no dependencies. Users manually start node_exporter or alloy depending on platform. Simpler packaging, more explicit control.
 
-Recommendation: Provide the automatic option as default, with documentation for manual deployment.
+* **Alternative Solution (Automatic deployment)**: Conditional unit files with automatic dependency management and configuration deployment via `ExecStartPre`. Better user experience, but more complex packaging and less control.
+
+The proposed solution prioritizes simplicity and user control, while the alternative solution prioritizes convenience and automation.
 
 == Summary of Changes
 [cols="20,20,60"]
@@ -742,13 +791,13 @@ Recommendation: Provide the automatic option as default, with documentation for 
 |Trento Agent
 |Add options for Prometheus remote write URL, authentication method and credentials.
 
-|Conditional systemd unit install
+|Systemd unit file approach
 |Trento Agent (rpm)
-|Install trento-agent-alloy.service for SLES 16+ and trento-agent.service (node_exporter) for SLES 15 and earlier using sle_version macro.
+|Proposed: Install single trento-agent.service for all SLES versions with no dependencies. Alternative: Conditionally install trento-agent-alloy.service for SLES 16+ and trento-agent.service (with node_exporter dependencies) for SLES 15 using sle_version macro.
 
-|Install configure-alloy.sh script
+|Alloy configuration deployment
 |Trento Agent (rpm)
-|Install configure-alloy.sh to /usr/share/trento/ for SLES 16+. Script generates /etc/alloy/config.d/trento.alloy, sets alloy:alloy ownership and 0640 permissions, then reloads alloy.
+|Proposed: Users manually run "trento-agent generate alloy" and deploy configuration. Alternative: Install configure-alloy.sh script to /usr/share/trento/ for SLES 16+ that automatically generates /etc/alloy/config.d/trento.alloy via ExecStartPre, sets alloy:alloy ownership and 0640 permissions, then reloads alloy.
 
 |Prometheus remote write enablement
 |Trento helm chart / nginx config
@@ -764,7 +813,7 @@ Recommendation: Provide the automatic option as default, with documentation for 
 
 |Uninstall cleanup
 |RPM %postun scriptlet
-|Remove /etc/alloy/config.d/trento.alloy and reload alloy on uninstall for SLES 16+ (best-effort).
+|Proposed: Users manually remove /etc/alloy/config.d/trento.alloy and reload alloy. Alternative: RPM scriptlet automatically removes /etc/alloy/config.d/trento.alloy and reloads alloy on uninstall for SLES 16+ (best-effort).
 
 |Documentation and guidance
 |Docs repository
