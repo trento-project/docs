@@ -678,10 +678,11 @@ WARNING: Running without authentication in production is not recommended. Anyone
 
 ==== Trento Out-of-the-Box Installations
 
-For Trento's provided installation methods, bearer token authentication is pre-configured:
+For Trento's provided installation methods, we want to provide a sane default configuration that does not add unwanted operational effort for the average user, while allowing advanced users to customize the setup as needed.
 
-* **systemd deployments**: nginx is configured with bearer token validation
-* **Helm deployments**: Kubernetes Ingress is configured with bearer token validation
+We will provide a default configuration where bearer token authentication in place on both ansible playbook and helm chart installation scripts.
+
+For both scenarios we configure the reverse proxy to validate bearer tokens for the Prometheus remote write endpoint. The token is meant to be long-lived and static, as it is used by multiple agents.
 
 == Handling Edge Cases
 
