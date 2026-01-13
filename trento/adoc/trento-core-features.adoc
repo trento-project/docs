@@ -1,0 +1,9 @@
+== Core Features
+
+include::trento-user-manage.adoc[]
+include::trento-sso-integration.adoc[]
+include::trento-activity-log.adoc[]
+include::trento-housekeeping.adoc[]
+include::trento-manage-tags.adoc[]
+include::trento-rotate-api-keys.adoc[]
+include::trento-personal-access-tokens.adoc[]

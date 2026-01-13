@@ -1,0 +1,4 @@
+== Installation
+
+include::trento-install-server.adoc[]
+include::trento-install-agents.adoc[]
