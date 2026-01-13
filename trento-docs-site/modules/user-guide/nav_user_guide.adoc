@@ -9,6 +9,9 @@
  *** xref:trento-update-trento-server.adoc[Updating Trento Server]
  *** xref:trento-update-trento-checks.adoc[Updating Trento Checks]
  *** xref:trento-update-trento-agent.adoc[Updating a Trento Agent]
+ ** xref:trento-uninstall.adoc[Uninstallation]
+ *** xref:trento-uninstall-trento-server.adoc[Uninstalling Trento Server]
+ *** xref:trento-uninstall-trento-agent.adoc[Uninstalling a Trento Agent]
  ** xref:trento-mcp-integration.adoc[MCP Integration]
  *** xref:trento-mcp-install.adoc[Installing Trento MCP Server]
  *** xref:trento-mcp-config.adoc[Configuring Trento MCP Server]
@@ -27,8 +30,7 @@
  ** xref:trento-rotate-api-keys.adoc[Rotating API keys]
  ** xref:trento-personal-access-tokens.adoc[Personal Access Tokens]
 
- ** xref:trento-uninstall-trento-server.adoc[Uninstalling Trento Server]
- ** xref:trento-uninstall-trento-agent.adoc[Uninstalling a Trento Agent]
+
  ** xref:trento-report-issue.adoc[Reporting an Issue]
  ** xref:trento-analyze-problems.adoc[Problem Analysis]
  ** xref:trento-compatibility.adoc[Compatibility matrix between Trento Server and Trento Agents]
