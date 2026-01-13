@@ -26,13 +26,13 @@ https://github.com/trento-project/agent/releases.
 [indent=-1]
 
 Version 3.0.0 (released on 2025/12/16)::
- Includes Helm chart 3.0.0, Web Component 3.0.0, orchestration engine (wanda) 2.0.0, compliance checks 1.2.0, MCP server 1.0.0, and agent 3.0.0, with the following highlights:
+ Includes Helm chart 3.0.0, {web} Component 3.0.0, orchestration engine ({wanda}) 2.0.0, compliance checks 1.2.0, {mcp} 1.0.0, and agent 3.0.0, with the following highlights:
 
   * First operation use cases
-  * MCP integration 
+  * {mcp} integration 
   * A more flexible, secure alert emails configuration
   * A more helpful activity log with correlation of entries
-  * Improved observability around offline clusters and HANA native HA scenarios (including multi target/tier setups)
+  * Improved observability around offline clusters and {hana} native HA scenarios (including multi target/tier setups)
   * Improved compliance validation with additional scenario-specific checks
 
 Version 2.5.0 (released on 2025/08/07)::
