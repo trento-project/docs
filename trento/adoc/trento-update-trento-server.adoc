@@ -1,7 +1,7 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-updating-trentoserver]]
-== Updating {trserver}
+=== Updating {trserver}
 :revdate: 2025-06-10
 
 
