@@ -1,4 +1,6 @@
 == Compliance Features
 
-include::trento-checks-customization.adoc[]
 include::trento-checks.adoc[]
+include::trento-checks-customization.adoc[]
+
+
