@@ -1,20 +1,20 @@
 include::product-attributes.adoc[]
 
 [[sec-systemd-deployment]]
-=== systemd deployment
+==== systemd deployment
 :revdate: 2025-06-11
 
 A systemd-based installation of the {trserver} using RPM packages can be performed manually on the latest supported versions of {sles4sap}, from 15 SP4 up to 16. For installations on service packs other than the current one, make sure to update the repository URL as described in the relevant notes throughout this guide.
 
-==== List of dependencies
+===== List of dependencies
 
 * https://nginx.org/en/[NGINX]
 * https://www.postgresql.org/[PostgreSQL]
 * https://rabbitmq.com/[RabbitMQ]
 
-==== Install {trento} dependencies
+===== Install {trento} dependencies
 
-===== Install PostgreSQL
+====== Install PostgreSQL
 
 The current instructions are tested with the following PostgreSQL
 versions:
@@ -48,7 +48,7 @@ zypper in postgresql-server
 systemctl enable --now postgresql
 ----
 
-====== Configure PostgreSQL
+======= Configure PostgreSQL
 
 . Start `+psql+` with the `+postgres+` user to open a connection to the
 database:
@@ -121,7 +121,7 @@ listen_addresses = '*'
 systemctl restart postgresql
 ----
 
-===== Install RabbitMQ
+====== Install RabbitMQ
 
 . Install RabbitMQ server:
 +
@@ -150,7 +150,7 @@ firewall-cmd --reload
 systemctl enable --now rabbitmq-server
 ----
 
-====== Configure RabbitMQ
+======= Configure RabbitMQ
 
 To configure RabbitMQ for a production system, follow the official
 suggestions in the
@@ -175,7 +175,7 @@ rabbitmqctl add_vhost vhost
 rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
 ----
 
-==== Install {trento} using RPM packages
+===== Install {trento} using RPM packages
 
 The `trento-web` and `trento-wanda` packages are available by default on supported {sles4sap} distributions.
 
@@ -186,7 +186,7 @@ Install {trento} web, wanda and checks:
 zypper install trento-web trento-wanda
 ----
 
-===== Create the configuration files
+====== Create the configuration files
 
 Both services depend on respective configuration files. They must be
 placed in `+/etc/trento/trento-web+` and `+/etc/trento/trento-wanda+`
@@ -209,7 +209,7 @@ Otherwise, WebSocket connections will fail, preventing real-time updates
 in the web interface.
 ====
 
-===== trento-web configuration
+====== trento-web configuration
 
 ====
 [source,bash]
@@ -257,7 +257,7 @@ SMTP_PASSWORD=<<SMTP_PASSWORD>>
 ----
 ====
 
-===== trento-wanda configuration
+====== trento-wanda configuration
 
 ====
 [source,bash]
@@ -273,7 +273,7 @@ AUTH_SERVER_URL=http://localhost:4000
 ----
 ====
 
-===== Start the services
+====== Start the services
 
 [NOTE]
 ====
@@ -313,7 +313,7 @@ Enable and start the services:
 systemctl enable --now trento-web trento-wanda
 ----
 
-===== Monitor the services
+====== Monitor the services
 
 Use `+journalctl+` to check if the services are up and running
 correctly. For example:
@@ -324,7 +324,7 @@ journalctl -fu trento-web
 ----
 
 [[validate-the-health-status-of-trento-web-and-wanda]]
-==== Check the health status of {tr_web} and {tr_wanda}
+===== Check the health status of {tr_web} and {tr_wanda}
 
 You can check if {tr_web} and {tr_wanda} services function correctly by
 accessing accessing the `+healthz+` and `+readyz+` API.
@@ -363,7 +363,7 @@ correctly, the output should be as follows:
 ====
 
 
-==== Install and configure NGINX
+===== Install and configure NGINX
 
 . Install NGINX package:
 +
@@ -468,13 +468,13 @@ server {
 ----
 ====
 
-==== Prepare SSL certificate for NGINX
+===== Prepare SSL certificate for NGINX
 
 Create or provide a certificate for https://nginx.org/en/[NGINX] to
 enable SSL for {trento}.
 
 [[option-1-creating-a-self-signed-certificate]]
-===== Create a self-signed certificate
+====== Create a self-signed certificate
 
 . Generate a self-signed certificate:
 +
@@ -535,7 +535,7 @@ systemctl restart nginx
 ----
 
 [[option-2-using-lets-encrypt-for-a-signed-certificate-using-packagehub-repository]]
-===== Create a signed certificate with Let's Encrypt using PackageHub repository
+====== Create a signed certificate with Let's Encrypt using PackageHub repository
 
 . Enable the PackageHub repository (replace `x.x` with your OS version, for example `15.7`):
 +
@@ -576,7 +576,7 @@ Certbot certificates are valid for 90 days. Refer to the above link for
 details on how to renew certificates.
 ====
 
-==== Accessing the trento-web UI
+===== Accessing the trento-web UI
 
 Pin the browser to `+https://trento.example.com+`. You should be able to
 login using the credentials specified in the `+ADMIN_USER+` and
