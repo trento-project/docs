@@ -9,3 +9,5 @@ The {tr_mcp} is an optional component that enables AI-assisted infrastructure ma
 include::trento-mcp-install.adoc[]
 include::trento-mcp-config.adoc[]
 include::trento-mcp-how-to-use.adoc[]
+
+

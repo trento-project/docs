@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-personal-access-tokens]]
 
-== Personal Access Tokens
+=== Personal Access Tokens
 :revdate: 2025-11-05
 
 {trento} allows users to create Personal Access Tokens (PATs) for authentication and authorization purposes in third-party integrations with the APIs exposed by its components:
@@ -10,7 +10,7 @@ include::product-attributes.adoc[]
  * link:https://www.trento-project.io/web/swaggerui/[Web]
  * link:https://www.trento-project.io/wanda/swaggerui/[Wanda]
 
-=== Creating a Personal Access Token
+==== Creating a Personal Access Token
 
 Log in to {trento} Web UI, click on your username in the top-right corner, and select *Profile* from the drop-down menu.
 
@@ -27,7 +27,7 @@ image::trento-web-generate-pat.png[trento-web-generate-pat,scaledwidth=80.0%]
 .Generated personal access token
 image::trento-web-generated-pat.png[trento-web-generated-pat,scaledwidth=80.0%]
 
-=== Using a Personal Access Token
+==== Using a Personal Access Token
 
 You can use the created Personal Access Token to authenticate API requests by including it in the `Authorization` header as a Bearer token.
 
@@ -36,7 +36,7 @@ You can use the created Personal Access Token to authenticate API requests by in
 $ curl -X GET "..." -H "Authorization: Bearer trento_pat_<rest_of_token>"
 ----
 
-=== Deleting a Personal Access Token
+==== Deleting a Personal Access Token
 
 To delete Personal Access Token, click its contextual *Delete* button in the *Personal Access Tokens* section of the profile.
 
@@ -48,7 +48,7 @@ Confirm the deletion
 .Delete personal access token modal
 image::trento-web-delete-pat-confirmation.png[trento-web-delete-pat-confirmation,scaledwidth=80.0%]
 
-=== Notes for user admins
+==== Notes for user admins
 
 User admins can delete tokens for other users. However, admins cannot create new tokens for other users.
 
