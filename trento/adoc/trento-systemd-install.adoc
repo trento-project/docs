@@ -48,7 +48,7 @@ zypper in postgresql-server
 systemctl enable --now postgresql
 ----
 
-======= Configure PostgreSQL
+====== Configure PostgreSQL
 
 . Start `+psql+` with the `+postgres+` user to open a connection to the
 database:
@@ -150,7 +150,7 @@ firewall-cmd --reload
 systemctl enable --now rabbitmq-server
 ----
 
-======= Configure RabbitMQ
+====== Configure RabbitMQ
 
 To configure RabbitMQ for a production system, follow the official
 suggestions in the
