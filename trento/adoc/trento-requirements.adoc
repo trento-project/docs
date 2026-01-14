@@ -4,7 +4,12 @@ include::product-attributes.adoc[]
 == Requirements
 :revdate: 2026-01-08
 
-This section describes requirements for the {trserver} and its {tragent}s, as well as the {sap} systems and clusters that we want to monitor in the backend environment. 
+This section describes requirements for the {trserver} and its {tragent}s, as well as the {sap} systems and clusters that we want to monitor in the backend environment.
+
+[[sec-trento-cluster-requirements]]
+=== Cluster requirements
+
+The initial discovery of a pacemaker cluster requires the DC node to be online. Once the cluster has been discovered, all nodes can be stopped and Trento will continue to discover the cluster. 
 
 [[sec-trento-server-requirements]]
 === {trserver} requirements
