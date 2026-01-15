@@ -2,35 +2,6 @@
 <!-- History -->
 <revhistory xml:id="rh-article-trento">
   <revision>
-    <revnumber>2.5</revnumber>
-    <date>2025-06-05</date>
-    <revdescription>
-      <para>Revision update for version 2.5:</para>
-      <itemizedlist>
-        <listitem><para>Migrated documentation from Markdown to AsciiDoc</para></listitem>
-        <listitem><para>Migrated content from XML to AsciiDoc</para></listitem>
-        <listitem>
-          <para>
-            Moved documentation repository from <uri>https://github.com/SUSE/doc-unversioned</uri>
-            to <uri>https://github.com/trento-project/docs</uri>.
-          </para>
-        </listitem>
-        <listitem>
-          <para>
-            Implemented Antora documentation site: <uri>https://www.trento-project.io/docs/</uri>
-          </para>
-        </listitem>
-        <listitem>
-          <para>
-            Added versioning with <emphasis>latest</emphasis> (current release) and
-            <emphasis>pre-release</emphasis> documentation
-          </para>
-        </listitem>
-      </itemizedlist>
-    </revdescription>
-  </revision>
-  <revision>
-    <revnumber>3.0</revnumber>
     <date>2026-01-12</date>
     <revdescription>
       <para>Revision update for version 3.0:</para>
