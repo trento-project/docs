@@ -24,7 +24,7 @@ In a {k8s} deployment, you can use Helm to update {trserver}:
 ----
 helm upgrade \
    --install trento-server oci://registry.suse.com/trento/trento-server \
-   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
+   --set trento-web.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
    --set trento-web.adminUser.password=ADMIN_PASSWORD
         
 ----
@@ -43,7 +43,7 @@ must be set in the Helm command:
 ----
 helm upgrade \
    --install trento-server oci://registry.suse.com/trento/trento-server \
-   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
+   --set trento-web.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
    --set trento-web.adminUser.password=ADMIN_PASSWORD \
    --set rabbitmq.auth.erlangCookie=$(openssl rand -hex 16)
         

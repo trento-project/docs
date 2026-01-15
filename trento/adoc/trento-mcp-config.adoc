@@ -272,7 +272,7 @@ Enable health checks when deploying on {k8s} with {helm}:
 ----
 helm upgrade \
   --install trento-server oci://registry.suse.com/trento/trento-server \
-  --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
+  --set trento-web.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
   --set trento-web.adminUser.password=ADMIN_PASSWORD \
   --set trento-mcp-server.enabled=true \
   --set TRENTO_MCP_ENABLE_HEALTH_CHECK=true \
