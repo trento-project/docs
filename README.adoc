@@ -40,3 +40,8 @@ From the repository root, build the DocBook HTML in a container and serve it on 
 ----
 docker compose -f docker-compose.daps.yml up
 ----
+
+Open http://localhost:3001 while the command is running.
+
+The generated HTML is in `trento/build/SLES-SAP-trento/html/SLES-SAP-trento`.
+Each run clears `trento/build/SLES-SAP-trento` before rebuilding to avoid stale files.
