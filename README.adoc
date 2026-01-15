@@ -45,3 +45,12 @@ Open http://localhost:3001 while the command is running.
 
 The generated HTML is in `trento/build/SLES-SAP-trento/html/SLES-SAP-trento`.
 Each run clears `trento/build/SLES-SAP-trento` before rebuilding to avoid stale files.
+
+== Combined preview (Antora + DocBook)
+
+Start both preview servers with one command:
+
+[source,bash]
+----
+docker compose -f docker-compose.yml -f docker-compose.daps.yml up
+----

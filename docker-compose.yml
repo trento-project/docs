@@ -3,7 +3,7 @@ services:
     image: node:20-bullseye
     volumes:
       - .:/workspace:z
-      - trento-docs-node_modules:/workspace/trento-docs-site/node_modules
+      - ./trento-docs-site/node_modules:/workspace/trento-docs-site/node_modules
     working_dir: /workspace/trento-docs-site
     command: >
       bash -lc "
@@ -13,6 +13,3 @@ services:
       "
     ports:
       - "3000:3000"
-
-volumes:
-  trento-docs-node_modules:
