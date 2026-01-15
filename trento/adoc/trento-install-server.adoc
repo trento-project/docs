@@ -1,7 +1,7 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-installing-trentoserver]]
-== Installing {trserver}
+=== Installing {trserver}
 :revdate: 2026-01-08
 
 {trserver} can be deployed in different ways depending on your infrastructure and requirements.

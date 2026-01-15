@@ -1,7 +1,7 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-k8s-deployment]]
-=== {k8s} deployment
+==== {k8s} deployment
 :revdate: 2026-01-08
 
 include::partials/kubernetes-placeholders.adoc[]
@@ -18,7 +18,7 @@ Find traefik specific usages link:https://github.com/search?q=repo%3Atrento-proj
 ====
 
 [[sec-trento-install-trentoserver-on-existing-k8s-cluster]]
-==== Installing {trserver} on an existing {k8s} cluster
+===== Installing {trserver} on an existing {k8s} cluster
 
 {trserver} consists of a several components delivered as container images and intended for deployment on a {k8s} cluster. A manual production-ready deployment of these components requires {k8s} knowledge. Customers without in-house {k8s} expertise and those who want to try {trento} with a minimum of effort, can use the {trento} Helm chart. This approach automates the deployment of all the required components on a single {k8s} cluster node. You can use the {trento} Helm chart to install {trserver} on a existing {k8s} cluster as follows:
 
@@ -77,7 +77,7 @@ HELM_EXPERIMENTAL_OCI=1 helm upgrade \
 . To verify that the {trserver} installation was successful, open the URL of the {tr_web} (`http://TRENTO_SERVER_HOSTNAME`) from a workstation on the {sap} administrator's LAN.
 
 [[sec-trento-install-trentoserver-on-k3s]]
-==== Installing {trserver} on K3s
+===== Installing {trserver} on K3s
 
 If you do not have a {k8s} cluster, or you have one but you do not want to use it for {trento}, you can use {suse} Rancher's K3s as an alternative. To deploy {trserver} on K3s, you need a server or VM (see <<sec-trento-server-requirements>> for minimum requirements) and follow steps in <<pro-trento-manually-installing>>.
 
@@ -87,7 +87,7 @@ The following procedure deploys {trserver} on a single-node K3s cluster. Note th
 ====
 
 [[pro-trento-manually-installing]]
-===== Manually installing Trento on a {trserver} host
+====== Manually installing Trento on a {trserver} host
 
 . Log in to the {trserver} host.
 +
@@ -170,7 +170,7 @@ All pods must be in the ready and running state.
 . To verify that the {trserver} installation was successful, open the URL of the {tr_web} (`http://TRENTO_SERVER_HOSTNAME`) from a workstation on the {sap} administrator's LAN.
 
 [[sec-trento-deploying-trento-on-selected-nodes]]
-==== Deploying {trserver} on selected nodes
+===== Deploying {trserver} on selected nodes
 
 If you use a multi-node {k8s} cluster, it is possible to deploy {trserver} images on selected nodes by specifying the field `nodeSelector` in the helm upgrade command as follows:
 ====
@@ -188,7 +188,7 @@ HELM_EXPERIMENTAL_OCI=1 helm upgrade \
 ====
 
 [[helm-event-pruning]]
-==== Configuring event pruning
+===== Configuring event pruning
 :revdate: 2025-05-23
 
 
@@ -232,7 +232,7 @@ helm upgrade \
 ----
 
 [[sec-trento-enabling-email-alerts]]
-==== Enabling email alerts
+===== Enabling email alerts
 
 Email alerting feature notifies the {sap} Basis administrator about important changes in the {sap} Landscape being monitored by {trento}.
 
@@ -281,7 +281,7 @@ HELM_EXPERIMENTAL_OCI=1 helm upgrade \
 ----
 
 [[sec-trento-enabling-ssl]]
-==== Enabling SSL
+===== Enabling SSL
 
 Ingress may be used to provide SSL termination for the Web component of {trserver}. This would allow to encrypt the communication from the agent to the server, which is already secured by the corresponding API key. It would also allow HTTPS access to the Web console with trusted certificates.
 
