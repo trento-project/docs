@@ -6,11 +6,6 @@ include::product-attributes.adoc[]
 
 This section describes requirements for the {trserver} and its {tragent}s, as well as the {sap} systems and clusters that we want to monitor in the backend environment.
 
-[[sec-trento-cluster-requirements]]
-=== Cluster requirements
-
-The initial discovery of a pacemaker cluster requires the DC node to be online. Once the cluster has been discovered, all nodes can be stopped and Trento will continue to discover the cluster. 
-
 [[sec-trento-server-requirements]]
 === {trserver} requirements
 
@@ -67,3 +62,8 @@ The agent must be installed in all the hosts that are part of the SAP system arc
 * the host where the ERS instance, if it exists, is running
 * all the hosts where an application server instance is running
 * all the database hosts
+
+[[sec-trento-cluster-requirements]]
+=== Cluster requirements
+
+The initial discovery of a pacemaker cluster requires the DC node to be online. Once the cluster has been discovered, all nodes can be stopped and Trento will continue to discover the cluster. 
