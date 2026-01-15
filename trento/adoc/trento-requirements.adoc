@@ -67,3 +67,4 @@ The agent must be installed in all the hosts that are part of the SAP system arc
 === Cluster requirements
 
 The initial discovery of a pacemaker cluster requires the DC node to be online. Once the cluster has been discovered, all nodes can be stopped and Trento will continue to discover the cluster. 
+
