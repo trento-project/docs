@@ -1,0 +1,43 @@
+services:
+  daps-build:
+    image: registry.opensuse.org/documentation/containers/15.6/opensuse-daps-toolchain:latest
+    working_dir: /tmp
+    volumes:
+      - .:/src:ro
+      - ./trento-docs-site/build:/out
+    environment:
+      DC_FILE: ${DC_FILE:-DC-SLES-SAP-trento}
+    command: >
+      bash -lc "
+        set -euo pipefail;
+        dc_file=\"$$DC_FILE\";
+        dc_file=\"$${dc_file##*/}\";
+        doc_name=\"$${DOC_NAME:-$${dc_file#DC-}}\";
+        work=/tmp/trento-src;
+        rm -rf \"$$work\";
+        cp -a /src/trento \"$$work\";
+        cd \"$$work\";
+        daps --color=0 -d \"$$dc_file\" html;
+        rm -rf /out/daps;
+        mkdir -p /out/daps;
+        cp -a \"build/$$doc_name/html/$$doc_name/.\" /out/daps/
+      "
+    restart: "no"
+
+  daps-serve:
+    image: node:20-alpine
+    working_dir: /srv
+    ports:
+      - "${PORT:-3001}:3001"
+    volumes:
+      - ./trento-docs-site/build/daps:/srv:ro
+    environment:
+      NPM_CONFIG_LOGLEVEL: error
+      NPM_CONFIG_FUND: "false"
+      NPM_CONFIG_AUDIT: "false"
+      NPM_CONFIG_UPDATE_NOTIFIER: "false"
+    command: >
+      sh -lc "npx --yes http-server /srv -p 3001 -c-1"
+    depends_on:
+      daps-build:
+        condition: service_completed_successfully
