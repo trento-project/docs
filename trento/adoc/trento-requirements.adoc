@@ -4,7 +4,7 @@ include::product-attributes.adoc[]
 == Requirements
 :revdate: 2026-01-08
 
-This section describes requirements for the {trserver} and its {tragent}s, as well as the {sap} systems and clusters that we want to monitor in the backend environment. 
+This section describes requirements for the {trserver} and its {tragent}s, as well as the {sap} systems and clusters that we want to monitor in the backend environment.
 
 [[sec-trento-server-requirements]]
 === {trserver} requirements
@@ -19,7 +19,11 @@ Running all the {trserver} components requires a minimum of 4 GB of RAM, two CPU
 * a {k8s} service in a cloud provider
 * any other CNCF-certified {k8s} running on x86_64 architecture
 
+The Helm chart and the container images required for a {k8s}-based deployment are available in {suse} public registry.
+
 A production-ready {k8s}-based deployment of {trserver} requires {k8s} knowledge. The Helm chart is intended to be used by customers without in-house {k8s} expertise, or as a way to try {trento} with a minimum of effort. However, Helm chart delivers a basic deployment of the {trserver} with all the components running on a single node of the cluster.
+
+The packages required for a systemd deployment are available in the repositories of {sles4sap} 15 (SP4 or higher) or {sles4sap} 16.0.
 
 [[sec-trento-agent-requirements]]
 === {tragent} requirements
@@ -31,6 +35,8 @@ The {tragent} component needs to interact with several low-level system componen
 The hosts must have unique machine identifiers (ids) in order to be registered in Trento. This means that if a host in your environment is built as a clone of another one, make sure to change the machine's identifier as part of the cloning process before starting the {tragent} on it.
 
 Similarly, the clusters must have unique authkeys in order to be registered in {trento}.
+
+The {tragent} package is available in the repositories of {sles4sap} 15 (SP4 or higher) or {sles4sap} 16.0.
 
 [[sec-trento-network-requirements]]
 === Network requirements
@@ -45,12 +51,6 @@ Similarly, the clusters must have unique authkeys in order to be registered in {
 ** Optionally: From the user network to {trserver} at ports TCP/4000, TCP/4001 and TCP/8080 (health checks for web, wanda and MCP, respectively).
 ** From Prometheus server, when it exists, to each {tragent} host at the port used by the Node Exporter.
 
-[[sec-trento-installation-prerequisites]]
-=== Installation prerequisites
-
-* *{trserver}* For a {k8s}-based deployment, you must have access to {suse} public registry for the deployment of {trserver} containers. For a systemd deployment, you must have a registered {sles4sap} 15 (SP4 or higher) or {sles4sap} 16.0 distribution.
-* *{tragent}s* A registered {sles4sap} 15 (SP3 or higher) distribution.
-
 [[sec-sap-requirements]]
 === {sap} requirements
 
@@ -62,3 +62,8 @@ The agent must be installed in all the hosts that are part of the SAP system arc
 * the host where the ERS instance, if it exists, is running
 * all the hosts where an application server instance is running
 * all the database hosts
+
+[[sec-trento-cluster-requirements]]
+=== Cluster requirements
+
+The initial discovery of a pacemaker cluster requires the DC node to be online. Once the cluster has been discovered, all nodes can be stopped and Trento will continue to discover the cluster. 
