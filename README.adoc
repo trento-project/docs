@@ -19,26 +19,26 @@ The `trento-docs-site` directory builds the link:https://www.trento-project.io/d
 
 The `trento-docs-site-ui` directory is used to customize and design the layout of the link:https://www.trento-project.io/docs/[Trento docs site]. Learn more about the xref:trento-docs-site-ui/README.adoc[ui customization here].
 
-== Trento docs hub preview (docs site)
+== Trento docs hub preview
 
 From the repository root, build the docs site and serve it on port 3000:
 
 [source,bash]
 ----
-docker compose -f docker-compose.yml up
+docker compose up trento-docs
 ----
 
 Open http://localhost:3000 while the command is running.
 
 The generated HTML is in `trento-docs-site/build/trento-docs-site-public`.
 
-== Official SUSE documentation preview (DocBook)
+== Official SUSE documentation preview
 
 From the repository root, build the DocBook HTML in a container and serve it on port 3001:
 
 [source,bash]
 ----
-docker compose -f docker-compose.daps.yml up
+docker compose up daps-serve
 ----
 
 Open http://localhost:3001 while the command is running.
@@ -52,5 +52,5 @@ Start both preview servers with one command:
 
 [source,bash]
 ----
-docker compose -f docker-compose.yml -f docker-compose.daps.yml up
+docker compose up
 ----
