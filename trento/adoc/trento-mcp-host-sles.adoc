@@ -1,0 +1,151 @@
+include::product-attributes.adoc[]
+
+:revdate: 2026-01-08
+[[sec-trento-mcp-sles]]
+==== Integrating the {tr_mcp} with {mcp_host}
+
+This guide explains how to connect the {tr_mcp} to {sles} 16 using {mcp_host}, a lightweight CLI tool for the Model Context Protocol (MCP).
+
+[IMPORTANT]
+====
+Supported only on {sles4sap} 16.0
+====
+
+===== Prerequisites
+	
+To configure {mcp_host}, ensure you have:
+
+include::partials/mcp-host-prerequisites.adoc[]
+
+===== Install {mcp_host}
+
+To install {mcp_host}, open a terminal and run:
+
+[source,console]
+----
+sudo zypper refresh
+sudo zypper install mcphost
+----
+
+After installation, verify that {mcp_host} is available and working by checking its version:
+[source,console]
+----
+mcphost --version
+----
+
+===== Configure MCPHost
+
+MCPHost reads its configuration from several locations; one common location is `~/.mcphost.yml`. Create `~/.mcphost.yml` with the following content:
+[source,yaml,subs="attributes"]
+----
+mcpServers:
+  trento-mcp-server:
+    type: "remote"
+    url: {tr_mcp_url_https}
+    headers:
+      - "Authorization: Bearer ${env://TRENTO_PAT}"
+----
+
+* Replace `{tr_mcp_url_https}` with the actual URL where your {tr_mcp} is accessible:
+  ** For Kubernetes deployments with ingress, use the ingress URL (e.g., `{tr_mcp_url_https}`).
+  ** For local or development setups, use `http://localhost:{tr_mcp_default_port}/mcp` (adjust the port as needed).
+  ** The transport type is configured on the {tr_mcp}, if using Server-Sent Events (SSE) transport instead of the default streamable transport, change the path from `/mcp` to `/sse`.
+* If you configured a custom header name (using `HEADER_NAME` or `--header-name`), update `Authorization` accordingly.
+
+[NOTE]
+====
+**Security best practice:** Keep secrets out of configuration files. Store your keys in environment variables instead of hardcoding them.
+
+Export your keys in the shell before running {mcp_host}, see this example:
+
+[source,console]
+----
+export GOOGLE_API_KEY=<your-google-api-key>
+export TRENTO_PAT=<your-trento-personal-access-token>
+----
+====
+
+[TIP]
+====
+Configure remote LLM models directly in your {mcp_host} configuration.
+For example, to use Google Gemini as your model provider:
+
+[source,yaml,subs="attributes"]
+----
+model: "google:gemini-2.5-flash"
+provider-url: "https://generativelanguage.googleapis.com/v1beta/openai/"
+provider-api-key: "${env://GOOGLE_API_KEY}"
+mcpServers:
+  mcp-server-trento:
+    type: "remote"
+    url: {tr_mcp_url_https}
+    headers:
+      - "Authorization: Bearer ${env://TRENTO_PAT}"
+----
+====
+
+===== Run {mcp_host} and use {trento} Tools
+
+[arabic]
+. Start {mcp_host}:
++
+[source,console]
+----
+mcphost
+----
++
+[TIP]
+====
+If no servers appear on startup, confirm your configuration file exists at `~/.mcphost.yml` and that your environment variables are exported in the same shell session.
+====
+. Verify the connection to {trento} and basic status:
++
+[source,console]
+----
+/servers
+----
++
+.MCPHost initial screen with the {tr_mcp} connected
+image::mcphost-initial.png[MCPHost initial screen, width=900]
+
+===== Use {mcp_host} to interact with {trserver}
+
+.Ask the model to invoke {trento} tools using natural language prompts, such as:
+* "List all {sap} systems managed".
+* "Show my HANA clusters".
+* "Are my {sap} systems compliant?"
+* "What is the health status of my {sap} landscape?"
+* "Show me all hosts running {sap} applications".
+* "Are there any critical alerts I need to address?"
+* "Get details about the latest check execution results".
+* "Which {sap} systems are currently running?"
+
+Example {mcp_host} session querying {trento} about SAP systems:
+
+image::example-mcphost.png[Example MCPHost session with {trento},width=900]
+
+===== {mcp_host} Troubleshooting 
+
+If you encounter issues connecting {mcp_host} to the {tr_mcp}:
+
+* *Connection Errors*
+** Verify that the {tr_mcp} URL in `~/.mcphost.yml` is correct and accessible from your system.
+** Check if the {tr_mcp} is running by reviewing logs from your {trento} installation.
+** Ensure network connectivity and that any required firewall rules are in place.
+** Test basic connectivity: `curl -I {tr_mcp_url_https}`.
+
+* *Authentication Errors*
+** Verify that your personal access token is valid by testing it directly against your {trento} Server API.
+** Ensure `TRENTO_PAT` is exported in the same shell session before running `mcphost`.
+** Check that the header name matches your server configuration (default: `Authorization`).
+** Ensure the token has the necessary permissions in {trento}.
+
+* *LLM Provider Errors*
+** Verify that LLM `GOOGLE_API_KEY` (or your provider's API key) is exported correctly.
+** Check the `provider-url` and `model` configuration in your `~/.mcphost.yml`.
+** Confirm that your API key has sufficient quota and permissions with your provider.
+
+* *General Issues*
+** Check the MCPHost terminal output for detailed error messages during startup or operation.
+** Review the {tr_mcp} logs for connection attempts and errors.
+** Verify that your configuration file exists at `~/.mcphost.yml` and has correct YAML syntax.

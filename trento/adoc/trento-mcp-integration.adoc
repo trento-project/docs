@@ -1,0 +1,13 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-mcp-integration]]
+:revdate: 2026-01-08
+== MCP Integration
+
+The {tr_mcp} is an optional component that enables AI-assisted infrastructure management for your SAP landscape. It exposes {trento} functionality through the Model Context Protocol (MCP), an open standard that facilitates secure communication between data sources and AI agents. While the core {trserver} operates independently, the {tr_mcp} component allows you to integrate {trento} into an agentic AI workflow. This enables the use of Large Language Models (LLMs) to perform common monitoring and troubleshooting tasks using natural language, providing a standardized way for AI tools to access real-time system state and best-practice validations.
+
+include::trento-mcp-install.adoc[]
+include::trento-mcp-config.adoc[]
+include::trento-mcp-how-to-use.adoc[]
+
+

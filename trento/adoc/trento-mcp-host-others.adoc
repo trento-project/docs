@@ -1,0 +1,90 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-mcp-others]]
+==== Integrating the {tr_mcp} with other clients
+:revdate: 2026-01-08
+
+The {tr_mcp} can be integrated with any client application that supports the Model Context Protocol. This makes it possible to interact with the {trento} API and execute tools defined in the OpenAPI specification through your preferred AI assistant or development tool.
+
+This guide uses Visual Studio Code with GitHub Copilot as an example, but the configuration procedures apply to any MCP-compatible client.
+
+===== Prerequisites
+	
+To configure your client, make sure that you have the following:
+
+include::partials/mcp-host-prerequisites.adoc[]
+
+===== Configuring Your Client
+
+Once you have your {trserver} installation ready with the {tr_mcp} URL and API token, you can configure the MCP Server client. The examples below show JSON configuration format used by most MCP Server clients, including VS Code, Claude Desktop, and others.
+
+
+====== Option 1: Configuration with Prompted Input
+
+This configuration prompts you for your personal access token when the client starts, keeping credentials secure and out of configuration files. The `password: true` setting ensures your personal access token input is masked when you type it.
+
+[NOTE]
+====
+This option is supported by most clients, including VS Code. Check your client's documentation if the prompt feature is not available.
+====
+
+[source,json,subs="attributes"]
+----
+{
+  "servers": {
+    "trento": {
+      "type": "http",
+      "url": "{tr_mcp_url_https}",
+      "headers": {
+        "Authorization": "${input:trento-personal-access-token}"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "trento-personal-access-token",
+      "description": "{trento} API key",
+      "password": true
+    }
+  ]
+}
+----
+
+====== Option 2: Direct Header Configuration
+
+For clients that don't support prompted input, or for testing purposes, set your {trento} personal access token directly in the configuration file.
+
+[WARNING]
+====
+When using this option, ensure your configuration file has appropriate permissions and is not committed to version control systems.
+====
+[source,json,subs="attributes"]
+----
+{
+  "servers": {
+    "trento": {
+      "type": "http",
+      "url": "{tr_mcp_url_https}",
+      "headers": {
+        "Authorization": "trento-personal-access-token"
+      }
+    }
+  }
+}
+----
+
+[NOTE]
+====
+Replace `{tr_mcp_url_https}` with your actual {tr_mcp} endpoint URL from your installation.
+====
+
+====== Client Options
+
+For detailed guidance on leveraging MCP capabilities in different tools, refer to the following official documentation:
+
+* link:https://code.visualstudio.com/docs/copilot/customization/mcp-servers[Visual Studio Code with GitHub Copilot - MCP Server Configuration].
+* link:https://docs.claude.com/en/docs/mcp[Claude Desktop - Model Context Protocol Integration].
+* link:https://cursor.com/[Cursor] - AI-powered code editor with MCP support.
+* link:https://cloud.google.com/gemini/docs/codeassist/use-agentic-chat-pair-programmer[Google Cloud Gemini Code Assist - Agentic Chat].
+* link:https://docs.windsurf.com/windsurf/cascade/mcp[Windsurf - Cascade MCP Support].

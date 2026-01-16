@@ -1,0 +1,11 @@
+:revdate: 2026-01-08
+The subsection uses the following placeholders:
+
+* `TRENTO_SERVER_HOSTNAME`: the host name used by the end user to access the console.
+* `ADMIN_PASSWORD`: the password of the admin user created during the installation process.
++
+The password must meet the following requirements:
++
+- minimum length of 8 characters
+- the password must not contain 3 identical numbers or letters in a row (for example, 111 or aaa)
+- the password must not contain 4 sequential numbers or letters (for example, 1234, abcd, ABCD)

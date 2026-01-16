@@ -2,10 +2,9 @@ include::product-attributes.adoc[]
 
 [[sec-trento-requirements]]
 == Requirements
-:revdate: 2025-08-06
+:revdate: 2026-01-08
 
-
-This section describes requirements for the {trserver} and its {tragent}s.
+This section describes requirements for the {trserver} and its {tragent}s, as well as the {sap} systems and clusters that we want to monitor in the backend environment.
 
 [[sec-trento-server-requirements]]
 === {trserver} requirements
@@ -20,18 +19,11 @@ Running all the {trserver} components requires a minimum of 4 GB of RAM, two CPU
 * a {k8s} service in a cloud provider
 * any other CNCF-certified {k8s} running on x86_64 architecture
 
+The Helm chart and the container images required for a {k8s}-based deployment are available in {suse} public registry.
+
 A production-ready {k8s}-based deployment of {trserver} requires {k8s} knowledge. The Helm chart is intended to be used by customers without in-house {k8s} expertise, or as a way to try {trento} with a minimum of effort. However, Helm chart delivers a basic deployment of the {trserver} with all the components running on a single node of the cluster.
 
-[[sec-sap-requirements]]
-=== {sap} requirements
-
-An {sap} system must run on a HANA database to be discovered by {trento}. In addition, the parameter `dbs/hdb/dbname` must be set in the DEFAULT profile of the {sap} system to the correct database (tenant) name.
-
-The agent must be installed in the following locations:
-
-* the host where the ASCS instance is running
-* a host where an application server instance is running
-* all the database hosts
+The packages required for a systemd deployment are available in the repositories of {sles4sap} 15 (SP4 or higher) or {sles4sap} 16.0.
 
 [[sec-trento-agent-requirements]]
 === {tragent} requirements
@@ -44,16 +36,35 @@ The hosts must have unique machine identifiers (ids) in order to be registered i
 
 Similarly, the clusters must have unique authkeys in order to be registered in {trento}.
 
+The {tragent} package is available in the repositories of {sles4sap} 15 (SP4 or higher) or {sles4sap} 16.0.
+
 [[sec-trento-network-requirements]]
 === Network requirements
 
-* The Web component of the {trserver} must be reachable from any {tragent} host via HTTP (port TCP/80) or via HTTPS (port TCP/443) if SSL is enabled.
-* The checks engine component of the {trserver} must be reachable from any {tragent} host via Advanced Message Queuing Protocol or AMQP (port TCP/5672).
-* The Prometheus component of the {trserver} must be able to reach the Node Exporter in the {tragent} hosts (port TCP/9100).
-* The {sap} Basis administrator must access to the Web component of the {trserver} via HTTP (port TCP/80) or via HTTPS (port TCP/443) if SSL is enabled.
+* Required inbound connectivity:
+** From any {tragent} host to {trserver} at port TCP/80 (HTTP), or TCP/443 (HTTPS) if SSL is enabled.
+** From any {tragent} host to {trserver} at port TCP/5672 (Advanced Message Queuing Protocol or AMQP)
+** From the user network to {trserver} at port TCP/80 (HTTP), or TCP/443 (HTTPS) if SSL is enabled.
+** If the {tr_mcp} is installed and enabled:
+*** For a {k8s} deployment, from the MCP client to the {trserver} ingress at TCP/80 or TCP/443. Internally, the MCP Server Pod uses TCP/{tr_mcp_default_port} and TCP/8080 if the health check is enabled.
+*** For a systemd deployment, from the user network to {tr_mcp} at TCP/{tr_mcp_default_port}.
+** Optionally: From the user network to {trserver} at ports TCP/4000, TCP/4001 and TCP/8080 (health checks for web, wanda and MCP, respectively).
+** From Prometheus server, when it exists, to each {tragent} host at the port used by the Node Exporter.
 
-[[sec-trento-installation-prerequisites]]
-=== Installation prerequisites
+[[sec-sap-requirements]]
+=== {sap} requirements
 
-* *{trserver}* For a {k8s}-based deployment, you must have access to {suse} public registry for the deployment of {trserver} containers. For a systemd deployment, you must have a registered {sles4sap} 15 (SP3 or higher) distribution.
-* *{tragent}s* A registered {sles4sap} 15 (SP3 or higher) distribution.
+An {sap} system must run on a HANA database to be discovered by {trento}. In addition, the parameter `dbs/hdb/dbname` must be set in the DEFAULT profile of the {sap} system to the correct database (tenant) name.
+
+The agent must be installed in all the hosts that are part of the SAP system architecture. Particularly:
+
+* the host where the ASCS instance is running
+* the host where the ERS instance, if it exists, is running
+* all the hosts where an application server instance is running
+* all the database hosts
+
+[[sec-trento-cluster-requirements]]
+=== Cluster requirements
+
+The initial discovery of a pacemaker cluster requires the DC node to be online. Once the cluster has been discovered, all nodes can be stopped and Trento will continue to discover the cluster. 
+

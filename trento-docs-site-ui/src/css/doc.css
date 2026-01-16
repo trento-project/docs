@@ -16,6 +16,10 @@
     max-width: var(--doc-max-width--desktop);
     min-width: 0;
   }
+
+  .doc h6 {
+    font-size: var(--doc-font-size--desktop);
+  }
 }
 
 .doc h1,
@@ -48,6 +52,22 @@
 
 .doc > h2#name + .sectionbody {
   margin-top: 1rem;
+}
+
+.doc h3 {
+  font-size: 25px;
+}
+
+.doc h4 {
+  font-size: 23px;
+}
+
+.doc h5 {
+  font-size: 21px;
+}
+
+.doc h6 {
+  font-size: var(--doc-font-size);
 }
 
 #preamble + .sect1,

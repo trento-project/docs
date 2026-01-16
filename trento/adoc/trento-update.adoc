@@ -1,0 +1,6 @@
+== Update
+
+include::trento-update-trento-server.adoc[]
+include::trento-update-trento-checks.adoc[]
+include::trento-update-trento-agent.adoc[]
+

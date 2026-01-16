@@ -1,0 +1,12 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-mcp-how-to-use]]
+:revdate: 2026-01-08
+=== Using the {tr_mcp}
+
+The {tr_mcp} provides the interface for AI-assisted infrastructure operations, enabling agentic assistants to integrate with {trento}. By utilizing the Model Context Protocol, these assistants can perform monitoring and troubleshooting tasks through natural language. See <<sec-trento-mcp-sles,{mcp_host} on SLES>> or <<sec-trento-mcp-others,Using alternative MCP clients>> for details.
+
+include::trento-mcp-host-sles.adoc[]
+include::trento-mcp-host-others.adoc[]
+// Revisit suse-ai section
+// include::trento-mcp-suse-ai.adoc[]

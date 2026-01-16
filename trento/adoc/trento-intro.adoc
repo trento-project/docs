@@ -1,39 +1,47 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-what]]
+:revdate: 2026-01-08
 == What is {trento}?
-:revdate: 2025-06-10
-
 
 {trento} is the official version of the Trento community project. It is a comprehensive monitoring solution consisting of two main components: the {trserver} and the {tragent}. {trento} provides the following functionality and features:
 
 * A user-friendly reactive Web interface for {sap} Basis administrators.
 * Automated discovery of {pace} clusters using SAPHanaSR classic or angi as well as different fencing mechanisms, including diskless SBD.
-* Automated discovery of SAP systems running on ABAP or JAVA stacks and HANA databases.
+* Automated discovery of {sap} systems running on ABAP or JAVA stacks and HANA databases.
 * Awareness of maintenance situations in a {pace} cluster at cluster, node, or resource level.
 * Configuration validation for {hana} Scale-Up Performance/Cost-optimized, {hana} Scale-out and ASCS/ERS clusters deployed on Azure, AWS, GCP or on-premises bare metal platforms, including KVM and Nutanix.
 * Useful information that offers insights about the execution of configuration checks.
 * Delivery of configuration checks decoupled from core functionality.
 * Email alerting for critical events in the monitored landscape.
 * Integration of saptune into the console and specific configuration checks at host and cluster levels.
-* Information about relevant patches and upgradable packages for registered hosts via integration with SUSE Multi-Linux Manager.
+* Information about relevant patches and upgradable packages for registered hosts via integration with {smlm}.
 * Monitoring of CPU and memory usage at the host level through basic integration with {prometheus}.
 * API-based architecture to facilitate integration with other monitoring tools.
 * Rotating API key to protect communication from the {tragent} to the {trserver}.
+* AI assistance via Model Context Protocol (MCP) integration.
 * Housekeeping capabilities.
 
-The *{trserver}* is an independent, distributed system designed to run on a {k8s} cluster or as a regular systemd stack. The {trserver} provides a Web front-end for user interaction. The {trserver} consists of the following components:
 
-* The web component that acts as a control plane responsible for internal and external communications as well as rendering the UI.
-* The checks engine named wanda that orchestrates the execution of configuration checks.
-* A {postgresql} database for data persistence.
-* The RabbitMQ message broker for communicating between the checks engine and the agents.
-* A {prometheus} instance that retrieves the metrics collected by the {prometheus} node exporter in the registered hosts.
-
-The *{tragent}* is a single background process (`trento-agent`) running on each monitored host of the SAP infrastructure.
-
-See <<fig-trento-architecture>> for additional details.
+=== Trento Architecture
 
 [[fig-trento-architecture]]
 .Architectural overview
-image::trento-high-level-architecture.png[width=80%]
+image::trento-high-level-architecture.svg[width=80%]
+
+=== {trserver}
+
+The {trserver} is an independent, distributed system designed to run on a {k8s} cluster or as a regular systemd stack. It provides both a Web front-end for user interaction and backend APIs for automation and integration with components such as the {tr_mcp}. Together with the optional link:https://modelcontextprotocol.io/docs/getting-started/intro[{tr_mcp}], it enables secure, AI-assisted operations by exposing {trserver} APIs for natural-language interactions with tools like {mcp_host}, Copilot, Claude, and {suseai}.
+
+The {trserver} consists of the following components:
+
+* The {web} component that acts as a control plane responsible for internal and external communications as well as rendering the UI.
+* The orchestration engine named {wanda} that orchestrates the execution of compliance checks and operations.
+* The {tr_mcp} which creates a secure bridge between the infrastructure data collected by Trento and your Large Language (LLM) of choice.
+* A {postgresql} database for data persistence.
+* The {rabbitmq} message broker for communication between the orchestration engine and the agents.
+* A {prometheus} instance that retrieves the metrics collected by the {prometheus} node exporter in the registered hosts. This {prometheus} instance is optional in a systemd deployment.
+
+=== {tragent}
+
+The *{tragent}* is a single background process (`trento-agent`) running on each monitored host of the SAP infrastructure.

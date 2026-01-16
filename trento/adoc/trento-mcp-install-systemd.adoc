@@ -1,0 +1,143 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-mcp-server-systemd]]
+:revdate: 2026-01-08
+==== systemd deployment
+
+A systemd-based installation of the {tr_mcp} using RPM packages can be performed manually on the latest supported versions of {sles4sap}.
+
+include::partials/supported-versions.adoc[]
+
+===== Installing {tr_mcp} using RPM packages
+
+. Install the {tr_mcp} package:
++
+[source,bash,subs="attributes"]
+----
+zypper install {tr_mcp_binary}
+----
+
+===== Configure {tr_mcp}
+
+. Create the {tr_mcp} configuration file `{tr_mcp_config_file}` by copying the example:
++
+[source,bash,subs="attributes"]
+----
+cp {tr_mcp_config_file}.example {tr_mcp_config_file}
+----
++
+. Edit the configuration file to point to your {trserver}:
++
+[source,bash,subs="attributes"]
+----
+vim {tr_mcp_config_file}
+----
++
+
+Example configuration:
++
+[source,env,subs="attributes"]
+----
+AUTODISCOVERY_PATHS=/api/all/openapi,/wanda/api/all/openapi
+ENABLE_HEALTH_CHECK=false
+HEADER_NAME=Authorization
+HEALTH_API_PATH={tr_mcp_health_api_path}
+HEALTH_PORT={tr_mcp_health_port}
+# OAS_PATH={tr_server_url_https}/api/all/openapi,{tr_server_url_https}/wanda/api/all/openapi
+PORT={tr_mcp_default_port}
+TAG_FILTER=MCP
+TRANSPORT=streamable
+TRENTO_URL={tr_server_url_https}
+VERBOSITY=info
+INSECURE_SKIP_TLS_VERIFY=false
+----
+
+[%hardbreaks]
+Configure the {tr_mcp} using either `TRENTO_URL` or `OAS_PATH`.
+If `OAS_PATH` is left empty, the {tr_mcp} automatically discovers the APIs from the {trserver} using `TRENTO_URL`.
+If `OAS_PATH` is set, it takes precedence and `TRENTO_URL` is ignored.
+
+**Use `TRENTO_URL` when one or more of the following conditions apply:**
+
+* {trserver} is deployed behind a reverse proxy (NGINX, etc.).
+* The {tr_mcp} runs on a different host or network than {trserver}.
+* You want to use external or public URLs.
+* You prefer automatic API autodiscovery.
+
+
+
+**Use `OAS_PATH` when one or more of the following conditions apply:**
+
+* You want to connect directly to internal services without autodiscovery.
+* You need to bypass reverse proxy configurations.
+
+
+====== Start the {tr_mcp} service
+
+Enable and start the {tr_mcp} service:
+
+[source,bash,subs="attributes"]
+----
+systemctl enable --now {tr_mcp_binary}
+----
+
+===== Verify the {tr_mcp} service
+
+. Verify the service is running:
++
+[source,bash,subs="attributes"]
+----
+systemctl status {tr_mcp_binary}
+----
++
+Expected output:
++
+[source,bash,subs="attributes"]
+----
+● {tr_mcp_binary}.service - {tr_mcp} service
+     Loaded: loaded (/usr/lib/systemd/system/{tr_mcp_binary}.service; enabled)
+     Active: active (running) since ...
+----
++
+. Check the service logs:
++
+[source,bash,subs="attributes"]
+----
+journalctl -u {tr_mcp_binary} -f
+----
++
+. If firewalld is running, allow {tr_mcp} to be accessible and add an exception to firewalld:
++
+[source,bash,subs="attributes"]
+----
+firewall-cmd --zone=public --add-port={tr_mcp_default_port}/tcp --permanent
+firewall-cmd --reload
+----
++
+. If you enabled health checks and want to expose them, also allow the health check port:
++
+[source,bash,subs="attributes"]
+----
+firewall-cmd --zone=public --add-port={tr_mcp_health_port}/tcp --permanent
+firewall-cmd --reload
+----
++
+. If you enabled health checks, verify the endpoints locally:
++
+[source,bash,subs="attributes"]
+----
+# Note: Replace localhost with the server's IP/hostname if running these commands from a remote machine,
+# and ensure the health port is allowed by your firewall.
+
+# Liveness endpoint:
+curl http://localhost:{tr_mcp_health_port}/livez
+
+# Example output:
+# {"info":{"name":"trento-mcp-server","version":"0.1.0"},"status":"up"}
+
+# Readiness endpoint:
+curl http://localhost:{tr_mcp_health_port}/readyz
+
+# Example output:
+# {"status":"up","details":{"mcp-server":{"status":"up","timestamp":"2025-10-09T12:11:09.528898849Z"},"wanda-api":{"status":"up","timestamp":"2025-10-09T12:11:09.542078327Z"},"web-api":{"status":"up","timestamp":"2025-10-09T12:11:09.544855047Z"}}}
+----

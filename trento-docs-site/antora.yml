@@ -1,7 +1,7 @@
 name: ROOT
 title: Trento Documentation
 version: latest
-display_version: 'latest: 2.5'
+display_version: 'latest: 3.0'
 nav:
 - modules/user-guide/nav_user_guide.adoc
 - modules/developer/nav_developer.adoc
@@ -29,7 +29,8 @@ ext:
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/web trento-docs-site/build/tmp_components/web
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/werkzeugkoffer trento-docs-site/build/tmp_components/werkzeugkoffer
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/workbench trento-docs-site/build/tmp_components/workbench
-
+        - command: git clone --depth 1 --single-branch https://github.com/trento-project/trento-installation-automation trento-docs-site/build/tmp_components/trento-installation-automation
+        
     # Generate navigation for components in nav_developer.adoc
     - run:
       - command: node trento-docs-site/scripts/generate-components.nav.js
@@ -43,6 +44,9 @@ ext:
         into: modules/user-guide/pages
       - dir: trento/images/src/png
         files: '**/*.png'
+        into: modules/user-guide/images
+      - dir: trento/images/src/svg
+        files: '**/*.svg'
         into: modules/user-guide/images
     - run:
         command: trento-docs-site/scripts/generate-attributes-yaml.sh trento/adoc/generic-attributes.adoc ./trento-docs-site/build/adoc_variables/user-guide/antora.yml
@@ -128,6 +132,11 @@ ext:
       - dir: trento-docs-site/build/tmp_components/tlint/docs
         files: ['**/*.adoc', '!README.adoc']
         into: modules/tlint/pages
+    ## Trento trento-installation-automation https://github.com/trento-project/trento-installation-automation
+    - scan:
+      - dir: trento-docs-site/build/tmp_components/trento-installation-automation
+        files: '*.adoc'
+        into: modules/trento-installation-automation/pages
     ## Trento Wanda https://github.com/trento-project/wanda
     - scan:
       - dir: trento-docs-site/build/tmp_components/wanda

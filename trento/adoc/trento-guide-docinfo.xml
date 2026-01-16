@@ -1,11 +1,46 @@
 <date><?dbtimestamp format="B d, Y"?></date>
 <!-- History -->
 <revhistory xml:id="rh-article-trento">
-  <revision><date>2025-06-05</date>
+  <revision>
+    <date>2026-01-12</date>
     <revdescription>
-      <para>
-        Initial version
-      </para>
+      <para>Revision update for version 3.0:</para>
+      <itemizedlist>
+        <listitem>
+          <para>New structure based on purpose and feature nature</para>
+        </listitem>
+        <listitem>
+          <para>Added:</para>
+          <itemizedlist>
+            <listitem>
+              <para>Activity Log: information about correlation of entries</para>
+            </listitem>
+            <listitem>
+              <para>Operations: new section</para>
+            </listitem>
+            <listitem>
+              <para>MCP integration: new section</para>
+            </listitem>
+            <listitem>
+              <para>Personal access tokens: new section</para>
+            </listitem>
+            <listitem>
+              <para>Alert email configuration in the UI</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para>Changed:</para>
+          <itemizedlist>
+            <listitem>
+              <para>
+                Prometheus integration moved out of the
+                Trento Server installation section
+              </para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+      </itemizedlist>
     </revdescription>
   </revision>
 </revhistory>
