@@ -33,7 +33,10 @@ Install the {tragent} on an {sap} host and register it with the
 {prompt_sudo}zypper install trento-agent
 ----
 ====
-. Open the configuration file `+/etc/trento/agent.yaml+` and uncomment
++
+A configuration file named `+/agent.yaml+` is created under `+/etc/trento/+` in {sles4sap} 15 
+or under `+/usr/etc/trento/+` in {sles4sap} 16.
+. Open the configuration file and uncomment
 (remove the `+#+` character) the entries for `+facts-service-url+`,
 `+server-url+` and `+api-key+`. Update the values if necessary:
 ** `+facts-service-url+`: the address of the AMQP RabbitMQ service used
