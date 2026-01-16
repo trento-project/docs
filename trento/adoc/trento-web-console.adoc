@@ -18,7 +18,7 @@ corresponding system IDs.
 perform on the different targets (hosts or clusters), cluster types
 (HANA scale up, HANA scale out or ASCS/ERS) and supported platforms
 (Azure, AWS, GCP, Nutanix, on-premises/KVM or VMware).
-* *Settings* Allows you retrieve and manage the API key for the current installation, configure the connection data for a SUSE Multi-Linux Manager instance, and stablish the retention time for the entries in the activity log.
+* *Settings* Allows you to modify user-defined settings.
 * *About* Shows the current server version, a link to the GitHub repository of the
 {trento} Web component, and the number of registered
 {sles4sap}{nbsp}subscriptions that has been discovered.
