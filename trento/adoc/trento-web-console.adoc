@@ -18,9 +18,7 @@ corresponding system IDs.
 perform on the different targets (hosts or clusters), cluster types
 (HANA scale up, HANA scale out or ASCS/ERS) and supported platforms
 (Azure, AWS, GCP, Nutanix, on-premises/KVM or VMware).
-* *Settings* Allows you retrieve and manage the API key for the current installation,
-configure the connection data for a SUSE Multi-Linux Manager instance,
-and stablish the retention time for the entries in the activity log.
+* *Settings* Allows you retrieve and manage the API key for the current installation, configure the connection data for a SUSE Multi-Linux Manager instance, and stablish the retention time for the entries in the activity log.
 * *About* Shows the current server version, a link to the GitHub repository of the
 {trento} Web component, and the number of registered
 {sles4sap}{nbsp}subscriptions that has been discovered.
@@ -299,9 +297,9 @@ image::trento-web-hana-database-details-view.png[trento-web-hana-database-detail
 [[sec-trento-settings-webconsole]]
 === Configuring {tr_web} settings
 
-{tr_web} feature the dedicated **Settings** section, where you can modify user-defined settings.
+Users with the `all:settings` permissions can use the **Settings** view of {tr_web} to modify the following:
 
-In the **Email Alerts** section, you can specify the settings required for sending alerts via email. All the options in the section are self-explanatory, but there are several important points you need to keep in mind.
-
-. Only users with the `all:settings` permissions can modify the email settings.
-. If the email settings are specified via environment variables (see <<sec-trento-enabling-email-alerts>>), the web-based configuration is disabled.
+- API key. See <<sec-trento-rotating-apikeys>>.
+- Connection data for SUSE Multi-Linux Manager. See <<sec-integration-with-SUSE-Manager>>.
+- Retention time for Activity Log entries. See <<sec-activity-log>>.
+- Settings required for sending alerts via email. Note that if _any_ of the email settings are specified via environment variables (see <<sec-trento-enabling-email-alerts>>), the web-based configuration is disabled.
