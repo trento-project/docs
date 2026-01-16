@@ -295,3 +295,13 @@ Click on a host name to go to the corresponding *Host details* view.
 +
 .HANA Database details
 image::trento-web-hana-database-details-view.png[trento-web-hana-database-details-view,scaledwidth=70.0%]
+
+[[sec-trento-settings-webconsole]]
+=== Configuring {tr_web} settings
+
+{tr_web} feature the dedicated **Settings** section, where you can modify user-defined settings.
+
+In the **Email Alerts** section, you can specify the settings required for sending alerts via email. All the options in the section are self-explanatory, but there are several important points you need to keep in mind.
+
+. Only users with the `all:settings` permissions can modify the email settings.
+. If the email settings are specified via environment variables (see <<sec-trento-enabling-email-alerts>>), the web-based configuration is disabled.
