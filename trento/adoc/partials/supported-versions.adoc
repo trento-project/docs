@@ -1,0 +1,6 @@
+:revdate: 2026-01-08
+
+*Supported versions*:
+
+* {sles4sap} 15: SP4–SP7
+* {sles4sap} 16.0

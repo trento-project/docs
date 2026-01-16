@@ -1,148 +1,34 @@
 include::product-attributes.adoc[]
 
 [[sec-systemd-deployment]]
-=== systemd deployment
-:revdate: 2025-08-05
+==== systemd deployment
+:revdate: 2025-06-11
 
+A systemd-based installation of the {trserver} using RPM packages can be performed manually on the latest supported versions of {sles4sap}, from 15 SP4 up to 16. For installations on service packs other than the current one, make sure to update the repository URL as described in the relevant notes throughout this guide.
 
-A systemd installation of {trento} Server, based on RPM packages, can be done
-manually using the latest available version of SUSE Linux Enterprise Server for
-SAP Applications. For installations on Service Packs other than the current one,
-update the repository address as indicated in the respective notes provided
-throughout this guide.
+===== List of dependencies
 
-*Supported Service Packs*:
-
-* SP3
-* SP4
-* SP5
-* SP6
-* SP7
-
-==== List of dependencies
-
+* https://nginx.org/en/[NGINX]
 * https://www.postgresql.org/[PostgreSQL]
 * https://rabbitmq.com/[RabbitMQ]
-* https://nginx.org/en/[NGINX]
-* https://prometheus.io/[Prometheus] (optional)
 
-==== Install {trento} dependencies
+===== Install {trento} dependencies
 
-===== Install Prometheus (Optional)
-
-https://prometheus.io/[Prometheus] is not required to run {trento}, but it
-is recommended, as it allows {trento} to display charts for each host with
-useful information about the CPU load and memory.
-
-[NOTE]
-====
-If you choose not to install Prometheus, set `+CHARTS_ENABLED+` to
-`+false+` in the {trento} web RPM configuration file stored in
-`+/etc/trento/trento-web+`. To use an existing Prometheus installation, set `+CHARTS_ENABLED+` to
-`+true+` 
-====
-
-[[prometheus-existing-installation, Use existing installation]]
-====== Use existing installation
-
-Minimal required Prometheus version is *2.28.0*.
-
-[[prometheus-packagehub, Install Prometheus using the *unsupported* PackageHub repository]]
-====== Install Prometheus using the *unsupported* PackageHub repository
-
-https://packagehub.suse.com/[PackageHub] packages are tested by SUSE,
-but they do not come with the same level of support as the core SLES
-packages. Users should assess the suitability of these packages based on
-their own risk tolerance and support needs.
-
-. Enable PackageHub repository (replace `15.x` with the correct Service Pack version):
-+
-[source,bash]
-----
-SUSEConnect --product PackageHub/15.x/x86_64
-----
-+
-[NOTE]
-====
-SLE15 SP3 requires a provided Prometheus server. The version available
-through `+SUSEConnect --product PackageHub/15.3/x86_64+` is outdated and
-is not compatible with {trento}'s Prometheus configuration. Refer to
-<<prometheus-existing-installation>> for SLE 15 SP3.
-====
-+
-. Add the Prometheus user/group:
-+
-[source,bash]
-----
-groupadd --system prometheus
-useradd -s /sbin/nologin --system -g prometheus prometheus
-----
-. Install Prometheus using Zypper:
-+
-[source,bash]
-----
-zypper in golang-github-prometheus-prometheus
-----
-+
-[NOTE]
-====
-In case the missing dependency cannot be satisfied, we have already
-added the Prometheus user/group. This makes it safe to proceed with the
-installation by choosing Solution 2: break
-golang-github-prometheus-prometheus
-====
-. Change Prometheus configuration by replacing the configuration at
-`+/etc/prometheus/prometheus.yml+` with:
-+
-[source,yaml]
-----
-global:
-  scrape_interval: 30s
-  evaluation_interval: 10s
-
-scrape_configs:
-  - job_name: "http_sd_hosts"
-    honor_timestamps: true
-    scrape_interval: 30s
-    scrape_timeout: 30s
-    scheme: http
-    follow_redirects: true
-    http_sd_configs:
-      - follow_redirects: true
-        refresh_interval: 1m
-        url: http://localhost:4000/api/prometheus/targets
-----
-+
-[NOTE]
-====
-*localhost:4000* in *url:http://localhost:4000/api/prometheus/targets*
-refers to the location where {trento} web service is running.
-====
-. Enable and start the Prometheus service:
-+
-[source,bash]
-----
-# systemctl enable --now prometheus
-----
-. If firewalld is running, allow Prometheus to be accessible and add an
-exception to firewalld:
-+
-[source,bash]
-----
-firewall-cmd --zone=public --add-port=9090/tcp --permanent
-firewall-cmd --reload
-----
-
-===== Install PostgreSQL
+====== Install PostgreSQL
 
 The current instructions are tested with the following PostgreSQL
 versions:
 
-* *13.9 for SP3*
-* *14.10 for SP4*
-* *15.5 for SP5*
-* *16.9 for SP6*
-* *17.5 for SP7*
+[cols="2,2", options="header"]
+|===
+| {sles4sap} | PostgreSQL Version
+
+| 15 SP4 | 14.10
+| 15 SP5 | 15.5
+| 15 SP6 | 16.9
+| 15 SP7 | 17.5
+| 16.0   | 17.6
+|===
 
 Using a different version of PostgreSQL may require different steps or
 configurations, especially when changing the major number. For more
@@ -207,8 +93,8 @@ databases and users. To do this, add the following to
 +
 [source,bash]
 ----
-host   wanda                      wanda_user    0.0.0.0/0   md5
-host   trento,trento_event_store  trento_user   0.0.0.0/0   md5
+host   wanda                      wanda_user    0.0.0.0/0     scram-sha-256
+host   trento,trento_event_store  trento_user   0.0.0.0/0     scram-sha-256
 ----
 +
 [NOTE]
@@ -235,7 +121,7 @@ listen_addresses = '*'
 systemctl restart postgresql
 ----
 
-===== Install RabbitMQ
+====== Install RabbitMQ
 
 . Install RabbitMQ server:
 +
@@ -289,47 +175,41 @@ rabbitmqctl add_vhost vhost
 rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
 ----
 
-==== Install {trento} using RPM packages
+===== Install {trento} using RPM packages
 
-The `+trento-web+` and `+trento-wanda+` packages come in the supported
-SLES4SAP distributions by default.
+The `trento-web` and `trento-wanda` packages are available by default on supported {sles4sap} distributions.
 
-Install {trento} web and wanda:
+Install {trento} web, wanda and checks:
 
 [source,bash]
 ----
 zypper install trento-web trento-wanda
 ----
 
-===== Create the configuration files
+====== Create the configuration files
 
 Both services depend on respective configuration files. They must be
 placed in `+/etc/trento/trento-web+` and `+/etc/trento/trento-wanda+`
 respectively, and examples of how to modify them are available in
-`+/etc/trento/trento-web.example+` and
-`+/etc/trento/trento-wanda.example+`.
-
-*Important: The content of `+SECRET_KEY_BASE+` and
-`+ACCESS_TOKEN_ENC_SECRET+` in both `+trento-web+` and `+trento-wanda+`
-must be the same.*
+`+/etc/trento/trento-web.example+` and `+/etc/trento/trento-wanda.example+`.
 
 [NOTE]
 ====
-You can create the content of the secret variables like
-`+SECRET_KEY_BASE+`, `+ACCESS_TOKEN_ENC_SECRET+` and
-`+REFRESH_TOKEN_ENC_SECRET+` with `+openssl+` running
-`+openssl rand -out /dev/stdout 48 | base64+`
+You can create the content of the secret variables such as
+`SECRET_KEY_BASE`, `ACCESS_TOKEN_ENC_SECRET` and `REFRESH_TOKEN_ENC_SECRET` using `openssl`:
+
+[source,bash]
+----
+openssl rand -out /dev/stdout 48 | base64
+----
+
+Also ensure that a valid hostname, FQDN, or IP address is configured in
+`TRENTO_WEB_ORIGIN` when using HTTPS.
+Otherwise, WebSocket connections will fail, preventing real-time updates
+in the web interface.
 ====
 
-[NOTE]
-====
-Depending on how you intend to connect to the console, a working
-hostname, FQDN, or an IP is required in `+TRENTO_WEB_ORIGIN+` for HTTPS.
-Otherwise websockets fail to connect, causing no real-time updates in
-the UI.
-====
-
-===== trento-web configuration
+====== trento-web configuration
 
 ====
 [source,bash]
@@ -339,30 +219,29 @@ AMQP_URL=amqp://trento_user:trento_user_password@localhost:5672/vhost
 DATABASE_URL=ecto://trento_user:web_password@localhost/trento
 EVENTSTORE_URL=ecto://trento_user:web_password@localhost/trento_event_store
 ENABLE_ALERTING=false
-CHARTS_ENABLED=true
-PROMETHEUS_URL=http://localhost:9090
+CHARTS_ENABLED=false
 ADMIN_USER=admin
-ADMIN_PASSWORD=test1234
+ADMIN_PASSWORD=trentodemo
 ENABLE_API_KEY=true
 PORT=4000
 TRENTO_WEB_ORIGIN=trento.example.com
 SECRET_KEY_BASE=some-secret
 ACCESS_TOKEN_ENC_SECRET=some-secret
 REFRESH_TOKEN_ENC_SECRET=some-secret
+CHECKS_SERVICE_BASE_URL=/wanda
+OAS_SERVER_URL=https://trento.example.com
 ----
 ====
 
-[NOTE]
-====
-*Note:* Add `+CHARTS_ENABLED=false+` in {trento} web configuration file if
-Prometheus is not installed or you do not want to use {trento}'s charts
-functionality.
-====
+The `ADMIN_PASSWORD` variable must must meet the following requiements:
+	
+* minimum of 8 characters
+* the password  not contain 3 consecutive identical numbers or letters (for example, 111 or aaa)
+* the password must not contain 4 consecutive  numbers or letters (for example, 1234, abcd, ABCD)
 
-The
-https://github.com/trento-project/web/blob/main/guides/alerting/alerting.md[alerting
-system to receive email notifications] can be enabled by setting
-`+ENABLE_ALERTING+` to `+true+` and adding the following entries:
+
+The `ENABLE_ALERTING` enables the 
+https://www.trento-project.io/docs/web/Alerting/alerting.html[alerting system to receive email notifications]. Set `ENABLE_ALERTING` to `true` and add additional variables to the `/etc/trento/trento-web`, to enable the feature.
 
 ====
 [source,bash]
@@ -378,7 +257,7 @@ SMTP_PASSWORD=<<SMTP_PASSWORD>>
 ----
 ====
 
-===== trento-wanda configuration
+====== trento-wanda configuration
 
 ====
 [source,bash]
@@ -389,11 +268,43 @@ AMQP_URL=amqp://trento_user:trento_user_password@localhost:5672/vhost
 DATABASE_URL=ecto://wanda_user:wanda_password@localhost/wanda
 PORT=4001
 SECRET_KEY_BASE=some-secret
-ACCESS_TOKEN_ENC_SECRET=some-secret
+OAS_SERVER_URL=https://trento.example.com/wanda
+AUTH_SERVER_URL=http://localhost:4000
 ----
 ====
 
-===== Start the services
+====== Start the services
+
+[NOTE]
+====
+In some {sles4sap} environments, SELinux may be enabled and set to *enforcing* mode by default.  
+If {trento} services fail to start or show permission-related errors, check the SELinux status:
+
+[source,bash]
+----
+getenforce
+----
+
+If SELinux is set to *enforcing*, switch it to *permissive* mode either temporarily or permanently:
+
+* **Temporary change (until reboot):**
++
+[source,bash]
+----
+setenforce 0
+----
+
+* **Permanent change (persists after reboot):**
++
+Edit `/etc/selinux/config` and set:
++
+[source]
+----
+SELINUX=permissive
+----
++
+
+====
 
 Enable and start the services:
 
@@ -402,7 +313,7 @@ Enable and start the services:
 systemctl enable --now trento-web trento-wanda
 ----
 
-===== Monitor the services
+====== Monitor the services
 
 Use `+journalctl+` to check if the services are up and running
 correctly. For example:
@@ -413,12 +324,12 @@ journalctl -fu trento-web
 ----
 
 [[validate-the-health-status-of-trento-web-and-wanda]]
-==== Check the health status of trento web and wanda
+===== Check the health status of {tr_web} and {tr_wanda}
 
-You can check if {trento} web and wanda services function correctly by
+You can check if {tr_web} and {tr_wanda} services function correctly by
 accessing accessing the `+healthz+` and `+readyz+` API.
 
-. Check {trento} web health status using `+curl+`:
+. Check {tr_web} health status using `+curl+`:
 +
 [source,bash]
 ----
@@ -451,7 +362,8 @@ correctly, the output should be as follows:
 ----
 ====
 
-==== Install and configure NGINX
+
+===== Install and configure NGINX
 
 . Install NGINX package:
 +
@@ -473,17 +385,24 @@ firewall-cmd --reload
 ----
 systemctl enable --now nginx
 ----
-. Create a configuration file for {trento}:
-+
-[source,bash]
-----
-vim /etc/nginx/conf.d/trento.conf
-----
-. Add the following configuration to `+/etc/nginx/conf.d/trento.conf+`:
+. Create a `+/etc/nginx/conf.d/trento.conf+` {trento} configuration file:
 +
 ====
 [source,bash]
 ----
+map $http_upgrade $connection_upgrade {
+  default upgrade;
+  '' close;
+}
+
+upstream web {
+  server 127.0.0.1:4000 max_fails=5 fail_timeout=60s;
+}
+
+upstream wanda {
+  server 127.0.0.1:4001 max_fails=5 fail_timeout=60s;
+}
+
 server {
     # Redirect HTTP to HTTPS
     listen 80;
@@ -492,9 +411,8 @@ server {
 }
 
 server {
-    # SSL configuration
-    listen 443 ssl;
     server_name trento.example.com;
+    listen 443 ssl;
 
     ssl_certificate /etc/nginx/ssl/certs/trento.crt;
     ssl_certificate_key /etc/ssl/private/trento.key;
@@ -505,7 +423,7 @@ server {
     ssl_session_cache shared:SSL:10m;
 
     # Wanda rule
-    location ~ ^/(api/checks|api/v1/checks|api/v2/checks|api/v3/checks|api/groups|api/v1/groups)/  {
+    location /wanda/  {
         allow all;
 
         # Proxy Headers
@@ -518,34 +436,45 @@ server {
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
 
-        proxy_pass http://localhost:4001;
+        # Add final slash to replace the location path value by the value in proxy_pass
+        # https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass
+        proxy_pass http://wanda/;
     }
 
     # Web rule
     location / {
+        # this endpoint should not be accessible publicly
+        # it is internally used by wanda to introspect access tokens and personal access tokens
+        location /api/session/token/introspect {
+            deny all;
+            return 404;
+        }
+
+        allow all;
+
+        # Proxy Headers
         proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Cluster-Client-Ip $remote_addr;
 
         # The Important Websocket Bits!
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
 
-        proxy_pass http://localhost:4000;
+        proxy_pass http://web;
     }
 }
 ----
 ====
 
-==== Prepare SSL certificate for NGINX
+===== Prepare SSL certificate for NGINX
 
 Create or provide a certificate for https://nginx.org/en/[NGINX] to
 enable SSL for {trento}.
 
 [[option-1-creating-a-self-signed-certificate]]
-===== Create a self-signed certificate
+====== Create a self-signed certificate
 
 . Generate a self-signed certificate:
 +
@@ -602,32 +531,25 @@ needs to be adjusted.
 +
 [source,bash]
 ----
-systemctl enable --now nginx
+systemctl restart nginx
 ----
 
 [[option-2-using-lets-encrypt-for-a-signed-certificate-using-packagehub-repository]]
-===== Create a signed certificate with Let's Encrypt using PackageHub repository
+====== Create a signed certificate with Let's Encrypt using PackageHub repository
 
-[NOTE]
-====
-Change repository if you use a Service Pack other than SP5. For example:
-`+SUSEConnect --product PackageHub/15.3/x86_64+` for SLE15 SP3,
-`+SUSEConnect --product PackageHub/15.4/x86_64+` for SLE15 SP4. Use
-packages in PackageHub at your own risk.
-====
-
-. Add PackageHub, if it is not already added:
+. Enable the PackageHub repository (replace `x.x` with your OS version, for example `15.7`):
 +
 [source,bash]
 ----
-SUSEConnect --product PackageHub/15.5/x86_64
+SUSEConnect --product PackageHub/x.x/x86_64
 zypper refresh
 ----
++
 . Install Certbot and its NGINX plugin:
 +
 [NOTE]
 ====
-Service Packs include version-specific Certbot NGINX plugin packages, for example `+python311-certbot-nginx+` or `+python3-certbot-nginx+`. Install the package available in the Service Pack you currently use.
+Service Packs include version-specific Certbot NGINX plugin packages, for example `+python311-certbot-nginx+`, `+python313-certbot-nginx+` or `+python3-certbot-nginx+`. Install the package available in the Service Pack you currently use.
 ====
 +
 [source,bash]
@@ -645,7 +567,7 @@ instructions for NGINX]
 +
 [source,bash]
 ----
-certbot --nginx -d example.com -d www.example.com
+certbot --nginx -d trento.example.com
 ----
 +
 [NOTE]
@@ -654,7 +576,7 @@ Certbot certificates are valid for 90 days. Refer to the above link for
 details on how to renew certificates.
 ====
 
-==== Accessing the trento-web UI
+===== Accessing the trento-web UI
 
 Pin the browser to `+https://trento.example.com+`. You should be able to
 login using the credentials specified in the `+ADMIN_USER+` and

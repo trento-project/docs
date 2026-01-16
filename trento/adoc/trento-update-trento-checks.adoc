@@ -1,7 +1,7 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-updating-trento-checks]]
-== Updating {trento} Checks
+=== Updating {trento} Checks
 :revdate: 2025-06-10
 
 

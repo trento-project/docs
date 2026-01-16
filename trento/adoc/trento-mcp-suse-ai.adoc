@@ -1,0 +1,68 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-mcp-suse-ai]]
+:revdate: 2026-01-08
+==== Integrating the {tr_mcp} with {suseai}
+
+This guide explains how to integrate the {tr_mcp} with {suseai}, including configuration and deployment instructions.
+
+===== Getting Started with {suseai}
+
+{suseai} is a platform that allows you to deploy and manage AI models and applications in a {kube} environment. It provides tools for model management, deployment, and integration with various AI frameworks.
+
+Refer to the official https://documentation.suse.com/suse-ai/1.0/[{suseai} documentation] for detailed information. Always refer to the latest instructions in the https://documentation.suse.com/suse-ai/1.0/html/AI-deployment-intro/index.html[{suseai} deployment guide] for the most accurate and up-to-date information.
+To run the entire stack, you can also use the https://github.com/SUSE/suse-ai-deployer[{suseai} Deployer {helm} chart].
+
+===== Install {owui}
+
+Refer to the official https://documentation.suse.com/suse-ai/1.0/html/openwebui-using/index.html[{owui} documentation]
+
+===== Deploying the {tr_mcp}
+
+To deploy the {tr_mcp} in your {suseai} cluster, install it via the {trento} Server {helm} chart. Follow the step-by-step instructions in <<sec-trento-mcp-server-k8s>>. The {tr_mcp} is packaged as a sub-chart and can be enabled during the {trento} Server installation.
+
+===== Add {tr_mcp} to {owui}
+
+{owui} includes native support for the Model Context Protocol (MCP). With this integration, {owui} connects to MCP servers from the backend, allowing you to safely use an internal {kube} Service DNS name without exposing the service publicly.
+
+====== Created a Personal Access Token
+
+** Log in to your {trento} web interface with your username and password.
+** Click on your username in the top-right corner and select *Profile*.
+** Scroll down to the *Personal Access Tokens* section.
+** Click the *Generate Token* button.
+** Enter a descriptive name for the token (e.g., "MCP Client").
+** Optionally configure an expiration date for the token, or select *Never Expires*.
+** Click *Generate Token*.
+** *Important:* Copy the generated token immediately and store it securely — it will not be shown again.
+
+.Generate a Personal Access Token in {trento}
+image::generate-pat.png[Generate a Personal Access Token in {trento},width=800]
+
+====== Enable {tr_mcp} in {owui}
+
+[arabic]
+. Open *Admin Settings* and go to *External Tools*.
+. Click *Add Server*.
+. Set *Type* to `MCP (Streamable HTTP)`.
+. Enter your Server URL and authentication details:
+.. *Server URL* (example): `http://trento-server-mcp-server.suse-ai.svc.cluster.local:{tr_mcp_default_port}/mcp`
+.. *Auth*: `<TOKEN>` (the token you generated in the {trento} console)
+. Click *Save*.
+
+.{owui} — Add the {tr_mcp} as a tool
+image::owui-add-tool.png[Add the {tr_mcp} as a tool,width=600]
+
+===== Enable the {tr_mcp} for a Model
+
+[arabic]
+. Go to *Models*, select *Manage Models*, and open your target model.
+. In the *Tools* or *MCP Servers* section, enable/select `{tr_mcp}` for this model. This makes the {trento} tools available to any user of that model in {owui}.
+. Verify the integration:
+.. Start a new chat with the enabled model
+.. Confirm that tools from `{tr_mcp}` are available and can be invoked (for example, try listing SAP systems)
+
+.{owui} — Enable {tr_mcp} for a model
+image::owui-add-model.png[Enable {tr_mcp} for model,width=600]
+
+The AI model will use the {tr_mcp} tools to query your {trento} installation and provide detailed, contextual responses about your SAP infrastructure.

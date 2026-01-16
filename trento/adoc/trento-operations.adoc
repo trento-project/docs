@@ -1,0 +1,174 @@
+include::product-attributes.adoc[]
+:revdate: 2026-01-09
+
+== Operations
+
+Operations in {trento} follow four principles:
+
+. **Permissions:** Only users with `operation:all` permissions can perform operations.
+. **Contextual UI paths:** The path to request an operation depends on the target. To enable maintenance on an entire cluster, use the **Operation** button in the cluster details view. To enable maintenance on a specific node or resource, use the options menu in the corresponding row.
+. **Single operation concurrency:** {trento} allows only one operation at a time on a target. While an operation runs, all other operations for that target (host, cluster, {sap} system, or {hana} database) are disabled.
+. **Safety policies:** Internal policies prevent users from executing operations that violate established best practices, even if the user has permission. For example, if a user attempts to stop a {hana} database managed by a cluster, {trento} forbids the operation and displays a reason. Each operation has specific internal policies, which are listed in the use cases below.
+
+[IMPORTANT]
+====
+Internal policies prevent users from making basic operational mistakes, but they cannot guarantee that an operation will not damage the environment. The user is ultimately responsible for executing operations.
+====
+
+Every operation request generates an entry in the activity log with a specific activity type. After a successful operation request, {trento} attempts to execute the operation. The activity log records the completion of the operation, regardless of success, with the activity type `Operation Completed`. This entry correlates to the request entry (see <<sec-activity-log, Activity Log>> for details). If an operation fails, {trento} restores the original state by rolling back the operation.
+
+To prevent endless execution when an agent is unresponsive, an internal timeout constrains every operation. When the timeout is reached, the operation execution resets.
+
+=== Host operations
+
+For any registered host, the details view provides the following operations:
+
+* **Apply {saptune} Solution**: Enabled when an {sap} workload is discovered on the host, but no {saptune} solution is applied. {trento} restricts the available solutions based on the {sap} workload type. If the {sap} workload is a {hana} instance, the choice is between `HANA` and `S4HANA-DESERVER`. If the {sap} workload is an application instance, the choice is between `NETWEAVER` and `S4HANA-APPSERVER`.
+** Activity type: `Host Operation Requested`
+** Internal policies: The {sap} workload must be stopped.
+** Internal timeout: 5m
+
+* **Change {saptune} Solution**: Enabled when an {sap} workload is discovered on the host and a {saptune} solution is already applied. As with the apply operation, {trento} restricts the available solutions based on the {sap} workload type.
+** Activity type: `Host Operation Requested`
+** Internal policies: The {sap} workload must be stopped.
+** Internal timeout: 5m
+
+* **Reboot Host**: Schedules a reboot of the target host within one minute of the request.
+** Activity type: `Host Operation Requested`
+** Internal policies:
+*** If an {sap} workload is discovered on the host, it must be stopped.
+*** If the host is a cluster node, the {pace} service must be disabled at boot and stopped (the node must be offline).
+** Internal timeout: 5m
+
+
+=== Cluster operations
+
+When a user requests a cluster operation, {trento} checks the cluster state using `cs_clusterstate -i`. If the {tragent} cannot find the `cs_clusterstate` executable or the command returns any state other than `IDLE`, the operation fails. This restriction prevents users from executing operations while the cluster is in transition.
+
+[NOTE]
+====
+The `cs_clusterstate` executable is delivered with the `ClusterTools2` package.
+====
+
+For any registered cluster, the details view provides the following operations:
+
+* At cluster level:
+** **Cluster maintenance**: Enabled when at least one node in the cluster is online. It turns maintenance on or off in the cluster, depending on the current status.
+*** Activity type: `Cluster Operation Requested`
+*** Internal policies: Not applicable.
+*** Internal timeout: 5m
+
+* At node level:
+** **Node maintenance**: Enabled when the node is online. It turns maintenance on or off in the node, depending on its current status.
+*** Activity type: `Operation Requested on a cluster host`
+*** Internal policies: Not applicable.
+*** Internal timeout: 5m
+** **Enable {pace} at boot**: Enabled when the service is disabled at boot in the corresponding host.
+*** Activity type: `Operation Requested on a cluster host`
+*** Internal policies: Not applicable.
+*** Internal timeout: 5m
+** **Disable {pace} at boot**: Enabled when the service is enabled at boot in the corresponding host.
+*** Activity type: `Operation Requested on a cluster host`
+*** Internal policies: Not applicable.
+*** Internal timeout: 5m
+** **Start cluster node**: Enabled when the node is offline.
+*** Activity type: `Operation Requested on a cluster host`
+*** Internal policies: In a {hana} cluster, if the node is managing a secondary instance, all the nodes managing primary instances must be online.
+*** Internal timeout: 5m
+** **Stop cluster node**: Enabled when the node is online.
+*** Activity type: `Operation Requested on a cluster host`
+*** Internal policies: In a {hana} cluster, if the node is managing a primary instance, all the nodes managing secondary instances must be offline.
+*** Internal timeout: 5m
+
+* At resource level:
+** **Resource maintenance**: Enabled when the corresponding node is online. It turns maintenance on or off in the resource, depending on its current status.
+*** Activity type: `Cluster Operation Requested`
+*** Internal policies: Not applicable.
+*** Internal timeout: 5m
+
+=== {hana} operations
+
+For any registered {hana} database that is not part of a HANA replication system, the details view provides the following operations at the top:
+
+* **Start database**: Enabled when the database is stopped. It calls `sapcontrol` with the function `StartSystem`.
+** **Options**:
+*** **Timeout**: Establishes the time in minutes that {trento} waits for the database to start before initiating a rollback.
+** Activity type: `Database Operation Requested`
+** Internal policies: Not applicable.
+** Internal timeout: 12 hours
+
+* **Stop database**: Enabled when the database is started. It calls `sapcontrol` with the function `StopSystem`.
+** **Options**:
+*** **Timeout**: Establishes the time in minutes that {trento} waits for the database to stop before initiating a rollback.
+** Activity type: `Database Operation Requested`
+** Internal policies: If there is an application layer ({sap} system) on top of the database, all application server instances must be stopped.
+** Internal timeout: 12 hours
+
+For any registered {hana} database that is part of a HANA replication system, the details view provides the following operations in the corresponding sections:
+
+* **Start database**: Enabled when the database is stopped. It calls `sapcontrol` with the function `StartSystem`.
+** **Options**:
+*** **Timeout**: Establishes the time in minutes that {trento} waits for the database to start before initiating a rollback.
+** Activity type: `Database Operation Requested`
+** Internal policies:
+*** If the database is managed by a {pace} cluster, the corresponding multistate resource or the cluster itself must be in maintenance mode.
+*** If the database is a secondary one, the corresponding primary database must be started.
+** Internal timeout: 12 hours
+
+* **Stop database**: Enabled when the database is started. It calls `sapcontrol` with the function `StopSystem`.
+** **Options**:
+*** **Timeout**: Establishes the time in minutes that {trento} waits for the database to stop before initiating a rollback.
+** Activity type: `Database Operation Requested`
+** Internal policies:
+*** If the database is managed by a {pace} cluster, the corresponding multistate resource or the cluster itself must be in maintenance mode.
+*** If the database is a primary one, the corresponding secondary database must be stopped.
+*** If the database is a primary one and there is an application layer ({sap} system) on top of the database, all application server instances must be stopped.
+** Internal timeout: 12 hours
+
+=== {sap} operations
+
+For any registered {sap} system, the details view provides the following operations:
+
+* **Start system**: Enabled when at least one instance of the system is stopped. It calls `sapcontrol` with the function `StartSystem` and the parameter selected as **Instance Type**:
+** **Options**:
+*** **Instance Type**: The available values are:
+**** **All instances**: Select to start all the instances in the system.
+**** **ABAP**: Select to start the instances with ABAP work processes.
+**** **J2EE**: Select to start the instances with J2EE work processes.
+**** **ASCS/SCS**: Select to start the instance with a message server and an enqueue server.
+**** **ENQREP**: Select to start the instance with an enqueue replication server.
+*** **Timeout**: Establishes the time in minutes that {trento} waits for the {sap} system to start before initiating a rollback.
+** Activity type: `{sap} System Operation Requested`
+** Internal policies: If any of the instances included in the **Instance Type** selection is managed by a cluster, the corresponding resource or the cluster itself must be in maintenance mode.
+** Internal timeout: 1h
+
+* **Stop system**: Enabled when at least one instance of the system is started. It calls `sapcontrol` with the function `StopSystem` and the parameter selected as **Instance Type**:
+** **Options**:
+*** **Instance Type**:
+**** **All instances**: Select to stop all the instances in the system.
+**** **ABAP**: Select to stop the instances with ABAP work processes.
+**** **J2EE**: Select to stop the instances with J2EE work processes.
+**** **ASCS/SCS**: Select to stop the instance with a message server and an enqueue server.
+**** **ENQREP**: Select to stop the instance with an enqueue replication server.
+*** **Timeout**: Establishes the time in minutes that {trento} waits for the {sap} system to stop before initiating a rollback.
+** Activity type: `{sap} System Operation Requested`
+** Internal policies: If any of the instances included in the **Instance Type** selection is managed by a cluster, the corresponding resource or the cluster itself must be in maintenance mode.
+** Internal timeout: 1h
+
+* **Start instance**: Enabled when the instance is stopped. It calls `sapcontrol` with the corresponding instance number and function `Start` in the host where the instance was discovered.
+** Activity type: `Application Instance Operation Requested`
+** Internal policies:
+*** If the instance is managed by a cluster, the corresponding resource or the cluster itself must be in maintenance mode.
+*** In the case of an application server instance, the ASCS/SCS instance and the database must be running.
+*** In the case of an ERS instance, the ASCS/SCS instance must be running.
+** Internal timeout: 5m
+
+* **Stop instance**: Enabled when the instance is started. It calls `sapcontrol` with the corresponding instance number and function `Stop` in the host where the instance was discovered.
+** Activity type: `Application Instance Operation Requested`
+** Internal policies:
+*** If the instance is managed by a cluster, the corresponding resource or the cluster itself must be in maintenance mode.
+*** In the case of an ASCS instance, the application server instances and, if it exists, the ERS instance must be stopped.
+** Internal timeout: 5m
+
+
+
