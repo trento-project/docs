@@ -38,7 +38,7 @@ $ curl -X GET "..." -H "Authorization: Bearer trento_pat_<rest_of_token>"
 
 ==== Deleting a personal access token
 
-To delete Personal Access Token, click its contextual *Delete* button in the *Personal Access Tokens* section of the profile.
+To delete personal access token, click its contextual *Delete* button in the *Personal Access Tokens* section of the profile.
 
 .Personal access tokens section
 image::trento-web-pats-list.png[trento-web-pats-list,scaledwidth=80.0%]
