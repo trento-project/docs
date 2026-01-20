@@ -2,15 +2,15 @@ include::product-attributes.adoc[]
 
 [[sec-trento-personal-access-tokens]]
 
-=== Personal Access Tokens
+=== Personal access tokens
 :revdate: 2025-11-05
 
-{trento} allows users to create Personal Access Tokens (PATs) for authentication and authorization purposes in third-party integrations with the APIs exposed by its components:
+{trento} allows users to create personal access tokens (PATs) for authentication and authorization purposes in third-party integrations with the APIs exposed by its components:
 
  * link:https://www.trento-project.io/web/swaggerui/[Web]
  * link:https://www.trento-project.io/wanda/swaggerui/[Wanda]
 
-==== Creating a Personal Access Token
+==== Creating a personal access token
 
 Log in to {trento} Web UI, click on your username in the top-right corner, and select *Profile* from the drop-down menu.
 
@@ -27,7 +27,7 @@ image::trento-web-generate-pat.png[trento-web-generate-pat,scaledwidth=80.0%]
 .Generated personal access token
 image::trento-web-generated-pat.png[trento-web-generated-pat,scaledwidth=80.0%]
 
-==== Using a Personal Access Token
+==== Using a personal access token
 
 You can use the created Personal Access Token to authenticate API requests by including it in the `Authorization` header as a Bearer token.
 
