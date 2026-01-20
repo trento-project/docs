@@ -14,14 +14,14 @@ To configure your client, make sure that you have the following:
 
 include::partials/mcp-host-prerequisites.adoc[]
 
-===== Configuring Your Client
+===== Configuring your client
 
 Once you have your {trserver} installation ready with the {tr_mcp} URL and API token, you can configure the MCP Server client. The examples below show JSON configuration format used by most MCP Server clients, including VS Code, Claude Desktop, and others.
 
 
-====== Option 1: Configuration with Prompted Input
+====== Option 1: Configuration with prompted input
 
-This configuration prompts you for your personal access token when the client starts, keeping credentials secure and out of configuration files. The `password: true` setting ensures your personal access token input is masked when you type it.
+This configuration asks for your personal access token when the client starts, keeping credentials secure and out of configuration files. The `password: true` setting ensures your personal access token input is masked when you type it.
 
 [NOTE]
 ====
@@ -51,7 +51,7 @@ This option is supported by most clients, including VS Code. Check your client's
 }
 ----
 
-====== Option 2: Direct Header Configuration
+====== Option 2: Direct header configuration
 
 For clients that don't support prompted input, or for testing purposes, set your {trento} personal access token directly in the configuration file.
 
@@ -79,9 +79,9 @@ When using this option, ensure your configuration file has appropriate permissio
 Replace `{tr_mcp_url_https}` with your actual {tr_mcp} endpoint URL from your installation.
 ====
 
-====== Client Options
+====== Client options
 
-For detailed guidance on leveraging MCP capabilities in different tools, refer to the following official documentation:
+For detailed guidance on taking advantage of MCP capabilities in different tools, refer to the following official documentation:
 
 * link:https://code.visualstudio.com/docs/copilot/customization/mcp-servers[Visual Studio Code with GitHub Copilot - MCP Server Configuration].
 * link:https://docs.claude.com/en/docs/mcp[Claude Desktop - Model Context Protocol Integration].

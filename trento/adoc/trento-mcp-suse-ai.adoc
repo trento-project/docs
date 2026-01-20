@@ -6,7 +6,7 @@ include::product-attributes.adoc[]
 
 This guide explains how to integrate the {tr_mcp} with {suseai}, including configuration and deployment instructions.
 
-===== Getting Started with {suseai}
+===== Getting started with {suseai}
 
 {suseai} is a platform that allows you to deploy and manage AI models and applications in a {kube} environment. It provides tools for model management, deployment, and integration with various AI frameworks.
 
@@ -19,13 +19,13 @@ Refer to the official https://documentation.suse.com/suse-ai/1.0/html/openwebui-
 
 ===== Deploying the {tr_mcp}
 
-To deploy the {tr_mcp} in your {suseai} cluster, install it via the {trento} Server {helm} chart. Follow the step-by-step instructions in <<sec-trento-mcp-server-k8s>>. The {tr_mcp} is packaged as a sub-chart and can be enabled during the {trento} Server installation.
+To deploy the {tr_mcp} in your {suseai} cluster, install it via the {trserver} {helm} chart. Follow the step-by-step instructions in <<sec-trento-mcp-server-k8s>>. The {tr_mcp} is packaged as a sub-chart and can be enabled during the {trserver} installation.
 
 ===== Add {tr_mcp} to {owui}
 
 {owui} includes native support for the Model Context Protocol (MCP). With this integration, {owui} connects to MCP servers from the backend, allowing you to safely use an internal {kube} Service DNS name without exposing the service publicly.
 
-====== Created a Personal Access Token
+====== Created a personal access token
 
 ** Log in to your {trento} web interface with your username and password.
 ** Click on your username in the top-right corner and select *Profile*.
@@ -36,7 +36,7 @@ To deploy the {tr_mcp} in your {suseai} cluster, install it via the {trento} Ser
 ** Click *Generate Token*.
 ** *Important:* Copy the generated token immediately and store it securely — it will not be shown again.
 
-.Generate a Personal Access Token in {trento}
+.Generate a personal access token in {trento}
 image::generate-pat.png[Generate a Personal Access Token in {trento},width=800]
 
 ====== Enable {tr_mcp} in {owui}
@@ -45,7 +45,7 @@ image::generate-pat.png[Generate a Personal Access Token in {trento},width=800]
 . Open *Admin Settings* and go to *External Tools*.
 . Click *Add Server*.
 . Set *Type* to `MCP (Streamable HTTP)`.
-. Enter your Server URL and authentication details:
+. Enter your server's URL and authentication details:
 .. *Server URL* (example): `http://trento-server-mcp-server.suse-ai.svc.cluster.local:{tr_mcp_default_port}/mcp`
 .. *Auth*: `<TOKEN>` (the token you generated in the {trento} console)
 . Click *Save*.
@@ -53,7 +53,7 @@ image::generate-pat.png[Generate a Personal Access Token in {trento},width=800]
 .{owui} — Add the {tr_mcp} as a tool
 image::owui-add-tool.png[Add the {tr_mcp} as a tool,width=600]
 
-===== Enable the {tr_mcp} for a Model
+===== Enable the {tr_mcp} for a model
 
 [arabic]
 . Go to *Models*, select *Manage Models*, and open your target model.

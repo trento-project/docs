@@ -13,13 +13,13 @@ Supported only on {sles4sap} 16.0
 
 ===== Prerequisites
 	
-To configure {mcp_host}, ensure you have:
+To configure {mcp_host}, ensure you have the following:
 
 include::partials/mcp-host-prerequisites.adoc[]
 
 ===== Install {mcp_host}
 
-To install {mcp_host}, open a terminal and run:
+To install {mcp_host}, open a terminal and run the following commands:
 
 [source,console]
 ----
@@ -56,7 +56,7 @@ mcpServers:
 ====
 **Security best practice:** Keep secrets out of configuration files. Store your keys in environment variables instead of hardcoding them.
 
-Export your keys in the shell before running {mcp_host}, see this example:
+Export your keys in the shell before running {mcp_host}. For example:
 
 [source,console]
 ----
@@ -84,7 +84,7 @@ mcpServers:
 ----
 ====
 
-===== Run {mcp_host} and use {trento} Tools
+===== Run {mcp_host} and use {trento} tools
 
 [arabic]
 . Start {mcp_host}:
@@ -128,24 +128,24 @@ image::example-mcphost.png[Example MCPHost session with {trento},width=900]
 
 If you encounter issues connecting {mcp_host} to the {tr_mcp}:
 
-* *Connection Errors*
+* *Connection errors*
 ** Verify that the {tr_mcp} URL in `~/.mcphost.yml` is correct and accessible from your system.
 ** Check if the {tr_mcp} is running by reviewing logs from your {trento} installation.
 ** Ensure network connectivity and that any required firewall rules are in place.
 ** Test basic connectivity: `curl -I {tr_mcp_url_https}`.
 
-* *Authentication Errors*
-** Verify that your personal access token is valid by testing it directly against your {trento} Server API.
+* *Authentication errors*
+** Verify that your personal access token is valid by testing it directly with your {trento} Server API.
 ** Ensure `TRENTO_PAT` is exported in the same shell session before running `mcphost`.
 ** Check that the header name matches your server configuration (default: `Authorization`).
 ** Ensure the token has the necessary permissions in {trento}.
 
-* *LLM Provider Errors*
+* *LLM provider errors*
 ** Verify that LLM `GOOGLE_API_KEY` (or your provider's API key) is exported correctly.
 ** Check the `provider-url` and `model` configuration in your `~/.mcphost.yml`.
 ** Confirm that your API key has sufficient quota and permissions with your provider.
 
-* *General Issues*
+* *General issues*
 ** Check the MCPHost terminal output for detailed error messages during startup or operation.
 ** Review the {tr_mcp} logs for connection attempts and errors.
 ** Verify that your configuration file exists at `~/.mcphost.yml` and has correct YAML syntax.

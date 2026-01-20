@@ -57,7 +57,7 @@ kubectl port-forward --namespace default \
   8080:8080
 ----
 +
-While the previous command is running, execute:
+While the previous command is running, perform the following check:
 +
 [source,bash,subs="attributes"]
 ----
@@ -95,7 +95,7 @@ The {tr_mcp} {helm} chart supports various configuration options:
 ====== Customize Ingress Path
 
 By default, ingress is enabled.
-To customize the ingress configuration in a basic K3s installation:
+To customize the ingress configuration in a basic K3s installation, run the command below:
 
 ====
 [source,bash,subs="attributes"]
@@ -150,7 +150,7 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 [[mcp-disabling-health-check-probes]]
 ====== Disabling Health Check Probes
 
-Health check probes are enabled by default. To disable them if needed:
+Health check probes are enabled by default. To disable them if needed, run the following command:
 
 ====
 [source,bash]
@@ -165,9 +165,9 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 ====
 
 
-===== Complete Configuration Example
+===== Complete configuration example
 
-Complete example that configures external access via a custom ingress path:
+Below is a complete example that configures external access via a custom ingress path:
 
 ====
 [source,bash,subs="attributes"]
