@@ -1,8 +1,8 @@
 [[checks-customization]]
 
-== Checks Customization
+=== Checks Customization
 
-=== Overview of checks Customization
+==== Overview of checks Customization
 
 Trento makes it possible to adjust expected check values to match target-specific requirements. This can be done directly through the Trento Web console without modifying the original check or impacting other targets.
 
@@ -28,15 +28,15 @@ The **Reset** button is enabled only when the check has been customized. Use the
 
 A **Modified Pill** indicator next to the check ID indicates that the values have been customized. A **Reset** icon next to the **Settings** icon can be used to revert to default values.
 
-=== Target-specific Check Customization
+==== Target-specific check customization
 
 A check is always executed on a target, which can be a host or a cluster. Users can customize check values specific to the target environment to ensure optimal system performance. Customizations are target-specific, and they do not affect other targets or the original default check values.
 
-=== Required permissions
+==== Required permissions
 
 Only admin users and users with the `all:checks_customization` permission can customize checks. The customization button in the Trento Web console is not shown for users without this permission. If a check has been modified, the modified Pill is shown for all users.
 
-=== Customizable checks
+==== Customizable checks
 
 All checks with the following value types are customizable:
 
@@ -46,6 +46,6 @@ All checks with the following value types are customizable:
 
 User input is validated to ensure that the input value matches the expected type before allowing to save the custom values in Wanda's database. If the input type is incorrect or mixed, the customization fails, triggering a toast notification, that checks customization failed and a warning message in the modal itself.
 
-=== Check Customization Persistence
+==== Check customization persistence
 
 Customized check values are persistently stored in Wanda's database. This ensures that any modifications made by users are consistently applied across subsequent executions. Additionally, customized values remain in effect even after system restarts or updates, ensuring continuous adherence to target-specific configurations.

@@ -1,0 +1,22 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-mcp-install]]
+:revdate: 2026-01-08
+=== Installing {tr_mcp}
+
+The {tr_mcp} can be deployed in different ways depending on your infrastructure and requirements.
+
+Supported installation methods: 
+
+* <<sec-trento-mcp-server-k8s,{k8s} deployment>>
+* <<sec-trento-mcp-server-systemd,systemd deployment>>
+
+==== Prerequisites {tr_mcp}
+
+The {tr_mcp} is lightweight and stateless. No persistent storage is required; allocate space for logs as per your logging policy. Before installing the {tr_mcp}, both {tr_web} and {tr_wanda} components must be running and be accessible for the {tr_mcp} to function properly.
+
+* There must be network connectivity between the {tr_mcp} and {trserver} components.
+* Access to the {trserver} URL (important when deployed behind {nginx}, or any other reverse proxy) must be possible.
+
+include::trento-mcp-install-kubernetes.adoc[]
+include::trento-mcp-install-systemd.adoc[]

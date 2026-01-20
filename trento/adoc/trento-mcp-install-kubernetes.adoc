@@ -1,0 +1,184 @@
+include::product-attributes.adoc[]
+
+
+[[sec-trento-mcp-server-k8s]]
+==== {k8s} deployment of {tr_mcp}
+:revdate: 2026-01-08
+
+include::partials/kubernetes-placeholders.adoc[]
+
+===== Enable the {tr_mcp}
+
+When installing {trserver} following the instructions in <<sec-trento-k8s-deployment>>, the {tr_mcp} is disabled by default. Enable it by passing `--set trento-mcp-server.enabled=true`:
+
+====
+[source,bash]
+----
+helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
+  --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
+  --set trento-web.adminUser.password=ADMIN_PASSWORD \
+  --set trento-mcp-server.enabled=true
+----
+====
+
+The {tr_mcp} will automatically connect to the {tr_web} and {tr_wanda} internal services within the {k8s} cluster.
+
+===== Verify the {tr_mcp} installation
+
+. Check that the {tr_mcp} Pod is running:
++
+[source,bash]
+----
+kubectl get pods -l app.kubernetes.io/name=mcp-server
+----
++
+Example output:
++
+[source,bash]
+----
+NAME                                       READY   STATUS    RESTARTS   AGE
+trento-server-mcp-server-xxxxxxxxxx-xxxxx  1/1     Running   0          2m
+----
+
+. Check the logs:
++
+[source,bash]
+----
+kubectl logs -l app.kubernetes.io/name=mcp-server
+----
+
+. Check the {tr_mcp} health endpoints:
++
+[source,bash]
+----
+# Expose the health check port from the Pod, as it is not exposed as a Kubernetes Service.
+kubectl port-forward --namespace default \
+  $(kubectl get pods --namespace default -l app.kubernetes.io/name=mcp-server -o jsonpath="{.items[0].metadata.name}") \
+  8080:8080
+----
++
+While the previous command is running, perform the following check:
++
+[source,bash,subs="attributes"]
+----
+# Liveness endpoint:
+curl http://localhost:{tr_mcp_health_port}/livez
+----
++
+[source,bash,subs="attributes"]
+----
+# Readiness endpoint:
+curl http://localhost:{tr_mcp_health_port}/readyz
+----
++
+Example output:
++
+[source,bash]
+----
+# Liveness:
+{"info":{"name":"trento-mcp-server","version":"0.1.0"},"status":"up"}
+
+# Readiness:
+{"status":"up","details":{"mcp-server":{"status":"up","timestamp":"2025-10-09T12:11:09.528898849Z"},"wanda-api":{"status":"up","timestamp":"2025-10-09T12:11:09.544855047Z"},"web-api":{"status":"up","timestamp":"2025-10-09T12:11:09.544855047Z"}}}
+----
+
+===== {tr_mcp} {helm} configuration options
+
+The {tr_mcp} {helm} chart supports various configuration options:
+
+* <<mcp-customize-ingress-path,Customize Ingress Path>>
+* <<mcp-adjust-log-verbosity,Adjust Log Verbosity>>
+* <<mcp-adjust-resource-limits,Adjust Resource Limits>>
+* <<mcp-disabling-health-check-probes,Disabling Health Check Probes>>
+
+[[mcp-customize-ingress-path]]
+====== Customize Ingress Path
+
+By default, ingress is enabled.
+To customize the ingress configuration in a basic K3s installation, run the command below:
+
+====
+[source,bash,subs="attributes"]
+----
+helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
+  --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
+  --set trento-web.adminUser.password=ADMIN_PASSWORD \
+  --set trento-mcp-server.enabled=true \
+  --set trento-mcp-server.ingress.hosts[0].host=TRENTO_SERVER_HOSTNAME \
+  --set trento-mcp-server.ingress.hosts[0].paths[0].path={tr_mcp_ingress_path} \
+  --set trento-mcp-server.ingress.hosts[0].paths[0].pathType=ImplementationSpecific
+----
+====
+
+The {tr_mcp} endpoint will be: `https://TRENTO_SERVER_HOSTNAME{tr_mcp_ingress_path}/mcp`
+
+[[mcp-adjust-log-verbosity]]
+====== Adjust Log Verbosity
+
+The default log level is `info`. Adjust it for debugging:
+
+====
+[source,bash]
+----
+helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
+  --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
+  --set trento-web.adminUser.password=ADMIN_PASSWORD \
+  --set trento-mcp-server.enabled=true \
+  --set trento-mcp-server.mcpServer.verbosity=debug
+----
+====
+
+[[mcp-adjust-resource-limits]]
+====== Adjust Resource Limits
+
+For production deployments with different resource requirements:
+
+====
+[source,bash]
+----
+helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
+  --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
+  --set trento-web.adminUser.password=ADMIN_PASSWORD \
+  --set trento-mcp-server.enabled=true \
+  --set trento-mcp-server.resources.requests.cpu=100m \
+  --set trento-mcp-server.resources.requests.memory=128Mi \
+  --set trento-mcp-server.resources.limits.cpu=1000m \
+  --set trento-mcp-server.resources.limits.memory=1Gi
+----
+====
+
+[[mcp-disabling-health-check-probes]]
+====== Disabling Health Check Probes
+
+Health check probes are enabled by default. To disable them if needed, run the following command:
+
+====
+[source,bash]
+----
+helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
+  --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
+  --set trento-web.adminUser.password=ADMIN_PASSWORD \
+  --set trento-mcp-server.enabled=true \
+  --set trento-mcp-server.livenessProbe.enabled=false \
+  --set trento-mcp-server.readinessProbe.enabled=false
+----
+====
+
+
+===== Complete configuration example
+
+Below is a complete example that configures external access via a custom ingress path:
+
+====
+[source,bash,subs="attributes"]
+----
+helm upgrade --install trento-server oci://registry.suse.com/trento/trento-server \
+  --set global.trentoWeb.origin={tr_server_url_https} \
+  --set trento-web.adminUser.password=SecurePassword123 \
+  --set trento-mcp-server.enabled=true \
+  --set trento-mcp-server.mcpServer.trentoURL={tr_server_url_https} \
+  --set trento-mcp-server.ingress.hosts[0].host={tr_server_url} \
+  --set trento-mcp-server.ingress.hosts[0].paths[0].path={tr_mcp_ingress_path} \
+  --set trento-mcp-server.ingress.hosts[0].paths[0].pathType=ImplementationSpecific
+----
+====
