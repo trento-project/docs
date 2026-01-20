@@ -29,14 +29,14 @@ image::trento-web-generated-pat.png[trento-web-generated-pat,scaledwidth=80.0%]
 
 ==== Using a personal access token
 
-You can use the created Personal Access Token to authenticate API requests by including it in the `Authorization` header as a Bearer token.
+You can use the created personal access token to authenticate API requests by including it in the `Authorization` header as a Bearer token.
 
 [source,bash]
 ----
 $ curl -X GET "..." -H "Authorization: Bearer trento_pat_<rest_of_token>"
 ----
 
-==== Deleting a Personal Access Token
+==== Deleting a personal access token
 
 To delete Personal Access Token, click its contextual *Delete* button in the *Personal Access Tokens* section of the profile.
 

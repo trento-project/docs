@@ -20,7 +20,7 @@ The following protocols are supported:
 * Open Authorization 2.0 (OAuth 2)
 * Security Assertion Markup Language (SAML)
 
-==== User Roles and Authentication
+==== User roles and authentication
 
 User authentication is entirely managed by the IDP, which is responsible
 for maintaining user accounts. A user, who does not exist on the IDP, is
