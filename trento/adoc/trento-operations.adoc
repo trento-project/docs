@@ -7,15 +7,15 @@ Operations in {trento} follow four principles:
 
 . **Permissions:** Only users with `operation:all` permissions can perform operations.
 . **Contextual UI paths:** The path to request an operation depends on the target. To enable maintenance on an entire cluster, use the **Operation** button in the cluster details view. To enable maintenance on a specific node or resource, use the options menu in the corresponding row.
-. **Single operation concurrency:** {trento} allows only one operation at a time on a target. While an operation runs, all other operations for that target (host, cluster, {sap} system, or {hana} database) are disabled.
-. **Safety policies:** Internal policies prevent users from executing operations that violate established best practices, even if the user has permission. For example, if a user attempts to stop a {hana} database managed by a cluster, {trento} forbids the operation and displays a reason. Each operation has specific internal policies, which are listed in the use cases below.
+. **Single operation concurrency:** {trento} permits only one operation at a time on a target. While an operation runs, all other operations for that target (host, cluster, {sap} system, or {hana} database) are disabled.
+. **Safety policies:** Internal policies prevent users from executing operations that violate established best practices, even if the user has the permission to so. For example, if a user attempts to stop a {hana} database managed by a cluster, {trento} forbids the operation and displays a reason. Each operation has specific internal policies that are listed in the use cases below.
 
 [IMPORTANT]
 ====
-Internal policies prevent users from making basic operational mistakes, but they cannot guarantee that an operation will not damage the environment. The user is ultimately responsible for executing operations.
+Internal policies prevent users from making basic operational mistakes, but they cannot guarantee that an operation will not damage the environment. The user is ultimately responsible for performing operations.
 ====
 
-Every operation request generates an entry in the activity log with a specific activity type. After a successful operation request, {trento} attempts to execute the operation. The activity log records the completion of the operation, regardless of success, with the activity type `Operation Completed`. This entry correlates to the request entry (see <<sec-activity-log, Activity Log>> for details). If an operation fails, {trento} restores the original state by rolling back the operation.
+Every operation request generates an entry in the activity log with a specific activity type. After a successful operation request, {trento} attempts to perform the operation. The activity log records the completion of the operation, regardless of success, with the activity type `Operation Completed`. This entry correlates to the request entry (see <<sec-activity-log, Activity Log>> for details). If an operation fails, {trento} restores the original state by rolling back the operation.
 
 To prevent endless execution when an agent is unresponsive, an internal timeout constrains every operation. When the timeout is reached, the operation execution resets.
 

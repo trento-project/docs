@@ -14,7 +14,7 @@ Main usages are related to:
  * path rewriting
  * endpoint protection
 
-Find traefik specific usages link:https://github.com/search?q=repo%3Atrento-project%2Fhelm-charts+traefik&type=code[here], and in case another ingress controller is used, please adapt accordingly.
+Search for Traefik link:https://github.com/search?q=repo%3Atrento-project%2Fhelm-charts+traefik&type=code[specific usage scenarios on GitHub]. In case another ingress controller is used, adapt accordingly.
 ====
 
 [[sec-trento-install-trentoserver-on-existing-k8s-cluster]]
