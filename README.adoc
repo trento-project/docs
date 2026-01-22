@@ -54,3 +54,18 @@ Start both preview servers with one command:
 ----
 docker compose up
 ----
+
+== Dev docs environment without logs
+
+Start all services in the background and skip compose logs:
+
+[source,bash]
+----
+sudo bash dev-docs-env.sh
+----
+
+Once it finishes, open:
+
+* http://localhost:3000 (Trento docs hub)
+* http://localhost:3001 (SUSE HTML build)
+* http://localhost:3002/SLES-SAP-trento_en.pdf (SUSE PDF build)
