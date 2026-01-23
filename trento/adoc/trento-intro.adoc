@@ -27,7 +27,12 @@ include::product-attributes.adoc[]
 
 [[fig-trento-architecture]]
 .Architectural overview
-image::trento-high-level-architecture.svg[width=80%]
+ifdef::site-gen-antora[]
+image::trento-high-level-architecture.svg[align=center]
+endif::site-gen-antora[]
+ifndef::site-gen-antora[]
+image::trento-high-level-architecture.svg[width=30%,align=center]
+endif::site-gen-antora[]
 
 === {trserver}
 
