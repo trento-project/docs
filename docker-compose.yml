@@ -39,6 +39,7 @@ services:
       <<: *http-health
   suse-daps-build:
     image: registry.opensuse.org/documentation/containers/15.6/opensuse-daps-toolchain:latest
+    user: "${UID:-1000}:${GID:-1000}"
     working_dir: /tmp
     volumes:
       - .:/src
@@ -47,8 +48,7 @@ services:
       cd /src/trento;
       rm -rf build/SLES-SAP-trento;
       daps --color=0 -d DC-SLES-SAP-trento html;
-      daps --color=0 -d DC-SLES-SAP-trento pdf;
-      chown -R 1000:1000 build/"
+      daps --color=0 -d DC-SLES-SAP-trento pdf;"
     restart: "no"
 
   daps-html-serve:
