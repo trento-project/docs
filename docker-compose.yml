@@ -1,37 +1,84 @@
+x-node-base: &node-base
+  image: node:20-bullseye
+
+x-http-health: &http-health
+  interval: 5s
+  timeout: 3s
+  retries: 60
+
 services:
-  trento-docs:
-    image: node:20-bullseye
+  trento-docs-build:
+    <<: *node-base
+    working_dir: /workspace/trento-docs-site
     volumes:
       - .:/workspace:z
       - ./trento-docs-site/node_modules:/workspace/trento-docs-site/node_modules
-    working_dir: /workspace/trento-docs-site
     command: >
       bash -lc "
-        npm install --no-save antora http-server &&
-        npx antora antora-playbook.yml &&
-        npx http-server build/trento-docs-site-public/ -c-1 -p 3000
+        npm install --no-save antora &&
+        npx antora antora-playbook.yml
+      "
+    restart: "no"
+
+  trento-docs:
+    <<: *node-base
+    working_dir: /workspace/trento-docs-site
+    volumes:
+      - .:/workspace:z
+    command: >
+      bash -lc "
+        npx --yes http-server build/trento-docs-site-public/ -c-1 -p 3000
       "
     ports:
       - "3000:3000"
-
-  daps-build:
+    depends_on:
+      trento-docs-build:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/3000'"]
+      <<: *http-health
+  suse-daps-build:
     image: registry.opensuse.org/documentation/containers/15.6/opensuse-daps-toolchain:latest
+    user: "${UID:-1000}:${GID:-1000}"
     working_dir: /tmp
     volumes:
       - .:/src
     command: >
-      bash -lc "set -euo pipefail; cd /src/trento; rm -rf build/SLES-SAP-trento; daps --color=0 -d DC-SLES-SAP-trento html"
+      bash -lc "set -euo pipefail;
+      cd /src/trento;
+      rm -rf build/SLES-SAP-trento;
+      daps --color=0 -d DC-SLES-SAP-trento html;
+      daps --color=0 -d DC-SLES-SAP-trento pdf;"
     restart: "no"
 
-  daps-serve:
-    image: node:20-bullseye
+  daps-html-serve:
+    <<: *node-base
     working_dir: /srv
     ports:
       - "${PORT:-3001}:3001"
     volumes:
       - ./trento/build/SLES-SAP-trento/html/SLES-SAP-trento:/srv:ro
     command: >
-      bash -lc "npx --yes http-server /srv -p 3001 -c-1"
+      bash -lc "npx --yes http-server /srv -c-1 -p 3001"
     depends_on:
-      daps-build:
+      suse-daps-build:
         condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/3001'"]
+      <<: *http-health
+
+  daps-pdf-serve:
+    <<: *node-base
+    working_dir: /srv
+    ports:
+      - "${PORTPDF:-3002}:3002"
+    volumes:
+      - ./trento/build/SLES-SAP-trento/:/srv:ro
+    command: >
+      bash -lc "npx --yes http-server /srv -c-1 -p 3002"
+    depends_on:
+      suse-daps-build:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/3002'"]
+      <<: *http-health
