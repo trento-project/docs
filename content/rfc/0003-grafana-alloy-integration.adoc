@@ -540,6 +540,12 @@ discovery.relabel "trento_system" {
         target_label = "agentID"
         replacement  = "{{ .AgentID }}"
     }
+
+    rule {
+        target_label = "exporter_name"
+        replacement  = "grafana_alloy"
+    }
+
 }
 
 // Scrape the system metrics
@@ -761,6 +767,17 @@ systemctl reload alloy 2>/dev/null || true
 %endif
 %systemd_postun_with_restart trento-agent.service
 ----
+
+== Trento UI Modifications
+
+=== Exporter status indication
+Currently, Trento Web shows the status of `node_exporter` for each host. The status is checked by querying Prometheus for `up{agentID=...}`. See https://github.com/trento-project/web/blob/0dee8297dbdf4e6d43197e4d52d8617e70f49df7/lib/trento/infrastructure/prometheus/adapter/prometheus_api.ex#L109. The status indicates whether Prometheus is able to scrape metrics from the host.
+
+Using the write API, Prometheus cannot ensure the `up` query has the same meaning as it now depends on the pusher. In the case of Alloy, it will always be `1` as long as Alloy is running and able to push metrics. This is not the same, but an acceptable approximation.
+
+On the Trento Web UI we can have a consistent experience by showing the same status indication for both `node_exporter`-based and `alloy`-based hosts. By labeling metrics with `exporter_name`, the _pill_ will be shown as expected by the current implementation, without further changes:
+
+image::../images/alloy-status-pill.png[Status Pill Example]
 
 == Open Questions
 
