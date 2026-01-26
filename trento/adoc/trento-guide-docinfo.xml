@@ -70,7 +70,7 @@ xmlns:its="http://www.w3.org/2005/11/its">Products &amp; Solutions</meta>
 -->
 <!-- Social Media -->
 <meta name="title" its:translate="yes"
-      xmlns:its="http://www.w3.org/2005/11/its">Getting Started with {trento}</meta>
+      xmlns:its="http://www.w3.org/2005/11/its">User Documentation</meta>
 <meta name="social-descr" its:translate="yes"
       xmlns:its="http://www.w3.org/2005/11/its">Use {trento} for {sles4sapa}</meta>
 <!-- Search -->

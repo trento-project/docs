@@ -1,4 +1,4 @@
-* xref:trento-guide.adoc[Getting Started with Trento]
+* xref:trento-guide.adoc[User Documentation]
  ** xref:trento-intro.adoc[What is Trento?]
  ** xref:trento-lifecycle.adoc[Lifecycle]
  ** xref:trento-requirements.adoc[Requirements]

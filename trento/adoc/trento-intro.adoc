@@ -27,7 +27,7 @@ include::product-attributes.adoc[]
 
 [[fig-trento-architecture]]
 .Architectural overview
-image::trento-high-level-architecture.svg[width=80%]
+image::trento-high-level-architecture.svg[align=center,scaledwidth=80%]
 
 === {trserver}
 
