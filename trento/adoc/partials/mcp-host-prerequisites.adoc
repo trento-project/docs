@@ -10,4 +10,4 @@ include::../product-attributes.adoc[]
 * A {trento} Personal Access Token generated in {tr_web} Profile view.
 +
 .Generate a Personal Access Token in {trento}
-image::generate-pat.png[Generate a Personal Access Token in {trento},width=800]
+image::generate-pat.png[Generate a Personal Access Token in {trento},width=80%,align=center]
