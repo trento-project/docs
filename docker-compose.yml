@@ -39,7 +39,6 @@ services:
       <<: *http-health
   suse-daps-build:
     image: registry.opensuse.org/documentation/containers/15.6/opensuse-daps-toolchain:latest
-    user: "${UID:-1000}:${GID:-1000}"
     working_dir: /tmp
     volumes:
       - .:/src
