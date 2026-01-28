@@ -1,13 +1,13 @@
-= RFC: SLES 16 System Metrics Support via Grafana Alloy
+== 3. Grafana Alloy Integration for SLES 16 System Monitoring
 
-[width="100%",cols="<18%,<82%"]
+[width="100%",cols="<18%,<82%",]
 |===
-|Feature Name |System Metrics Support via Grafana Alloy
-|Start Date |Dec 22nd, 2025
-|Category |Architecture, Monitoring
-|PR |https://github.com/trento-project/docs/pull/126
-|Status |Draft
+|Feature Name | Grafana Alloy Integration for SLES 16 System Monitoring
+|Start Date | Dec 22nd, 2025
+|Category | Architecture, Monitoring
+|PR | https://github.com/trento-project/docs/pull/126[#126]
 |===
+
 
 == Summary
 
