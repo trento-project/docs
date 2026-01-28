@@ -7,9 +7,17 @@
       </a>
       {{#if env.SITE_SEARCH_PROVIDER}}
       <div class="navbar-item search hide-for-print">
-        <div id="search-field" class="field">
-          <input id="search-input" type="text" placeholder="Search the docs"{{#if page.home}} autofocus{{/if}}>
+        <div id="search-wrapper" class="hidden medium">
+          <div id="search-field" class="field">
+            <input id="search-input" type="text" placeholder="Search the docs"{{#if page.home}} autofocus{{/if}}>
+            <button id="search-close" class="hidden large"><i class="eos-icons">close</i></button>
+          </div>
         </div>
+      </div>
+      <div class="search-icon hidden large">
+        <button class="search-toggle">
+          <i class="eos-icons">search</i>
+        </button>
       </div>
       {{/if}}
       <button class="navbar-burger" aria-controls="topbar-nav" aria-expanded="false" aria-label="Toggle main menu">
