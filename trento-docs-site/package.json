@@ -2,10 +2,12 @@
   "type": "module",
   "scripts": {
     "format": "prettier --write scripts/",
-    "format:check": "prettier -c scripts/"
+    "format:check": "prettier -c scripts/",
+    "test": "jest --config jest.config.cjs"
   },
   "devDependencies": {
     "antora": "3.1.10",
+    "jest": "^29.7.0",
     "prettier": "^3.0.0"
   },
   "dependencies": {
