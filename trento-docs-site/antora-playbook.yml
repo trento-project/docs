@@ -19,9 +19,10 @@ output:
 
 antora:
   extensions:
-  - '@antora/collector-extension'
-  - require: '@antora/lunr-extension'
-    index_latest_only: true
+    - require: '@antora/collector-extension'
+    - require: ./extensions/edit-url.cjs
+    - require: '@antora/lunr-extension'
+      index_latest_only: true
 
 asciidoc:
   attributes:
