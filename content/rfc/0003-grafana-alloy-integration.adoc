@@ -39,7 +39,7 @@ Trento currently achieves real-time system monitoring through the following arch
 
 This approach provides a seamless, zero-configuration experience for Trento users.
 
-=== Incoming Architecture: `alloy`-based 
+=== Incoming Architecture: `alloy`-based
 
 SUSE Linux Enterprise Server 16 no longer ships the `node_exporter` package. Instead, SLES 16 adopts Grafana Alloy as the preferred telemetry collection agent.
 
@@ -125,10 +125,10 @@ Options can be passed as command-line flags, environment variables, or via the c
 |===
 |Flag |Environment Variable |Required |Description
 
-|`--prometheus-url`
-|`TRENTO_PROMETHEUS_URL`
+|`--node-exporter-target`
+|`TRENTO_NODE_EXPORTER_TARGET`
 |Yes
-|The Prometheus remote write endpoint URL
+|The Prometheus remote write endpoint URL (shared with the `start` command)
 
 |`--prometheus-auth`
 |`TRENTO_PROMETHEUS_AUTH`
@@ -190,8 +190,8 @@ api-key: <api-key-generated-from-the-server>
 server-url: https://trento.example.com
 facts-service-url: amqp://guest:guest@localhost:5672
 
-# Alloy configuration options
-prometheus-url: https://prometheus-url/api/v1/write
+# Prometheus endpoint URL (shared with the start command in push mode)
+node-exporter-target: https://prometheus-url/api/v1/write
 scrape-interval: 15s
 
 # Authentication for Prometheus remote write endpoint
@@ -224,14 +224,14 @@ trento-agent generate alloy
 [source,bash]
 ----
 trento-agent generate alloy \
-  --prometheus-url "https://trento.example.com/api/v1/write"
+  --node-exporter-target "https://trento.example.com/api/v1/write"
 ----
 
 .With bearer token authentication (default)
 [source,bash]
 ----
 trento-agent generate alloy \
-  --prometheus-url "https://trento.example.com/api/v1/write" \
+  --node-exporter-target "https://trento.example.com/api/v1/write" \
   --prometheus-auth bearer \
   --prometheus-auth-bearer-token "my-secret-token"
 ----
@@ -240,7 +240,7 @@ trento-agent generate alloy \
 [source,bash]
 ----
 trento-agent generate alloy \
-  --prometheus-url "https://trento.example.com/api/v1/write" \
+  --node-exporter-target "https://trento.example.com/api/v1/write" \
   --prometheus-auth basic \
   --prometheus-auth-username trento \
   --prometheus-auth-password "secret"
@@ -250,7 +250,7 @@ trento-agent generate alloy \
 [source,bash]
 ----
 trento-agent generate alloy \
-  --prometheus-url "https://trento.example.com/api/v1/write" \
+  --node-exporter-target "https://trento.example.com/api/v1/write" \
   --prometheus-auth mtls \
   --prometheus-tls-ca-cert /etc/trento/certs/ca.crt \
   --prometheus-tls-client-cert /etc/trento/certs/client.crt \
@@ -260,7 +260,7 @@ trento-agent generate alloy \
 .Print configuration to stdout (using environment variables)
 [source,bash]
 ----
-TRENTO_PROMETHEUS_URL="https://trento.example.com/api/v1/write" \
+TRENTO_NODE_EXPORTER_TARGET="https://trento.example.com/api/v1/write" \
 TRENTO_PROMETHEUS_AUTH="bearer" \
 TRENTO_PROMETHEUS_AUTH_BEARER_TOKEN="my-secret-token" \
   trento-agent generate alloy
@@ -322,7 +322,7 @@ systemctl start trento-agent
 
 ===== Configuration File Requirements
 
-For `alloy`-based systems, the configuration file must include the `prometheus-url` option. Authentication settings are required for production deployments (bearer token is the default):
+For `alloy`-based systems, `prometheus-mode` must be set to `push` and `node-exporter-target` must point to the Prometheus remote write endpoint. Both the `start` command and the `generate alloy` command read the URL from this single key. Authentication settings (used by `generate alloy`) are required for production deployments (bearer token is the default):
 
 [source,yaml]
 ----
@@ -332,11 +332,13 @@ api-key: <api-key-generated-from-the-server>
 server-url: https://trento.example.com
 facts-service-url: amqp://guest:guest@localhost:5672
 
-# Required for alloy-based systems
-prometheus-url: https://prometheus-url/ # reverse-proxied via nginx/Ingress
+# Prometheus mode and target (shared by start and generate alloy)
+prometheus-mode: push
+node-exporter-target: https://prometheus-url/api/v1/write # reverse-proxied via nginx/Ingress
+node-exporter-name: grafana_alloy  # optional, defaults to node_exporter
 scrape-interval: 15s  # optional, defaults to 15s
 
-# Authentication (bearer is the default)
+# Authentication for Prometheus remote write endpoint (bearer is the default)
 prometheus-auth: bearer
 prometheus-auth-bearer-token: <token>
 ----
@@ -388,7 +390,7 @@ RestartSec=5
 WantedBy=multi-user.target
 ----
 
-NOTE: The `ExecStartPre` directive runs the `configure-alloy.sh` script, which generates and deploys the Alloy configuration before starting the agent. The script reads `prometheus-url` and other options from the configuration file (`/etc/trento/agent.yaml`). The `agent-id` is automatically determined.
+NOTE: The `ExecStartPre` directive runs the `configure-alloy.sh` script, which generates and deploys the Alloy configuration before starting the agent. The script reads `node-exporter-target` and other options from the configuration file (`/etc/trento/agent.yaml`). The `agent-id` is automatically determined.
 
 ====== Alloy Configuration Script (`packaging/scripts/configure-alloy.sh`)
 
@@ -600,16 +602,16 @@ The host discovery workflow must be updated to accept hosts that declare their m
 There is the need to differentiate between `node_exporter`-based and `alloy`-based hosts in the discovery payload sent by the Trento Agent.
 For the sake of keeping compatibility with existing installations, the payload will be extended by adding fields only instead of changing existing ones.
 
-Specifically, the `prometheus_mode` field is added providing the mode the agent is expecting to operate; Trento server can interpret a missing field as `pull` mode, and that is safe for existing installations.
+Specifically, the `prometheus_mode` field is added providing the mode the agent is expecting to operate; it is set explicitly via the `prometheus-mode` configuration key (defaulting to `pull`). Trento server can interpret a missing field as `pull` mode, and that is safe for existing installations.
 
-The field `prometheus_targets` is kept for backward compatibility, too. It can be used by `alloy`-based hosts to provide the configured Prometheus endpoint URL(s) (it is not strictly required, but Trento can show this information as a host configuration detail).
+The field `prometheus_targets` is kept for backward compatibility, too. The key in the map is determined by the `node-exporter-name` configuration (defaulting to `node_exporter`), and the value is the target address configured via `node-exporter-target` (or auto-discovered from the host's lowest IPv4 address). In push mode the target value represents the Prometheus remote write endpoint.
 
 
 [source,json]
 ----
 {
     [...]
-    "prometheus_targets": [prometheus-url] | [...host reachable urls],
+    "prometheus_targets": { "<node-exporter-name>": "<target-address>" },
     "prometheus_mode": "push" | "pull",
 }
 ----
@@ -658,7 +660,7 @@ The Trento agent can generate Alloy configurations for the following authenticat
 
 [cols="1,2"]
 |===
-|Method |`prometheus-auth` value 
+|Method |`prometheus-auth` value
 
 |None
 |`none`
@@ -779,6 +781,26 @@ On the Trento Web UI we can have a consistent experience by showing the same sta
 
 image::../images/alloy-status-pill.png[Status Pill Example]
 
+==== Expected Exporters
+
+A host's `prometheus_targets` field (populated during discovery) declares which exporters are expected to be active for that host. The exporter status evaluation uses this information to surface exporters that are not reporting to Prometheus at all, which the `up` query alone cannot detect.
+
+The logic works as follows:
+
+1. The `prometheus_targets` map is read from the host's read model. Each key in the map is an exporter name (e.g., `node_exporter`, `ha_cluster_exporter`, `grafana_alloy`).
+2. A baseline map is constructed from these keys, with every expected exporter set to `:critical`.
+3. Prometheus is queried with `up{agentID=...}` and the results are parsed into a map of exporter names to their actual status (`:passing`, `:critical`, or `:unknown`).
+4. The parsed query results are merged over the baseline map, so that any exporter reported by Prometheus retains its queried status, while any expected exporter absent from the query results remains `:critical`.
+
+This means:
+
+* An exporter that is expected but never scraped or pushed will appear as `:critical`, even if Prometheus has no record of it at all.
+* An exporter that Prometheus reports as up (`"1"`) will appear as `:passing`, regardless of whether it was in the expected list.
+* Exporters present in query results but not in `prometheus_targets` are still included in the output (the merge is not restrictive).
+* Hosts with a `nil` `prometheus_targets` (e.g., legacy agents that have not yet sent this field) behave exactly as before: only exporters present in the Prometheus query results are reported.
+
+`node_exporter`-based setups will keep using the default "node_exporter" label; `alloy`-based setups will use the `grafana_alloy`.
+
 == Open Questions
 
 === Which approach should be implemented?
@@ -806,7 +828,7 @@ The proposed solution prioritizes simplicity and user control, while the alterna
 
 |Change agent configuration file
 |Trento Agent
-|Add options for Prometheus remote write URL, authentication method and credentials.
+|Add `prometheus-mode` (default: `pull`) and `node-exporter-name` (default: `node_exporter`) configuration options to the agent start command. The `prometheus-url` start-command option is removed; in push mode the Prometheus endpoint is provided via `node-exporter-target`.
 
 |Systemd unit file approach
 |Trento Agent (rpm)
@@ -851,3 +873,4 @@ Such possibilities are out of the scope of this RFC, but can be considered for f
 * https://grafana.com/docs/alloy/latest/reference/components/prometheus/prometheus.remote_write/[prometheus.remote_write Component]
 * https://kubernetes.github.io/ingress-nginx/examples/auth/client-certs/[nginx Ingress Client Certificate Authentication]
 * https://nginx.org/en/docs/http/ngx_http_ssl_module.html[nginx SSL Module]
+
