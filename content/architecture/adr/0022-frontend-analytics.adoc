@@ -1,0 +1,48 @@
+== 22. Frontend analytics
+
+Date: 2026-01-29
+
+=== Status
+
+Accepted
+
+=== Context
+
+Knowing how Trento users navigate through the web console is essential to improve our
+decision-making about UX/UI functionalities and behaviors.
+
+Until now, we have had no way to track how users use the web console, which means that we are lacking a lot of information, especially about certain consecutive actions where we expect the user to be able to understand and follow them easily. For example, checks selection, customization, and execution, or transitions between different pages using internal links.
+
+=== Decision
+
+We will implement an analytics framework that tracks different user interventions in the web console.
+
+We have chosen link:https://posthog.com/[PostHog] to do that. PostHog is a very popular open-source platform for this purpose. Besides that, it is already used internally
+by other SUSE products, such as Rancher, Cloud Observability, and SCC. This will help us get additional support to use and understand the received metrics and fine-tune the information we really want to get.
+
+On top of this, we will use Google Tag Manager (GTM) to manage PostHog configuration parameters and different PostHog instances we might have. GTM is a very useful tool for inserting JS script snippets into our code without having them in the source code.
+In our case, we want to use it to set PostHog configuration values, such as the PostHog API key and the instance's region. Moreover, it helps us have different stage environments, like Prod and Test, as we will be able to redirect data depending on the originating page domain. Additionally, it opens the possibility of changing these configurations at any time without the need to bundle and release new artifacts with updated data.
+Finally, it is also used by other SUSE products for the same purpose.
+
+==== PostHog design decisions
+
+* Initially, we are going to track all the `pageview` and interactions without any advanced filtering. Further down the road, we can decide if we want to enhance the data collection.
+
+* Analytics functionality must be accepted and acknowledged by logged-in users. The user has the option to enable/disable its usage at any given time. This means that the actions are stored per user. This way, we can have more details about how Trento users are created and how they use the platform.
+
+* A new user that logs in for the first time will see an analytics acceptance EULA. This makes the user aware of this functionality from the beginning, increasing the chance of users using the feature.
+
+* The Trento admin user won't have analytics usage for now. The Trento admin user is a read-only user by definition, so we did not want to alter this feature.
+
+
+=== Consequences
+
+* This implementation will definitely improve our knowledge about how users use the Trento web console.
+
+* Its usage doesn't add significant technical overhead, at least initially, where we are simply collecting all interactions. The need to fine-tune this might create additional work for the team.
+
+* We are adding PostHog and GTM to our Trento landscape. This means that we will need to handle both. Using data consumed by PostHog is not trivial, and we will need to learn how to use it to our advantage. Having other SUSE colleagues with more experience in this area will help.
+
+* Using GTM has the advantage of: 
+** Saves us from the need to create new releases for configuration changes in our analytics code.
+** Improves operational tasks like redirecting and filtering requests.
