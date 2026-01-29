@@ -106,7 +106,7 @@ If no servers appear on startup, confirm your configuration file exists at `~/.m
 ----
 +
 .MCPHost initial screen with the {tr_mcp} connected
-image::mcphost-initial.png[MCPHost initial screen, width=900]
+image::mcphost-initial.png[MCPHost initial screen, width=80%,align=center]
 
 ===== Use {mcp_host} to interact with {trserver}
 
@@ -122,7 +122,7 @@ image::mcphost-initial.png[MCPHost initial screen, width=900]
 
 Example {mcp_host} session querying {trento} about SAP systems:
 
-image::example-mcphost.png[Example MCPHost session with {trento},width=900]
+image::example-mcphost.png[Example MCPHost session with {trento},width=80%,align=center]
 
 ===== {mcp_host} Troubleshooting 
 

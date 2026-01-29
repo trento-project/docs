@@ -2,7 +2,7 @@
 
 include::generic-attributes.adoc[]
 
-= Getting Started with {trento}
+= User Documentation
 
 include::trento-intro.adoc[]
 include::trento-lifecycle.adoc[]
