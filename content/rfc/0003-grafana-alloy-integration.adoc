@@ -1,13 +1,13 @@
-= RFC: SLES 16 System Metrics Support via Grafana Alloy
+== 3. Grafana Alloy Integration for SLES 16 System Monitoring
 
-[width="100%",cols="<18%,<82%"]
+[width="100%",cols="<18%,<82%",]
 |===
-|Feature Name |System Metrics Support via Grafana Alloy
-|Start Date |Dec 22nd, 2025
-|Category |Architecture, Monitoring
-|PR |https://github.com/trento-project/docs/pull/126
-|Status |Draft
+|Feature Name | Grafana Alloy Integration for SLES 16 System Monitoring
+|Start Date | Dec 22nd, 2025
+|Category | Architecture, Monitoring
+|PR | https://github.com/trento-project/docs/pull/126[#126]
 |===
+
 
 == Summary
 
@@ -39,7 +39,7 @@ Trento currently achieves real-time system monitoring through the following arch
 
 This approach provides a seamless, zero-configuration experience for Trento users.
 
-=== Incoming Architecture: `alloy`-based 
+=== Incoming Architecture: `alloy`-based
 
 SUSE Linux Enterprise Server 16 no longer ships the `node_exporter` package. Instead, SLES 16 adopts Grafana Alloy as the preferred telemetry collection agent.
 
@@ -127,8 +127,8 @@ Options can be passed as command-line flags, environment variables, or via the c
 
 |`--prometheus-url`
 |`TRENTO_PROMETHEUS_URL`
-|Yes
-|The Prometheus remote write endpoint URL
+|No
+|The Prometheus remote write endpoint URL (used in push mode with Alloy)
 
 |`--prometheus-auth`
 |`TRENTO_PROMETHEUS_AUTH`
@@ -190,7 +190,7 @@ api-key: <api-key-generated-from-the-server>
 server-url: https://trento.example.com
 facts-service-url: amqp://guest:guest@localhost:5672
 
-# Alloy configuration options
+# Prometheus endpoint URL (used in push mode with Alloy)
 prometheus-url: https://prometheus-url/api/v1/write
 scrape-interval: 15s
 
@@ -322,7 +322,7 @@ systemctl start trento-agent
 
 ===== Configuration File Requirements
 
-For `alloy`-based systems, the configuration file must include the `prometheus-url` option. Authentication settings are required for production deployments (bearer token is the default):
+For `alloy`-based systems, `prometheus-exporter-mode` must be set to `push` and `prometheus-url` must point to the Prometheus remote write endpoint. The `generate alloy` command reads these settings from the configuration file. Authentication settings are required for production deployments (bearer token is the default):
 
 [source,yaml]
 ----
@@ -332,16 +332,55 @@ api-key: <api-key-generated-from-the-server>
 server-url: https://trento.example.com
 facts-service-url: amqp://guest:guest@localhost:5672
 
-# Required for alloy-based systems
-prometheus-url: https://prometheus-url/ # reverse-proxied via nginx/Ingress
+# Prometheus exporter configuration
+prometheus-exporter-mode: push  # push for Alloy, pull for node_exporter
+prometheus-url: https://prometheus-url/api/v1/write  # reverse-proxied via nginx/Ingress
+prometheus-exporter-name: grafana_alloy  # optional, defaults to grafana_alloy in push mode, node_exporter in pull mode
 scrape-interval: 15s  # optional, defaults to 15s
 
-# Authentication (bearer is the default)
+# Authentication for Prometheus remote write endpoint (bearer is the default)
 prometheus-auth: bearer
 prometheus-auth-bearer-token: <token>
 ----
 
+For `node_exporter`-based systems (SLES 15), use pull mode configuration:
+
+[source,yaml]
+----
+# /etc/trento/agent.yaml
+
+api-key: <api-key-generated-from-the-server>
+server-url: https://trento.example.com
+facts-service-url: amqp://guest:guest@localhost:5672
+
+# Prometheus exporter configuration for pull mode (default)
+prometheus-exporter-mode: pull  # or omit this line, defaults to pull
+prometheus-node-exporter-target: http://localhost:9100/metrics  # optional, auto-discovered if not specified
+prometheus-exporter-name: node_exporter  # optional, defaults to node_exporter in pull mode
+----
+
+===== Backward Compatibility
+
+To maintain backward compatibility with existing installations:
+
+* `prometheus-exporter-mode` defaults to `pull` if not specified
+* `prometheus-exporter-name` defaults to:
+  - `node_exporter` in pull mode
+  - `grafana_alloy` in push mode
+* `prometheus-node-exporter-target` is used in pull mode (where Prometheus pulls from node_exporter)
+* `prometheus-url` is used in push mode (where Alloy pushes to Prometheus)
+* If the mode is `pull`, the `prometheus-url` flag is ignored
+* If the mode is `push`, the `prometheus-node-exporter-target` flag is ignored
+
+The agent will fail to start with a clear error message if:
+* `prometheus-exporter-mode` is `push` but `prometheus-url` is not provided
+* The configuration contains ambiguous or conflicting settings
+
 WARNING: The configuration file contains sensitive credentials. Ensure it has appropriate permissions (`chmod 600 /etc/trento/agent.yaml`).
+
+===== Alternative Naming: Unified URL Parameter
+
+An alternative configuration design was considered using a single `prometheus-exporter-url` parameter for both push and pull modes instead of separate `prometheus-url` and `prometheus-node-exporter-target` flags. This approach would use `--prometheus-exporter-url` whose meaning would be context-dependent: pointing to the Prometheus remote write endpoint in push mode, or to the node_exporter target in pull mode.
 
 ===== Alternative Solution: Conditional Unit Files With Automatic Dependency Management
 
@@ -493,17 +532,16 @@ install -D -m 0644 packaging/systemd/trento-agent.service \
 
 NOTE: The `suse_version` and `sle_version` macros are provided by OBS and contain the SLES version as an integer (e.g., `150000` for SLES 15, `1600` for SLES 16). As per documentation, _SLES 16 currently doesn't use the sle_version macro_. See https://en.opensuse.org/openSUSE:Build_Service_cross_distribution_howto
 
-==== Alloy Configuration Directory Strategy
+==== Alloy Configuration Strategy
 
-On SLES 16, Trento uses Alloy's directory-based configuration loading:
+Grafana Alloy uses a configuration language to define how components collect, transform, and send data. Alloy configuration is written in files with the `.alloy` extension, typically located in `/etc/alloy/`. Alloy supports loading a single configuration file or multiple files from a directory; in the latter case, all files are merged together. See https://grafana.com/docs/alloy/latest/reference/cli/run/.
 
-[source]
-----
-/etc/alloy/
-├── config.alloy          # Main Alloy config (user/system managed)
-└── config.d/
-    └── trento.alloy      # Trento-managed configuration (generated by trento-agent)
-----
+To use Alloy with Trento, a tailor-made configuration is required. SLES 16 ships Alloy with a default configuration file located at `/etc/alloy/config.alloy`. Trento users will have to choose their preferred approach to manage Alloy configuration:
+1. **Single configuration file**: Users will append the Trento-specific configuration to the existing `/etc/alloy/config.alloy` file.
+2. **Import configuration file**: Users will place the Trento-specific configuration in a separate file (e.g., `/etc/alloy/trento.alloy`) and include it in the main configuration using the `import` directive. See https://grafana.com/docs/alloy/latest/reference/config-blocks/import.file/.
+3. **Configuration directory**: Users will place the Trento-specific configuration in a separate file (e.g., `/etc/alloy/trento.alloy`) and tell Alloy to automatically load all `*.alloy` files from the `/etc/alloy` directory; this can be setup by overriding the `CONFIG_FILE` environment variable in the `alloy.service` systemd unit using a systemd drop-in file. See https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html.
+
+IMPORTANT: Either approach consider all components defined in the Trento configuration must have unique names across all configuration files to avoid conflicts.
 
 ==== Alloy Configuration Template
 
@@ -541,6 +579,12 @@ discovery.relabel "trento_system" {
         target_label = "agentID"
         replacement  = "{{ .AgentID }}"
     }
+
+    rule {
+        target_label = "exporter_name"
+        replacement  = "grafana_alloy"
+    }
+
 }
 
 // Scrape the system metrics
@@ -595,16 +639,18 @@ The host discovery workflow must be updated to accept hosts that declare their m
 There is the need to differentiate between `node_exporter`-based and `alloy`-based hosts in the discovery payload sent by the Trento Agent.
 For the sake of keeping compatibility with existing installations, the payload will be extended by adding fields only instead of changing existing ones.
 
-Specifically, the `prometheus_mode` field is added providing the mode the agent is expecting to operate; Trento server can interpret a missing field as `pull` mode, and that is safe for existing installations.
+Specifically, the `prometheus_mode` field is added providing the mode the agent is expecting to operate; it is set explicitly via the `prometheus-exporter-mode` configuration key (defaulting to `pull`). Trento server can interpret a missing field as `pull` mode, and that is safe for existing installations.
 
-The field `prometheus_targets` is kept for backward compatibility, too. It can be used by `alloy`-based hosts to provide the configured Prometheus endpoint URL(s) (it is not strictly required, but Trento can show this information as a host configuration detail).
+The field `prometheus_targets` is kept for backward compatibility, too. The key in the map is determined by the `prometheus-exporter-name` configuration (defaulting to `node_exporter` in pull mode or `grafana_alloy` in push mode), and the value is the target address:
+* In pull mode: configured via `prometheus-node-exporter-target` (or auto-discovered from the host's lowest IPv4 address if not specified)
+* In push mode: configured via `prometheus-url`
 
 
 [source,json]
 ----
 {
     [...]
-    "prometheus_targets": [prometheus-url] | [...host reachable urls],
+    "prometheus_targets": { "<prometheus-exporter-name>": "<target-address>" },
     "prometheus_mode": "push" | "pull",
 }
 ----
@@ -653,7 +699,7 @@ The Trento agent can generate Alloy configurations for the following authenticat
 
 [cols="1,2"]
 |===
-|Method |`prometheus-auth` value 
+|Method |`prometheus-auth` value
 
 |None
 |`none`
@@ -763,6 +809,37 @@ systemctl reload alloy 2>/dev/null || true
 %systemd_postun_with_restart trento-agent.service
 ----
 
+== Trento UI Modifications
+
+=== Exporter status indication
+Currently, Trento Web shows the status of `node_exporter` for each host. The status is checked by querying Prometheus for `up{agentID=...}`. See https://github.com/trento-project/web/blob/0dee8297dbdf4e6d43197e4d52d8617e70f49df7/lib/trento/infrastructure/prometheus/adapter/prometheus_api.ex#L109. The status indicates whether Prometheus is able to scrape metrics from the host.
+
+Using the write API, Prometheus cannot ensure the `up` query has the same meaning as it now depends on the pusher. In the case of Alloy, it will always be `1` as long as Alloy is running and able to push metrics. This is not the same, but an acceptable approximation.
+
+On the Trento Web UI we can have a consistent experience by showing the same status indication for both `node_exporter`-based and `alloy`-based hosts. By labeling metrics with `exporter_name`, the _pill_ will be shown as expected by the current implementation, without further changes:
+
+image::../images/alloy-status-pill.png[Status Pill Example]
+
+==== Expected Exporters
+
+A host's `prometheus_targets` field (populated during discovery) declares which exporters are expected to be active for that host. The exporter status evaluation uses this information to surface exporters that are not reporting to Prometheus at all, which the `up` query alone cannot detect.
+
+The logic works as follows:
+
+1. The `prometheus_targets` map is read from the host's read model. Each key in the map is an exporter name (e.g., `node_exporter`, `ha_cluster_exporter`, `grafana_alloy`).
+2. A baseline map is constructed from these keys, with every expected exporter set to `:critical`.
+3. Prometheus is queried with `up{agentID=...}` and the results are parsed into a map of exporter names to their actual status (`:passing`, `:critical`, or `:unknown`).
+4. The parsed query results are merged over the baseline map, so that any exporter reported by Prometheus retains its queried status, while any expected exporter absent from the query results remains `:critical`.
+
+This means:
+
+* An exporter that is expected but never scraped or pushed will appear as `:critical`, even if Prometheus has no record of it at all.
+* An exporter that Prometheus reports as up (`"1"`) will appear as `:passing`, regardless of whether it was in the expected list.
+* Exporters present in query results but not in `prometheus_targets` are still included in the output (the merge is not restrictive).
+* Hosts with a `nil` `prometheus_targets` (e.g., legacy agents that have not yet sent this field) behave exactly as before: only exporters present in the Prometheus query results are reported.
+
+`node_exporter`-based setups will keep using the default "node_exporter" label; `alloy`-based setups will use the `grafana_alloy`.
+
 == Open Questions
 
 === Which approach should be implemented?
@@ -790,7 +867,7 @@ The proposed solution prioritizes simplicity and user control, while the alterna
 
 |Change agent configuration file
 |Trento Agent
-|Add options for Prometheus remote write URL, authentication method and credentials.
+|Add `prometheus-exporter-mode` (default: `pull`), `prometheus-exporter-name` (default: `node_exporter` in pull mode, `grafana_alloy` in push mode), `prometheus-url` (for push mode), and `prometheus-node-exporter-target` (for pull mode) configuration options. The agent uses different URL flags depending on the mode, ignoring the non-relevant one.
 
 |Systemd unit file approach
 |Trento Agent (rpm)
@@ -835,3 +912,4 @@ Such possibilities are out of the scope of this RFC, but can be considered for f
 * https://grafana.com/docs/alloy/latest/reference/components/prometheus/prometheus.remote_write/[prometheus.remote_write Component]
 * https://kubernetes.github.io/ingress-nginx/examples/auth/client-certs/[nginx Ingress Client Certificate Authentication]
 * https://nginx.org/en/docs/http/ngx_http_ssl_module.html[nginx SSL Module]
+
