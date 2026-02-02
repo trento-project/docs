@@ -9,9 +9,13 @@ Accepted
 === Context
 
 Knowing how Trento users navigate through the web console is essential to improve our
-decision-making about UX/UI functionalities and behaviors.
+decision-making about product functionalities and behaviors. Until now, we have had no way to track how users use the web console,
+which means that we are lacking a lot of information. Having this information can obviously be very helpful for many reasons, such as:
 
-Until now, we have had no way to track how users use the web console, which means that we are lacking a lot of information, especially about certain consecutive actions where we expect the user to be able to understand and follow them easily. For example, checks selection, customization, and execution, or transitions between different pages using internal links.
+* Become a more data-driven oriented development team and start working with real data instead of blind assumptions.
+* Understand which parts of our page are getting the most attention and which features are being ignored.
+* Map out the exact steps a user takes to complete a goal.
+* Run A/B tests to compare different versions of the product.
 
 === Decision
 
