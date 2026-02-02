@@ -32,10 +32,7 @@ Finally, it is also used by other SUSE products for the same purpose.
 
 * Initially, we are going to track all the `pageview` and interactions without any advanced filtering. Further down the road, we can decide if we want to enhance the data collection.
 
-* Analytics functionality must be accepted and acknowledged by logged-in users. The user has the option to enable/disable its usage at any given time. This means that the actions are stored per user. This way, we can have more details about how Trento users are created and how they use the platform.
-
-* A new user that logs in for the first time will see an analytics acceptance EULA. This makes the user aware of this functionality from the beginning, increasing the chance of users using the feature.
-
+* Analytics functionality must be accepted and acknowledged by logged-in users. The user has the option to enable/disable its usage at any given time. This means that the actions are stored per user. This way, we can have more details about how Trento users are created and how they use the platform. Logged-in users will also be required to accept an EULA to enable the tracking.
 * The Trento admin user won't have analytics usage for now. The Trento admin user is a read-only user by definition, so we did not want to alter this feature.
 
 
