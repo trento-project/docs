@@ -45,5 +45,5 @@ Finally, it is also used by other SUSE products for the same purpose.
 * We are adding PostHog and GTM to our Trento landscape. This means that we will need to handle both. Using data consumed by PostHog is not trivial, and we will need to learn how to use it to our advantage. Having other SUSE colleagues with more experience in this area will help.
 
 * Using GTM has the advantage of: 
-** Saves us from the need to create new releases for configuration changes in our analytics code.
+** Saves us from the need to create new releases for configuration changes in our analytics code. We will only provide the GTM ID during the release, which is used to get the PostHog configuration values, such as PostHog API key and region. This way, we can customize the usage of those values for different deployments with the same released artifacts. This is really interesting, as releasing, specially in OBS, is not trivial.
 ** Improves operational tasks like redirecting and filtering requests.
