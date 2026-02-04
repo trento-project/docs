@@ -96,14 +96,7 @@ The operations orchestration is composed only by 2 states:
 
 This image represents the states and transitions:
 
-ifdef::env-github[]
-:MERMAID: source, mermaid
-endif::[]
-ifndef::env-github[]
-:MERMAID: mermaid
-endif::[]
-
-[{MERMAID}]
+[mermaid]
 ----
   graph TD;
       A[Start operation]-->B{Steps left to run?};
