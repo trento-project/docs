@@ -28,11 +28,14 @@ On top of this, we will use Google Tag Manager (GTM) to manage PostHog configura
 In our case, we want to use it to set PostHog configuration values, such as the PostHog API key and the instance's region. Moreover, it helps us have different stage environments, like Prod and Test, as we will be able to redirect data depending on the originating page domain. Additionally, it opens the possibility of changing these configurations at any time without the need to bundle and release new artifacts with updated data.
 Finally, it is also used by other SUSE products for the same purpose.
 
-==== PostHog design decisions
+==== Design details
 
-* Initially, we are going to track all the `pageview` and interactions without any advanced filtering. Further down the road, we can decide if we want to enhance the data collection.
+To implement the initial version of analytics usage we have agreed a list of requirements that shape how the feature will work:
+
+* We are going to track all the `pageview` and interactions without any advanced filtering. Further down the road, we can decide if we want to enhance the data collection.
 
 * Analytics functionality must be accepted and acknowledged by logged-in users. The user has the option to enable/disable its usage at any given time. This means that the actions are stored per user. This way, we can have more details about how Trento users are created and how they use the platform. Logged-in users will also be required to accept an EULA to enable the tracking.
+
 * The Trento admin user won't have analytics usage for now. The Trento admin user is a read-only user by definition, so we did not want to alter this feature.
 
 
