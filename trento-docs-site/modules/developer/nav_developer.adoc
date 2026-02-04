@@ -33,6 +33,7 @@
 ** RFC
 *** xref:rfc/0001-checks-customization.adoc[1. Check Customization]
 *** xref:rfc/0002-personal-access-tokens-management.adoc[2. Personal Access Tokens Management and Authentication]
+*** xref:rfc/0003-grafana-alloy-integration.adoc[3. Grafana Alloy Integration for SLES 16 System Monitoring]
 
 ** Internal Notes
 *** xref:internal-notes/pr-env-ssl-certificate-setup.adoc[SSL Certificate creation and setup Guide for Pull Request Environments]
