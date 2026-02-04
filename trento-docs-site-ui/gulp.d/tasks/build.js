@@ -19,7 +19,6 @@ const map = (transform) => new Transform({ objectMode: true, transform })
 const through = () => map((file, enc, next) => next(null, file))
 const uglify = require('gulp-uglify')
 const vfs = require('vinyl-fs')
-const mermaidDist = ospath.join(process.cwd(), 'node_modules/mermaid/dist')
 
 module.exports = (src, dest, preview) => () => {
   const opts = { base: src, cwd: src }
@@ -73,14 +72,6 @@ module.exports = (src, dest, preview) => () => {
     vfs
       .src('js/vendor/*.min.js', opts)
       .pipe(map((file, enc, next) => next(null, Object.assign(file, { extname: '' }, { extname: '.js' })))),
-    vfs.src(`${mermaidDist}/**/*`, { allowEmpty: true }).pipe(
-      map((file, enc, next) => {
-        var relativePath = file.relative
-        file.base = ospath.join(process.cwd(), src)
-        file.path = ospath.join(file.base, 'js/vendor/mermaid', relativePath)
-        next(null, file)
-      })
-    ),
     // NOTE use the next line to bundle a JavaScript library that cannot be browserified, like jQuery
     //vfs.src(require.resolve('<package-name-or-require-path>'), opts).pipe(concat('js/vendor/<library-name>.js')),
     vfs
