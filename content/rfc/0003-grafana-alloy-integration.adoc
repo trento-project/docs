@@ -322,7 +322,7 @@ systemctl start trento-agent
 
 ===== Configuration File Requirements
 
-For `alloy`-based systems, `prometheus-exporter-mode` must be set to `push` and `prometheus-url` must point to the Prometheus remote write endpoint. The `generate alloy` command reads these settings from the configuration file. Authentication settings are required for production deployments (bearer token is the default):
+For `alloy`-based systems, `prometheus-mode` must be set to `push` and `prometheus-url` must point to the Prometheus remote write endpoint. The `generate alloy` command reads these settings from the configuration file. Authentication settings are required for production deployments (bearer token is the default):
 
 [source,yaml]
 ----
@@ -333,7 +333,7 @@ server-url: https://trento.example.com
 facts-service-url: amqp://guest:guest@localhost:5672
 
 # Prometheus exporter configuration
-prometheus-exporter-mode: push  # push for Alloy, pull for node_exporter
+prometheus-mode: push  # push for Alloy, pull for node_exporter
 prometheus-url: https://prometheus-url/api/v1/write  # reverse-proxied via nginx/Ingress
 prometheus-exporter-name: grafana_alloy  # optional, defaults to grafana_alloy in push mode, node_exporter in pull mode
 scrape-interval: 15s  # optional, defaults to 15s
@@ -354,7 +354,7 @@ server-url: https://trento.example.com
 facts-service-url: amqp://guest:guest@localhost:5672
 
 # Prometheus exporter configuration for pull mode (default)
-prometheus-exporter-mode: pull  # or omit this line, defaults to pull
+prometheus-mode: pull  # or omit this line, defaults to pull
 prometheus-node-exporter-target: http://localhost:9100/metrics  # optional, auto-discovered if not specified
 prometheus-exporter-name: node_exporter  # optional, defaults to node_exporter in pull mode
 ----
@@ -363,7 +363,7 @@ prometheus-exporter-name: node_exporter  # optional, defaults to node_exporter i
 
 To maintain backward compatibility with existing installations:
 
-* `prometheus-exporter-mode` defaults to `pull` if not specified
+* `prometheus-mode` defaults to `pull` if not specified
 * `prometheus-exporter-name` defaults to:
   - `node_exporter` in pull mode
   - `grafana_alloy` in push mode
@@ -373,7 +373,7 @@ To maintain backward compatibility with existing installations:
 * If the mode is `push`, the `prometheus-node-exporter-target` flag is ignored
 
 The agent will fail to start with a clear error message if:
-* `prometheus-exporter-mode` is `push` but `prometheus-url` is not provided
+* `prometheus-mode` is `push` but `prometheus-url` is not provided
 * The configuration contains ambiguous or conflicting settings
 
 WARNING: The configuration file contains sensitive credentials. Ensure it has appropriate permissions (`chmod 600 /etc/trento/agent.yaml`).
@@ -639,7 +639,7 @@ The host discovery workflow must be updated to accept hosts that declare their m
 There is the need to differentiate between `node_exporter`-based and `alloy`-based hosts in the discovery payload sent by the Trento Agent.
 For the sake of keeping compatibility with existing installations, the payload will be extended by adding fields only instead of changing existing ones.
 
-Specifically, the `prometheus_mode` field is added providing the mode the agent is expecting to operate; it is set explicitly via the `prometheus-exporter-mode` configuration key (defaulting to `pull`). Trento server can interpret a missing field as `pull` mode, and that is safe for existing installations.
+Specifically, the `prometheus_mode` field is added providing the mode the agent is expecting to operate; it is set explicitly via the `prometheus-mode` configuration key (defaulting to `pull`). Trento server can interpret a missing field as `pull` mode, and that is safe for existing installations.
 
 The field `prometheus_targets` is kept for backward compatibility, too. The key in the map is determined by the `prometheus-exporter-name` configuration (defaulting to `node_exporter` in pull mode or `grafana_alloy` in push mode), and the value is the target address:
 * In pull mode: configured via `prometheus-node-exporter-target` (or auto-discovered from the host's lowest IPv4 address if not specified)
@@ -867,7 +867,7 @@ The proposed solution prioritizes simplicity and user control, while the alterna
 
 |Change agent configuration file
 |Trento Agent
-|Add `prometheus-exporter-mode` (default: `pull`), `prometheus-exporter-name` (default: `node_exporter` in pull mode, `grafana_alloy` in push mode), `prometheus-url` (for push mode), and `prometheus-node-exporter-target` (for pull mode) configuration options. The agent uses different URL flags depending on the mode, ignoring the non-relevant one.
+|Add `prometheus-mode` (default: `pull`), `prometheus-exporter-name` (default: `node_exporter` in pull mode, `grafana_alloy` in push mode), `prometheus-url` (for push mode), and `prometheus-node-exporter-target` (for pull mode) configuration options. The agent uses different URL flags depending on the mode, ignoring the non-relevant one.
 
 |Systemd unit file approach
 |Trento Agent (rpm)
