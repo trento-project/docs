@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-installing-trentoagent]]
 === Installing {tragent}s
-:revdate: 2025-06-10
+:revdate: 2026-02-05
 
 
 Before you can install a {tragent}, you must obtain the API key of your
@@ -34,7 +34,7 @@ Install the {tragent} on an {sap} host and register it with the
 ----
 ====
 +
-A configuration file named `+/agent.yaml+` is created under `+/etc/trento/+` in {sles4sap} 15 
+A configuration file named `+/agent.yaml+` is created under `+/etc/trento/+` in {sles4sap} 15
 or under `+/usr/etc/trento/+` in {sles4sap} 16.
 . Open the configuration file and uncomment
 (remove the `+#+` character) the entries for `+facts-service-url+`,
@@ -55,7 +55,7 @@ custom values, you must use them.
 ** `+server-url+`: URL for the Trento Server
 (http://TRENTO_SERVER_HOSTNAME)
 ** `+api-key+`: the API key retrieved from the Web console
-** `+node-exporter-target+`: specifies IP address and port for node exporter as `<ip_address>:<port>`. In situations where the host has multiple IP addresses and/or the exporter is listening to a port different from the default one, configuring this settings enables Prometheus to connect to the correct IP address and port of the host.
+** `+prometheus-mode+`: Determines how metrics are collected. Valid values are `pull` (default) for `node_exporter`-based collection, or `push` for {grafana} Alloy-based collection. See <<prometheus-metrics-configuration>> for details.
 . If SSL termination has been enabled on the server side, you can
 encrypt the communication from the agent to the server as follows:
 .. Provide an HTTPS URL instead of an HTTP one.
@@ -100,4 +100,54 @@ openssl x509 -in mycert.crt -out mycert.pem -outform PEM
 ----
 ====
 . Repeat this procedure on all SAP hosts that you want to monitor.
+
+[[prometheus-metrics-configuration]]
+==== {prometheus} metrics configuration
+
+{trento} collects system metrics (CPU, memory) using different exporters depending on the operating system version:
+
+* **{sles4sap} 15**: Uses `node_exporter` in pull mode by default.
+* **{sles4sap} 16**: Uses {grafana} Alloy in push mode.
+
+NOTE: {sles4sap} 15 SP7 also provides {grafana} Alloy as an optional package. Users who prefer to use Alloy on {sles4sap} 15 SP7 can manually install and configure it following the same procedure described for {sles4sap} 16.
+
+When using {grafana} Alloy (on {sles4sap} 16 or optionally on {sles4sap} 15 SP7), additional configuration is required. See the {prometheus} integration documentation for details on configuring Alloy.
+
+The following parameters control the metrics collection behavior:
+
+`+prometheus-mode+`:: Determines how metrics are collected. Valid values are `pull` (default) for `node_exporter`-based collection, or `push` for {grafana} Alloy-based collection.
+
+`+prometheus-exporter-name+`:: The name used to identify the exporter in {prometheus}. Defaults to `node_exporter` in pull mode or `grafana_alloy` in push mode.
+
+===== Pull mode parameters ({sles4sap} 15)
+
+These parameters apply when `prometheus-mode` is set to `pull` (the default):
+
+`+prometheus-node-exporter-target+`:: Specifies IP address and port for the node exporter as `<ip_address>:<port>`. In situations where the host has multiple IP addresses and/or the exporter is listening to a port different from the default one, configuring this setting enables {prometheus} to connect to the correct IP address and port of the host. If not set, {prometheus} uses the lowest IPv4 address discovered in the host with default port 9100.
+
+NOTE: The legacy parameter name `+node-exporter-target+` is still supported for backward compatibility.
+
+===== Push mode parameters ({grafana} Alloy)
+
+These parameters apply when `prometheus-mode` is set to `push`, which is required for {sles4sap} 16 and optional for {sles4sap} 15 SP7. They are used both by the agent and by the `trento-agent generate alloy` command to produce the {grafana} Alloy configuration:
+
+`+prometheus-url+`:: The {prometheus} remote write endpoint URL where Alloy will push metrics. Required in push mode.
+
+`+scrape-interval+`:: The interval at which Alloy scrapes local metrics. Defaults to `15s`. Used by `trento-agent generate alloy` only.
+
+`+prometheus-auth+`:: The authentication method for the {prometheus} remote write endpoint. Valid values are `none`, `basic`, `bearer` (default), or `mtls`. Used by `trento-agent generate alloy` only.
+
+`+prometheus-auth-username+`:: Username for basic authentication. Required when `prometheus-auth` is set to `basic`. Used by `trento-agent generate alloy` only.
+
+`+prometheus-auth-password+`:: Password for basic authentication. Required when `prometheus-auth` is set to `basic`. Used by `trento-agent generate alloy` only.
+
+`+prometheus-auth-bearer-token+`:: Bearer token for authentication. Required when `prometheus-auth` is set to `bearer`. Used by `trento-agent generate alloy` only.
+
+`+prometheus-tls-ca-cert+`:: Path to CA certificate file for TLS verification. Used by `trento-agent generate alloy` only.
+
+`+prometheus-tls-client-cert+`:: Path to client certificate file for mTLS authentication. Required when `prometheus-auth` is set to `mtls`. Used by `trento-agent generate alloy` only.
+
+`+prometheus-tls-client-key+`:: Path to client private key file for mTLS authentication. Required when `prometheus-auth` is set to `mtls`. Used by `trento-agent generate alloy` only.
+
+NOTE: The `trento-agent generate alloy` command reads these parameters to generate the {grafana} Alloy configuration file. See the {prometheus} integration documentation for detailed instructions on deploying the generated configuration.
 
