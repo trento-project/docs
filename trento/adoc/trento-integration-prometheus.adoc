@@ -1,17 +1,39 @@
 include::product-attributes.adoc[]
 
-:revdate: 2026-01-08
+:revdate: 2026-02-05
 == {prometheus} integration
 
-{prometheus} Server is a {trserver} component responsible for retrieving  the memory and CPU utilization metrics collected by the `node-exporter` in the agent hosts and serving them to the web component. The web component renders the metrics as dynamic graphical charts in the details view of the registered hosts.
+{prometheus} Server is a {trserver} component responsible for retrieving the memory and CPU utilization metrics from the agent hosts and serving them to the web component. The web component renders the metrics as dynamic graphical charts in the details view of the registered hosts.
 
-=== Requirements
+=== Metrics collection overview
 
-The `node-exporter` must be installed and running in the agent hosts and {prometheus} Server must be able to reach the agent hosts at the IP address and port that the `node-exporter` is bound to.
+{trento} supports two methods for collecting system metrics, depending on the operating system version running on your monitored hosts:
 
-The IP address and port that {prometheus} Server uses to reach the `node-exporter` can be changed by setting parameter `node-exporter-target` with value `<ip_address>:<port>` in the agent configuration file.
+* **{sles4sap} 15**: Uses `node_exporter` in *pull mode* by default. {prometheus} Server periodically scrapes metrics from each host's `node_exporter` endpoint.
+
+* **{sles4sap} 16**: Uses {grafana} Alloy in *push mode*. Alloy collects metrics locally and pushes them to the {prometheus} remote write endpoint.
+
+NOTE: {sles4sap} 15 SP7 also provides {grafana} Alloy as an optional package. Users who prefer to use Alloy on {sles4sap} 15 SP7 can manually install and configure it following the same procedure described for {sles4sap} 16.
+
+NOTE: In environments where at least one host uses {grafana} Alloy (either {sles4sap} 16 or {sles4sap} 15 SP7 with Alloy manually configured), you must enable the {prometheus} remote write endpoint. See <<enabling-remote-write>> for details.
+
+=== Requirements for {sles4sap} 15 hosts (pull mode)
+
+The `node_exporter` must be installed and running in the agent hosts and {prometheus} Server must be able to reach the agent hosts at the IP address and port that the `node_exporter` is bound to.
+
+The IP address and port that {prometheus} Server uses to reach the `node_exporter` can be changed by setting parameter `node-exporter-target` with value `<ip_address>:<port>` in the agent configuration file.
 
 If the parameter is not set, {prometheus} Server uses the lowest IPv4 address discovered in the host with default port 9100.
+
+=== Requirements for {sles4sap} 16 hosts (push mode)
+
+{sles4sap} 16 uses {grafana} Alloy instead of `node_exporter` for metrics collection. In this mode:
+
+* {grafana} Alloy must be installed and running on the agent hosts.
+* The {prometheus} remote write endpoint must be enabled on {trserver}.
+* The {tragent} generates the Alloy configuration using the `trento-agent generate alloy` command.
+
+See <<configuring-alloy>> for detailed setup instructions.
 
 === {kube} deployment
 
@@ -119,3 +141,117 @@ Note: the value of the `PROMETHEUS_URL` parameter above assumes that the {tr_web
 ==== Not using {prometheus} Server
 
 If you decide not to use {prometheus} Server in your {trento} installation, you must disable graphical charts in the UI by setting `CHARTS_ENABLED=false` in the {tr_web} configuration file.
+
+[[enabling-remote-write]]
+=== Enabling {prometheus} remote write for {grafana} Alloy hosts
+
+If your environment includes at least one host using {grafana} Alloy for metrics collection (either {sles4sap} 16 or {sles4sap} 15 SP7 with Alloy manually configured), you must enable the {prometheus} remote write endpoint to receive pushed metrics.
+
+==== {kube} deployment
+
+When using the official {trento} {helm} chart, the remote write endpoint is configured automatically with bearer token authentication. No additional configuration is required.
+
+==== {systemd} deployment
+
+When using the official {trento} {ansible} playbook, the remote write endpoint is configured automatically with bearer token authentication. No additional configuration is required.
+
+For custom deployments, you must:
+
+. Start {prometheus} with the `--web.enable-remote-write-receiver` flag to enable the remote write API.
+
+. Expose the {prometheus} remote write endpoint through a reverse proxy (such as {nginx}) with TLS termination.
+
+It is recommended to configure authentication for the remote write endpoint to prevent unauthorized metric submissions. {trento} supports bearer token, basic authentication, and mutual TLS (mTLS). The official {ansible} and {helm} installation methods provide sane defaults using bearer token authentication.
+
+[[configuring-alloy]]
+=== Configuring {grafana} Alloy
+
+On {sles4sap} 16, {grafana} Alloy replaces `node_exporter` for collecting system metrics. On {sles4sap} 15 SP7, Alloy is available as an optional package for users who prefer push-based metrics collection.
+
+The {tragent} provides a command to generate the required Alloy configuration.
+
+==== Prerequisites
+
+* {grafana} Alloy must be installed on the host:
+** On {sles4sap} 16, it is available in the default repositories.
+** On {sles4sap} 15 SP7, it is available as an optional package.
+* The {prometheus} remote write endpoint must be enabled on {trserver} (see <<enabling-remote-write>>).
+
+==== Generate and deploy the Alloy configuration
+
+. Install {grafana} Alloy:
++
+[source,bash]
+----
+zypper install alloy
+----
+
+. Configure the {tragent} with the required parameters for push mode in `/etc/trento/agent.yaml`. At minimum, you must set:
++
+[source,yaml]
+----
+prometheus-mode: push
+prometheus-url: https://<trento-server>/api/v1/write
+prometheus-auth: bearer
+prometheus-auth-bearer-token: <your-token>
+----
++
+See the {tragent} configuration documentation for the complete list of available parameters.
+
+. Generate the Alloy configuration and deploy it:
++
+Generate the {trento}-specific Alloy configuration using the {tragent}:
++
+[source,bash]
+----
+trento-agent generate alloy > /etc/alloy/trento.alloy
+chown alloy:alloy /etc/alloy/trento.alloy
+chmod 640 /etc/alloy/trento.alloy
+----
++
+{grafana} Alloy supports loading a single configuration file or multiple files from a directory. {sles4sap} 16 ships Alloy with a default configuration file at `/etc/alloy/config.alloy`. Choose one of the following approaches to integrate the {trento} configuration:
++
+--
+* **Single configuration file**: Append the content of `/etc/alloy/trento.alloy` to the existing `/etc/alloy/config.alloy` file.
+
+* **Import configuration file**: Keep `/etc/alloy/trento.alloy` as a separate file and include it in the main configuration using the `import` directive. See https://grafana.com/docs/alloy/latest/reference/config-blocks/import.file/[import.file].
+
+* **Configuration directory**: Keep `/etc/alloy/trento.alloy` as a separate file and configure Alloy to automatically load all `*.alloy` files from the `/etc/alloy/` directory. This can be set up by overriding the `CONFIG_FILE` environment variable in the `alloy.service` systemd unit using a systemd drop-in file. See https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html[systemd.unit].
+--
++
+IMPORTANT: Regardless of the chosen approach, all components defined in the {trento} configuration must have unique names across all configuration files to avoid conflicts.
+
+. Enable and start the Alloy service:
++
+[source,bash]
+----
+systemctl enable --now alloy
+----
++
+If Alloy is already running, reload the configuration:
++
+[source,bash]
+----
+systemctl reload alloy
+----
+
+. Start or restart the {tragent}:
++
+[source,bash]
+----
+systemctl enable --now trento-agent
+----
+
+==== Verifying the configuration
+
+After completing the setup, verify that metrics are being pushed successfully:
+
+. Check that Alloy is running without errors:
++
+[source,bash]
+----
+systemctl status alloy
+journalctl -u alloy -f
+----
+
+. In the {trento} web console, navigate to the host details view. The CPU and memory charts should display data after a short time.
