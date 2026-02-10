@@ -25,6 +25,8 @@
 **** xref:architecture/adr/0020-checks-customization.adoc[20. Checks Customization]
 **** xref:architecture/adr/0021-personal-access-tokens.adoc[21. Personal Access Tokens]
 **** xref:architecture/adr/0022-frontend-analytics.adoc[22. Frontend analytics]
+**** xref:architecture/adr/0023-prometheus-push-mode.adoc[23. Prometheus Push Mode]
+**** xref:architecture/adr/0024-systemd-unit-without-service-dependencies.adoc[24. Systemd unit without service dependencies]
 
 **  xref:coding-standards/README.adoc[Coding standards]
 *** xref:coding-standards/elixir.adoc[Elixir coding standards]
