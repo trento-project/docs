@@ -46,6 +46,17 @@ module.exports = (src, dest, preview) => () => {
           return path.join('..', 'font', basename)
         },
       },
+      {
+        filter: (asset) => new RegExp('^[~]eos-icons/dist/fonts/.+[.](?:ttf|woff|woff2|eot|svg?)$').test(asset.url),
+        url: (asset) => {
+          const relpath = asset.pathname.slice(1)
+          const abspath = require.resolve(relpath)
+          const basename = ospath.basename(abspath)
+          const destpath = ospath.join(dest, 'font', basename)
+          if (!fs.pathExistsSync(destpath)) fs.copySync(abspath, destpath)
+          return path.join('..', 'font', basename)
+        },
+      },
     ]),
     postcssVar({ preserve: preview }),
     // NOTE to make vars.css available to all top-level stylesheets, use the next line in place of the previous one
