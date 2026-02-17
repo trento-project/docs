@@ -28,7 +28,6 @@ ext:
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/wanda trento-docs-site/build/tmp_components/wanda
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/web trento-docs-site/build/tmp_components/web
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/werkzeugkoffer trento-docs-site/build/tmp_components/werkzeugkoffer
-        - command: git clone --depth 1 --single-branch https://github.com/trento-project/workbench trento-docs-site/build/tmp_components/workbench
         - command: git clone --depth 1 --single-branch https://github.com/trento-project/trento-installation-automation trento-docs-site/build/tmp_components/trento-installation-automation
         
     # Generate navigation for components in nav_developer.adoc
