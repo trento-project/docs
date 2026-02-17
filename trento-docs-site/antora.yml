@@ -72,6 +72,9 @@ ext:
       - dir: trento-docs-site/build/tmp_components/agent/docs
         files: ['**/*.adoc', '!README.adoc']
         into: modules/agent/pages
+      - dir: trento-docs-site/build/tmp_components/agent/docs/images
+        files: '**/*.{png,jpg,jpeg,svg,gif}'
+        into: modules/agent/pages/images/
     ## Trento Ansible https://github.com/trento-project/ansible
     - scan:
       - dir: trento-docs-site/build/tmp_components/ansible
@@ -167,11 +170,3 @@ ext:
       - dir: trento-docs-site/build/tmp_components/werkzeugkoffer/docs
         files: ['**/*.adoc', '!README.adoc']
         into: modules/werkzeugkoffer/pages
-    ## Trento Workbench https://github.com/trento-project/workbench
-    - scan:
-      - dir: trento-docs-site/build/tmp_components/workbench
-        files: '*.adoc'
-        into: modules/workbench/pages
-      - dir: trento-docs-site/build/tmp_components/workbench
-        files: '**/*.{png,jpg,jpeg,svg,gif}'
-        into: modules/workbench/images
