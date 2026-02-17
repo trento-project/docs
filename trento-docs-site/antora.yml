@@ -73,7 +73,7 @@ ext:
         into: modules/agent/pages
       - dir: trento-docs-site/build/tmp_components/agent/docs/images
         files: '**/*.{png,jpg,jpeg,svg,gif}'
-        into: modules/agent/pages/images/
+        into: modules/agent/images/
     ## Trento Ansible https://github.com/trento-project/ansible
     - scan:
       - dir: trento-docs-site/build/tmp_components/ansible
