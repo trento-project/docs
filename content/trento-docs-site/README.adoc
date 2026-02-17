@@ -13,7 +13,6 @@ The actual documentation content is maintained in separate upstream repositories
 * https://github.com/trento-project/helm-charts[helm-charts]
 * https://github.com/trento-project/ansible[ansible]
 * https://github.com/trento-project/checks[checks]
-* https://github.com/trento-project/workbench[workbench]
 * https://github.com/trento-project/contracts[contracts]
 * https://github.com/trento-project/tlint[tlint]
 * https://github.com/trento-project/wanda[wanda]
