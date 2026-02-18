@@ -9,6 +9,7 @@ Most of this process is automated via GitHub Actions.
 
 Trento's branching strategy is chosen so that it fulfills these few
 objectives:
+
 . be simple and straightforward
 . allows for quick releases when the need arises
 . allows for simple versioning for nightly builds
@@ -73,13 +74,14 @@ the rest of the team members can open a pull-request as usual.
 
 Successfully merging the VERSION file change on the respective branch
 will trigger the following automated steps:
-** automatically generate CHANGELOG entries from the names of the PRs
-   merged into the respective branch, new commit is made on the on
-   that same branch for this by the CI bot;
-** create necessary version tags on the correct branch;
-** publish a GitHub release;
-** build container images hosted on ghcr.io;
-** update SUSE distribution packages in OBS;
+
+- automatically generate CHANGELOG entries from the names of the PRs
+  merged into the respective branch, new commit is made on the on that
+  same branch for this by the CI bot;
+- create necessary version tags on the correct branch;
+- publish a GitHub release;
+- build container images hosted on ghcr.io;
+- update SUSE distribution packages in OBS;
 
 ____
 ⚠️ *Note* +
