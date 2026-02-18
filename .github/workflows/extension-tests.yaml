@@ -1,0 +1,31 @@
+name: Run Trento docs extension tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'trento-docs-site/extensions/**'
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'trento-docs-site/extensions/**'
+  workflow_dispatch:
+
+jobs:
+  test-extensions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: trento-docs-site/package-lock.json
+      - name: Install dependencies
+        working-directory: trento-docs-site
+        run: npm install --no-audit --no-fund
+      - name: Run extension tests
+        working-directory: trento-docs-site
+        run: npm test
