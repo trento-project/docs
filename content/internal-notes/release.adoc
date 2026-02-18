@@ -10,16 +10,16 @@ Most of this process is automated via GitHub Actions.
 Trento's branching strategy is chosen so that it fulfills these few
 objectives:
 
-. be simple and straightforward
-. allows for quick releases when the need arises
-. allows for simple versioning for nightly builds
+1. be simple and straightforward
+2. allows for quick releases when the need arises
+3. allows for simple versioning for nightly builds
 
 The last point means that there is a need for the latest nightly
 builds to be versioned in a way that always sorts greater than the
 official release with the biggest versioning number. This is trivial
 if the versioning is linear and work is done in a single
 branch. However, to be able to release small fixes before work is
-feature-complete, a need for more branches arises.
+feature-complete (point 2.), a need for more branches arises.
 
 Thus, Trento settle for semi-linear approach to branching and
 release. This means a Trento repository has two long-running branches
@@ -33,10 +33,10 @@ We support two types of releases -- *full* and *hotfix*:
 
 Full releases are made by cross-merging `main` and `release` branches
 and tagging the resulting merge commit. This merge commit is actually
-shared by both branches because once one of the branches is merged
-into the other, the reverse operation is a fast-forward merge. They
-contain all the new features developed on `main` since the last full
-release. They happen on a cadence of roughly 6 months.
+shared by both branches because when one of the branches is merged
+into the other, the reverse operation is a fast-forward merge. Full
+releases contain all the new features developed on `main` since the
+last full release. They happen on a cadence of roughly 6 months.
 
 Hotfix releases allows for quick reaction on unforeseen problems with
 the released code such as critical bugs found or new security CVE
@@ -95,7 +95,8 @@ ____
 
 === Preparation for full releases
 
-when the project is ready to make a new full release:
+There is no special requirements when doing full releases. When the
+repository is ready to be released:
 
 - open a PR with the sole change of setting the new version into
   `VERSION` file;
@@ -107,7 +108,7 @@ when the project is ready to make a new full release:
 
 From then on, the CI will finish the process for you.
 
-=== Preparation for full releases
+=== Preparation for hotfix releases
 
 Hotfix releases warrant more preparation work from the person
 doing the release.
@@ -125,6 +126,7 @@ on both places. We recommend to first make the fix on `main` and then
 anomalies when auto-resolving merges in the CI.
 
 When back-porting you must:
+
 - find the PR that introduced the change on `main` that you want to
   back-port;
 - add `released-as-hotfix` label on the already closed/merged PR;
