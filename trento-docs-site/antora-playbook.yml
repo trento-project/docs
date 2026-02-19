@@ -25,10 +25,10 @@ antora:
       script_stem: header-scripts
       mermaid_initialize_options:
         start_on_load: true
-    - require: ./extensions/edit-url.cjs
-      enabled: true
     - require: '@antora/lunr-extension'
       index_latest_only: true
+    - require: ./extensions/edit-url.cjs
+      enabled: true
 
 asciidoc:
   attributes:

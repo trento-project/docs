@@ -6,7 +6,7 @@ on:
     paths:
       - 'trento-docs-site/extensions/**'
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened]
     paths:
       - 'trento-docs-site/extensions/**'
   workflow_dispatch:

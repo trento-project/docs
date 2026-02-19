@@ -14,7 +14,7 @@ const MAIN_REF = { refName: "main", refType: "branch" };
 const CONTRIBUTION_UPSTREAM_PATH = "trento-docs-site/contribution-upstream/";
 
 // Reference for Antora extensions: https://docs.antora.org/antora/latest/extend/define-extension/
-// Antora listen for events emitted by the generator when Antora runs and this is the entry point for the edit url extension.
+// Antora listens for events emitted by the generator when Antora runs and this is the entry point for the edit url extension.
 // See as reference: https://docs.antora.org/antora/latest/extend/generator-events-reference/
 
 module.exports.register = function () {
@@ -32,6 +32,10 @@ function applyEditUrls(contentCatalog) {
   }
 }
 
+// Checks whether a file has source metadata and no existing edit URL,
+// computes one via resolveEditUrl(src),
+//  then saves it on both file and src and logs it,
+//  so each page gets a single consistent “Edit this page” link only when valid and not already set.
 function setEditUrl(file) {
   const src = file?.src;
   if (!src || file.editUrl || src.editUrl) return;
@@ -132,6 +136,7 @@ function resolveEditTarget({ componentInfo, origin, relPath }) {
   return { head, remoteUrl, relPath };
 }
 
+// checks if a target had all required fields to build url
 function hasCompleteTarget(target) {
   return Boolean(target?.head && target?.remoteUrl && target?.relPath);
 }
@@ -146,6 +151,7 @@ function resolveDefaultHead(originHead) {
   return originHead;
 }
 
+// Picks the best relative file path to use for edit-link generation, in priority order
 function resolveRelativePath(
   src,
   absPath,
@@ -173,11 +179,12 @@ function resolveRelativePath(
 
   return null;
 }
+// standardizes origin metadata into one predictable object without undefined edge cases.
 function getOriginInfo(src) {
   const originUrl = src.origin?.url;
   return { head: getOriginHead(src), url: originUrl || null };
 }
-
+// Extracts Git ref info from src.origin, this gives downstream code a clean, consistent “branch/tag pointer” shape
 function getOriginHead(src) {
   const origin = src.origin || {};
   return origin.refname
@@ -185,7 +192,7 @@ function getOriginHead(src) {
     : null;
 }
 
-// provides the best available absolute file path so later logic can correctly detect repo root and build accurate repo-relative edit links.
+// Provides the best available absolute file path so later logic can correctly detect repo root and build accurate repo-relative edit links.
 function getAbsolutePath(src) {
   if (!src) return null;
   const { realpath, abspath, scanned, origin } = src;
@@ -199,6 +206,9 @@ function getAbsolutePath(src) {
   return null;
 }
 
+// Tries to parse a normalized scanned path as a temporary component path
+// Because some pages come from temporary tmp_components/... paths that don’t directly map to the real repo file layout
+// and this function extracts the real pieces (repo and relative file path) so the extension can build correct edit URLs instead of broken ones.
 function inferComponentInfo(scannedPath) {
   const normalized = normalizePath(scannedPath);
   if (!normalized) return null;
@@ -209,6 +219,8 @@ function inferComponentInfo(scannedPath) {
   return { repo: match[1], relPath: match[2] };
 }
 
+// Exists to detect “this file came from upstream docs” so the extension
+// can apply upstream-specific edit URL logic (repo/path mapping) and avoid generating links with the wrong target repository.
 function isUpstreamReference(value) {
   const normalized = normalizePath(value);
   if (!normalized) return false;
@@ -252,7 +264,7 @@ function isTmpComponentPath(value) {
   if (!normalized) return false;
   return TMP_COMPONENT_ROOT_RX.test(normalized);
 }
-//  makes GitHub URLs safe and valid when branch names or file paths contain special characters (spaces, #, ?, %) but keeps / separator
+// Makes GitHub URLs safe and valid when branch names or file paths contain special characters (spaces, #, ?, %) but keeps / separator
 function encodeGitPath(value) {
   return String(value)
     .split("/")
@@ -270,7 +282,6 @@ function pathExists(filePath) {
 }
 
 // Logging
-
 function printBuildLog(entry) {
   try {
     console.log(`[${extensionName}] ${JSON.stringify(entry)}`);
@@ -303,7 +314,7 @@ function recordEditUrlError(context, error) {
   };
   printBuildError(entry);
 }
-
+// Testing
 module.exports._test = {
   applyEditUrls,
   setEditUrl,
