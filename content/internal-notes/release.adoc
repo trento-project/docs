@@ -110,7 +110,7 @@ repository is ready to be released:
 - notify your team mates
 - merge
 
-From then on, the CI will finish the process for you.
+From then on, the CI finishes the process for you.
 
 === Preparation for hotfix releases
 
@@ -181,4 +181,4 @@ target branch for the PR is different:
 - notify your team mates;
 - merge.
 
-Again, the CI will take it from here.
+Again, the CI takes it from here.
