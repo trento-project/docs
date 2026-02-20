@@ -22,23 +22,25 @@ branch. However, to be able to release small fixes before work is
 feature-complete (point 2.), a need for more branches arises.
 
 Thus, Trento settle for semi-linear approach to branching and
-release. This means a Trento repository has two long-running branchesw
--- `main` and `release`. `main` contains the newly developed features
-and is kept stable at all times by using Pull Requests, Peer Reviews
-and automated CI checks before any new code integration. `release`
-branch contains the code from `main` that is ready for release plus
-potentially small custom fixes.
+release. This means a Trento repository has two long-running branches:
 
-We support two types of releases -- *full* and *hotfix*:
+main:: Contains the newly developed features and is kept stable at all
+times by using Pull Requests, Peer Reviews and automated CI checks
+before any new code integration.
 
-Full releases are made by cross-merging `main` and `release` branches
+release:: Branch contains the code from `main` that is ready for
+release plus potentially small custom fixes.
+
+We support two types of releases:
+
+Full releases:: Made by cross-merging `main` and `release` branches
 and tagging the resulting merge commit. This merge commit is actually
 shared by both branches because when one of the branches is merged
 into the other, the reverse operation is a fast-forward merge. Full
 releases contain all the new features developed on `main` since the
 last full release.
 
-Hotfix releases allow for quick reaction on unforeseen problems with
+Hotfix releases:: Allow for quick reaction on unforeseen problems with
 the released code such as critical bugs found or new security CVE
 discovered. Hotfix releases are made directly on `release` branch and
 tagged there.
