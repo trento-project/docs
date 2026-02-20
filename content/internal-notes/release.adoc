@@ -11,8 +11,8 @@ Trento's branching strategy is chosen so that it fulfills these few
 objectives:
 
 1. be simple and straightforward
-2. allows for quick releases when the need arises
-3. allows for simple versioning for nightly builds
+2. allow for quick releases when the need arises
+3. allow for simple versioning for nightly builds
 
 The last point means that there is a need for the latest nightly
 builds to be versioned in a way that always sorts greater than the
@@ -22,7 +22,7 @@ branch. However, to be able to release small fixes before work is
 feature-complete (point 2.), a need for more branches arises.
 
 Thus, Trento settle for semi-linear approach to branching and
-release. This means a Trento repository has two long-running branches
+release. This means a Trento repository has two long-running branchesw
 -- `main` and `release`. `main` contains the newly developed features
 and is kept stable at all times by using Pull Requests, Peer Reviews
 and automated CI checks before any new code integration. `release`
@@ -36,9 +36,9 @@ and tagging the resulting merge commit. This merge commit is actually
 shared by both branches because when one of the branches is merged
 into the other, the reverse operation is a fast-forward merge. Full
 releases contain all the new features developed on `main` since the
-last full release. They happen on a cadence of roughly 6 months.
+last full release.
 
-Hotfix releases allows for quick reaction on unforeseen problems with
+Hotfix releases allow for quick reaction on unforeseen problems with
 the released code such as critical bugs found or new security CVE
 discovered. Hotfix releases are made directly on `release` branch and
 tagged there.
@@ -62,6 +62,10 @@ WARNING: Not all Trento repositories are using this branching
 strategy. We're still in a process of migrating to this new way of
 operation.
 
+Example of test repository using this branching strategy:
+
+image::../images/release-branching.png[Release branching]
+
 === How to trigger a release
 
 The steps to initiate the process are the same for both types of
@@ -73,11 +77,11 @@ branches are protected, so only admins can push directly to them. All
 the rest of the team members can open a pull-request as usual.
 
 Successfully merging the VERSION file change on the respective branch
-will trigger the following automated steps:
+triggers the following automated steps:
 
 - automatically generate CHANGELOG entries from the names of the PRs
-  merged into the respective branch, new commit is made on the on that
-  same branch for this by the CI bot;
+  merged into the respective branch, new commit is made on the same
+  branch for this by the CI bot;
 - create necessary version tags on the correct branch;
 - publish a GitHub release;
 - build container images hosted on ghcr.io;
@@ -154,8 +158,15 @@ adding or removing files.
 Other than that, the only needed additional step is to mark the PRs
 you make towards `release` branch with the label `released-as-hotfix`.
 
-NOTE: Ideally, adding that label should not be needed. However, it's
-caused by a limitation in the changelog generator we currently use.
+So, when making custom fix you must:
+- create a new branch `<some-hotfix-name>` starting off from `release`;
+- add you changes;
+- open a PR for `<some-hotfix-name>` targeting `release`;
+- add label `released-as-hotfix` on that PR;
+
+NOTE: Ideally, adding `released-as-hotfix` label should not be
+needed. However, it's caused by a limitation in the changelog
+generator we currently use.
 
 ==== Trigger the hotfix release
 
@@ -167,7 +178,7 @@ target branch for the PR is different:
 - target the PR towards `release` branch;
 - name the PR `Trigger release <version>`
 - add label `skip-release-notes` to not include this PR in the changelog;
-- notify your team mates
-- merge
+- notify your team mates;
+- merge.
 
 Again, the CI will take it from here.
