@@ -1,8 +1,7 @@
 == Release Process
 
-To issue a new version of any Trento component (e.g. Web, Agent,
-Wanda, etc.), a simple process must be followed in the context of
-the respective repository. +
+To issue a new version of a Trento component (such as Web, Agent, or Wanda), follow the procedure described in this document in the context of the respective repository.
+
 Most of this process is automated via GitHub Actions.
 
 === Branching Strategy
@@ -13,57 +12,46 @@ The Trento branching strategy fulfills the following objectives:
 * It allows for quick releases when necessary.
 * It enables simple versioning for nightly builds.
 
-For nightly builds, the versioning must ensure that the latest build always
-sorts higher than the latest official release. While this is easier with linear
-versioning, the need to release small fixes before features are complete
-requires a multi-branch approach.
+For nightly builds, the versioning must ensure that the latest build always sorts higher than the latest official release.
+While this is easier with linear versioning, the need to release small fixes before features are complete requires a multi-branch approach.
 
-Therefore, Trento uses a semi-linear branching and release approach. A Trento
-repository maintains two long-running branches:
+Therefore, Trento uses a semi-linear branching and release approach.
+A Trento repository maintains two long-running branches:
 
 `main`::
-  Contains newly developed features. It is kept stable at all times by using
-  Pull Requests, Peer Reviews, and automated CI checks before any new code
-  integration.
+Contains newly developed features.
+It is kept stable at all times by using Pull Requests, Peer Reviews, and automated CI checks before any new code integration.
 
 `release`::
-  Contains the code from `main` that is ready for release, plus potential small
-  custom fixes.
+Contains the code from `main` that is ready for release, plus potential small custom fixes.
 
 Trento supports two types of releases:
 
 Full releases::
-  Created by cross-merging the `main` and `release` branches and tagging the
-  resulting merge commit. This merge commit is shared by both branches because
-  when one branch is merged into the other, the reverse operation is a
-  fast-forward merge. Full releases contain all new features developed on `main`
-  since the last full release.
+Created by cross-merging the `main` and `release` branches and tagging the resulting merge commit.
+This merge commit is shared by both branches because when one branch is merged into the other, the reverse operation is a fast-forward merge.
+Full releases contain all new features developed on `main` since the last full release.
 
 Hotfix releases::
-  Allow for quick reactions to unforeseen problems with the released code, such
-  as critical bugs or new security CVEs. Hotfix releases are made directly on
-  the `release` branch and tagged there.
+Allow for quick reactions to unforeseen problems with the released code, such as critical bugs or new security CVEs.
+Hotfix releases are made directly on the `release` branch and tagged there.
 
-To achieve linear versioning in a straightforward manner, all release tags must
-be reachable from `main`. For instance, built-in tools like `git describe`
-should correctly identify the number of commits since the last release. This is
-achieved by merging the `release` branch back into `main` when performing
-hotfix releases.
+To achieve linear versioning in a straightforward manner, all release tags must be reachable from `main`.
+For instance, built-in tools like `git describe` should correctly identify the number of commits since the last release.
+This is achieved by merging the `release` branch back into `main` when performing hotfix releases.
 
 [NOTE]
 ====
-This implies that Trento does not support releasing version 2.0.1 if release
-3.0.0 already exists. The next possible release must be monotonically
-increasing (for example, 3.0.1, 3.1.0, or 4.0.0).
+This implies that Trento does not support releasing version 2.0.1 if release 3.0.0 already exists.
+The next possible release must be monotonically increasing (for example, 3.0.1, 3.1.0, or 4.0.0).
 ====
 
-In all merges between the long-running branches, `main` is taken as the source
-of truth, and all merge conflicts are auto-resolved in its favor.
+In all merges between the long-running branches, `main` is taken as the source of truth, and all merge conflicts are auto-resolved in its favor.
 
 [WARNING]
 ====
-Not all Trento repositories use this branching strategy. We are currently
-migrating to this new way of operation.
+Not all Trento repositories use this branching strategy.
+We are currently migrating to this new way of operation.
 ====
 
 Example of a test repository using this branching strategy:
@@ -74,15 +62,13 @@ image::../images/release-branching.png[Release branching]
 
 The steps to initiate the release process are the same for both release types.
 To bump the version, modify the `VERSION` file at the root of the repository.
-Commit this change to the respective branch for the release type. Because both
-long-running branches are protected, only administrators can push directly to
-them. Other team members must open a pull request.
+Commit this change to the respective branch for the release type.
+Because both long-running branches are protected, only administrators can push directly to them.
+Other team members must open a pull request.
 
-Successfully merging the `VERSION` file change on the respective branch triggers
-the following automated steps:
+Successfully merging the `VERSION` file change on the respective branch triggers the following automated steps:
 
-* The CI bot automatically generates CHANGELOG entries from the names of the
-  pull requests merged into the respective branch, creating a new commit.
+* The CI bot automatically generates CHANGELOG entries from the names of the pull requests merged into the respective branch, creating a new commit.
 * The system creates the necessary version tags on the correct branch.
 * It publishes a GitHub release.
 * It builds container images hosted on ghcr.io.
@@ -90,17 +76,15 @@ the following automated steps:
 
 [NOTE]
 ====
-The Continuous Integration test phase is not executed during this release
-process. For example, changing only the `VERSION` file will not trigger any
-test jobs. Therefore, developers must ensure that the `main` branch is always
-in a green build status. If it is not, achieve a green build on `main` before
-bumping the version.
+The standard Continuous Integration step, which occurs on a push to the `main` branch, must not execute after a release.
+Adapt the CI configuration to account for any other files changed alongside the `VERSION` file in the release-triggering pull request.
+Ideally, change only the `VERSION` file in the release-triggering PR.
 ====
 
 === Preparation for Full Releases
 
-There are no special requirements for full releases. When the repository is
-ready to be released, follow this procedure:
+There are no special requirements for full releases.
+When the repository is ready to be released, follow this procedure:
 
 . Open a pull request (PR) that only updates the version in the `VERSION` file.
 . Target the PR against the `main` branch.
@@ -109,25 +93,21 @@ ready to be released, follow this procedure:
 . Notify your teammates.
 . Merge the PR.
 
-After merging, the Continuous Integration (CI) system automatically completes
-the process.
+After merging, the Continuous Integration (CI) system automatically completes the process.
 
 === Preparation for Hotfix Releases
 
-Hotfix releases require more preparation work from the person performing the
-release.
+Hotfix releases require more preparation work from the person performing the release.
 
-There are two paths you can take when making changes for a hotfix. However,
-regardless of which path you choose, the changes introduced on the `release`
-branch must be made using a pull request (PR).
+There are two paths you can take when making changes for a hotfix.
+However, regardless of which path you choose, the changes introduced on the `release` branch must be made using a pull request (PR).
 
 ==== Back-Porting
 
-In general, if a problem is discovered in the release code, it exists on both
-the `main` and `release` branches. Therefore, apply the fix in both places. It
-is recommended to first make the fix on `main` and then back-port it to
-`release`. This lowers the possibility of anomalies when auto-resolving merges
-in the CI.
+In general, if a problem is discovered in the release code, it exists on both the `main` and `release` branches.
+Therefore, apply the fix in both places.
+It is recommended to first make the fix on `main` and then back-port it to `release`.
+This lowers the possibility of anomalies when auto-resolving merges in the CI.
 
 When back-porting, follow this procedure:
 
@@ -143,20 +123,17 @@ When back-porting, follow this procedure:
 
 [NOTE]
 ====
-Ideally, adding the label in the last step should not be necessary. However,
-this is currently required due to a limitation in the changelog generator.
+Ideally, adding the label in the last step should not be necessary.
+However, this is currently required due to a limitation in the changelog generator.
 ====
 
 ==== Custom Fix Directly on Release
 
-If it is not possible to cherry-pick the change from `main` directly because it
-is intertwined with a feature not ready to be released, make the fix directly
-on the `release` branch. Later, when the CI merges `release` back to `main`,
-double-check if everything was resolved correctly. This is especially important
-if the fix involves adding or removing files.
+If it is not possible to cherry-pick the change from `main` directly because it is intertwined with a feature not ready to be released, make the fix directly on the `release` branch.
+Later, when the CI merges `release` back to `main`, double-check if everything was resolved correctly.
+This is especially important if the fix involves adding or removing files.
 
-Other than that, the only additional step required is to mark the PRs targeting
-the `release` branch with the `released-as-hotfix` label.
+Other than that, the only additional step required is to mark the PRs targeting the `release` branch with the `released-as-hotfix` label.
 
 To make a custom fix, follow this procedure:
 
@@ -167,8 +144,8 @@ To make a custom fix, follow this procedure:
 
 [NOTE]
 ====
-Ideally, adding the `released-as-hotfix` label should not be necessary. However,
-this is currently required due to a limitation in the changelog generator.
+Ideally, adding the `released-as-hotfix` label should not be necessary.
+However, this is currently required due to a limitation in the changelog generator.
 ====
 
 ==== Trigger the Hotfix Release
