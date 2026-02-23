@@ -1,4 +1,5 @@
 == Release Process
+ifndef::imagesdir[:imagesdir: ../images]
 
 To issue a new version of a Trento component (such as Web, Agent, or Wanda), follow the procedure described in this document in the context of the respective repository.
 
@@ -56,7 +57,7 @@ We are currently migrating to this new way of operation.
 
 Example of a test repository using this branching strategy:
 
-image::../images/release-branching.png[Release branching]
+image::release-branching.png[Release branching]
 
 === How to Trigger a Release
 
