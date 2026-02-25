@@ -16,13 +16,26 @@ The `trento-docs-site` directory builds the link:https://www.trento-project.io/d
 
 === Images in `content/`
 
-For docs under `content/`, keep image files in `content/images/` and reference them from pages using relative paths such as `image::../images/release-branching.png[]` or `image::../images/analytics/create-container.png[]`.
+For docs under `content/`, keep image files in `content/images/`.
+
+In pages that include images, add this fallback directive:
+
+[source,asciidoc]
+----
+ifndef::imagesdir[:imagesdir: ../images]
+----
+
+Then reference images relative to `imagesdir`, for example:
+
+[source,asciidoc]
+----
+image::release-branching.png[]
+image::analytics/create-container.png[]
+----
 
 The collector scan preserves subdirectories from `content/images/`; it does not flatten files.
 
-Because `imagesdir` is already defined globally by the Antora playbook, do not redefine it with `ifndef::imagesdir[...]` in these pages.
-
-This is done to render images on GitHub and Antora.
+This setup renders images in both GitHub preview and Antora.
 
 
 == Trento docs site ui
