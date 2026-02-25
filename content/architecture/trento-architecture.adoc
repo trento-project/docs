@@ -1,10 +1,12 @@
+ifndef::imagesdir[:imagesdir: ../images]
+
 == Trento Architecture
 
 Here’s a high level view of what we do to achieve the result of
 providing a reactive event driven system.
 
 .Trento Architecture
-image::../images/trento-architecture.png[Trento Architecture]
+image::trento-architecture.png[Trento Architecture]
 
 === Discovery
 
@@ -93,4 +95,4 @@ basic CRUD operation).
 
 Find here a simple diagram to understand how CQRS works:
 
-image::../images/event-sourcing-cqrs.png[ES+CQRS]
+image::event-sourcing-cqrs.png[ES+CQRS]

@@ -1,3 +1,5 @@
+ifndef::imagesdir[:imagesdir: ../images]
+
 == 3. Grafana Alloy Integration for SLES 16 System Monitoring
 
 [width="100%",cols="<18%,<82%",]
@@ -811,7 +813,7 @@ Using the write API, Prometheus cannot ensure the `up` query has the same meanin
 
 On the Trento Web UI we can have a consistent experience by showing the same status indication for both `node_exporter`-based and `alloy`-based hosts. By labeling metrics with `exporter_name`, the _pill_ will be shown as expected by the current implementation, without further changes:
 
-image::../images/alloy-status-pill.png[Status Pill Example]
+image::alloy-status-pill.png[Status Pill Example]
 
 ==== Expected Exporters
 
@@ -905,4 +907,3 @@ Such possibilities are out of the scope of this RFC, but can be considered for f
 * https://grafana.com/docs/alloy/latest/reference/components/prometheus/prometheus.remote_write/[prometheus.remote_write Component]
 * https://kubernetes.github.io/ingress-nginx/examples/auth/client-certs/[nginx Ingress Client Certificate Authentication]
 * https://nginx.org/en/docs/http/ngx_http_ssl_module.html[nginx SSL Module]
-

@@ -14,6 +14,29 @@ This repository contains the Trento project documentation that does not interest
 
 The `trento-docs-site` directory builds the link:https://www.trento-project.io/docs/[Trento project’s unified documentation site] using https://antora.org/[Antora]. Learn more about xref:trento-docs-site/README.adoc[the documentation hub here].
 
+=== Images in `content/`
+
+For docs under `content/`, keep image files in `content/images/`.
+
+In pages that include images, add this fallback directive:
+
+[source,asciidoc]
+----
+ifndef::imagesdir[:imagesdir: ../images]
+----
+
+Then reference images relative to `imagesdir`, for example:
+
+[source,asciidoc]
+----
+image::release-branching.png[]
+image::analytics/create-container.png[]
+----
+
+The collector scan preserves subdirectories from `content/images/`; it does not flatten files.
+
+This setup renders images in both GitHub preview and Antora.
+
 
 == Trento docs site ui
 

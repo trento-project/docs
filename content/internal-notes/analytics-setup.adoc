@@ -1,3 +1,5 @@
+ifndef::imagesdir[:imagesdir: ../images]
+
 == Analytics setup with Google Tag Manager and PostHog
 
 This guide explains how to set up the analytics environment with
@@ -10,12 +12,12 @@ Follow these steps to set up GTM:
 
 . Create a new container of type `Web` in the GTM account.
 +
-image::../images/analytics/create-container.png[Create container]
+image::analytics/create-container.png[Create container]
 +
 
 . Get the `Container ID`. This value is used during the `trento-web` artifacts generation.
 +
-image::../images/analytics/get-id.png[Get ID]
+image::analytics/get-id.png[Get ID]
 +
 
 . Go to the container.
@@ -45,8 +47,8 @@ The content includes the PostHog configuration, which is sent to the `trento-web
 +
 Finally, use the `All Pages` trigger as `Firing Triggers`.
 +
-image::../images/analytics/create-tag.png[Create tag] 
-image::../images/analytics/set-custom-html.png[Custom HTML] 
+image::analytics/create-tag.png[Create tag] 
+image::analytics/set-custom-html.png[Custom HTML] 
 +
 With this, the simple approach is done, and GTM is ready to be used.
 Let's explain now how to enhance this to have a more production-ready setup.
@@ -59,20 +61,20 @@ Let's explain now how to enhance this to have a more production-ready setup.
   the Trento demo page, PR environment pages, and localhost setups.
   Use `PageView` as the type and configure the correct domains to be redirected to the Test/Devel tag.
 +
-image::../images/analytics/create-trigger.png[Create trigger]
-image::../images/analytics/all-triggers.png[Triggers] 
+image::analytics/create-trigger.png[Create trigger]
+image::analytics/all-triggers.png[Triggers] 
 +
 
 . Now that the Triggers are created, use them in the Prod and Test tags.
    Add them as exceptions in the Prod tag and as firing triggers in the Test tag.
 +
-image::../images/analytics/prod-tag-triggers.png[Prod triggers] 
-image::../images/analytics/test-tag-triggers.png[Test triggers]  
+image::analytics/prod-tag-triggers.png[Prod triggers] 
+image::analytics/test-tag-triggers.png[Test triggers]  
 +
 
 The end result should look like this:
 +
-image::../images/analytics/final-tags.png[Tags]
+image::analytics/final-tags.png[Tags]
 +
 
 
@@ -88,4 +90,4 @@ mix release
 This is already done in `trent-web` Github Action CI, so it is already automatized.
 To set a new `GTM_ID`, change the value from the repository settings secrets.
 
-image::../images/analytics/github-setup.png[Github CI setup]
+image::analytics/github-setup.png[Github CI setup]

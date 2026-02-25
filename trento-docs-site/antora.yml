@@ -61,7 +61,7 @@ ext:
         into: modules/developer/pages/
       - dir: content/images
         files: '**/*.{png,jpg,jpeg,svg,gif}'
-        into: modules/developer/images/images
+        into: modules/developer/images
     ## Trento upstream projects documentation
     ## Trento Agent https://github.com/trento-project/agent
     - scan:

@@ -1,5 +1,6 @@
-== Release Process
 ifndef::imagesdir[:imagesdir: ../images]
+
+== Release Process
 
 To issue a new version of a Trento component (such as Web, Agent, or Wanda), follow the procedure described in this document in the context of the respective repository.
 
