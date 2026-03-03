@@ -486,7 +486,7 @@ SAML_SIGNED_ENVELOPES::
   Require to receive SAML envelopes signed from the IDP. Set to false if
   the IDP doesn't sign the envelopes (default value: `+true+`)
 
-[[saml-troubleshooting-failed-login]]
+[[troubleshooting-failed-login]]
 ==== Troubleshooting failed login
 
 In some cases, the IDP successfully authenticates a user, but {trento} fails
