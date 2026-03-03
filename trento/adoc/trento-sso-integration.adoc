@@ -311,17 +311,17 @@ user profile username is defined as `+attr:username+` use
 
 ====== SAML URLs
 
-Trento exposes some SAML related URLs when SAML is enabled:
+{trento} exposes some SAML related URLs when SAML is enabled:
 
 - Assertion consumer service (or ACS): an endpoint to accept SAML messages to establish a
-session into the Service Provider. The endpoint for ACS in Trento is:
+session into the Service Provider. The endpoint for ACS in {trento} is:
 https://#{TRENTO_WEB_ORIGIN}/sso/sp/consume/#{SAML_IDP_ID}
 
 - Single logout service (or SLS): an endpoint to initiate a logout request from the IdP.
-The endpoint for SLS in Trento is: https://#{TRENTO_WEB_ORIGIN}/sso/sp/logout/#{SAML_IDP_ID}
+The endpoint for SLS in {trento} is: https://#{TRENTO_WEB_ORIGIN}/sso/sp/logout/#{SAML_IDP_ID}
 
-- Metadata: an endpoint to retrieve Trento metadata for SAML.
-The endpoint for metadata in Trento is: https://#{TRENTO_WEB_ORIGIN}/sso/sp/metadata/#{SAML_IDP_ID}.
+- Metadata: an endpoint to retrieve {trento} metadata for SAML.
+The endpoint for metadata in {trento} is: https://#{TRENTO_WEB_ORIGIN}/sso/sp/metadata/#{SAML_IDP_ID}.
 This URL is used as default value for `+SAML_SP_ENTITY_ID+` if the configuration variable is not set
 
 ===== Enabling SAML when using kubernetes deployment
@@ -428,11 +428,11 @@ SAML_SIGNED_ENVELOPES=<SAML_SIGNED_ENVELOPES>
 ===== Available variables for SAML
 
 SAML_IDP_ID::
-  SAML IDP id. This is a user-defined string used to identify the associated IDP in trento.
+  SAML IDP id. This is a user-defined string used to identify the associated IDP in {trento}.
   The value is used as well to compose relevant SAML URLs like the ACS and metadata URLs.
   It can have any value, for example: trento
 SAML_SP_ID::
-  SAML SP id. This is a user-defined string to identify Trento as service provider.
+  SAML SP id. This is a user-defined string to identify {trento} as service provider.
   It can have any value, for example: trento
 SAML_METADATA_URL::
   URL to retrieve the SAML metadata xml file. One of
@@ -489,7 +489,7 @@ SAML_SIGNED_ENVELOPES::
 [[saml-troubleshooting-failed-login]]
 ==== Troubleshooting failed login
 
-In some cases, the IDP successfully authenticates a user, but Trento fails
+In some cases, the IDP successfully authenticates a user, but {trento} fails
 to create a session and displays a "Login Failed" page.
 This typically indicates that Trento encountered an error while processing
 the authentication response.
