@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[integrating-single-sign-on]]
 === Single Sign-On integration
-:revdate: 2025-06-10
+:revdate: 2026-03-02
 
 
 {trento} can be integrated for Single Sign-On (SSO) with a third-party identity
@@ -202,6 +202,7 @@ OAUTH2_CALLBACK_URL::
   authentication is completed (default value:
   `+https://#{TRENTO_WEB_ORIGIN}/auth/oauth2_callback+`)
 
+[[using-saml]]
 ==== Using SAML
 
 {trento} integrates with an IDP that uses the SAML protocol to
@@ -308,12 +309,20 @@ values with the values configured in the IDP. For example, if the IDP
 user profile username is defined as `+attr:username+` use
 `+SAML_USERNAME_ATTR_NAME=attr:username+`.
 
-====== Checking SAML redirect URI
+====== SAML URLs
 
-After a successful login, the IDP redirects the user's session back to
-{trento} and redirected at https://trento.example.com/sso/sp/consume/saml.
-To ensure seamless SSO, this URI must be configured as valid within the
-IDP.
+Trento exposes some SAML related URLs when SAML is enabled:
+
+- Assertion consumer service (or ACS): an endpoint to accept SAML messages to establish a
+session into the Service Provider. The endpoint for ACS in Trento is:
+https://#{TRENTO_WEB_ORIGIN}/sso/sp/consume/#{SAML_IDP_ID}
+
+- Single logout service (or SLS): an endpoint to initiate a logout request from the IdP.
+The endpoint for SLS in Trento is: https://#{TRENTO_WEB_ORIGIN}/sso/sp/logout/#{SAML_IDP_ID}
+
+- Metadata: an endpoint to retrieve Trento metadata for SAML.
+The endpoint for metadata in Trento is: https://#{TRENTO_WEB_ORIGIN}/sso/sp/metadata/#{SAML_IDP_ID}.
+This URL is used as default value for `+SAML_SP_ENTITY_ID+` if the configuration variable is not set
 
 ===== Enabling SAML when using kubernetes deployment
 
@@ -419,9 +428,12 @@ SAML_SIGNED_ENVELOPES=<SAML_SIGNED_ENVELOPES>
 ===== Available variables for SAML
 
 SAML_IDP_ID::
-  SAML IDP id
+  SAML IDP id. This is a user-defined string used to identify the associated IDP in trento.
+  The value is used as well to compose relevant SAML URLs like the ACS and metadata URLs.
+  It can have any value, for example: trento
 SAML_SP_ID::
-  SAML SP id
+  SAML SP id. This is a user-defined string to identify Trento as service provider.
+  It can have any value, for example: trento
 SAML_METADATA_URL::
   URL to retrieve the SAML metadata xml file. One of
   `+SAML_METADATA_URL+` or `+SAML_METADATA_CONTENT+` is required
@@ -437,8 +449,8 @@ SAML_SP_DIR::
   certificates and metadata file) are placed (default value:
   `+/etc/trento/saml+`)
 SAML_SP_ENTITY_ID::
-  SAML SP entity id. If it is not given, value from the metadata.xml
-  file is used
+  SAML SP entity id. This value must match with the entity ID configured in the IDP as SAML client
+  (default value: `https://#{TRENTO_WEB_ORIGIN}/sso/sp/metadata/#{SAML_IDP_ID}`)
 SAML_SP_CONTACT_NAME::
   SAML SP contact name (default value: `+Trento SP Admin+`)
 SAML_SP_CONTACT_EMAIL::
@@ -473,3 +485,19 @@ SAML_SIGNED_ASSERTION::
 SAML_SIGNED_ENVELOPES::
   Require to receive SAML envelopes signed from the IDP. Set to false if
   the IDP doesn't sign the envelopes (default value: `+true+`)
+
+[[saml-troubleshooting-failed-login]]
+==== Troubleshooting failed login
+
+In some cases, the IDP successfully authenticates a user, but Trento fails
+to create a session and displays a "Login Failed" page.
+This typically indicates that Trento encountered an error while processing
+the authentication response.
+
+To find the specific cause:
+
+* Open the Network tab in your browser's Developer Tools
+* Attempt the login again
+* Look for a 4xx HTTP response
+* View the Response payload. This contains the internal error details,
+such as missing required user attributes, needed to troubleshoot the failure.
