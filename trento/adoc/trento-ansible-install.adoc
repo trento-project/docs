@@ -2,8 +2,433 @@ include::product-attributes.adoc[]
 
 [[sec-ansible-deployment]]
 ==== Automated deployment with Ansible
-:revdate: 2025-08-05
+:revdate: 2026-03-05
+
+An automated installation of Trento Server using RPM packages can be performed with Ansible playbooks, provided by the `ansible-trento` package.
+
+===== Supported Operating Systems
+
+The playbooks can only be executed on _target nodes_ running SLES4SAP 15-SP5 and up.
+The supported SLES4SAP systems for the _control node_ are the same.
+However, the requirements for the control nodes are less strict.
+Any operating system can be uses as long as the version of Ansible installed on that node is compatible with the Python interpreter available on the managed target nodes.
+
+Please refer to the support matrix on the official link:https://docs.ansible.com/projects/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix[Ansible documentation].
 
 
-An automated installation of Trento Server using RPM packages can be performed with a Ansible playbook. For further information, refer to the https://github.com/trento-project/ansible[Trento Ansible project].
+===== Requirements
 
+For the control node:
+
+* Only `ansible` needs to be installed
+
+For the target nodes:
+
+* Operating System should be SLES4SAP
+
+* Python should be installed
+
+* Basesystem Module 15 x86_64 (for SLES15, replace `x` with your SP version)
++
+`SUSEConnect -p sle-module-basesystem/15.x/x86_64`
+
+* SUSE Package Hub 15 x86_64 (for SLES15, replace `x` with your SP version)
++
+`SUSEConnect -p PackageHub/15.x/x86_a64`
+
+* Python 3 module (for SLES15, replace `x` with your SP version)
++
+`SUSEConnect -p sle-module-python3/15.x/x86_64`
+
+* Legacy Module 15 x86_64 (SLES15-SP6 only)
++
+`SUSEConnect -p sle-module-legacy/15.6/x86_64`
+
+
+===== Installation
+
+For SLES-based operating systems, you can install `ansible-trento` from `zypper`:
+
+[source,console]
+----
+# zypper install ansible-trento
+----
+
+===== Components
+
+The comprising components of the playbooks are the following:
+
+Trento Server components:
+
+web:: The main component of the Trento server, containing the backend and frontend.
+wanda:: Checks engine component.
+
+Trento agent:
+
+agent:: Agent collecting information and processing commands, installed on SAP infrastructure host machines.
+
+Third-party dependencies:
+
+PostgreSQL:: Database server.
+RabbitMQ:: Messaging broker.
+Prometheus:: Metrics collecting and processing server.
+Nginx:: HTTP server used as reverse proxy.
+
+`ansible-trento` package provides an Ansible role for every one of these components.
+
+===== Playbooks overview
+
+Trento provides three playbooks -- `server`, `agent` and `site`.
+
+server::
+Install Trento server components (Web and Wanda) along with the supporting third-party application dependencies.
+
+agent::
+Install and configure Trento agent.
+
+site::
+Make full Trento installation.
+It installs both the server components and agents.
+Additional feature of this playbook is that the API key for the agents is automatically retrieved from Trento server and passed on to the deployed agents.
+
+cleanup::
+Clean-up playbook that uninstalls all Trento components.
+
+===== Setting up the inventory
+
+You have to prepare an inventory file to be used by your Ansible deployment.
+Create an `inventory.yml` file defining the IP addresses or domain names of the target nodes for each group expected in the playbooks.
+The inventory should have the following following structure:
+
+[source,yaml]
+----
+all:
+  children:
+    trento_server:
+      hosts:
+        vitellone:
+          ansible_host: "your-host"
+          ansible_user: "your-user"
+          ansible_ssh_private_key_file: "/home/user/.ssh/id_rsa"
+    postgres_hosts:
+      hosts:
+        vitellone:
+          ansible_host: "your-host"
+          ansible_user: "your-user"
+          ansible_password: "your-password"
+    rabbitmq_hosts:
+      hosts:
+        vitellone:
+          ansible_host: "your-host"
+          ansible_user: "your-user"
+          ansible_ssh_private_key_file: "/home/user/.ssh/id_rsa"
+    prometheus_hosts:
+      hosts:
+        vitellone:
+          ansible_host: "your-host"
+          ansible_user: "your-user"
+          ansible_ssh_private_key_file: "/home/user/.ssh/id_rsa"
+   agents:
+     hosts:
+       vitellone:
+          ansible_host: "your-host"
+          ansible_user: "your-user"
+          ansible_password: "your-password"
+----
+
+In this example, every component is installed on the same host, named `vitellone`.
+Adapt this example to your concrete case.
+
+You can skip some of the host groups if you're not provisioning them by `ansible-trento`.
+For example, you can skip defining `postgres_hosts` if you are going to be using PostgreSQL installation managed by external team at your company.
+Another example is if you are going to use only `agent` playbook, then there is no need to define anything else than `agents` in your inventory.
+Please refer to <<Configuration>> section to see how to make `ansible-trento` skip provisioning a given component.
+
+In the example given above, a mixture of authentication methods are used to access the target nodes.
+When using SSH to connect (`ansible_ssh_private_key_file`), make sure all the target nodes contain the public key of the control node.
+To copy you public key from control node to target node, you can use the following command:
+
+[source, console]
+----
+$ ssh-copy-id <username>@<ip-or-domain-name-of-the-node>
+----
+
+===== Running the playbooks
+
+To run a playbook:
+
+[source, console]
+----
+$ ansible-playbook -i <path-to-inventory> suse.trento.<playbook-name>
+----
+
+Where `<playbook-name>` is one of `server`, `agent` or `site`.
+
+===== Configuration
+
+There are two types of variables that could be configured -- playbook-level and role-level ones.
+They differ in the way they are configured.
+Playbook-level variables are kept to a minimum.
+
+====== Playbook-level configuration
+
+These variables affect how the playbooks execute.
+The available configuration options are:
+
+provision_postgres:: Whether to install and configure PostgreSQL.
+provision_prometheus:: Whether to install and configure Prometheus.
+provision_rabbitmq:: Whether to install and configure RabbitMQ.
+provision_proxy:: Whether to install and configure a reverse proxy like Nginx.
+
+Playbook-level variables need to be supplied as `--extra-vars/-e` on the command line on every playbook execution:
+
+[source,console]
+----
+$ ansible-playbook -i <path-to-inventory> suse.trento.site -e provision_postgres=false -e provision_rabbitmq=false
+----
+
+NOTE: When disabling provisioning of a Trento component, you need to manually set the respective `*_host* role-level variables which are otherwise automatically populated from the playbook.
+For example, if you specify `-e provision_postgres=false` when executing the `server` or `site` playbook, you have to explicitly set `trento_postgres_host` in you inventory.
+
+====== Role-level configuration
+
+Almost all configuration is done via role-level variables.
+They are set into the inventory file, under the `vars:` section:
+
+[source,yaml]
+----
+all:
+  children:
+    trento_server:
+      hosts: ...
+    postgres_hosts:
+      hosts: ...
+    rabbitmq_hosts:
+      hosts: ...
+    prometheus_hosts:
+      hosts: ...
+    agents:
+      hosts: ...
+
+  vars:
+    trento_server_name": "trento-deployment.example.com",
+    trento_web_admin_password: "adminpassword",
+    trento_web_postgres_password: "postgres",
+    trento_wanda_postgres_password: "postgres",
+    trento_rabbitmq_password: "guest",
+    rproxy_ssl_cert: "<SSL certificate in base64>",
+    rproxy_ssl_key: "<SSL certificate key in base64>"
+----
+
+Some of the role-level variables are mandatory:
+
+For Trento Server these are:
+
+[width="100%",cols="24%,76%",options="header",]
+|===
+|Name |Description
+| trento_server_name | Domain name of the Trento web application
+
+| trento_web_admin_password | Password of the admin user in Web
+  application
+
+| trento_web_postgres_password | Password of the Postgres user used in
+  Web application
+
+| trento_wanda_postgres_password | Password of the Postgres user used
+  in Wanda application
+
+| trento_rabbitmq_password | Password of the RabbitMQ user configured
+  for the Trento project
+
+| rproxy_ssl_cert | String with the content of the .crt file to beused
+  by the reverse proxy for https
+
+| rproxy_ssl_key | String with the content of the .key file used to
+  generate the certificate
+|===
+
+For Trento Agent they are:
+
+[width="100%",cols="24%,76%",options="header",]
+|===
+|Name |Description
+| agent_web_api_key | API key for accessing Trento Web collection
+  endpoint.
+|===
+
+The rest of the variables are optional and the full listing could be found on the the https://github.com/trento-project/ansible[Trento Ansible] project page.
+
+===== Example scenarios
+
+The playbooks in `ansible-trento` allow for various installation scenarios.
+
+====== Every component on a dedicated node
+
+Inventory file that installs every Trento component on a different host.
+Also, optional e-mail alerting is enabled and configured:
+
+[source,yaml]
+----
+all:
+  children:
+    trento_server:
+      hosts:
+        vitellone:
+          ansible_host: "your-host"
+          ansible_user: "your-user"
+    postgres_hosts:
+      hosts:
+        vitellone-pg:
+          ansible_host: "your-host"
+          ansible_user: "your-user"
+    rabbitmq_hosts:
+      hosts:
+        vitellone-mq:
+          ansible_host: "your-host"
+          ansible_user: "your-user"
+    prometheus_hosts:
+      hosts:
+        vitellone-metrics:
+          ansible_host: "your-host"
+          ansible_user: "your-user"
+    agents:
+      hosts:
+        hana01:
+          ansible_host: "your-hana01-host"
+          ansible_user: root
+        hana02:
+          ansible_host: "your-hana02-host"
+          ansible_user: root
+
+  vars:
+    trento_server_name: "yourserver.com"
+    trento_web_admin_password: "adminpassword"
+    trento_web_postgres_password: "pass"
+    trento_wanda_postgres_password: "wanda"
+    trento_rabbitmq_password: "trento"
+    rproxy_ssl_cert: |-
+      -----BEGIN CERTIFICATE-----
+      MIIEZDCCA0ygAwIBAgIUAue46Y/9kwT+zvPPW2xfuNv1+Z4wDQYJKoZIhvcNAQEL
+      ...
+      vzczKRPmQOQbiu02WM2hivWtPBH//A5N
+      -----END CERTIFICATE-----
+    rproxy_ssl_key: |-
+      -----BEGIN PRIVATE KEY-----
+      MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC1L7Ddc6oYaNPC
+      ...
+      mpNiKDOPALNTs+Ukdkt5KlE=
+      -----END PRIVATE KEY-----
+
+    web_enable_alerting: true
+    web_alert_sender: "trento@example.com"
+    web_alert_recipient: "trento_maintainers@example.com"
+    web_smtp_server: "smtp.example.com"
+    web_smtp_port: 587
+    web_smtp_user: "smtp_user"
+    web_smtp_password: "stmp_pass"
+----
+
+We execute Ansible by simply running the following:
+
+[source,console]
+----
+$ ansible-playbook -i <path-to-inventory> suse.trento.site
+----
+
+====== Trento with externally managed PostgreSQL, RabbitMQ and Prometheus
+
+Inventory file that does not provision PostgreSQL, RabbitMQ and Prometheus.
+Please note:
+* There is no configuration about `postgres_hosts`, `rabbitmq_hosts` and `prometheus_hosts`.
+* Explicit `trento_postgres_host` and `trento_rabbitmq_host` are configured.
+
+[source,yaml]
+----
+all:
+  children:
+    trento_server:
+      hosts:
+        vitellone:
+          ansible_host: "your-host"
+          ansible_user: "your-user"
+    agents:
+      hosts:
+        hana01:
+          ansible_host: "your-hana01-host"
+          ansible_user: root
+        hana02:
+          ansible_host: "your-hana02-host"
+          ansible_user: root
+
+  vars:
+    trento_postgres_host: "yourexternalpg.com"
+    trento_rabbitmq_host: "yourexternalrabbit.com:5671"
+
+    trento_server_name: "your-servername.com"
+    trento_web_admin_password: "adminpassword"
+    trento_web_postgres_username: "postgres"
+    trento_web_postgres_password: "trentoansible1"
+    trento_wanda_postgres_username: "postgres"
+    trento_wanda_postgres_password: "trentoansible1"
+    trento_rabbitmq_username: "trentoansible"
+    trento_rabbitmq_password: "trentoansible1"
+    rproxy_ssl_cert: |-
+      -----BEGIN CERTIFICATE-----
+      MIIEZDCCA0ygAwIBAgIUAue46Y/9kwT+zvPPW2xfuNv1+Z4wDQYJKoZIhvcNAQEL
+      ...
+      vzczKRPmQOQbiu02WM2hivWtPBH//A5N
+      -----END CERTIFICATE-----
+    rproxy_ssl_key: |-
+      -----BEGIN PRIVATE KEY-----
+      MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC1L7Ddc6oYaNPC
+      ...
+      mpNiKDOPALNTs+Ukdkt5KlE=
+      -----END PRIVATE KEY-----
+----
+
+Ansible needs to be executed with the following command:
+
+[source,console]
+----
+$ ansible-playbook -i <path-to-inventory> suse.trento.site -e provision_postgres=false -e provision_rabbitmq=false -e provision_prometheus=false
+----
+
+====== Every component on a dedicated node
+
+Inventory file used for installation and configuration of Trento agents only.
+Please note how `agent_web_api_key` needs to be specified explicitly.
+You have to acquire that key manually before running the agent playbook alone.
+
+[source,yaml]
+----
+all:
+  children:
+    agents:
+      hosts:
+        hana01:
+          ansible_host: "your-hana01-host"
+          ansible_user: root
+        hana02:
+          ansible_host: "your-hana02-host"
+          ansible_user: root
+
+  vars:
+    agent_web_api_key: "yourserver.com"
+----
+
+We execute Ansible by specifying the `agent` playbook:
+
+[source,console]
+----
+$ ansible-playbook -i <path-to-inventory> suse.trento.agent
+----
+
+NOTE: It is important to note that the custom tailored inventories are not a requirement.
+They are used to highlight which parameters are needed in which cases.
+You can, as easily, use a single, fully populated inventory and run only a subset of the operations, like installing only the agent or skipping PostgreSQL installation.
+The playbook would pick-up or skip variables in the inventory as appropriate for the desired execution configuration.
+
+===== Reference
+
+For further information, refer to the https://github.com/trento-project/ansible[Trento Ansible project].
