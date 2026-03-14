@@ -91,7 +91,9 @@ The `ansible-trento` package provides an {ansible} role for every one of these c
   An additional feature of this playbook is that the API key for the agents is automatically retrieved from the {trserver} and passed to the deployed agents.
 
 `cleanup`::
-  Uninstalls all {trento} components.
+  Tries to undo operations performed by executing the other playbooks.
+  It only reverts a subset of the operations.
+  Consult the code of that playbook for full details.
 
 ===== Setting up the inventory
 
