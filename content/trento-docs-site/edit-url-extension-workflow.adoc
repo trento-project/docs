@@ -1,0 +1,145 @@
+= Edit URL Extension Workflow
+
+This page documents how `trento-docs-site/extensions/edit-url.cjs` computes Edit links for pages in the Trento documentation hub.
+
+== Goal
+
+For each page, generate a GitHub Edit URL that points to the correct repository, ref, and file path.
+
+== Execution Lifecycle
+
+. Antora triggers the extension on `contentClassified`.
+. The extension iterates over all pages from `contentCatalog.getPages()`.
+. It skips pages with missing `src` or pre-existing `file.editUrl` / `file.src.editUrl`.
+. For remaining pages, it computes the edit target and assigns `file.editUrl` and `file.src.editUrl`.
+. It prints generated URL entries to the build log (`stdout`) with `[edit-url]`.
+. It prints unresolved URL decisions and URL build failures to the build log (`stderr`) with `[edit-url:error]`.
+
+== High-Level Flow
+
+[source]
+----
+page src
+  -> collectEditUrlContext()
+  -> resolveEditTarget()
+  -> hasCompleteTarget()
+  -> buildEditUrl()
+  -> assign file.editUrl + src.editUrl
+----
+
+== Data Transformations
+
+=== 1. Context Collection
+
+`collectEditUrlContext()` builds normalized data used by target resolution:
+
+* `absPath`: from `realpath`, `abspath`, or `collectorWorktree + scanned`
+* `repoRoot`: discovered by traversing parent directories until `.git` is found
+* `origin`: `{ head, url }` from Antora `src.origin`
+* `scannedPath`: normalized path value
+* `componentInfo`: inferred when scanned path matches `build/tmp_components/<repo>/<path>`
+* `relPath`: relative path for URL generation
+
+Ref selection does not read local git branch/tag state; it uses Antora `src.origin` values.
+
+=== 2. Target Resolution Rules
+
+`resolveEditTarget()` applies branch/repo selection in this order:
+
+. If `componentInfo` exists:
+* Use upstream repo: `https://github.com/trento-project/<componentRepo>`
+* Use `main`
+* Use component-relative path
+
+. If `relPath` contains `trento-docs-site/contribution-upstream/`:
+* Use docs repo remote (`origin.url`)
+* Use `main`
+* Use resolved relative path
+
+. Default case:
+* Use docs repo remote (`origin.url`)
+* Resolve ref with `resolveDefaultHead()` (case-insensitive `latest` / `HEAD` remap):
+** `latest` -> `main`
+** `HEAD` -> `main`
+** otherwise keep origin head
+
+=== 3. Relative Path Resolution
+
+`resolveRelativePath()` resolves the path used in GitHub URLs:
+
+* If `absPath` and `repoRoot` exist: use `path.relative(repoRoot, absPath)`
+* Else if `scannedPath` exists:
+** return `null` for tmp component paths (component flow provides its own path)
+** otherwise use `scannedPath`
+* Else if `src.relative` exists: use normalized `src.relative`
+* Else if `src.path` exists: use normalized `src.path`
+* Else return `null`
+
+Normalization (`normalizePath`) trims leading `./` or `/`.
+
+In collector-based builds, this usually produces the repository source path (for example `trento/adoc/checks_customization.adoc`), not Antora's destination path (for example `modules/user-guide/pages/checks_customization.adoc`).
+
+=== 4. URL Building
+
+`buildEditUrl(remoteUrl, head, relPath)`:
+
+. Parses GitHub remote (HTTPS or SSH, for example `git@github.com:org/repo.git`) with `GITHUB_REMOTE_RX`
+. Encodes ref and file path segment-by-segment (`encodeGitPath`)
+. Builds URL in this format:
++
+----
+https://github.com/<org>/<repo>/edit/<ref>/<relPath>
+----
+
+If the remote URL is not GitHub, the function returns `null` and the page keeps no `editUrl`.
+
+== Completion Criteria
+
+`hasCompleteTarget()` requires:
+
+* `head`
+* `remoteUrl`
+* `relPath`
+
+If any is missing, no edit URL is assigned for that page.
+
+For unresolved cases, the extension prints structured error entries in the build log (for example `incomplete_target` and `build_edit_url_failed`).
+
+== Practical Examples
+
+For docs content when `src.origin.refname` is `latest` (or `HEAD`):
+
+* origin ref: `latest`
+* resulting ref in URL: `main`
+* resulting URL:
+`https://github.com/trento-project/docs/edit/main/trento/adoc/checks_customization.adoc`
+
+For docs content from a normal branch (no forced remap):
+
+* origin ref: `main`
+* resulting ref in URL: `main`
+* resulting URL:
+`https://github.com/trento-project/docs/edit/main/trento/adoc/checks_customization.adoc`
+
+Example with another branch:
+
+* origin ref: `edit_button`
+* resulting ref in URL: `edit_button`
+* resulting URL:
+`https://github.com/trento-project/docs/edit/edit_button/trento/adoc/checks_customization.adoc`
+
+For a generated component page:
+
+* scanned path: `trento-docs-site/build/tmp_components/web/README.adoc`
+* inferred component: `web`
+* target ref: `main`
+* resulting URL:
+`https://github.com/trento-project/web/edit/main/README.adoc`
+
+For a generated component page with missing origin metadata:
+
+* scanned path: `trento-docs-site/build/tmp_components/agent/docs/operators.adoc`
+* origin metadata: missing/empty
+* target ref: `main`
+* resulting URL:
+`https://github.com/trento-project/agent/edit/main/docs/operators.adoc`

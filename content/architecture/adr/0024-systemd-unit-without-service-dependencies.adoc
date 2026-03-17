@@ -1,0 +1,83 @@
+== 24. Systemd Unit Without Service Dependencies
+
+Date: 2026-02-06
+
+=== Status
+
+Accepted
+
+=== Context
+
+The Trento Agent runs as a systemd service on monitored hosts. Depending on the host platform,
+a metrics provider service must also be running: `node_exporter` on SLES 15 or Grafana Alloy on
+SLES 16. The current systemd unit file declares `node_exporter` as a dependency using `Wants=`
+and `After=` directives.
+
+With the introduction of Alloy support
+(see xref:../../rfc/0003-grafana-alloy-integration.adoc[RFC 0003 - Grafana Alloy Integration for
+SLES 16 System Monitoring]), maintaining conditional systemd dependencies based on the target
+platform was considered. This would require two separate unit files: one referencing
+`prometheus-node_exporter.service` and another referencing `alloy.service`, with the appropriate
+one installed based on the SLES version during RPM packaging.
+
+=== Decision
+
+We decided to use a single systemd unit file for the Trento Agent with no dependencies on
+external services (`node_exporter` or `alloy`).
+
+[source,ini]
+----
+[Unit]
+Description=Trento agent service
+
+[Service]
+ExecStart=/usr/bin/trento-agent start
+Type=simple
+User=root
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+----
+
+The effort of maintaining two separate systemd unit configurations and the conditional packaging
+logic required to install the correct one outweighs the benefit of automatic dependency
+management. A single unit file simplifies packaging, testing, and maintenance.
+
+Additionally, this approach provides greater flexibility for user environments. It naturally
+supports SLES 15 SP7, where Alloy is available as an optional package alongside `node_exporter`,
+without requiring special-cased packaging logic. Users are free to choose and manage their
+preferred metrics provider independently from the Trento Agent lifecycle.
+
+==== Design details
+
+See
+xref:../../rfc/0003-grafana-alloy-integration.adoc[RFC 0003 - Grafana Alloy Integration for SLES
+16 System Monitoring] for the complete design, including the alternative approach with conditional
+unit files and automatic dependency management.
+
+=== Consequences
+
+* Users are responsible for starting and managing the metrics provider service
+(`node_exporter` or `alloy`) independently from the Trento Agent. The agent will start
+successfully even if the metrics provider is not running, but system metrics will not be
+available until the provider is properly configured and started.
+
+* On Alloy-based systems, users must review and deploy the Alloy configuration manually. This
+has the benefit of requiring an explicit review step, reducing the risk of unwanted
+misconfigurations being applied automatically.
+
+=== Alternatives Considered
+
+==== Conditional Unit Files With Automatic Dependency Management
+
+Two separate systemd unit files would be maintained: one for SLES 15 declaring a dependency on
+`prometheus-node_exporter.service`, and one for SLES 16 declaring a dependency on
+`alloy.service` with an `ExecStartPre` directive to automatically generate and deploy the Alloy
+configuration. The RPM spec would conditionally install the appropriate unit file based on the
+`sle_version` OBS macro.
+
+This approach was discarded because it doubles the packaging and testing effort for the systemd
+unit, introduces platform-specific branching in the build system, and reduces user control over
+the metrics provider lifecycle.

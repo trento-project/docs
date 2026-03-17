@@ -1,0 +1,83 @@
+== 25. Basic Auth for Prometheus Remote Write
+
+Date: 2026-02-26
+
+=== Status
+
+Accepted
+
+=== Context
+
+xref:../../rfc/0003-grafana-alloy-integration.adoc[RFC 0003 - Grafana Alloy Integration for SLES
+16 System Monitoring] specifies bearer token as the default authentication method for the
+Prometheus remote write endpoint. The RFC states that both the Ansible playbook and the Helm chart
+installation scripts would configure the reverse proxy to validate bearer tokens.
+
+During implementation, we evaluated what each authentication method requires from the reverse proxy
+layer in our supported deployment targets.
+
+Trento's Kubernetes deployment uses https://traefik.io/traefik/[Traefik] as the Ingress
+controller. Traefik provides a
+https://doc.traefik.io/traefik/middlewares/http/basicauth/[built-in BasicAuth middleware] that
+validates credentials against a Kubernetes secret of type `kubernetes.io/basic-auth`. Enabling
+basic auth on a route requires only a `Middleware` resource and a `Secret` -- no additional
+services, no extra containers, no new dependencies.
+
+Bearer token validation, on the other hand, has no built-in support in Traefik's open-source
+edition. Implementing it requires one of the following:
+
+* Deploying an auxiliary service and using Traefik's
+  https://doc.traefik.io/traefik/middlewares/http/forwardauth/[ForwardAuth middleware] to delegate
+  token validation to it.
+* Using Traefik Enterprise or Traefik Hub, which provide a
+  https://doc.traefik.io/traefik-enterprise/middlewares/jwt/[JWT middleware], but these are
+  commercial products.
+
+Both options add operational complexity that is not justified for the task at hand: protecting a
+single endpoint with a static, long-lived credential shared across agents.
+
+=== Decision
+
+We use basic authentication instead of bearer token authentication for the Prometheus remote write
+endpoint. This applies to both the Helm chart and the Ansible playbook installation methods.
+
+The `--prometheus-auth` agent configuration defaults to `basic` instead of `bearer`. The agent
+still supports `bearer`, `mtls`, and `none` for users who configure authentication independently.
+
+When the Prometheus remote write receiver is enabled, both the Helm chart and the Ansible playbook
+require the user to either provide authentication credentials or explicitly set authentication to
+`none`. If neither is provided, the installation or upgrade fails with an error. There is no
+implicit default that silently disables authentication. This prevents a scenario where upgrading
+the chart or playbook enables the remote write endpoint without authentication, leaving Prometheus
+open to unauthorized metric injection.
+
+=== Consequences
+
+* The Helm chart configures a Traefik `BasicAuth` middleware with no additional services required.
+
+* The Ansible playbook configures nginx basic auth using `htpasswd`, which is equally
+  straightforward.
+
+* Users who need bearer token or mTLS authentication can still configure their edge layer
+  independently and set `--prometheus-auth` accordingly. The agent supports all methods defined in
+  the RFC.
+
+=== Alternatives Considered
+
+==== Bearer Token With ForwardAuth
+
+Deploy a small service that reads the `Authorization: Bearer <token>` header and validates it
+against a configured secret, then use Traefik's ForwardAuth middleware to route authentication
+requests to it.
+
+This was discarded because it introduces a new service to deploy, monitor, and maintain. The
+credential model is the same (a static shared secret), so the added infrastructure provides no
+security benefit over basic auth. It only adds moving parts.
+
+==== Traefik Enterprise / Traefik Hub JWT Middleware
+
+Use the commercial JWT middleware available in Traefik Enterprise or Traefik Hub to validate
+bearer tokens natively.
+
+This was discarded because it introduces a dependency on a commercial product for a feature that
+basic auth covers without additional cost or complexity.
