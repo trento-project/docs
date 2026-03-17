@@ -1,0 +1,79 @@
+== 23. Prometheus Push Mode
+
+Date: 2026-02-06
+
+=== Status
+
+Accepted
+
+=== Context
+
+Trento collects real-time system metrics (CPU, memory, etc.) from monitored hosts via Prometheus
+to render usage charts in the host detail view. Currently, Prometheus pulls these metrics from
+`node_exporter` instances running on each host.
+
+With the introduction of SLES 16 support, `node_exporter` is no longer shipped as a package.
+SLES 16 adopts Grafana Alloy as the preferred telemetry collection agent, which natively supports
+pushing metrics to a Prometheus-compatible endpoint via `prometheus.remote_write`.
+
+Trento must support mixed environments where both SLES 15 (`node_exporter`-based) and SLES 16
+(`alloy`-based) hosts coexist. This requires Prometheus to simultaneously handle pull-based metric
+collection from `node_exporter` hosts and push-based metric ingestion from Alloy hosts.
+
+The full design for the Grafana Alloy integration is documented in
+xref:../../rfc/0003-grafana-alloy-integration.adoc[RFC 0003 - Grafana Alloy Integration for SLES
+16 System Monitoring].
+
+=== Decision
+
+We decided to enable the Prometheus remote write receiver
+(`--web.enable-remote-write-receiver`) to allow Alloy-based hosts to push metrics directly to
+Prometheus. This feature is currently marked as experimental by the Prometheus project.
+
+Despite its experimental status, we are adopting this approach because it is the most
+straightforward way to support both `node_exporter`-based and `alloy`-based hosts within the same
+Prometheus instance. Alloy natively supports `prometheus.remote_write`, making it the natural
+integration path without introducing additional components into the architecture.
+
+The Trento Agent is extended with a `prometheus-mode` configuration option (`pull` or `push`)
+that determines the metric delivery mechanism. In `pull` mode (default), the existing
+`node_exporter` workflow is preserved. In `push` mode, the agent generates an Alloy configuration
+that pushes metrics to the Prometheus remote write endpoint. Authentication and TLS termination
+are handled at the edge layer (reverse proxy or Kubernetes Ingress), keeping Prometheus
+configuration minimal.
+
+==== Design details
+
+See
+xref:../../rfc/0003-grafana-alloy-integration.adoc[RFC 0003 - Grafana Alloy Integration for SLES
+16 System Monitoring] for the complete design, including agent configuration, Alloy configuration
+templating, host discovery changes, systemd packaging, and authentication strategies.
+
+=== Consequences
+
+* The Prometheus remote write endpoint must be reachable from the monitored hosts. This is a
+reversal of the current network topology where Prometheus initiates connections to the hosts. In
+the push model, the hosts initiate connections toward the Prometheus write endpoint. Network
+policies and firewall rules must be updated accordingly.
+
+* Prometheus must be at least version 2.33, which introduced the
+`--web.enable-remote-write-receiver` flag. Earlier versions do not support the built-in remote
+write receiver.
+
+* We take a dependency on an experimental Prometheus feature. This means we must monitor upstream
+changes and be prepared to adapt if the API evolves or graduation requirements change.
+
+=== Alternatives Considered
+
+==== Prometheus Pushgateway
+
+The https://github.com/prometheus/pushgateway[Prometheus Pushgateway] was considered as an
+alternative. In this architecture, Alloy would push metrics to a Pushgateway instance, and
+Prometheus would continue pulling metrics from the Pushgateway, preserving the pull-based model
+across the entire pipeline.
+
+This approach was discarded because it would require deploying and operating an additional service
+(the Pushgateway) on or near the monitored hosts. Trento's design principle is to impose the bare
+minimum operational overhead on users' workloads. Requiring users to manage yet another service
+contradicts this goal and adds unnecessary complexity to the deployment, especially in
+environments with many monitored hosts.

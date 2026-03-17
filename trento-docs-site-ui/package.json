@@ -23,6 +23,7 @@
     "browser-pack-flat": "~3.4",
     "browserify": "~16.5",
     "cssnano": "~4.1",
+    "eos-icons": "^5.4.0",
     "eslint": "~6.8",
     "eslint-config-standard": "~14.1",
     "eslint-plugin-import": "~2.20",
