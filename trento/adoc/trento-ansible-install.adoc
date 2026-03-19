@@ -16,7 +16,7 @@ Refer to the support matrix in the link:https://docs.ansible.com/projects/ansibl
 
 [NOTE]
 ====
-Currently, you can install only {tragent} on _target nodes_ running {sles4sap} 15-SP5.
+Currently, {tsserver} cannot be installed with the {ansible} playbook on _target nodes_ running {sles4sap} 15 SP5. 
 ====
 
 ===== Requirements
