@@ -1,12 +1,12 @@
 include::product-attributes.adoc[]
 
 [[sec-ansible-deployment]]
-==== Installing with {ansible}
+=== Automated Installation with {ansible}
 :revdate: 2026-03-05
 
 You can perform an automated installation of {trento} using RPM packages with {ansible} playbooks provided by the `ansible-trento` package.
 
-===== Supported operating systems
+==== Supported operating systems
 
 Execute the playbooks only on _target nodes_ running {sles4sap} 15-SP5 and higher, or 16.0 and higher.
 The supported {sles4sap} systems for the _control node_ are the same.
@@ -19,7 +19,7 @@ Refer to the support matrix in the link:https://docs.ansible.com/projects/ansibl
 Currently, {tsserver} cannot be installed with the {ansible} playbook on _target nodes_ running {sles4sap} 15 SP5. 
 ====
 
-===== Requirements
+==== Requirements
 
 As a prerequisite, enable the following modules on {sles4sap} 15.
 Replace `x` with your SP version.
@@ -61,7 +61,7 @@ Target node package requirements:
 +
 `# zypper install python311`
 
-===== Installation
+==== Installation
 
 For {slsa}-based operating systems, install the `ansible-trento` package using {zypper}.
 
@@ -70,7 +70,7 @@ For {slsa}-based operating systems, install the `ansible-trento` package using {
 # zypper install ansible-trento
 ----
 
-===== Components
+==== Components
 
 The playbooks comprise the following components.
 
@@ -99,7 +99,7 @@ Third-party dependencies:
 
 The `ansible-trento` package provides an {ansible} role for every one of these components.
 
-===== Playbooks overview
+==== Playbooks overview
 
 {trento} provides the following playbooks:
 
@@ -119,7 +119,7 @@ The `ansible-trento` package provides an {ansible} role for every one of these c
   It only reverts a subset of the operations.
   Consult the link:https://github.com/trento-project/ansible/blob/main/cleanup.yml[code] of that playbook for full details.
 
-===== Setting up the inventory
+==== Setting up the inventory
 
 Prepare an inventory file for your {ansible} deployment.
 Create an `inventory.yml` file defining the IP addresses or domain names of the target nodes for each group expected in the playbooks.
@@ -178,7 +178,7 @@ To copy your public key from the control node to the target node, use the follow
 $ ssh-copy-id <username>@<ip-or-domain-name-of-the-node>
 ----
 
-===== Running the playbooks
+==== Running the playbooks
 
 To run a playbook, use the following command:
 
@@ -190,13 +190,13 @@ $ ansible-playbook -i <path-to-inventory> suse.trento.<playbook-name>
 Replace `<playbook-name>` with one of the following: `server`, `agent`, or
 `site`.
 
-===== Configuration
+==== Configuration
 
 You can configure two types of variables: playbook-level and role-level variables.
 They differ in how you configure them and the scope of the changes they imply.
 We try to keep playbook-level variables to a minimum.
 
-====== Playbook-level configuration
+===== Playbook-level configuration
 
 These variables affect how the playbooks execute.
 The available configuration options are:
@@ -223,7 +223,7 @@ When disabling the provisioning of a {trento} component, you must manually set t
 For example, if you specify `-e provision_postgres=false` when executing the `server` or `site` playbook, explicitly set `trento_postgres_host` in your inventory.
 ====
 
-====== Role-level configuration
+===== Role-level configuration
 
 Almost all settings are configured via role-level variables.
 Set them in the inventory file under the `vars:` section:
@@ -286,11 +286,11 @@ For {tragent}, they are:
 The rest of the variables are optional.
 You can find the full listing on the https://github.com/trento-project/ansible[{trento} {ansible}] project page.
 
-===== Example scenarios
+==== Example scenarios
 
 The playbooks in `ansible-trento` allow for various installation scenarios.
 
-====== Every component on a dedicated node
+===== Every component on a dedicated node
 
 The following inventory file installs every {trento} component on a different host.
 It also enables and configures optional e-mail alerting:
@@ -363,7 +363,7 @@ Execute {ansible} by running the following command:
 $ ansible-playbook -i <path-to-inventory> suse.trento.site
 ----
 
-====== {trento} with externally managed {postgresql}, {rabbitmq} and {prometheus}
+===== {trento} with externally managed {postgresql}, {rabbitmq} and {prometheus}
 
 The following inventory file does not provision {postgresql}, {rabbitmq}, or {prometheus}.
 
@@ -424,7 +424,7 @@ Execute {ansible} using the following command:
 $ ansible-playbook -i <path-to-inventory> suse.trento.site -e provision_postgres=false -e provision_rabbitmq=false -e provision_prometheus=false
 ----
 
-====== Deploy only {trento} agents
+===== Deploy only {trento} agents
 
 Use the following inventory file to install and configure only the {trento} agents.
 You must explicitly specify the `agent_web_api_key` variable.
@@ -462,6 +462,8 @@ You can easily use a single, fully populated inventory and run only a subset of 
 The playbook automatically picks up or skips variables in the inventory as appropriate for the desired execution configuration.
 ====
 
-===== Reference
+==== Reference
 
 For more information, refer to the https://github.com/trento-project/ansible[{trento} {ansible}] project page.
+
+
