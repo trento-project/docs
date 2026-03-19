@@ -117,7 +117,7 @@ The `ansible-trento` package provides an {ansible} role for every one of these c
 `cleanup`::
   Tries to undo operations performed by executing the other playbooks.
   It only reverts a subset of the operations.
-  Consult the code of that playbook for full details.
+  Consult the link:https://github.com/trento-project/ansible/blob/main/cleanup.yml[code] of that playbook for full details.
 
 ===== Setting up the inventory
 
