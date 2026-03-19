@@ -1,6 +1,25 @@
-== Installation
+include::product-attributes.adoc[]
 
-include::trento-install-server.adoc[]
+== Installation
+:revdate: 2026-01-08
+
+{trserver} and {tragent} can be deployed in different ways depending on your infrastructure and requirements.
+
+Supported deployment methods:
+
+* <<sec-systemd-deployment>>
+* <<sec-trento-installing-trentoagent>>
+* <<sec-trento-k8s-deployment>>
+* <<sec-ansible-deployment>>
+
+=== Installing {trserver} systemd
+
+include::trento-systemd-install.adoc[]
 include::trento-install-agents.adoc[]
+
+
+=== Installing {trserver} with Kubernetes
+
+include::trento-kubernetes-install.adoc[]
 
 include::trento-ansible-install.adoc[]
