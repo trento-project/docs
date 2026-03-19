@@ -5,7 +5,7 @@
  ** xref:trento-installation.adoc[Installation]
  *** xref:trento-install-server.adoc[Installing Trento Server]
  *** xref:trento-install-agents.adoc[Installing Trento Agents]
- *** xref:trento-ansible-install.adoc[Installing with Ansible]
+ *** xref:trento-ansible-install.adoc[Automated Installation with Ansible]
  ** xref:trento-update.adoc[Update]
  *** xref:trento-update-trento-server.adoc[Updating Trento Server]
  *** xref:trento-update-trento-checks.adoc[Updating Trento Checks]
