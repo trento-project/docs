@@ -1,41 +1,65 @@
 include::product-attributes.adoc[]
 
 [[sec-ansible-deployment]]
-==== Automated deployment with {ansible}
+==== Installing with {ansible}
 :revdate: 2026-03-05
 
 You can perform an automated installation of {trento} using RPM packages with {ansible} playbooks provided by the `ansible-trento` package.
 
-===== Supported Operating Systems
+===== Supported operating systems
 
-Execute the playbooks only on _target nodes_ running SLES4SAP 15-SP5 and higher.
-The supported SLES4SAP systems for the _control node_ are the same.
+Execute the playbooks only on _target nodes_ running {sles4sap} 15-SP5 and higher, or 16.0 and higher.
+The supported {sles4sap} systems for the _control node_ are the same.
 However, the requirements for the control nodes are less strict.
-You can use any operating system as long as the installed Ansible version is compatible with the Python interpreter available on the managed target nodes.
-Refer to the support matrix in the official link:https://docs.ansible.com/projects/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix[Ansible documentation].
+You can use any operating system as long as the installed {ansible} version is compatible with the Python interpreter available on the managed target nodes.
+Refer to the support matrix in the link:https://docs.ansible.com/projects/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix[{ansible} documentation].
+
+[NOTE]
+====
+Currently, you can install only {tragent} on _target nodes_ running {sles4sap} 15-SP5.
+====
 
 ===== Requirements
 
-Control node requirements:
+As a prerequisite, enable the following modules on {sles4sap} 15.
+Replace `x` with your SP version.
 
-* Install only `ansible`.
+Control node module requirements:
 
-Target node requirements:
-
-* Use the {sles4sap} operating system.
-* Install Python.
-* Enable the Basesystem Module 15 x86_64 (for {sles} 15, replace `x` with your SP version).
+* Enable the Systems Management module (not needed for SP5).
 +
-`{suseconnect} -p sle-module-basesystem/15.x/x86_64`
-* Enable the {ph} 15 x86_64 (for {sles} 15, replace `x` with your SP version).
+`{suseconnect} -p sle-module-systems-management/15.x/x86_64`
 +
-`{suseconnect} -p PackageHub/15.x/x86_64`
-* Enable the Python 3 module (for {sles} 15, replace `x` with your SP version).
+This repository contains {ansible}.
+
+Target node module requirements:
+
+* Enable the Python 3 module.
 +
 `{suseconnect} -p sle-module-python3/15.x/x86_64`
-* Enable the Legacy Module 15 x86_64 ({sles} 15 SP6 only).
 +
-`{suseconnect} -p sle-module-legacy/15.6/x86_64`
+This repository contains essential Python dependencies.
+
+* Enable {ph}.
++
+`{suseconnect} -p PackageHub/15.x/x86_64`
++
+This module is optional.
+Use it when you need to install Prometheus.
+
+Additionally, install the following packages regardless of the operating system version.
+
+Control node package requirements:
+
+* Install {ansible}.
++
+`# zypper install ansible`
+
+Target node package requirements:
+
+* Install Python version 3.11 or higher.
++
+`# zypper install python311`
 
 ===== Installation
 
