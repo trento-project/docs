@@ -16,7 +16,7 @@ Refer to the support matrix in the link:https://docs.ansible.com/projects/ansibl
 
 [NOTE]
 ====
-Currently, {tsserver} cannot be installed with the {ansible} playbook on _target nodes_ running {sles4sap} 15 SP5. 
+Currently, {trserver} cannot be installed with the {ansible} playbook on _target nodes_ running {sles4sap} 15 SP5.
 ====
 
 ==== Requirements
@@ -465,5 +465,3 @@ The playbook automatically picks up or skips variables in the inventory as appro
 ==== Reference
 
 For more information, refer to the https://github.com/trento-project/ansible[{trento} {ansible}] project page.
-
-
