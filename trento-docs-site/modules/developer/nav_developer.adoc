@@ -27,7 +27,7 @@
 **** xref:architecture/adr/0022-frontend-analytics.adoc[22. Frontend analytics]
 **** xref:architecture/adr/0023-prometheus-push-mode.adoc[23. Prometheus Push Mode]
 **** xref:architecture/adr/0024-systemd-unit-without-service-dependencies.adoc[24. Systemd unit without service dependencies]
-c**** xref:architectur/adr/0025-basic-auth-for-prometheus-remote-write.adoc[25. Basic Auth for Prometheus Remote Write]
+**** xref:architecture/adr/0025-basic-auth-for-prometheus-remote-write.adoc[25. Basic Auth for Prometheus Remote Write]
 
 **  xref:coding-standards/README.adoc[Coding standards]
 *** xref:coding-standards/elixir.adoc[Elixir coding standards]

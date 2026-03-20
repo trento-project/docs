@@ -1,21 +1,36 @@
 include::product-attributes.adoc[]
 
-:revdate: 2026-01-08
+:revdate: 2026-03-19
 == {prometheus} integration
 
-{prometheus} Server is a {trserver} component responsible for retrieving  the memory and CPU utilization metrics collected by the `node-exporter` in the agent hosts and serving them to the web component. The web component renders the metrics as dynamic graphical charts in the details view of the registered hosts.
+{prometheus} Server is a {trserver} component responsible for retrieving resources utilization metrics such as CPU, memory and filesystem from the agent hosts, and serving them to the web component. The web component renders the metrics as dynamic graphical charts in the details view of the registered hosts.
+
+{trento} supports two metric collection modes:
+
+* **Pull mode** (default): {prometheus} Server scrapes metrics from `node-exporter` instances running on the agent hosts. This is the standard mode for {sles4sap} 15.x hosts.
+* **Push mode**: Agent hosts run Grafana Alloy, which pushes metrics to the {prometheus} remote write endpoint. This is required for {sles4sap} 16.0 and later, where `node-exporter` is no longer shipped.
+
+Both modes can coexist in the same {trento} installation, allowing mixed {sles4sap} 15.x and 16.0 environments.
 
 === Requirements
 
-The `node-exporter` must be installed and running in the agent hosts and {prometheus} Server must be able to reach the agent hosts at the IP address and port that the `node-exporter` is bound to.
+==== Pull mode ({sles4sap} 15.x)
+
+The `node-exporter` must be installed and running on the agent hosts and {prometheus} Server must be able to reach them at the IP address and port that the `node-exporter` is bound to.
 
 The IP address and port that {prometheus} Server uses to reach the `node-exporter` can be changed by setting parameter `node-exporter-target` with value `<ip_address>:<port>` in the agent configuration file.
 
 If the parameter is not set, {prometheus} Server uses the lowest IPv4 address discovered in the host with default port 9100.
 
+==== Push mode ({sles4sap} 16.0)
+
+Grafana Alloy must be installed and running on the agent hosts. The agent hosts must be able to reach the {prometheus} remote write endpoint on {trserver}.
+
+The {tragent} generates the Alloy configuration with the `trento-agent generate alloy` command. See <<agent-push-mode-configuration>> for details.
+
 === {kube} deployment
 
-When using the {helm} chart to deploy {trserver} on a {kube} cluster, an image of {prometheus} Server is deployed automatically. No further actions are required by the user, other than ensuring that it can reach the `node-exporter` in the agent hosts.
+When using the {helm} chart to deploy {trserver} on a {kube} cluster, an image of {prometheus} Server is deployed automatically. No further actions are required by the user, other than ensuring that it can reach the `node-exporter` in the agent hosts (pull mode).
 
 In a {kube} cluster with multiple nodes, the user can select on which node to deploy the {prometheus} Server by adding the following flag to the {helm} installation command:
 
@@ -25,6 +40,75 @@ In a {kube} cluster with multiple nodes, the user can select on which node to de
 ----
 
 Where `<value>` is the label assigned to the node where the user wants {prometheus} Server to be deployed.
+
+==== Enabling push mode with basic authentication
+
+To accept pushed metrics from Grafana Alloy, the {helm} chart enables the {prometheus} remote write receiver and deploys an nginx sidecar container in the {prometheus} pod to handle authentication.
+
+The authentication type must be explicitly configured. The chart fails to install or upgrade if the authentication type is left unconfigured.
+
+To enable basic authentication, add the following values to your {helm} installation:
+
+[source,bash]
+----
+--set prometheus.server.auth.type=basic \
+--set prometheus.server.auth.basic.username=<username> \
+--set prometheus.server.auth.basic.password=<password>
+----
+
+This creates:
+
+* An nginx sidecar container that protects the `/prometheus/api/v1/write` endpoint with HTTP Basic Auth
+* A {kube} `Secret` containing the generated `htpasswd` credentials
+
+Other {prometheus} routes (UI and query API) remain accessible without authentication.
+
+To explicitly disable authentication (not recommended for production):
+
+[source,bash]
+----
+--set prometheus.server.auth.type=none
+----
+
+WARNING: Running without authentication allows anyone with network access to push arbitrary metrics to {prometheus}.
+
+=== {ansible} deployment
+
+When using the {ansible} playbook to deploy {trserver}, {prometheus} Server is installed and configured automatically.
+
+==== Enabling push mode with basic authentication
+
+To accept pushed metrics from Grafana Alloy, set the following inventory variables:
+
+[source,yaml]
+----
+all:
+  vars:
+    trento_prometheus_auth: "basic"
+    trento_prometheus_auth_username: <username>
+    trento_prometheus_auth_password: <password>
+----
+
+The `trento_prometheus_auth` variable must be explicitly set to `basic` or `none`. The playbook fails if {prometheus} is enabled and this variable is not set.
+
+When set to `basic`, the playbook:
+
+* Validates that both username and password are provided
+* Generates an `htpasswd` file at `/etc/nginx/prometheus.htpasswd`
+* Configures the nginx reverse proxy to enforce basic authentication on the `/prometheus/api/v1/write` endpoint
+
+These credentials propagate automatically to the agent role, so agents deployed by the same playbook are configured to authenticate against the {prometheus} endpoint without additional setup.
+
+To explicitly disable authentication (not recommended for production):
+
+[source,yaml]
+----
+all:
+  vars:
+    trento_prometheus_auth: "none"
+----
+
+WARNING: Running without authentication allows anyone with network access to push arbitrary metrics to {prometheus}.
 
 === {systemd} deployment
 
@@ -119,3 +203,66 @@ Note: the value of the `PROMETHEUS_URL` parameter above assumes that the {tr_web
 ==== Not using {prometheus} Server
 
 If you decide not to use {prometheus} Server in your {trento} installation, you must disable graphical charts in the UI by setting `CHARTS_ENABLED=false` in the {tr_web} configuration file.
+
+[[agent-push-mode-configuration]]
+=== Agent push mode configuration
+
+On {sles4sap} 16.0 hosts, the {tragent} operates in push mode using Grafana Alloy to send metrics to the {prometheus} remote write endpoint.
+
+==== Agent configuration
+
+Add the following to the agent configuration file (`/etc/trento/agent.yaml`):
+
+[source,yaml]
+----
+prometheus-mode: push
+prometheus-url: https://{tr_server_url}/prometheus/api/v1/write
+prometheus-auth: basic
+prometheus-auth-username: <username>
+prometheus-auth-password: <password>
+----
+
+Replace `<username>` and `<password>` with the credentials configured on {trserver}.
+
+NOTE: When using the {ansible} playbook, the agent configuration is set automatically from the inventory variables.
+
+==== Generating and deploying the Alloy configuration
+
+The {tragent} generates the Grafana Alloy configuration from the agent configuration file:
+
+[source,bash]
+----
+trento-agent generate alloy \
+  | sudo tee /etc/alloy/config.d/trento.alloy > /dev/null
+
+sudo chown alloy:alloy /etc/alloy/config.d/trento.alloy
+sudo chmod 640 /etc/alloy/config.d/trento.alloy
+sudo systemctl reload alloy
+----
+
+The generated configuration collects system metrics (CPU, memory, filesystem, network) and pushes them to the configured {prometheus} endpoint with the authentication method specified in the agent configuration.
+
+==== Supported authentication methods
+
+The `prometheus-auth` parameter supports the following values:
+
+[cols="1,3"]
+|===
+|Value |Description
+
+|`basic`
+|HTTP Basic Authentication (default for {trento} deployments)
+
+|`bearer`
+|Bearer token authentication
+
+|`mtls`
+|Mutual TLS client certificate authentication
+
+|`none`
+|No authentication
+|===
+
+For `bearer` authentication, set `prometheus-auth-bearer-token` in the agent configuration. For `mtls`, set `prometheus-tls-ca-cert`, `prometheus-tls-client-cert`, and `prometheus-tls-client-key`.
+
+WARNING: The agent configuration file contains sensitive credentials. Ensure it has appropriate permissions (`chmod 600 /etc/trento/agent.yaml`).
