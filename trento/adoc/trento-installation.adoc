@@ -2,5 +2,5 @@
 
 include::trento-install-server.adoc[]
 include::trento-install-agents.adoc[]
-
 include::trento-ansible-install.adoc[]
+
