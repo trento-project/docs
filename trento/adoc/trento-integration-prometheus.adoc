@@ -147,21 +147,79 @@ If you decide not to use {prometheus} Server in your {trento} installation, you 
 
 If your environment includes at least one host using {grafana} Alloy for metrics collection (either {sles4sap} 16 or {sles4sap} 15 SP7 with Alloy manually configured), you must enable the {prometheus} remote write endpoint to receive pushed metrics.
 
+The authentication type must be explicitly configured during installation or upgrade. Both the {helm} chart and the {ansible} playbook fail if the authentication type is left unconfigured, preventing an unprotected remote write endpoint from being silently exposed.
+
 ==== {kube} deployment
 
-When using the official {trento} {helm} chart, the remote write endpoint is configured automatically with bearer token authentication. No additional configuration is required.
+The {helm} chart enables the {prometheus} remote write receiver and deploys an {nginx} sidecar container in the {prometheus} pod to handle authentication. The {kube} Ingress routes traffic to the {nginx} sidecar (port 8081) instead of directly to {prometheus} (port 9090).
 
-==== {systemd} deployment
+The {nginx} sidecar protects the `/prometheus/api/v1/write` endpoint with HTTP Basic Auth. Other {prometheus} routes (UI and query API) remain accessible without authentication.
 
-When using the official {trento} {ansible} playbook, the remote write endpoint is configured automatically with bearer token authentication. No additional configuration is required.
+To enable basic authentication, add the following values to your {helm} installation:
 
-For custom deployments, you must:
+[source,bash]
+----
+--set prometheus.server.auth.type=basic \
+--set prometheus.server.auth.basic.username=<username> \
+--set prometheus.server.auth.basic.password=<password>
+----
+
+The `auth.type` field must be explicitly set to `basic` or `none`. An empty value causes the chart to fail validation.
+
+To explicitly disable authentication (not recommended for production):
+
+[source,bash]
+----
+--set prometheus.server.auth.type=none
+----
+
+WARNING: Running without authentication allows anyone with network access to push arbitrary metrics to {prometheus}.
+
+==== {ansible} deployment
+
+The {ansible} playbook configures basic authentication on the existing {nginx} reverse proxy. The reverse proxy terminates TLS and enforces basic auth on the {prometheus} write endpoint.
+
+Set the following inventory variables:
+
+[source,yaml]
+----
+all:
+  vars:
+    trento_prometheus_auth: "basic"
+    trento_prometheus_auth_username: <username>
+    trento_prometheus_auth_password: <password>
+----
+
+The `trento_prometheus_auth` variable must be explicitly set to `basic` or `none`. The playbook fails if {prometheus} is enabled and this variable is not set.
+
+When set to `basic`, the playbook:
+
+* Validates that both username and password are provided
+* Generates an `htpasswd` file at `/etc/nginx/prometheus.htpasswd`
+* Configures the {nginx} reverse proxy to enforce basic authentication on the `/prometheus/api/v1/write` endpoint
+
+These credentials propagate automatically to the agent role, so agents deployed by the same playbook are configured to authenticate against the {prometheus} endpoint without additional setup.
+
+To explicitly disable authentication (not recommended for production):
+
+[source,yaml]
+----
+all:
+  vars:
+    trento_prometheus_auth: "none"
+----
+
+WARNING: Running without authentication allows anyone with network access to push arbitrary metrics to {prometheus}.
+
+==== Custom deployments
+
+For custom deployments not using the official {helm} chart or {ansible} playbook, you must:
 
 . Start {prometheus} with the `--web.enable-remote-write-receiver` flag to enable the remote write API.
 
-. Expose the {prometheus} remote write endpoint through a reverse proxy (such as {nginx}) with TLS termination.
+. Expose the {prometheus} remote write endpoint through a reverse proxy (such as {nginx}) with TLS termination and authentication.
 
-It is recommended to configure authentication for the remote write endpoint to prevent unauthorized metric submissions. {trento} supports bearer token, basic authentication, and mutual TLS (mTLS). The official {ansible} and {helm} installation methods provide sane defaults using bearer token authentication.
+{trento} supports basic authentication, bearer token, and mutual TLS (mTLS) on the agent side. Configure your reverse proxy to validate credentials using the method of your choice.
 
 [[configuring-alloy]]
 === Configuring {grafana} Alloy
@@ -190,13 +248,18 @@ zypper install alloy
 +
 [source,yaml]
 ----
-prometheus-mode: push
-prometheus-url: https://<trento-server>/api/v1/write
-prometheus-auth: bearer
-prometheus-auth-bearer-token: <your-token>
+prometheus-exporter-mode: push
+prometheus-url: https://<trento-server>/prometheus/api/v1/write
+prometheus-auth: basic
+prometheus-auth-username: <username>
+prometheus-auth-password: <password>
 ----
 +
-See the {tragent} configuration documentation for the complete list of available parameters.
+Replace `<username>` and `<password>` with the credentials configured on {trserver}.
++
+NOTE: When using the {ansible} playbook, the agent configuration is set automatically from the inventory variables.
++
+The {tragent} also supports `bearer`, `mtls`, and `none` authentication methods. See the {tragent} configuration documentation for the complete list of available parameters.
 
 . Generate the Alloy configuration and deploy it:
 +
