@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-ansible-deployment]]
 === Automated Installation with {ansible}
-:revdate: 2026-03-05
+:revdate: 2026-03-20
 
 You can perform an automated installation of {trento} using RPM packages with {ansible} playbooks provided by the `ansible-trento` package.
 
