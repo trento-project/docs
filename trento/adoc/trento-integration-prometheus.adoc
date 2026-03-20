@@ -263,6 +263,36 @@ The {tragent} also supports `bearer`, `mtls`, and `none` authentication methods.
 
 . Generate the Alloy configuration and deploy it:
 +
+The generated configuration enables the following collectors by default:
++
+[cols="1,2"]
+|===
+|Collector |Description
+
+|`cpu`
+|CPU usage statistics
+
+|`cpufreq`
+|CPU frequency scaling
+
+|`loadavg`
+|System load averages
+
+|`meminfo`
+|Memory usage statistics
+
+|`filesystem`
+|Filesystem usage and capacity
+
+|`netdev`
+|Network device statistics
+
+|`uname`
+|System information (kernel version, architecture)
+|===
++
+These collectors cover the metrics used by {trento} to render CPU and memory charts in the host detail view. If you need additional system metrics, you can edit the generated Alloy configuration to add more collectors from the https://grafana.com/docs/alloy/latest/reference/components/prometheus/prometheus.exporter.unix/#collectors-list[full list of available collectors].
++
 Generate the {trento}-specific Alloy configuration using the {tragent}:
 +
 [source,bash]
