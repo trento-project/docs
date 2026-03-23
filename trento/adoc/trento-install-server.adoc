@@ -10,7 +10,6 @@ Supported deployment methods:
 
 * <<sec-trento-k8s-deployment>>
 * <<sec-systemd-deployment>>
-* <<sec-ansible-deployment>>
 
 include::trento-kubernetes-install.adoc[]
 include::trento-systemd-install.adoc[]
