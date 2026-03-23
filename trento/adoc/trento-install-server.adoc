@@ -6,11 +6,10 @@ include::product-attributes.adoc[]
 
 {trserver} can be deployed in different ways depending on your infrastructure and requirements.
 
-Supported deployment methods: 
+Supported deployment methods:
 
 * <<sec-trento-k8s-deployment>>
 * <<sec-systemd-deployment>>
 
 include::trento-kubernetes-install.adoc[]
 include::trento-systemd-install.adoc[]
-include::trento-ansible-install.adoc[]
