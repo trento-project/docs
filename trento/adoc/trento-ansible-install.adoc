@@ -28,7 +28,10 @@ Control node module requirements:
 
 * Enable the Systems Management module (not needed for SP5).
 +
-`{suseconnect} -p sle-module-systems-management/15.x/x86_64`
+[source,console,subs="attributes"]
+----
+$ {suseconnect} -p sle-module-systems-management/15.x/x86_64
+----
 +
 This repository contains {ansible}.
 
@@ -36,13 +39,19 @@ Target node module requirements:
 
 * Enable the Python 3 module.
 +
-`{suseconnect} -p sle-module-python3/15.x/x86_64`
+[source,console,subs="attributes"]
+----
+$ {suseconnect} -p sle-module-python3/15.x/x86_64
+----
 +
 This repository contains essential Python dependencies.
 
 * Enable {ph}.
 +
-`{suseconnect} -p PackageHub/15.x/x86_64`
+[source,console,subs="attributes"]
+----
+$ {suseconnect} -p PackageHub/15.x/x86_64
+----
 +
 This module is optional.
 Use it when you need to install Prometheus.
@@ -53,13 +62,19 @@ Control node package requirements:
 
 * Install {ansible}.
 +
-`{prompt_sudo}zypper install ansible`
+[source,console]
+----
+zypper install ansible
+----
 
 Target node package requirements:
 
 * Install Python version 3.11 or higher.
 +
-`{prompt_sudo}zypper install python311`
+[source,console]
+----
+zypper install python311
+----
 
 ==== Installation
 
@@ -67,7 +82,7 @@ For {slsa}-based operating systems, install the `ansible-trento` package using {
 
 [source,console]
 ----
-{prompt_sudo}zypper install ansible-trento
+zypper install ansible-trento
 ----
 
 ==== Components
