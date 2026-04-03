@@ -2,7 +2,7 @@
 
 [width="100%",cols="<18%,<82%",]
 |===
-|Feature Name |AI assistant chatbox
+|Feature Name |AI assistant
 |Start Date |Jan 1st, 2026
 |Category |AI, Architecture
 |PR |https://github.com/trento-project/docs/pull/164[#164]
@@ -134,7 +134,9 @@ PROs:
 
 * Mature and feature-rich framework with a large community and ecosystem.
 * Extensive documentation and resources available.
+
 CONs:
+
 * Requires a separate deployable component
 * the Python version would require a new technology stack for the backend
 
@@ -215,7 +217,7 @@ The problem with another artifact is not about releasing it: that's being stream
 
 ==== The proposed path forward
 
-Given the above, the proposed path forward is to avoid adding a separate artifact and instead integrate the AI agent within an existing component, specifically Trento Web (Elixir implementation). 
+Given the above, the proposed path forward is to avoid adding a separate artifact and instead integrate the AI agent within an existing component, specifically Trento Web (Native Elixir implementation). 
 
 This approach minimizes architectural complexity and operational overhead allowing us to focus on the core features, which have their degree of inherent complexity.
 
