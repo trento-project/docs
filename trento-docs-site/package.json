@@ -6,7 +6,7 @@
     "test": "jest --config jest.config.cjs"
   },
   "devDependencies": {
-    "antora": "3.1.10",
+    "antora": "3.1.14",
     "jest": "^30.0.0",
     "prettier": "^3.0.0"
   },
