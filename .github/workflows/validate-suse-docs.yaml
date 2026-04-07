@@ -25,7 +25,7 @@ jobs:
       allow-build: ${{ steps.select-dc-build.outputs.allow-build }}
       relevant-branches: ${{ steps.select-dc-build.outputs.relevant-branches }}
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Checking basic soundness of DC files
         uses: openSUSE/doc-ci@e349aced35306105cd981adfa9243836deb119ea # gha-select-dcs
@@ -54,7 +54,7 @@ jobs:
       matrix:
         dc-files: ${{ fromJson(needs.select-dc-files.outputs.validate-list) }}
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Validating DC file(s) ${{ matrix.dc-files }}
         uses: openSUSE/doc-ci@bd6cbd0ef4bb85994839ef42cf904a2ce08b55fd # gha-validate
         with:
