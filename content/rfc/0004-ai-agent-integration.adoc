@@ -188,7 +188,9 @@ Elixir:
 * https://github.com/trento-project/web/tree/liz-testing-langchain-elixir
 * https://github.com/trento-project/web/tree/ai-native-poc
 
-Golang: no reference available, but it has been attempted.
+Golang: 
+
+* https://github.com/trento-project/mcp-server/tree/TRNT-4140-liz-alt
 
 ===== How to choose which way to go?
 
