@@ -62,6 +62,10 @@ There are 3 main areas involved in the "which technology/standard to use" questi
 * link:#_ui_to_agent_communication[UI to Agent Communication]: the protocols and technologies that enable the frontend UI to interact with the AI agent backend
 * link:#_ui-components[UI Components]: the actual implementation of the assistant widget in the frontend
 
+Additionally to these there is a fourth area around the tools that the AI agent can use, how they're provided to the agent, and how they interact with the rest of the system.
+
+* link:#_tools_integration[Tools Integration]: the way the AI agent can leverage tools
+
 The first one, Agentic Framework, drives the decision about whether we need/want to introduce a new artifact in the picture of our architecture, which at this stage is the main question we want to answer.
 
 === Agentic Frameworks
@@ -288,6 +292,80 @@ Considering:
 * branding/watermark issues
 
 The proposed direction is to defer commitment to a specific AG-UI (or non-AG-UI) compliant component library.
+
+=== Tools Integration
+
+Currently the MCP server exposes tools to AI assistants from Trento's API specifications. This is necessary for external assistants like VSCode, Claude, etc...
+
+With a natively integrated AI Agent, we have two options:
+
+* keep using MCP Server to add tools the AI Agent
+* use internal functions, where possible, as tools for AI agent
+
+==== Option 1: Keep using MCP Server to add tools the AI Agent
+
+Using the MCP server as the main "tools provider" means registering it in the AI Agent, effectively requiring to have an MCP client for it.
+
+PROs:
+
+* leverage the work already done in the MCP server to expose tools
+* any new endpoint tagged with "MCP" will be automatically available to the AI Agent as a tool
+
+CONs:
+
+* latency/network overhead, as it would require an unpredictable amount of network calls (See following note)
+* how to deal with tools only relevant for the AI Agent but that we might not need/want to expose as an API?
+
+Note on latency/networking overhead
+
+Let's consider a basic use case where a user prompt resolves in 1 API to be called.
+
+What would be the flow? (Let's consider web == AI Agent)
+
+1. User sends a prompt from the UI to the AI Agent (client -> web [not counted])
+2. AI Agent calls, at least once, the MCP server to get the list of the available tools (APIs) (web -> MCP server [1 call at least])
+3. AI Agent calls the LLM with the user prompt and the list of tools (web -> LLM provider [1 call])
+4. AI Agent receives instructions from the LLM on which tool to use, then calls the tool which is an API exposed by Trento 
+    a. if the tool is a web API (web -> MCP server -> web [2 calls])
+    b. If the tool is a Wanda  API, then there is also Token introspection involved (web -> MCP server -> wanda -> token introspection in web [3 calls])
+
+4 requests when the tool is a web API, 5 when the tool is a Wanda API. Average of 4 considering the amount of wanda tools is less than the amount of web tools.
+
+It is worth mentioning that:
+
+* there is also the roundtrip of the responses not explicitly mentioned above
+* the amount of tools to be called is unpredictable, meaning that the flow could be even more complex than the one described above and the failing points and latency could be more significant
+* authnz is re-executed many times against web when its APIs are called as tools
+
+==== Option 2: Internal tools
+
+PROs:
+
+* one less component to install and still have access to the same AI capabilities
+* opens the possiblity to expose internal functions as tools for the AI agent without necessarily exposing them as APIs, if not needed
+* less latency/networking overhead, as the calls to the tools would be mainly internal function calls instead of network calls to the MCP server
+* maximised authnz reuse within the same conversation context
+
+CONs:
+
+* exposing internal features/functions as tools for the AI agent might lead to repetition of code that is already wired up in how our controllers work, or that needs to be wired up both as a controller action and as an AI agent tool
+* since wanda is a separate component, we would need to call it as an external API (similarly to what we do with Prometheus, for instance)
+
+What would be the flow in this case? (Let's consider web == AI Agent)
+
+1. User sends a prompt from the UI to the AI Agent (client -> web [not counted])
+2. AI Agent calls the LLM with the user prompt and the list of tools (web -> LLM provider [1 call])
+3. AI Agent receives instructions from the LLM on which tool to use, then:
+    a. if the tool is a web functionality call the internal tool, no need to go outside
+    b. If the tool is a Wanda functionality, then call the related API (web -> wanda -> token introspection in web [2 call])
+
+1 request when the tool is internal to web, 3 when the tool is a Wanda API. Average of 2.
+
+The amount of network calls could be reduced by around up to 50%, however the unpredictability still remains, based on what the user prompts and what the LLM instructions are.
+
+==== The proposed solution
+
+TBD
 
 == Summary
 
