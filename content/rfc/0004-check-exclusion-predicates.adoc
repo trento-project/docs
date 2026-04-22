@@ -1,0 +1,158 @@
+== 4. Host-level Exclusion Predicates for Check Executions
+
+[width="100%",cols="<18%,<82%",]
+|===
+|Feature Name | Host-level Exclusion Predicates for Check Executions
+|Start Date | Apr 22nd, 2026
+|Category | Architecture, Checks
+|PR | TBD
+|===
+
+== Summary
+
+Let a check declare an optional `exclude:` Rhai predicate; Wanda evaluates it per target using host metadata supplied by Trento Web, and drops excluded hosts before dispatching the gathering request.
+
+== Motivation
+
+Today a check execution targets every host the user selected in the Web UI. There is no way for a check author to declare "this check does not apply to host X" based on properties of the host itself.
+
+We want check authors to express, inside the check definition, a predicate that decides per-host whether the check should run at all, evaluated against data the Web UI already knows about each host.
+
+=== Use Cases outline
+
+* As a check author, I want to declare that a check does not apply to hosts with certain properties (e.g. provider, OS family, cluster role), so that I don't need to maintain near-duplicate checks.
+* As a user running an execution, I want excluded hosts to be clearly surfaced in the result, distinct from failed or skipped ones, so that I can tell why a host was not evaluated.
+* As a catalog maintainer, I want applicability logic to live next to the check it belongs to, instead of being scattered across Web, Wanda and catalog curation.
+
+== Detailed Design
+
+=== Overview
+
+* Trento Web attaches a small, structured "host data" payload to each target in the execution request.
+* The execution-request contract is extended so each target carries its host data alongside `agent_id` and `checks`.
+* A check definition gains an optional top-level `exclude:` field, containing a Rhai expression evaluated against the host data.
+* Wanda evaluates the `exclude` predicate per (host, check) pair and filters out excluded pairs before dispatching `FactsGatheringRequested` to the agents.
+* Excluded pairs are reported in the execution result with a clear "excluded by policy" status, distinct from failed or skipped, so the UI can render it.
+
+=== Component changes
+
+==== Trento Web
+
+For each host in the execution request, attach a free-form `attributes` map (see link:#_contracts[Contracts]). Initial keys are whatever the catalog asks for — plausible candidates drawn from the existing host read model include `provider`, `os_family`, `arch`, `roles`, `cluster_role`, `is_majority_maker` — but the proto does not fix the set, and Web is free to start emitting new keys when a check author needs them.
+
+No UI change is required for v1: the data is already available server-side; we just need to forward it.
+
+==== Contracts
+
+The change is confined to the `Target` message in `target.proto`, which is already carried by `ExecutionRequested.targets`. `FactsGatheringRequested` is *not* affected: host data is consumed by Wanda before dispatch and is never forwarded to agents.
+
+===== Current shape
+
+[source,proto]
+----
+// contracts/proto/target.proto
+syntax = "proto3";
+package Trento.Checks.V1;
+
+message Target {
+    string agent_id = 1;
+    repeated string checks = 2;
+}
+----
+
+===== Proposed shape
+
+Add a single new field `attributes` on `Target`, typed as `map<string, google.protobuf.Value>`. The map is free-form: there are no typed fields, no reserved keys, and no schema-level contract on the set of attributes Web emits. Values use `google.protobuf.Value` so scalars, lists and nested structs are all representable without breaking the wire format. This mirrors the existing `ExecutionRequested.env` field (same package, same import), so we do not introduce a new convention.
+
+[source,proto]
+----
+// contracts/proto/target.proto
+syntax = "proto3";
+package Trento.Checks.V1;
+
+import "google/protobuf/struct.proto";
+
+message Target {
+    string agent_id = 1;
+    repeated string checks = 2;
+
+    // Free-form host attributes known to Trento Web at request time.
+    // Consumed by Wanda to evaluate each check's `exclude` predicate;
+    // never forwarded to agents.
+    //
+    // Keys are opaque strings agreed between Trento Web (producer) and
+    // check authors (consumers); the contract on which keys exist and
+    // what they mean lives outside the proto file.
+    map<string, google.protobuf.Value> attributes = 3;
+}
+----
+
+===== Rhai surface
+
+Wanda exposes `Target.attributes` to predicates as a single `host` object, where each entry is accessed by key: `host["provider"]`, `host["is_majority_maker"]`, `host["cluster_role"]`. Absent keys return `()` so predicates can guard with the usual Rhai patterns.
+
+==== Checks
+
+A new optional top-level field `exclude:` on a check, containing a Rhai expression.
+
+Contract:
+
+* The script receives one host's data as input and must return a boolean.
+* `true` => exclude this host from this check.
+* Absent field => never exclude (current behaviour).
+
+.Example: exclude majority maker nodes from a cluster check
+[source,yaml]
+----
+id: "ABC123"
+name: Check that does not apply to majority maker nodes
+exclude: |
+  host.is_majority_maker == true
+facts:
+  - ...
+expectations:
+  - ...
+----
+
+In an HA cluster, a _majority maker_ node participates in quorum decisions but does not run the workload being checked. Checks targeting the workload (e.g. SAP or database configuration) should skip such nodes entirely rather than produce spurious failures or forcing authors to maintain a separate "non-majority-maker" variant of the check.
+
+==== Wanda
+
+Before dispatching `FactsGatheringRequested` to agents, Wanda:
+
+1. Evaluates each check's `exclude` predicate against each target's host data.
+2. Filters the (host, check) pairs accordingly.
+3. Reports excluded pairs in the execution result with a clear "excluded by policy" status, distinct from failed / skipped, so the UI can render it.
+
+The predicate runs in the same Rhai sandbox Wanda already uses for checks; no new sandboxing is introduced.
+
+== Non-goals
+
+* Changing how `when:` conditions work inside expectations.
+* Letting the predicate query remote facts: it only sees host data Web already has; no extra round-trip.
+* User-authored ad-hoc exclusions from the UI.
+* Security sandboxing changes: `exclude` runs in the same Rhai sandbox Wanda already uses for checks.
+
+== Summary of Changes
+
+[cols="20,20,60"]
+|===
+|Action |Target |Description
+
+|Attach host data to execution targets
+|Trento Web
+|For each host in an execution request, forward a structured "host data" payload (majority maker, provider, OS family, roles, arch, cluster role, ...) to Wanda.
+
+|Extend `Target` message
+|Contracts
+|Add `map<string, google.protobuf.Value> attributes = 3;` to `Target` in `target.proto`. Free-form: no typed fields, no reserved keys. Purely additive; producer/consumer alignment on key names lives outside the proto.
+
+|New optional `exclude:` field on checks
+|Checks catalog
+|Top-level Rhai expression that receives one host's data and returns a boolean. `true` excludes the host from the check; absent field preserves current behaviour.
+
+|Evaluate `exclude` predicates before dispatch
+|Wanda
+|Filter (host, check) pairs before sending `FactsGatheringRequested` to agents. Report excluded pairs in the execution result with a distinct "excluded by policy" status.
+
+|===
