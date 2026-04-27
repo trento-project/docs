@@ -213,13 +213,84 @@ WARNING: Running without authentication allows anyone with network access to pus
 
 ==== Custom deployments
 
-For custom deployments not using the official {helm} chart or {ansible} playbook, you must:
+For custom deployments not using the official {helm} chart or {ansible} playbook, the {prometheus} remote write endpoint must be enabled and exposed manually. The procedure below walks through how to add an authenticated `/prometheus/` endpoint to an existing {trserver} installation that already has {nginx} running as a TLS-terminating reverse proxy in front of the {tr_web} and {tr_wanda} services.
 
-. Start {prometheus} with the `--web.enable-remote-write-receiver` flag to enable the remote write API.
+{grafana} Alloy supports basic authentication, bearer token, and mutual TLS (mTLS) when pushing metrics. Configure your reverse proxy to validate credentials using the method of your choice. The example below uses HTTP basic authentication.
 
-. Expose the {prometheus} remote write endpoint through a reverse proxy (such as {nginx}) with TLS termination and authentication.
+===== Enable the {prometheus} remote write receiver
 
-{trento} supports basic authentication, bearer token, and mutual TLS (mTLS) on the agent side. Configure your reverse proxy to validate credentials using the method of your choice.
+{prometheus} must be started with the `--web.enable-remote-write-receiver` flag. How to set this flag depends on how {prometheus} is managed on your platform (for example, via a sysconfig file, a systemd drop-in, or a command-line argument).
+
+After enabling the flag, restart {prometheus} and confirm it is healthy:
+
+[source,bash]
+----
+systemctl restart prometheus
+systemctl status prometheus --no-pager
+----
+
+===== Create the htpasswd file for basic authentication
+
+Generate the password hash with `openssl passwd -apr1`:
+
+[source,bash]
+----
+PROM_USER='prometheus'
+PROM_PASS='<choose a strong password>'
+
+printf '%s:%s\n' "$PROM_USER" \
+  "$(openssl passwd -apr1 "$PROM_PASS")" \
+  > /etc/nginx/prometheus.htpasswd
+
+chown root:nginx /etc/nginx/prometheus.htpasswd
+chmod 0640       /etc/nginx/prometheus.htpasswd
+----
+
+Verify that the file contains exactly one line of the form `prometheus:$apr1$<salt>$<hash>`.
+
+===== Patch the {nginx} vhost
+
+. Edit `/etc/nginx/conf.d/trento.conf` and add a `prometheus` upstream alongside the existing `web` and `wanda` upstreams. Adjust the address and port to match your {prometheus} installation:
++
+[source,bash]
+----
+upstream prometheus {
+  server 127.0.0.1:9090 max_fails=5 fail_timeout=60s;
+}
+----
+
+. Inside the existing `server { listen 443 ssl; ... }` block, add a `/prometheus/` location *before* the catch-all `location / { ... }` block:
++
+[source,bash]
+----
+# Prometheus API
+location /prometheus/ {
+  auth_basic           "Prometheus";
+  auth_basic_user_file /etc/nginx/prometheus.htpasswd;
+
+  # Sized for remote_write batches and longer queries
+  client_max_body_size 16m;
+  proxy_read_timeout   120s;
+  proxy_send_timeout   60s;
+
+  proxy_http_version 1.1;
+  proxy_set_header Host                 $http_host;
+  proxy_set_header X-Forwarded-For      $proxy_add_x_forwarded_for;
+  proxy_set_header X-Forwarded-Proto    $scheme;
+  proxy_set_header X-Cluster-Client-Ip  $remote_addr;
+
+  # Trailing slash strips the /prometheus/ prefix:
+  # /prometheus/api/v1/write -> /api/v1/write upstream
+  proxy_pass http://prometheus/;
+}
+----
+
+. Validate and reload {nginx}:
++
+[source,bash]
+----
+nginx -t && systemctl reload nginx
+----
 
 [[configuring-alloy]]
 === Configuring {grafana} Alloy
