@@ -34,7 +34,7 @@
  ** xref:trento-operations.adoc[Operations]
  ** xref:trento-report-issue.adoc[Reporting an Issue]
  ** xref:trento-analyze-problems.adoc[Problem Analysis]
+ ** xref:trento-analytics.adoc[Analytics]
  ** xref:trento-compatibility.adoc[Compatibility matrix between Trento Server and Trento Agents]
  ** xref:trento-version-history.adoc[Highlights of Trento versions]
- ** xref:trento-analytics.adoc[Analytics]
  ** xref:trento-more-info.adoc[More information]
