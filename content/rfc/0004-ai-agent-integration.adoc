@@ -1,0 +1,377 @@
+== 4. AI Assistant Chatbox
+
+[width="100%",cols="<18%,<82%",]
+|===
+|Feature Name |AI assistant
+|Start Date |Jan 1st, 2026
+|Category |AI, Architecture
+|PR |https://github.com/trento-project/docs/pull/164[#164]
+|===
+
+== Summary
+
+Build an **AI assistant widget**, fully integrated within Trento product experience.
+
+== Motivation
+
+Currently users have only access to https://github.com/trento-project/mcp-server[Trento MCP server] to leverage AI capabilities. 
+While already quite powerful, it requires to use external tools, like VSCode, to actually interact with the assistant.
+
+We want to make AI capabilities more accessible and integrated within Trento to:
+
+* reduce the barrier of setup
+* enrich the LLM capabilities with product-specific context (UI context, RAG, etc.)
+* enhance the overall user experience
+
+This RFC addresses the development of such an integrated AI assistant by defining what it entails in overall Trento Architecture:
+
+* technologies for the agentic framework
+* communication protocols between the AI Agent and the UI
+* where data and operations belong (that is: another artifact or not?)
+
+=== Use Cases Outline
+
+The core use cases for the AI assistant can be categorized into two main groups: **Onboarding/Configuration** and **Conversation**.
+
+Oversimplified use cases:
+
+* As a user, I want to configure my AI integration (e.g. provider and model selection, API key input) directly from the UI, so that I can easily set up and customize my AI assistant (Onboarding/Configuration)
+* As a user, I want an AI assistant chatbox easily accessible within the UI that can understand complex, multi-step requests, so that I can get help and information to solve my problems more efficiently (Conversation)
+
+There are also some more nuances that can be added to the above use cases:
+
+* the conversation should flow naturally without abrupt stops or "forgetting" previous parts
+* the system should handle large conversations efficiently to keep the chat going smoothly
+* the system should be able to handle complex requests by breaking them down and using the best tool or function for each part
+* the system should have access to relevant UI context to provide more accurate and helpful responses
+* the system should have access to relevant product-specific context (e.g. RAG) to provide more accurate and helpful responses
+
+NOTE: The outlined use cases are intentionally high-level and simplified. For instance whether the model selection happens during onboarding (ie in user's profile) or dynamically during conversation is an implementation detail that does not affect the overall goal of this RFC. Also the mentioned "nuances" or non-functional requirements are not exhaustive, might be implemented in different moments and do not interfere with the overall content of this RFC, but it is important to keep them in mind as we proceed iterating on the design and implementation.
+
+== Detailed design
+
+Before diving into the detailed design, a premise is due.
+
+The current landscape of AI assistants implementation is rapidly evolving, with a plethora of agentic frameworks, tools and best practices emerging (and possibly disappearing) at a very fast pace.
+
+While we value the mantra of "not reinventing the wheel" and "standing on the shoulders of giants" meaning that we value standards, we also have to be mindful about adopting standards and/or solutions that might not be mature enough, that might bring accidental complexity, that might not fit well with our specific use case and architecture, that might put us in a vendor lock-in position, or that might be just too much for the team to digest all at once considering also product strategy and goals.
+
+There are 3 main areas involved in the "which technology/standard to use" question:
+
+* link:#_agentic_frameworks[Agentic Frameworks]: the underlying software that allows us to build and run AI agents
+* link:#_ui_to_agent_communication[UI to Agent Communication]: the protocols and technologies that enable the frontend UI to interact with the AI agent backend
+* link:#_ui-components[UI Components]: the actual implementation of the assistant widget in the frontend
+
+Additionally to these there is a fourth area around the tools that the AI agent can use, how they're provided to the agent, and how they interact with the rest of the system.
+
+* link:#_tools_integration[Tools Integration]: the way the AI agent can leverage tools
+
+The first one, Agentic Framework, drives the decision about whether we need/want to introduce a new artifact in the picture of our architecture, which at this stage is the main question we want to answer.
+
+=== Agentic Frameworks
+
+What is an AI Agent, to begin with? 
+
+Simply put, it can be thought as the piece of software that:
+
+* takes user input (e.g. "What is the saptune tuning status of the registered hosts? Provide a report that includes...")
+* takes relevant context and tools into account (e.g. the UI context, the MCP server, the RAG context)
+* acts on it by orchestrating LLM calls/responses, tools invocation (MCP, RAG, etc.)
+* provides the final LLM-generated answer to the user
+
+==== Available Options
+
+The agentic framework landscape is very fragmented and rapidly evolving, with many options available that present a significant decision-making challenge.
+
+The core problem lies in selecting the most suitable framework considering:
+
+* *Suitability:* which framework aligns best with the project's technical requirements, complexity, and performance needs?
+* *Maintenance/Longevity:* Is the chosen framework actively maintained, and what is the risk of it being abandoned or becoming obsolete, potentially leading to costly migrations or security vulnerabilities?
+* *Risk Profile:* Beyond maintenance, what are the inherent risks associated with adopting a specific framework? Security risks, licensing risks, dependency management complexity, community support quality, and the learning curve for the development team.
+
+.List of not selected frameworks alternatives
+[%collapsible]
+====
+
+[width="100%",cols="<25%,<75%",]
+|===
+|Framework |Link
+|**AiSDR** | https://aisdr.com/platform/
+|**OpenAgents** |https://openagents.org/
+|**OpenAgent** |https://open-agent.io/
+|**Claude Agent SDK** |https://platform.claude.com/docs/en/agent-sdk/overview
+|**ChatGPT Agents / AgentKit** |https://openai.com/en-EN/index/introducing-agentkit/
+|**Manus** |https://open.manus.im/docs
+|**AutoGen** |https://github.com/microsoft/autogen
+|**Camel AI** |https://docs.camel-ai.org/get_started/introduction
+|**Microsoft Agent Framework** |https://github.com/microsoft/agent-framework
+|**GraphBit** |https://github.com/InfinitiBit/graphbit
+|**Rig.rs** |https://rig.rs/
+|**CrewAI** |https://docs.crewai.com/en/introduction
+|**AWS Bedrock Agents** |https://aws.amazon.com/es/bedrock/agents/
+|**AG2/AutoGen** |https://github.com/ag2ai/ag2
+|**Pydantic AI** |https://ai.pydantic.dev/
+|**LlamaIndex** |https://github.com/run-llama/
+|**Cloudflare Agents** |https://developers.cloudflare.com/agents/
+|**Agno** |https://www.agno.com/
+|**Google ADK** |https://google.github.io/adk-docs/
+|===
+
+====
+
+Long story short, considering the above criteria and in the spirit of:
+
+* not adding too many fragmentation withing SUSE's ecosystem
+* maximize knowledge reuse coming from Rancher Liz AI Assistant (see https://documentation.suse.com/cloudnative/rancher-ai/latest/en/introduction.html[Doc] and https://github.com/rancher/rancher-ai-agent[implementation])
+
+the mainly evaluated options is the https://docs.langchain.com/[LangChain] ecosystem.
+
+==== Langchain options
+
+LangChain is a popular agentic framework. It has a large and active community, hopefully meaning it is likely to be well-maintained and supported in the long term.
+
+===== Python/JavaScript/TypeScript
+
+Official implementation of the LangChain framework, available in https://github.com/langchain-ai/langchain[Python] and https://github.com/langchain-ai/langchainjs[JavaScript/TypeScript].
+
+PROs:
+
+* Mature and feature-rich framework with a large community and ecosystem.
+* Extensive documentation and resources available.
+
+CONs:
+
+* Requires a separate deployable component
+* the Python version would require a new technology stack for the backend
+
+===== Golang
+
+Golang implementation of the Langchain framework. Quite active and with a growing community.
+
+See https://github.com/tmc/langchaingo[Repo] and https://tmc.github.io/langchaingo/docs/[Docs]
+
+PROs:
+
+* Could be deployed along with the MCP server component, which is already in Go
+* Uses a familiar stack for backend pieces
+
+CONs:
+
+* MCP support is limited
+* if not included in the MCP server, it would require a separate deployable component
+* if deployed in the MCP server, it could "pollute" the MCP server with non-MCP server features
+
+===== Elixir
+
+Elixir implementation of the LangChain framework. Catching up with the other implementations.
+
+See https://github.com/brainlid/langchain[Repo] and https://hexdocs.pm/langchain/readme.html[Docs]
+
+PROs:
+
+* does not require a separate deployable component, it would be included in web
+* uses a familiar stack for backend pieces
+* could have access to internal web functions that could be exposed as tools for the agent
+
+CONs:
+
+* catching up ecosystem, not as mature as the other implementations
+
+For completeness, there is also a https://github.com/agentjido/jido[agentjido/jido] in the elixir ecosystem that is not langchain oriented, though.
+
+==== The proposal evaluation
+
+There has been discovery and experimentation around LangChain in the following PoCs:
+
+JS:
+
+* https://github.com/trento-project/liz/tree/TRNT-4140-1
+
+Elixir:
+
+* https://github.com/trento-project/web/tree/liz-testing-langchain-elixir
+* https://github.com/trento-project/web/tree/ai-native-poc
+
+Golang: 
+
+* https://github.com/trento-project/mcp-server/tree/TRNT-4140-liz-alt
+
+===== How to choose which way to go?
+
+We made a comparative analysis between the different implementations by evaluating their behavior aganst the same setup:
+
+* same trento dataset
+* same LLM model being used
+* same system prompt
+* same user prompts
+
+The bottom line result is that there has been observed feature parity between the implementations, with similar improvements needed in each, mainly in the network communication with the MCP server.
+
+Considering the above, since from a functional perspective we could not identify significant reasons to prefer one implementation over the other, we added to the evaluation criteria non-functional requirements more related to the architectural implications, which is the main decision factor at this stage.
+
+The focus shifts to whether adding another component to the architecture.
+
+===== The problem with "a separate deployable/artifact/component"
+
+The problem with another artifact is not about releasing it: that's being streamlined and automated, but rather about the architectural implications:
+
+* *Authorization and Authentication:* There is extra complexity to be addressed to add authnz to the new artifact
+* *Data Management:* The new artifact would need to manage its own data storage, which could lead to data consistency and synchronization challenges with the rest of the system
+* *Inter-Service Communication:* The new artifact would need to communicate with existing services, which could introduce further latency and reliability issues
+* *Activity Logging and Monitoring:* A separate artifact would require its own logging and monitoring setup, which could lead to fragmented observability and increased maintenance efforts
+* *Operational Overhead:* another artifact would add operational overhead, including deployment, monitoring, and troubleshooting efforts for customers and the team
+
+==== The proposed path forward
+
+Given the above, the proposed path forward is to avoid adding a separate artifact and instead integrate the AI agent within an existing component, specifically Trento Web (Native Elixir implementation). 
+
+This approach minimizes architectural complexity and operational overhead allowing us to focus on the core features, which have their degree of inherent complexity.
+
+Even though the Elixir ecosystem is not as mature as others, in this regard, we believe it is enough to support our needs.
+
+=== UI to Agent Communication
+
+The client application, namely the AI assistant widget in Trento, needs to communicate with the backend AI agent to send inputs and receive responses.
+
+The main characteristic of this communication is that it is a (near) real-time, bidirectional communication channel, where the UI sends user inputs and possibly UI context, and receives responses from the agent.
+
+The consideration here is about:
+
+* the Transport
+* the Protocol
+
+==== Transport
+
+The main options for the transport layer are:
+
+* Server-Sent Events (SSE)
+* WebSocket
+
+In the context of an elixir-based backend embedded in Trento Web, the proposal is to use WebSockets due to:
+
+* native support in the tech stack with Socket/Channels
+* already used for other features, meaning that we can leverage existing infrastructure
+
+==== Protocol
+
+When it comes to the protocol, that is the semantics and structure of the messages exchanged between the UI and the AI Agent, there are two main options:
+
+* *AG-UI*: adopt an existing protocol for agent-user interaction, such as the Agent-User Interaction Protocol https://docs.ag-ui.com/introduction[AG-UI]
+* *Custom Protocol*: implement a protocol tailored to our specific use case and requirements
+
+AG-UI seems to be the de-facto standard for agent-user interaction, however, considering:
+
+* the link:_detailed_design[premise]
+* the team capacity and expertise
+* we don't need interoperability with other AG-UI compliant products at this stage
+* the product strategy and goals
+
+it sounds acceptable considering deferring its adoption (or the adoption of any other standard) to a later stage.
+
+Additionally, some research highlights that:
+
+* There are means of https://docs.ag-ui.com/quickstart/middleware[translating existing protocols to AG-UI]
+* There is already work in progress in the AG-UI ecosystem to support the Elixir https://github.com/ag-ui-protocol/ag-ui/pull/1046[ag-ui/pull/1046] and https://github.com/ag-ui-protocol/ag-ui/pull/1293[ag-ui/pull/1293]
+* We can implement it ourselves also partially by using only the parts of the protocol that are relevant to us
+
+Further research on these items is deferred.
+
+=== UI Components
+
+For the UI components implementation there are options to leverage AG-UI compliant component libraries, such as:
+
+* https://github.com/google/A2UI[A2UI]
+* https://www.copilotkit.ai/ag-ui[CopilotKit]
+* https://www.assistant-ui.com/docs/runtimes/pick-a-runtime[Assistant-UI]
+
+Considering:
+
+* the link:_detailed_design[premise]
+* the fact that we are considering not going AG-UI, yet
+* vendor lock-in/licensing risks (mainly with CopilotKit)
+* branding/watermark issues
+
+The proposed direction is to defer commitment to a specific AG-UI (or non-AG-UI) compliant component library.
+
+=== Tools Integration
+
+Currently the MCP server exposes tools to AI assistants from Trento's API specifications. This is necessary for external assistants like VSCode, Claude, etc...
+
+With a natively integrated AI Agent, we have two options:
+
+* keep using MCP Server to add tools the AI Agent
+* use internal functions, where possible, as tools for AI agent
+
+==== Option 1: Keep using MCP Server to add tools the AI Agent
+
+Using the MCP server as the main "tools provider" means registering it in the AI Agent, effectively requiring to have an MCP client for it.
+
+PROs:
+
+* leverage the work already done in the MCP server to expose tools
+* any new endpoint tagged with "MCP" will be automatically available to the AI Agent as a tool
+
+CONs:
+
+* latency/network overhead, as it would require an unpredictable amount of network calls (See following note)
+* how to deal with tools only relevant for the AI Agent but that we might not need/want to expose as an API?
+
+Note on latency/networking overhead
+
+Let's consider a basic use case where a user prompt resolves in 1 API to be called.
+
+What would be the flow? (Let's consider web == AI Agent)
+
+1. User sends a prompt from the UI to the AI Agent (client -> web [not counted])
+2. AI Agent calls, at least once, the MCP server to get the list of the available tools (APIs) (web -> MCP server [1 call at least])
+3. AI Agent calls the LLM with the user prompt and the list of tools (web -> LLM provider [1 call])
+4. AI Agent receives instructions from the LLM on which tool to use, then calls the tool which is an API exposed by Trento 
+    a. if the tool is a web API (web -> MCP server -> web [2 calls])
+    b. If the tool is a Wanda  API, then there is also Token introspection involved (web -> MCP server -> wanda -> token introspection in web [3 calls])
+
+4 requests when the tool is a web API, 5 when the tool is a Wanda API. Average of 4 considering the amount of wanda tools is less than the amount of web tools.
+
+It is worth mentioning that:
+
+* there is also the roundtrip of the responses not explicitly mentioned above
+* the amount of tools to be called is unpredictable, meaning that the flow could be even more complex than the one described above and the failing points and latency could be more significant
+* authnz is re-executed many times against web when its APIs are called as tools
+
+==== Option 2: Internal tools
+
+PROs:
+
+* one less component to install and still have access to the same AI capabilities
+* opens the possiblity to expose internal functions as tools for the AI agent without necessarily exposing them as APIs, if not needed
+* less latency/networking overhead, as the calls to the tools would be mainly internal function calls instead of network calls to the MCP server
+* maximised authnz reuse within the same conversation context
+
+CONs:
+
+* exposing internal features/functions as tools for the AI agent might lead to repetition of code that is already wired up in how our controllers work, or that needs to be wired up both as a controller action and as an AI agent tool
+* since wanda is a separate component, we would need to call it as an external API (similarly to what we do with Prometheus, for instance)
+
+What would be the flow in this case? (Let's consider web == AI Agent)
+
+1. User sends a prompt from the UI to the AI Agent (client -> web [not counted])
+2. AI Agent calls the LLM with the user prompt and the list of tools (web -> LLM provider [1 call])
+3. AI Agent receives instructions from the LLM on which tool to use, then:
+    a. if the tool is a web functionality call the internal tool, no need to go outside
+    b. If the tool is a Wanda functionality, then call the related API (web -> wanda -> token introspection in web [2 call])
+
+1 request when the tool is internal to web, 3 when the tool is a Wanda API. Average of 2.
+
+The amount of network calls could be reduced by around up to 50%, however the unpredictability still remains, based on what the user prompts and what the LLM instructions are.
+
+==== The proposed solution
+
+TBD
+
+== Summary
+
+The proposed design for the AI assistant chatbox is to implement it as a feature within Trento Web, leveraging an Elixir-based implementation of the LangChain framework for the agentic capabilities, using WebSockets for real-time communication between the UI and the agent, and deferring the adoption of AG-UI or any specific UI component library to a later stage.
+
+== Unresolved questions
+
+* RAG integration is out of scope for this RFC. Even though there has been some degree of exploration (https://github.com/georgeguimaraes/arcana[arcana] lib especially) it is deferred to a later stage.
+* Details about the actual implementation of the agent, such as AI onboarding, the system prompt, the tools to be used, the MCP integration, the way to leverage UI context, etc. are out of scope for this RFC and will be defined as we iterate on the implementation.
