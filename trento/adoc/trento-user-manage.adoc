@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-user-management]]
 === User management
-:revdate: 2026-01-08
+:revdate: 2026-04-30
 
 
 {trento} provides a local permission-based user management feature with
@@ -68,6 +68,15 @@ The *Create User* and *Edit User* views provide a built-in password
 generation button that allows user managers to easily generate secure
 and compliant passwords. The user manager must provide the user with
 their password through an authorized secure channel.
+
+Users and user managers may also set a preferred timezone for the
+account from the *Create User* and *Edit User* views. Individual users
+can configure their own preference later in the *Profile* view. The
+web console displays dates and times according to each user's preferred
+timezone for presentation; if no preference is set, UTC is used. This
+preference affects only how timestamps are presented in the UI —
+backend storage, API payloads, logs and scheduled tasks continue to use
+UTC.
 
 A user can reset their password in the Profile view. In this view, they
 can also update their name and email address as well as activate

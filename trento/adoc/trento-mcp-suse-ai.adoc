@@ -1,7 +1,7 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-mcp-suse-ai]]
-:revdate: 2026-01-08
+:revdate: 2026-04-30
 ==== Integrating the {tr_mcp} with {suseai}
 
 This guide explains how to integrate the {tr_mcp} with {suseai}, including configuration and deployment instructions.
@@ -32,7 +32,7 @@ To deploy the {tr_mcp} in your {suseai} cluster, install it via the {trserver} {
 ** Scroll down to the *Personal Access Tokens* section.
 ** Click the *Generate Token* button.
 ** Enter a descriptive name for the token (e.g., "MCP Client").
-** Optionally configure an expiration date for the token, or select *Never Expires*.
+** Optionally configure an expiration date (shown in user's timezone but stored in UTC) for the token, or select *Never Expires*.
 ** Click *Generate Token*.
 ** *Important:* Copy the generated token immediately and store it securely — it will not be shown again.
 

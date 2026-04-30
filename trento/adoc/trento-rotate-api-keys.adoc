@@ -2,13 +2,14 @@ include::product-attributes.adoc[]
 
 [[sec-trento-rotating-apikeys]]
 === Rotating API keys
-:revdate: 2025-06-10
+:revdate: 2026-04-30
 
 
 Communication from the {tragent} to the {trserver} is secured by a API
 key that must be provided in the agent configuration file.
 
-By default, the API key does not have an expiration date. You can set up
+By default, the API key does not have an expiration date
+(shown in user's timezone but stored in UTC). You can set up
 a custom expiration date to increase the overall security of the setup
 and meet internal security requirements.
 
