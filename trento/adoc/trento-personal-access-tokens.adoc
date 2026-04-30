@@ -3,7 +3,7 @@ include::product-attributes.adoc[]
 [[sec-trento-personal-access-tokens]]
 
 === Personal access tokens
-:revdate: 2025-11-05
+:revdate: 2026-04-30
 
 {trento} allows users to create personal access tokens (PATs) for authentication and authorization purposes in third-party integrations with the APIs exposed by its components:
 
@@ -18,7 +18,7 @@ Log in to {trento} Web UI, click on your username in the top-right corner, and s
 image::trento-web-profile.png[trento-web-profile,scaledwidth=80.0%]
 
 . Click *Generate Token* in the *Personal Access Tokens* section.
-. When prompted, provide a name and an expiration date, then click *Generate Token*.
+. When prompted, provide a name and an expiration date (shown in user's timezone but stored in UTC), then click *Generate Token*.
 +
 .Generate personal access token modal
 image::trento-web-generate-pat.png[trento-web-generate-pat,scaledwidth=80.0%]
@@ -54,6 +54,6 @@ User admins can delete tokens for other users. However, admins cannot create new
 
 To delete a token for another user, a user admin must perform the following steps:
 
-. navigate to the *Users* page 
+. navigate to the *Users* page
 . select a user
 . click a token's contextual *Delete* button in the *Personal Access Tokens* section

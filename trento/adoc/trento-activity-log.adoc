@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-activity-log]]
 === Activity Log
-:revdate: 2026-01-08
+:revdate: 2026-04-30
 
 
 {trento} collects system events and user actions in the Activity Log.
@@ -11,8 +11,9 @@ console.
 
 Each entry in the Activity Log includes the following:
 
-* A timestamp: the day and time (UTC timezone) the
-system event or the user action occurred
+* A timestamp: the day and time the system event or user action occurred.
+Timestamps are displayed using the user's preferred timezone (set in the user profile).
+If no preference is set, times default to UTC.
 * A message: type of the occurred event or user action
 * The user that triggered the event or performed the action. User system
 is used for events triggered by the system itself.
@@ -32,7 +33,7 @@ The Activity Log allows you to filter by the type of event or user action
 (commonly referred to as resource type), by the user that triggered the event or
 performed the action, and by severity status. Only active users are available
 for filtering. The Activity Log also allows you to filter out entries that are
-newer and/or older than an specific date and time (UTC timezone).
+newer and/or older than a specific date and time. Date/time inputs in the UI are interpreted according to the user's preferred timezone; if no preference is set, UTC is assumed.
 
 Once a filter has been set, click Apply to filter out the undesired
 entries and Reset to remove all the filters.
@@ -67,6 +68,8 @@ This can be changed in the Activity Log section under Settings. Changing
 the retention time requires the `+all:settings+` permissions. Entries
 older than the specified retention time are deleted every day at
 midnight (UTC timezone).
+Note that the cleanup schedule uses UTC,but timestamps shown in the UI are
+adjusted to each user's preferred timezone for display purposes.
 
 The correlation functionality of the Activity Log links related events together,
 offering a chronological, linear view of a chain of events in multi-step workflows
