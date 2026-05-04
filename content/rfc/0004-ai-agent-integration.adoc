@@ -265,22 +265,16 @@ When it comes to the protocol, that is the semantics and structure of the messag
 * *AG-UI*: adopt an existing protocol for agent-user interaction, such as the Agent-User Interaction Protocol https://docs.ag-ui.com/introduction[AG-UI]
 * *Custom Protocol*: implement a protocol tailored to our specific use case and requirements
 
-AG-UI seems to be the de-facto standard for agent-user interaction, however, considering:
+AG-UI seems to be the de-facto standard for agent-user interaction and after iterating over the actual implementation we successfully were able to integrate it, even though a partial subset of events that are relevant to us at the moment.
 
-* the link:_detailed_design[premise]
-* the team capacity and expertise
-* we don't need interoperability with other AG-UI compliant products at this stage
-* the product strategy and goals
+Given the successful result of this iteration, we feel that AG-UI is a viable option for the protocol.
 
-it sounds acceptable considering deferring its adoption (or the adoption of any other standard) to a later stage.
+[NOTE]
+====
 
-Additionally, some research highlights that:
-
-* There are means of https://docs.ag-ui.com/quickstart/middleware[translating existing protocols to AG-UI]
-* There is already work in progress in the AG-UI ecosystem to support the Elixir https://github.com/ag-ui-protocol/ag-ui/pull/1046[ag-ui/pull/1046] and https://github.com/ag-ui-protocol/ag-ui/pull/1293[ag-ui/pull/1293]
-* We can implement it ourselves also partially by using only the parts of the protocol that are relevant to us
-
-Further research on these items is deferred.
+* There is work in progress in the AG-UI ecosystem to support the Elixir https://github.com/ag-ui-protocol/ag-ui/pull/1046[ag-ui/pull/1046] and https://github.com/ag-ui-protocol/ag-ui/pull/1293[ag-ui/pull/1293]
+* We can implement only the parts of the protocol that are relevant to us
+====
 
 === UI Components
 
@@ -292,12 +286,12 @@ For the UI components implementation there are options to leverage AG-UI complia
 
 Considering:
 
-* the link:_detailed_design[premise]
-* the fact that we are considering not going AG-UI, yet
 * vendor lock-in/licensing risks (mainly with CopilotKit)
-* branding/watermark issues
+* branding/watermark issues (mainly with CopilotKit)
+* the successful integration of an end to end AG-UI compliant setup using Assistant-UI components in our iterations
+* the composability and flexibility of Assistant-UI components
 
-The proposed direction is to defer commitment to a specific AG-UI (or non-AG-UI) compliant component library.
+The proposed direction is to rely on Assistant-UI components for the UI implementation.
 
 === Tools Integration
 
@@ -371,11 +365,23 @@ The amount of network calls could be reduced by around up to 50%, however the un
 
 ==== The proposed solution
 
-TBD
+Considering the reduced complexity for customers around installation and the reduced latency/networking overhead, the proposed solution is to:
+
+* map internal functions as tools for the AI agent, 
+* have web call wanda as an external service (like we do with Prometheus, for instance) to map Wanda APIs as tools for the AI agent
+* keep the MCP server as a tools provider for external APIs and Wanda APIs.
+
+This means we need to find ways to reduce and mitigate repetition of the code already wired in the controllers and expose it as tools for the AI agent.
 
 == Summary
 
-The proposed design for the AI assistant chatbox is to implement it as a feature within Trento Web, leveraging an Elixir-based implementation of the LangChain framework for the agentic capabilities, using WebSockets for real-time communication between the UI and the agent, and deferring the adoption of AG-UI or any specific UI component library to a later stage.
+The proposed design for the AI assistant chatbox is to:
+
+* implement it natively within Trento Web leveraging an Elixir-based implementation of the LangChain framework for the agentic capabilities
+* using WebSockets for real-time communication between the UI and the agent
+* adopt the AG-UI protocol for the semantics of the communication between the UI and the agent, limited to our needs and use cases at the moment
+* use Assistant-UI components for the UI implementation
+* map internal functions as tools for the AI agent, call Wanda as an external service to map
 
 == Unresolved questions
 
