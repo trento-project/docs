@@ -177,7 +177,13 @@ CONs:
 
 * catching up ecosystem, not as mature as the other implementations
 
-For completeness, there is also a https://github.com/agentjido/jido[agentjido/jido] in the elixir ecosystem that is not langchain oriented, though.
+For completeness, there is also:
+
+* https://github.com/agentjido/jido[agentjido/jido] not langchain oriented, though.
+* https://github.com/sagents-ai/sagents[sagents] 
+** builds on top of langchain
+** one of the maintainers is the same of the langchain elixir implementation
+** we successfully had it working in an AG-UI+Assistant-UI+websocket setup
 
 ==== The proposal evaluation
 
