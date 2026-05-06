@@ -85,7 +85,7 @@ For any registered cluster, the details view provides the following operations:
 *** Internal timeout: 5m
 
 * At resource level:
-** **Resource maintenance**: Enabled when the corresponding node is online. It turns maintenance on or off in the resource, depending on its current status.
+** **Resource maintenance**: Enabled when at least one node in the cluster is online. It turns maintenance on or off in the resource, depending on its current status.
 *** Activity type: `Cluster Operation Requested`
 *** Internal policies: Not applicable.
 *** Internal timeout: 5m
