@@ -75,11 +75,11 @@ For any registered cluster, the details view provides the following operations:
 *** Activity type: `Operation Requested on a cluster host`
 *** Internal policies: Not applicable.
 *** Internal timeout: 5m
-** **Start cluster node**: Enabled when the node is offline.
+** **Set node online in cluster**: Enabled when the node is offline.
 *** Activity type: `Operation Requested on a cluster host`
 *** Internal policies: In a {hana} cluster, if the node is managing a secondary instance, all the nodes managing primary instances must be online.
 *** Internal timeout: 5m
-** **Stop cluster node**: Enabled when the node is online.
+** **Set node offline in cluster**: Enabled when the node is online.
 *** Activity type: `Operation Requested on a cluster host`
 *** Internal policies: In a {hana} cluster, if the node is managing a primary instance, all the nodes managing secondary instances must be offline.
 *** Internal timeout: 5m
