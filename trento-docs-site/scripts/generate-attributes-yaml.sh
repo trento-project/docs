@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# SPDX-FileCopyrightText: SUSE LLC
+# SPDX-License-Identifier: Apache-2.0
+
+
 # Accepts generic-attributes.adoc from doc-unversioned and generates antora.yml with asciidoc attributes
 INPUT_FILE="$1"
 OUTPUT_FILE="$2"
@@ -33,7 +37,7 @@ declare -A seen
 # Read all keys from generic-attributes.adoc
 grep '^:' "$INPUT_FILE" | while read -r line; do
   key=$(echo "$line" | sed -E 's/^:([^:]+):.*/\1/' | xargs)
-  
+
   # skip key if seen or in ignore list
   if [[ -n "${seen[$key]}" ]] || is_ignored "$key"; then
     continue
