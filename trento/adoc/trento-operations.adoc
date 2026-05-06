@@ -57,6 +57,10 @@ For any registered cluster, the details view provides the following operations:
 *** Activity type: `Cluster Operation Requested`
 *** Internal policies: Not applicable.
 *** Internal timeout: 5m
+** **Refresh resources**: Enabled when at least one node in the cluster is online. It refreshes all the resources in the cluster.
+*** Activity type: `Cluster Operation Requested`
+*** Internal policies: Not applicable.
+*** Internal timeout: 5m
 
 * At node level:
 ** **Node maintenance**: Enabled when the node is online. It turns maintenance on or off in the node, depending on its current status.
@@ -82,6 +86,10 @@ For any registered cluster, the details view provides the following operations:
 
 * At resource level:
 ** **Resource maintenance**: Enabled when the corresponding node is online. It turns maintenance on or off in the resource, depending on its current status.
+*** Activity type: `Cluster Operation Requested`
+*** Internal policies: Not applicable.
+*** Internal timeout: 5m
+** **Refresh resource**: Enabled when at least one node in the cluster is online. It refreshes the resource.
 *** Activity type: `Cluster Operation Requested`
 *** Internal policies: Not applicable.
 *** Internal timeout: 5m
