@@ -7,7 +7,7 @@ This repository is the central documentation source for the Trento project.
 It contains:
 
 * Trento user-facing documentation
-* Internal project documentation
+* Internal developer documentation
 * Antora site assembly
 * Custom Trento-Antora site UI
 * CI and build tooling for the published documentation outputs
@@ -27,7 +27,7 @@ No older published versions are currently maintained in this repository.
 
 == Repository Layout
 
-* link:https://github.com/trento-project/docs/tree/main/content[`content`] -> project documentation and docs hub content such as architecture, ADRs, coding standards, RFCs, templates, and internal notes
+* link:https://github.com/trento-project/docs/tree/main/content[`content`] -> developer documentation and docs hub content such as architecture, ADRs, coding standards, RFCs, templates, and internal notes
 * link:https://github.com/trento-project/docs/tree/main/trento-docs-site[`trento-docs-site`] -> Antora playbook, extensions, and site build logic
 * link:https://github.com/trento-project/docs/tree/main/trento-docs-site-ui[`trento-docs-site-ui`] -> custom Antora UI bundle
 * link:https://github.com/trento-project/docs/tree/main/trento[`trento`] -> Trento user-facing documentation source used for both the docs hub and the official SUSE documentation
@@ -38,7 +38,7 @@ The developer documentation published in the Trento docs hub has two parts.
 
 === Documentation Maintained in This Repository
 
-This repository contains project-level developer documentation, including:
+This repository contains developer documentation maintained in this repository, including:
 
 * xref:architecture/trento-architecture.adoc[Architecture]
 * xref:architecture/adr/README.adoc[Architecture Decision Records (ADR)]
@@ -74,20 +74,13 @@ They are picked up and included in the next Antora build of link:https://www.tre
 
 The `trento-docs-site` directory builds the link:https://www.trento-project.io/docs/[Trento project’s unified documentation site] using https://antora.org/[Antora]. Learn more about xref:trento-docs-site/README.adoc[the documentation hub here].
 
-The site build also collects documentation from upstream Trento component repositories during generation.
-
 == How This Repository Works
 
 This repository combines multiple documentation sources into the final published outputs.
 
 * `trento/` provides the user-facing Trento documentation
-* `content/` provides the project documentation maintained in this repository
-* other Trento component repositories provide additional documentation that is fetched as external sources during the Antora build
-
-During the Antora build, the external component documentation is fetched and moved into the Antora content layout so it can be published together with the documentation maintained in this repository.
-
-The Antora build pipeline fetches upstream project documentation directly from Trento component repositories and publishes it in the developer documentation area as component documentation.
-For example, the Agent documentation is exposed as `/agent/README.html` in the local preview.
+* `content/` provides the developer documentation maintained in this repository
+* upstream Trento component repositories provide additional component documentation for the docs hub
 
 The CI for the user-facing documentation intentionally mirrors link:https://github.com/SUSE/doc-unversioned[SUSE/doc-unversioned] with small Trento-specific adjustments.
 This keeps the `trento/` sources compatible with both the Trento docs hub build and the SUSE documentation toolchain.
