@@ -45,7 +45,7 @@
 *** xref:internal-notes/trento-container-install.adoc[Containerized deployment]
 *** xref:internal-notes/analytics-setup.adoc[Analytics Google Tag Manager setup]
 
-** Trento Documentation Page
+**  xref:README.adoc[Trento Documentation]
 *** xref:trento-docs-site/README.adoc[Documentation Page]
 *** xref:trento-docs-site/preview-docs-with-docker.adoc[Local Documentation Preview with Docker]
 *** xref:trento-docs-site/edit-url-extension-workflow.adoc[Edit URL Extension Workflow]

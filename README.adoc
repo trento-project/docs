@@ -1,8 +1,45 @@
-= Developer Documentation
+= Trento Documentation
 ifndef::site-gen-antora[:relfileprefix: /content/]
 
-This repository contains the Trento project documentation that does not interest a specific service, such as ADR, coding standards and best practices, CI workflows, and templates. The link:https://github.com/trento-project/docs/tree/main/content[*content* directory] is the home of these sources.
- 
+This repository is the central documentation source for the Trento project.
+
+
+It contains:
+
+* Trento user-facing documentation
+* Internal project documentation
+* Antora site assembly
+* Custom Trento-Antora site UI
+* CI and build tooling for the published documentation outputs
+
+The `trento/` directory is the single source for Trento user-facing documentation.
+The same sources are used to publish:
+
+* the Trento docs hub at link:https://www.trento-project.io/docs/[trento-project.io/docs]
+* the official SUSE documentation at link:https://documentation.suse.com/sles-sap/trento/html/SLES-SAP-trento/index.html[documentation.suse.com]
+
+The published documentation currently exposes two versions:
+
+* `main` - the pre-release version, reflecting the latest state of the project
+* `latest` - the current release version
+
+No older published versions are currently maintained in this repository.
+
+== Repository Layout
+
+* link:https://github.com/trento-project/docs/tree/main/content[`content`] -> project documentation and docs hub content such as architecture, ADRs, coding standards, RFCs, templates, and internal notes
+* link:https://github.com/trento-project/docs/tree/main/trento-docs-site[`trento-docs-site`] -> Antora playbook, extensions, and site build logic
+* link:https://github.com/trento-project/docs/tree/main/trento-docs-site-ui[`trento-docs-site-ui`] -> custom Antora UI bundle
+* link:https://github.com/trento-project/docs/tree/main/trento[`trento`] -> Trento user-facing documentation source used for both the docs hub and the official SUSE documentation
+
+== Internal Developer Documentation
+
+The developer documentation published in the Trento docs hub has two parts.
+
+=== Documentation Maintained in This Repository
+
+This repository contains project-level developer documentation, including:
+
 * xref:architecture/trento-architecture.adoc[Architecture]
 * xref:architecture/adr/README.adoc[Architecture Decision Records (ADR)]
 * xref:coding-standards/README.adoc[Coding standards]
@@ -10,9 +47,111 @@ This repository contains the Trento project documentation that does not interest
 * link:https://github.com/trento-project/docs/tree/main/content/internal-notes[Internal Notes]
 * link:https://github.com/trento-project/docs/tree/main/content/templates[Templates]
 
+These sources are maintained directly in this repository.
+
+=== Component Documentation Fetched from Upstream Repositories
+
+The second part of the developer documentation is component documentation.
+During the Antora build, this repository fetches documentation directly from upstream Trento project repositories and assembles it into the docs hub under the `Components` section.
+
+These sources usually live in the upstream repositories under `docs/` or `guides/`.
+For example, the Trento Web documentation is maintained in:
+link:https://github.com/trento-project/web/tree/main/guides[trento-project/web/guides]
+
+The build process adapts this upstream content to the Antora layout used by the docs hub.
+For example, documentation maintained in an upstream repository such as `trento-project/web` is published in the docs hub as link:https://www.trento-project.io/docs/web/README.html[`/docs/web/README.html`].
+The source of truth still remains the upstream repository.
+
+[IMPORTANT]
+====
+Do not edit component documentation in this repository.
+
+All changes to component documentation must be made in the source repository.
+They are picked up and included in the next Antora build of link:https://www.trento-project.io/docs/[trento-project.io/docs].
+====
+
 == Trento docs site
 
 The `trento-docs-site` directory builds the link:https://www.trento-project.io/docs/[Trento project’s unified documentation site] using https://antora.org/[Antora]. Learn more about xref:trento-docs-site/README.adoc[the documentation hub here].
+
+The site build also collects documentation from upstream Trento component repositories during generation.
+
+== How This Repository Works
+
+This repository combines multiple documentation sources into the final published outputs.
+
+* `trento/` provides the user-facing Trento documentation
+* `content/` provides the project documentation maintained in this repository
+* other Trento component repositories provide additional documentation that is fetched as external sources during the Antora build
+
+During the Antora build, the external component documentation is fetched and moved into the Antora content layout so it can be published together with the documentation maintained in this repository.
+
+The Antora build pipeline fetches upstream project documentation directly from Trento component repositories and publishes it in the developer documentation area as component documentation.
+For example, the Agent documentation is exposed as `/agent/README.html` in the local preview.
+
+The CI for the user-facing documentation intentionally mirrors link:https://github.com/SUSE/doc-unversioned[SUSE/doc-unversioned] with small Trento-specific adjustments.
+This keeps the `trento/` sources compatible with both the Trento docs hub build and the SUSE documentation toolchain.
+
+== Trento docs site ui
+
+The `trento-docs-site-ui` directory is used to customize and design the layout of the link:https://www.trento-project.io/docs/[Trento docs site]. Learn more about the xref:trento-docs-site-ui/README.adoc[ui customization here].
+
+== Local Preview
+
+=== Trento docs hub preview
+
+From the repository root, build the docs site and serve it on port 3000:
+
+[source,bash]
+----
+docker compose up trento-docs
+----
+
+Open http://localhost:3000 while the command is running.
+
+The generated HTML is in `trento-docs-site/build/trento-docs-site-public`.
+
+== Official SUSE documentation preview
+
+From the repository root, build the DocBook HTML in a container and serve it on port 3001:
+
+[source,bash]
+----
+docker compose up daps-html-serve
+----
+
+Open http://localhost:3001 while the command is running.
+
+The generated HTML is in `trento/build/SLES-SAP-trento/html/SLES-SAP-trento`.
+Each run clears `trento/build/SLES-SAP-trento` before rebuilding to avoid stale files.
+
+== Combined preview (Antora + DocBook)
+
+Start both preview servers with one command:
+
+[source,bash]
+----
+docker compose up
+----
+
+== Dev docs environment without logs
+
+Start all services in the background and skip compose logs:
+
+[source,bash]
+----
+bash dev-docs-env.sh
+----
+
+If your local Docker setup requires elevated permissions, run it with `sudo`.
+
+Once it finishes, open:
+
+* http://localhost:3000 (Trento docs hub)
+* http://localhost:3001 (SUSE HTML build)
+* http://localhost:3002/SLES-SAP-trento_en.pdf (SUSE PDF build)
+
+== Contribution Notes
 
 === Images in `content/`
 
@@ -37,58 +176,9 @@ The collector scan preserves subdirectories from `content/images/`; it does not 
 
 This setup renders images in both GitHub preview and Antora.
 
+== Contributor Guides
 
-== Trento docs site ui
-
-The `trento-docs-site-ui` directory is used to customize and design the layout of the link:https://www.trento-project.io/docs/[Trento docs site]. Learn more about the xref:trento-docs-site-ui/README.adoc[ui customization here].
-
-== Trento docs hub preview
-
-From the repository root, build the docs site and serve it on port 3000:
-
-[source,bash]
-----
-docker compose up trento-docs
-----
-
-Open http://localhost:3000 while the command is running.
-
-The generated HTML is in `trento-docs-site/build/trento-docs-site-public`.
-
-== Official SUSE documentation preview
-
-From the repository root, build the DocBook HTML in a container and serve it on port 3001:
-
-[source,bash]
-----
-docker compose up daps-serve
-----
-
-Open http://localhost:3001 while the command is running.
-
-The generated HTML is in `trento/build/SLES-SAP-trento/html/SLES-SAP-trento`.
-Each run clears `trento/build/SLES-SAP-trento` before rebuilding to avoid stale files.
-
-== Combined preview (Antora + DocBook)
-
-Start both preview servers with one command:
-
-[source,bash]
-----
-docker compose up
-----
-
-== Dev docs environment without logs
-
-Start all services in the background and skip compose logs:
-
-[source,bash]
-----
-sudo bash dev-docs-env.sh
-----
-
-Once it finishes, open:
-
-* http://localhost:3000 (Trento docs hub)
-* http://localhost:3001 (SUSE HTML build)
-* http://localhost:3002/SLES-SAP-trento_en.pdf (SUSE PDF build)
+* xref:trento-docs-site/preview-docs-with-docker.adoc[Local documentation preview with Docker]
+* xref:trento-docs-site/collaboration-docs-team/docs-git-workflow.adoc[Git workflow for Trento documentation]
+* xref:trento-docs-site/contribution-upstream/components-nav-guide.adoc[Component documentation navigation guide]
+* xref:trento-docs-site/edit-url-extension-workflow.adoc[Edit URL extension workflow]
