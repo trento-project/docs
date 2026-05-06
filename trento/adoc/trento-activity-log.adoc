@@ -68,7 +68,7 @@ This can be changed in the Activity Log section under Settings. Changing
 the retention time requires the `+all:settings+` permissions. Entries
 older than the specified retention time are deleted every day at
 midnight (UTC timezone).
-Note that the cleanup schedule uses UTC,but timestamps shown in the UI are
+Note that the cleanup schedule uses UTC, but timestamps shown in the UI are
 adjusted to each user's preferred timezone for display purposes.
 
 The correlation functionality of the Activity Log links related events together,
