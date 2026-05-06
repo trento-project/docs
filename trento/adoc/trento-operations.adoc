@@ -3,12 +3,15 @@ include::product-attributes.adoc[]
 
 == Operations
 
-Operations in {trento} follow four principles:
+Operations in {trento} follow five principles:
 
 . **Permissions:** Only users with `operation:all` permissions can perform operations.
 . **Contextual UI paths:** The path to request an operation depends on the target. To enable maintenance on an entire cluster, use the **Operation** button in the cluster details view. To enable maintenance on a specific node or resource, use the options menu in the corresponding row.
 . **Single operation concurrency:** {trento} permits only one operation at a time on a target. While an operation runs, all other operations for that target (host, cluster, {sap} system, or {hana} database) are disabled.
 . **Safety policies:** Internal policies prevent users from executing operations that violate established best practices, even if the user has the permission to so. For example, if a user attempts to stop a {hana} database managed by a cluster, {trento} forbids the operation and displays a reason. Each operation has specific internal policies that are listed in the use cases below.
+. **Target heartbeat:** The execution of an operation depends on the heartbeat status of the target host(s). If the heartbeat is not active the operation is not allowed.
+.. **Single-host resource operations:** The target host must have an active heartbeat. This applies to operations in resources like: Host, Cluster node, SAP instance, etc.
+.. **Multi-host resource operations:** At least one constituent target host must have an active heartbeat. This applies to operations in resources like: Cluster, Database, SAP system, etc
 
 [IMPORTANT]
 ====
