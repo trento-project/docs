@@ -43,12 +43,7 @@ For any registered host, the details view provides the following operations:
 
 === Cluster operations
 
-When a user requests a cluster operation, {trento} checks the cluster state using `cs_clusterstate -i`. If the {tragent} cannot find the `cs_clusterstate` executable or the command returns any state other than `IDLE`, the operation fails. This restriction prevents users from executing operations while the cluster is in transition.
-
-[NOTE]
-====
-The `cs_clusterstate` executable is delivered with the `ClusterTools2` package.
-====
+When a user requests a cluster operation, {trento} checks the cluster state running `crmadmin -qS NODE` (`NODE` being the DC node). If the command returns any state other than `IDLE`, the operation fails. This restriction prevents users from executing operations while the cluster is in transition.
 
 For any registered cluster, the details view provides the following operations:
 
