@@ -1,0 +1,100 @@
+= CI and Publishing Overview
+
+This document explains the GitHub workflows used by this repository and how they relate to the docs hub and the user-facing SUSE documentation sources.
+
+== Overview
+
+The repository currently defines three GitHub workflows:
+
+* `build-page.yaml`
+* `extension-tests.yaml`
+* `validate-suse-docs.yaml`
+
+Each workflow has a different purpose:
+
+* `build-page.yaml` publishes the docs hub to GitHub Pages
+* `validate-suse-docs.yaml` validates the user-facing documentation sources under `trento/`
+* `extension-tests.yaml` runs tests for the custom Antora extension
+
+== Docs Hub Publication
+
+The docs hub publication workflow is `.github/workflows/build-page.yaml`.
+
+It runs on:
+
+* pushes to `main`
+* manual dispatch
+* a weekly schedule
+
+The workflow:
+
+. Checks out the repository with full history
+. Installs Node.js
+. Installs Antora dependencies needed by the workflow
+. Runs `npx antora antora-playbook.yml` in `trento-docs-site/`
+. Uploads `trento-docs-site/build/trento-docs-site-public`
+. Deploys the rendered site to GitHub Pages
+
+Because the playbook builds from `HEAD` and `latest`, a publication run from `main` publishes both the pre-release docs and the current release docs.
+
+== User-Facing Documentation Validation
+
+The user-facing documentation validation workflow is `.github/workflows/validate-suse-docs.yaml`.
+
+It runs for changes under:
+
+* `trento/DC-*`
+* `trento/xml/**`
+* `trento/adoc/**`
+* `trento/images/src/**`
+
+It also supports manual dispatch.
+
+The workflow uses link:https://github.com/openSUSE/doc-ci[`openSUSE/doc-ci`] actions to:
+
+* check the basic soundness of the DC files
+* determine which DC files must be validated
+* run the validation jobs for those DC files
+
+This workflow validates the SUSE documentation sources in the repository.
+It does not publish to `documentation.suse.com`.
+Publication to `documentation.suse.com` happens separately: every Thursday, the user-facing documentation is built with the internal build tools maintained by the SUSE documentation team.
+
+== Extension Tests
+
+The extension test workflow is `.github/workflows/extension-tests.yaml`.
+
+It runs when files under `trento-docs-site/extensions/**` change, on:
+
+* pushes to `main`
+* pull requests
+* manual dispatch
+
+The workflow:
+
+. Installs Node.js
+. Installs dependencies in `trento-docs-site/`
+. Runs `npm test`
+
+At the moment, the tests verify the custom edit URL extension, including how it resolves repository paths, branch names, and final GitHub edit links for local docs and fetched component documentation.
+
+At the moment, these tests are focused on the custom Antora extension logic.
+
+== What Happens When You Change a Directory
+
+The workflows are easiest to understand when viewed by directory:
+
+* `trento/` changes trigger SUSE source validation and will be included in the next docs hub publication after merge to `main`
+* `content/` changes do not trigger a dedicated validation workflow, but they are included in the next docs hub publication after merge to `main`
+* `trento-docs-site/extensions/` changes trigger extension tests and are included in the next docs hub publication after merge to `main`
+* `trento-docs-site-ui/` changes do not trigger a dedicated workflow by themselves; the rebuilt bundle is consumed by the next docs hub publication
+
+== Relationship to Local Preview
+
+The local preview commands in the root `README.adoc` are the closest local equivalent to the CI behavior:
+
+* `docker compose up trento-docs` previews the docs hub build
+* `docker compose up daps-html-serve` previews the SUSE HTML output
+* `docker compose up daps-pdf-serve` previews the SUSE PDF output
+
+These previews are the recommended first step before relying on CI feedback.

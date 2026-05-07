@@ -39,7 +39,7 @@ The link:https://github.com/trento-project/docs/tree/main/trento[`trento`] direc
 
 === Project Documentation
 
-This repository contains project documentation maintained in this repository, including:
+This repository contains project documentation such as:
 
 * xref:architecture/trento-architecture.adoc[Architecture]
 * xref:architecture/adr/README.adoc[Architecture Decision Records (ADR)]
@@ -62,7 +62,7 @@ For example:
 
 The build process adapts this upstream content to the Antora layout used by the docs hub.
 For example, documentation maintained in an upstream repository such as link:https://github.com/trento-project/web[`trento-project/web`] is published in the docs hub as link:https://www.trento-project.io/docs/web/README.html[`/docs/web/README.html`].
-The source of truth still remains the upstream repository.
+The source of truth remains the upstream repository.
 
 [IMPORTANT]
 ====
@@ -212,7 +212,10 @@ These notes describe the documentation versioning and release workflow, includin
 
 == Build and Automation Notes
 
-These notes explain how the docs hub assembles external documentation and how supporting build automation works.
+These notes explain how the docs hub build, publication, and supporting automation work.
 
+* xref:trento-docs-site/build-pipeline-overview.adoc[Documentation build pipeline overview]
+* xref:trento-docs-site/ci-and-publishing-overview.adoc[CI and publishing overview]
+* xref:trento-docs-site/maintainer-runbook.adoc[Documentation maintainer runbook]
 * xref:trento-docs-site/contribution-upstream/components-nav-guide.adoc[Component documentation navigation guide]
 * xref:trento-docs-site/edit-url-extension-workflow.adoc[Edit URL extension workflow]
