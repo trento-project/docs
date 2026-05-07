@@ -30,6 +30,16 @@ Two permanent branches define the flow of work:
 *Purpose:* Reflects the content of the *currently published and supported* release.  
 *Contains:* The *official* version (e.g., v2.5).
 
+== Ownership and Review Expectations
+
+Ownership of the repository and its release branches is shared in practice, but not every branch has the same role:
+
+* the repository is owned by the Trento team
+* `main` is the collaboration branch used by the Trento developers and the documentation team
+* `latest` is a shared branch because it is used to build the official user-facing documentation
+
+Because `latest` is used for the official user-facing documentation, changes under `trento/` that are promoted to `latest` should be reviewed by a member of the documentation team.
+
 == Branch Protection
 
 To maintain stability and consistency:

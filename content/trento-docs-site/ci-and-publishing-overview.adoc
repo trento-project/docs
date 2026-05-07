@@ -78,8 +78,6 @@ The workflow:
 
 At the moment, the tests verify the custom edit URL extension, including how it resolves repository paths, branch names, and final GitHub edit links for local docs and fetched component documentation.
 
-At the moment, these tests are focused on the custom Antora extension logic.
-
 == What Happens When You Change a Directory
 
 The workflows are easiest to understand when viewed by directory:
@@ -98,3 +96,14 @@ The local preview commands in the root `README.adoc` are the closest local equiv
 * `docker compose up daps-pdf-serve` previews the SUSE PDF output
 
 These previews are the recommended first step before relying on CI feedback.
+
+== Ownership and External Dependencies
+
+For repository ownership, branch roles, and review expectations, see xref:trento-docs-site/collaboration-docs-team/docs-git-workflow.adoc[Git Workflow for Trento Documentation].
+
+The repository also depends on systems maintained outside the Trento team:
+
+* the DAPS container used for local SUSE preview is maintained by the documentation team
+* the weekly build that publishes the official SUSE documentation is run with the internal build tools maintained by the documentation team
+
+If these external systems break, or if SUSE publication behavior no longer matches the local preview or validation results, coordinate with the documentation team instead of trying to resolve the issue only in this repository.

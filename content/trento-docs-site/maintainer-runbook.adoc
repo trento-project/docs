@@ -20,6 +20,13 @@ If a new maintainer needs a fast onboarding path, read these documents in order:
 . `Edit URL Extension Workflow`
 . `Component Documentation Navigation Guide`
 
+== Ownership and Escalation
+
+For repository ownership, branch responsibilities, review expectations, and external dependency boundaries, see:
+
+* xref:trento-docs-site/collaboration-docs-team/docs-git-workflow.adoc[Git Workflow for Trento Documentation]
+* xref:trento-docs-site/ci-and-publishing-overview.adoc[CI and Publishing Overview]
+
 == Quick Impact Guide
 
 Use this section to decide what a change affects and what to verify.
