@@ -178,7 +178,7 @@ Once it finishes, open:
 * http://localhost:3001 (SUSE HTML build)
 * http://localhost:3002/SLES-SAP-trento_en.pdf (SUSE PDF build)
 
-== Contribution Notes
+== Authoring Notes
 
 For docs under `content/`, keep image files in `content/images/`.
 
