@@ -1,13 +1,13 @@
-= Documentation Page
+= Antora Documentation Site
 
-This directory builds and publishes the link:https://www.trento-project.io/docs/[Trento project’s unified documentation site] using https://antora.org/[Antora].
+This directory contains the Antora playbook and site assembly logic for the link:https://www.trento-project.io/docs/[Trento project’s unified documentation site].
+It builds the docs hub from the documentation maintained in this repository together with documentation fetched from upstream Trento repositories.
 
-The actual documentation content is maintained in separate upstream repositories:
+The current list of fetched upstream repositories is defined in `trento-docs-site/antora.yml`.
 
 == Included Repositories
 
 * https://github.com/trento-project/docs[docs]
-* https://github.com/SUSE/doc-unversioned[doc-unversioned]
 * https://github.com/trento-project/web[web]
 * https://github.com/trento-project/agent[agent]
 * https://github.com/trento-project/helm-charts[helm-charts]
@@ -21,6 +21,7 @@ The actual documentation content is maintained in separate upstream repositories
 * https://github.com/trento-project/continuous-delivery[continuous-delivery]
 * https://github.com/trento-project/werkzeugkoffer[werkzeugkoffer]
 * https://github.com/trento-project/mcp-server[mcp-server]
+* https://github.com/trento-project/trento-installation-automation[trento-installation-automation]
 
 == How to Build and Preview the Site
 
@@ -36,8 +37,10 @@ cd docs/trento-docs-site
 
 [source,bash]
 ----
-npm i -D -E antora
+npm install
 ----
+
+This installs the Antora dependencies and extensions declared in `trento-docs-site/package.json`.
 
 === 3. Build Antora page
 
@@ -46,7 +49,9 @@ npm i -D -E antora
 npx antora antora-playbook.yml
 ----
 
-This will generate the site into the /build/trento-docs-site-public folder.
+The build fetches documentation from the upstream repositories defined in `antora.yml`, so network access is required.
+
+This generates the site into `./build/trento-docs-site-public`.
 
 === 4. Preview Locally
 
