@@ -1,6 +1,7 @@
 = Antora Documentation Site UI
 
-This project is a customized UI bundle for Antora, based on the https://gitlab.com/antora/antora-ui-default[Antora default UI]. It provides the branding and layout for the Trento documentation site.
+This directory contains the customized UI bundle for the Trento documentation site, based on the https://gitlab.com/antora/antora-ui-default[Antora default UI].
+The Antora site assembly in `trento-docs-site/` consumes the generated UI bundle from this directory.
 Checkout the whole documentation at link:https://docs.antora.org/antora-ui-default/[Antora Default UI Documentation].
 
 == Project Structure
@@ -8,6 +9,7 @@ Checkout the whole documentation at link:https://docs.antora.org/antora-ui-defau
 [source]
 ----
 src/            # UI source files (layouts, partials, helpers)
+gulp.d/         # Gulp task implementations and task helpers
 preview-src/    # Demo content for local preview
 public/         # Output directory for preview site
 build/          # Build artifacts including ui-bundle.zip
@@ -54,7 +56,7 @@ To continuously build and preview your UI as you make changes, run:
 npx gulp preview
 ----
 
-This starts a local development server using the content in `preview-src/`, allowing you to see updates live in the browser.
+This starts a local development server using the content in `preview-src/`, allowing you to see updates live in the browser on port `5252`.
 
 === Build the UI Bundle
 
@@ -67,7 +69,14 @@ npx gulp bundle
 
 This command creates a compiled UI bundle (`ui-bundle.zip`) in the `build/` directory.
 
-The Trento documentation site uses this bundle from the `trento-antora-ui/build/ui-bundle.zip` path in the playbook configuration.
+The Antora site in `trento-docs-site/` uses this bundle from `trento-docs-site-ui/build/ui-bundle.zip` in the playbook configuration.
+
+[IMPORTANT]
+====
+If you change the UI sources, you must rebuild the UI bundle and commit the updated `build/ui-bundle.zip`.
+
+Otherwise the previously generated bundle will still be used, and your UI changes will not be applied in the site build.
+====
 
 === Customize the UI
 
