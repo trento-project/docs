@@ -204,8 +204,15 @@ link:https://github.com/trento-project/docs/blob/main/content/internal-notes/ana
 
 The collector scan preserves subdirectories from `content/images/`; it does not flatten files.
 
-== Contributor Guides
+== Versioning and Release Workflow
+
+These notes describe the documentation versioning and release workflow, including the roles of `main` and `latest` and the promotion flow for releases and hotfixes.
 
 * xref:trento-docs-site/collaboration-docs-team/docs-git-workflow.adoc[Git workflow for Trento documentation]
+
+== Build and Automation Notes
+
+These notes explain how the docs hub assembles external documentation and how supporting build automation works.
+
 * xref:trento-docs-site/contribution-upstream/components-nav-guide.adoc[Component documentation navigation guide]
 * xref:trento-docs-site/edit-url-extension-workflow.adoc[Edit URL extension workflow]
