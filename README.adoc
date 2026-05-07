@@ -206,7 +206,6 @@ The collector scan preserves subdirectories from `content/images/`; it does not 
 
 == Contributor Guides
 
-* xref:trento-docs-site/preview-docs-with-docker.adoc[Local documentation preview with Docker]
 * xref:trento-docs-site/collaboration-docs-team/docs-git-workflow.adoc[Git workflow for Trento documentation]
 * xref:trento-docs-site/contribution-upstream/components-nav-guide.adoc[Component documentation navigation guide]
 * xref:trento-docs-site/edit-url-extension-workflow.adoc[Edit URL extension workflow]
