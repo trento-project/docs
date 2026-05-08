@@ -1,6 +1,8 @@
 = Documentation Build Pipeline Overview
 
 This document explains how the Trento docs hub is assembled from local sources, fetched component documentation, generated metadata, and the custom UI bundle.
+It focuses on site assembly mechanics.
+For local preview commands, see the root `README.adoc` or xref:trento-docs-site/README.adoc[Antora Documentation Site].
 
 == Overview
 

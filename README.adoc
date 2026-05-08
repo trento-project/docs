@@ -109,7 +109,7 @@ Examples:
 
 === Preview the Trento docs hub
 
-From the repository root, build the docs site and serve it on port 3000:
+From the repository root, this is the default way to preview the full docs hub workflow, including the current site assembly and published-output structure:
 
 [source,bash]
 ----
@@ -119,6 +119,17 @@ docker compose up trento-docs
 Open http://localhost:3000 while the command is running.
 
 The generated HTML is in `trento-docs-site/build/trento-docs-site-public`.
+
+[NOTE]
+====
+If you are working only in `trento-docs-site/`, you can use the manual Antora workflow described in xref:trento-docs-site/README.adoc[Antora Documentation Site].
+====
+
+[IMPORTANT]
+====
+Docs hub previews consume `trento-docs-site-ui/build/ui-bundle.zip`.
+If you changed UI sources in `trento-docs-site-ui/`, rebuild the UI bundle first or the docs hub preview will still use the previous bundle.
+====
 
 === Preview SUSE documentation
 

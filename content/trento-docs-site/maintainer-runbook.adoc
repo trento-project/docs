@@ -62,11 +62,25 @@ Then confirm that the fetched component documentation appears correctly in the d
 
 === Update UI behavior
 
-Edit `trento-docs-site-ui/`, preview with `npx gulp preview`, rebuild `build/ui-bundle.zip`, and commit the regenerated bundle.
+Edit `trento-docs-site-ui/`, preview with `npx gulp preview`, rebuild the bundle with `npx gulp bundle`, and commit the regenerated `build/ui-bundle.zip`.
 
 === Update site assembly logic
 
 Edit `trento-docs-site/`, preview the docs hub, inspect the generated files under `trento-docs-site/build/`, and update the related maintainer documentation when the build behavior changes.
+
+=== Update publication or validation workflows
+
+Edit `.github/workflows/`, verify the intended behavior against xref:trento-docs-site/ci-and-publishing-overview.adoc[CI and Publishing Overview], and update the related documentation in the same change.
+
+== Quick Routing
+
+Use this quick guide when you know what kind of change you are making:
+
+* content-only docs hub change: preview with `docker compose up trento-docs`
+* user-facing documentation change: preview both the docs hub and the SUSE output
+* UI-only change: use `npx gulp preview`, then rebuild `build/ui-bundle.zip` with `npx gulp bundle`
+* Antora assembly logic change: preview the docs hub and inspect generated files under `trento-docs-site/build/`
+* workflow/config change: compare the workflow behavior with `CI and Publishing Overview`
 
 == Troubleshooting
 

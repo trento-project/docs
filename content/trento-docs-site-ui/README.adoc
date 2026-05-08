@@ -18,12 +18,10 @@ gulpfile.js     # Gulp tasks for building the UI
 
 === Install dependencies
 
-
 [source,sh]
 ----
-npm i
+npm install
 ----
-
 
 === Supported build tasks
 
@@ -35,17 +33,16 @@ npx gulp --tasks-simple
 You should see:
 [source]
 ----
-default          // Runs the default task, typically an alias for 'build'
+default          // Runs the default task, which maps to the publishable bundle flow
 clean            // Removes generated files and directories (e.g., build/, public/)
 lint             // Lints JavaScript and stylesheet source files
 format           // Applies formatting to source files using configured linters
-build            // Runs the full build process: clean, lint, format, bundle
-bundle           // Compiles and copies UI assets into the 'public/' folder
+build            // Stages the UI assets used for bundling
+bundle           // Cleans, lints, builds, and creates the publishable UI bundle
 bundle:pack      // Creates a zip archive of the UI bundle as 'ui-bundle.zip' in the build/ folder
 preview          // Starts a local preview server using content in preview-src/
 preview:build    // Builds a static site for preview into the 'public/' directory
 ----
-
 
 === Develop and Preview Changes
 
@@ -58,6 +55,12 @@ npx gulp preview
 
 This starts a local development server using the content in `preview-src/`, allowing you to see updates live in the browser on port `5252`.
 
+[NOTE]
+====
+Use `npx gulp preview` when you are working only on the UI and want fast feedback on templates, styles, or helpers.
+This preview does not rebuild the docs hub automatically.
+====
+
 === Build the UI Bundle
 
 When you're ready to package the UI for use in the actual documentation site, run:
@@ -67,7 +70,7 @@ When you're ready to package the UI for use in the actual documentation site, ru
 npx gulp bundle
 ----
 
-This command creates a compiled UI bundle (`ui-bundle.zip`) in the `build/` directory.
+This command runs the full publishable UI flow and creates `build/ui-bundle.zip`.
 
 The Antora site in `trento-docs-site/` uses this bundle from `trento-docs-site-ui/build/ui-bundle.zip` in the playbook configuration.
 
@@ -76,6 +79,12 @@ The Antora site in `trento-docs-site/` uses this bundle from `trento-docs-site-u
 If you change the UI sources, you must rebuild the UI bundle and commit the updated `build/ui-bundle.zip`.
 
 Otherwise the previously generated bundle will still be used, and your UI changes will not be applied in the site build.
+====
+
+[NOTE]
+====
+If you preview the docs hub with `docker compose` or by running `npx antora`, the build consumes the checked-in UI bundle.
+Raw UI source changes are not visible there until `ui-bundle.zip` is rebuilt.
 ====
 
 === Customize the UI

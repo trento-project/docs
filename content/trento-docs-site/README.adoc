@@ -1,10 +1,12 @@
 = Antora Documentation Site
 
-This directory contains the Antora playbook and site assembly logic for the link:https://www.trento-project.io/docs/[Trento project’s unified documentation site].
-It builds the docs hub from the documentation maintained in this repository together with documentation fetched from upstream Trento repositories.
+This directory contains the Antora playbook and site assembly logic for the link:https://www.trento-project.io/docs/[Trento documentation hub].
+It builds the docs hub from the documentation maintained in this repository together with documentation fetched from upstream component repositories.
 
-The current list of fetched upstream repositories is defined in
-link:https://github.com/trento-project/docs/blob/main/trento-docs-site/antora.yml[`trento-docs-site/antora.yml`].
+The Antora content assembly is controlled by two main files:
+
+* link:https://github.com/trento-project/docs/blob/main/trento-docs-site/antora.yml[`trento-docs-site/antora.yml`] defines how local and fetched documentation is scanned into Antora modules
+* link:https://github.com/trento-project/docs/blob/main/trento-docs-site/antora-playbook.yml[`trento-docs-site/antora-playbook.yml`] selects the local branches to build and the UI bundle to use
 
 Examples of fetched component repositories include:
 
@@ -12,7 +14,13 @@ Examples of fetched component repositories include:
 * https://github.com/trento-project/agent[agent]
 * https://github.com/trento-project/mcp-server[mcp-server]
 
-For the full current list, refer to `antora.yml`.
+For the full current list of fetched repositories, refer to `trento-docs-site/antora.yml`.
+
+[NOTE]
+====
+Use the root `README.adoc` when you want the default repository-wide preview workflow with `docker compose`.
+Use the commands in this page when you are working directly in `trento-docs-site/` and want a focused Antora-site build without the full compose environment.
+====
 
 == How to Build and Preview the Site
 
@@ -43,6 +51,12 @@ npx antora antora-playbook.yml
 The build fetches documentation from the upstream repositories defined in `antora.yml`, so network access is required.
 
 This generates the site into `./build/trento-docs-site-public`.
+
+[IMPORTANT]
+====
+This build consumes `trento-docs-site-ui/build/ui-bundle.zip`.
+If you changed the UI sources in `trento-docs-site-ui/`, rebuild the UI bundle first or your docs hub preview will still use the previous bundle.
+====
 
 === 4. Preview Locally
 

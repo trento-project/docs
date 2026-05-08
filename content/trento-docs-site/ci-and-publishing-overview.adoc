@@ -1,6 +1,8 @@
 = CI and Publishing Overview
 
 This document explains the GitHub workflows used by this repository and how they relate to the docs hub and the user-facing SUSE documentation sources.
+It focuses on workflow triggers, validation, and publication behavior.
+For Antora site assembly details, see xref:trento-docs-site/build-pipeline-overview.adoc[Documentation build pipeline overview].
 
 == Overview
 
@@ -96,6 +98,11 @@ The local preview commands in the root `README.adoc` are the closest local equiv
 * `docker compose up daps-pdf-serve` previews the SUSE PDF output
 
 These previews are the recommended first step before relying on CI feedback.
+
+[NOTE]
+====
+If your change is in `trento-docs-site-ui/`, rebuild `trento-docs-site-ui/build/ui-bundle.zip` before relying on a docs hub preview or publication result.
+====
 
 == Ownership and External Dependencies
 
