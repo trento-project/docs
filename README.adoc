@@ -207,7 +207,7 @@ The collector scan preserves subdirectories from `content/images/`; it does not 
 
 == Versioning and Release Workflow
 
-These notes describe the documentation versioning and release workflow, including the roles of `main` and `latest` and the promotion flow for releases and hotfixes.
+These notes describe the documentation versioning and release workflow, including the roles of `main` and `latest` and the promotion flow for releases, partial release updates, and hotfixes.
 
 * xref:trento-docs-site/collaboration-docs-team/docs-git-workflow.adoc[Git workflow for Trento documentation]
 

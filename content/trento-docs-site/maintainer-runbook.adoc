@@ -53,6 +53,7 @@ Edit `content/`, preview the docs hub, and confirm that links and images resolve
 === Update user-facing documentation
 
 Edit `trento/`, preview the docs hub and the SUSE output, and make sure the change works in both output styles.
+If several reviewed user-facing documentation changes already exist on `main` and should move together to the current release without a version bump, follow the partial release update workflow in xref:trento-docs-site/collaboration-docs-team/docs-git-workflow.adoc[Git Workflow for Trento Documentation].
 
 === Update component documentation
 
