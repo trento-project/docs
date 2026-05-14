@@ -235,6 +235,51 @@ This approach minimizes architectural complexity and operational overhead allowi
 
 Even though the Elixir ecosystem is not as mature as others, in this regard, we believe it is enough to support our needs.
 
+===== Details about the integration in web
+
+Langchain https://github.com/brainlid/langchain[library] itself provides a set of primitives and tools to integrate with LLMs and build AI agents. We need to implement the actual agent logic ourselves, using the LangChain library as a foundation.
+
+In this regard, the https://github.com/brainlid[same author] of the LangChain Elixir library has also implemented a higher level framework called https://github.com/sagents-ai/sagents[Sagents] which provides more batteries included features and abstractions to build AI agents. Take a look also at its https://github.com/sagents-ai/agents_demo[demo application].
+
+It's worth noting that:
+* we can introduce the more advanced features (like HITL) that Sagents provides incrementally
+* Sagents provides a generator/scaffolding tool to create the basic building blocks for the agent
+* Sagents natively addresses LiveView integration, however we can revisit it to suit our needs and work with Channels
+* we successfully had it working in an AG-UI+Assistant-UI+websocket setup in our iterations, meaning that it is possible to use it in the way we want to use it
+
+Now the point is that the agentic core is quite decoupled from stricty trento (except for a few integrations points, such as linking conversations to users, a few tables that need to be created in the database, Channel integration) and this opens for two options of integration:
+
+====== In-Web integration
+
+This option is about scaffolding the agentic core within web, meaning that we would have the agent logic and the LangChain/Sagents library as part of web's codebase.
+
+PROs:
+
+* simple to set up and straigntforward evolution as per the needs that Trento application might have (change inline what you need, when you need it)
+* we can eventually extract the agentic core as a separate library if we see the need to do so in the future
+
+CONs:
+
+* higher risk of mixing concerns between the agentic logic and the web application logic, even though we can mitigate it with good practices and clear boundaries
+
+====== Library integration
+
+This option is about wrapping the agentic core as a separate library that web would use to implement the AI assistant features. This library could be developed and maintained independently from web.
+
+Here's a possibility for the proposed library https://github.com/trento-project/agentic_runtime
+
+PROs:
+
+* clear separation of concerns between the agentic logic and the web application logic
+* an example for the future about other possibly extractable pieces of code 
+
+CONs:
+
+* possibly higher level of friction in the development and evolution of the agentic runtime
+* we might not get the correct library boundaries from the start, meaning that we might end up with some parts in web that should be in the library, leading to friction and overhead in the development (like: is the Channel implementation part of the library or of web? is the AG-UI protocol implementation part of the library or of web? etc...), however when we realize this we can always move the code in the right place
+
+Given the above, the proposed solution is TBD...
+
 === UI to Agent Communication
 
 The client application, namely the AI assistant widget in Trento, needs to communicate with the backend AI agent to send inputs and receive responses.
