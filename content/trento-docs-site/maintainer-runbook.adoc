@@ -1,0 +1,151 @@
+= Documentation Maintainer Runbook
+
+This document is a practical handover guide for maintainers of the Trento documentation repository.
+It is intentionally task-oriented.
+Use it together with the more detailed system documents:
+
+* xref:trento-docs-site/build-pipeline-overview.adoc[Documentation build pipeline overview]
+* xref:trento-docs-site/ci-and-publishing-overview.adoc[CI and publishing overview]
+* xref:trento-docs-site/edit-url-extension-workflow.adoc[Edit URL extension workflow]
+* xref:trento-docs-site/contribution-upstream/components-nav-guide.adoc[Component documentation navigation guide]
+
+== Start Here
+
+If a new maintainer needs a fast onboarding path, read these documents in order:
+
+. `README.adoc`
+. `Documentation Build Pipeline Overview`
+. `CI and Publishing Overview`
+. `Documentation Maintainer Runbook`
+. `Edit URL Extension Workflow`
+. `Component Documentation Navigation Guide`
+
+== Ownership and Escalation
+
+For repository ownership, branch responsibilities, review expectations, and external dependency boundaries, see:
+
+* xref:trento-docs-site/collaboration-docs-team/docs-git-workflow.adoc[Git Workflow for Trento Documentation]
+* xref:trento-docs-site/ci-and-publishing-overview.adoc[CI and Publishing Overview]
+
+== Quick Impact Guide
+
+Use this section to decide what a change affects and what to verify.
+
+* `trento/` - user-facing documentation source
+  Verify: docs hub preview, SUSE HTML preview, and SUSE PDF preview when formatting matters.
+* `content/` - project documentation source
+  Verify: docs hub preview, links, and images.
+* upstream component repositories - source of truth for documentation published under `Components`
+  Verify: docs hub preview, component navigation, images, and `Edit this page` links.
+* `trento-docs-site/` - Antora assembly logic, scripts, and extensions
+  Verify: docs hub preview, generated artifacts under `trento-docs-site/build/`, and `npm test` when extension logic changes.
+* `trento-docs-site-ui/` - custom UI bundle
+  Verify: `npx gulp preview`, rebuild the bundle with `npx gulp bundle`, and commit the updated `build/ui-bundle.zip`.
+* `.github/workflows/` - validation and publication behavior
+  Verify: workflow intent against `CI and Publishing Overview`, and update the docs when workflow behavior changes.
+
+== Routine Maintenance
+
+=== Update project documentation
+
+Edit `content/`, preview the docs hub, and confirm that links and images resolve correctly.
+
+=== Update user-facing documentation
+
+Edit `trento/`, preview the docs hub and the SUSE output, and make sure the change works in both output styles.
+If several reviewed user-facing documentation changes already exist on `main` and should move together to the current release without a version bump, follow the partial release update workflow in xref:trento-docs-site/collaboration-docs-team/docs-git-workflow.adoc[Git Workflow for Trento Documentation].
+
+=== Update component documentation
+
+Edit the source repository, not this repository.
+Then confirm that the fetched component documentation appears correctly in the docs hub.
+
+=== Update UI behavior
+
+Edit `trento-docs-site-ui/`, preview with `npx gulp preview`, rebuild the bundle with `npx gulp bundle`, and commit the regenerated `build/ui-bundle.zip`.
+
+=== Update site assembly logic
+
+Edit `trento-docs-site/`, preview the docs hub, inspect the generated files under `trento-docs-site/build/`, and update the related maintainer documentation when the build behavior changes.
+
+=== Update publication or validation workflows
+
+Edit `.github/workflows/`, verify the intended behavior against xref:trento-docs-site/ci-and-publishing-overview.adoc[CI and Publishing Overview], and update the related documentation in the same change.
+
+== Quick Routing
+
+Use this quick guide when you know what kind of change you are making:
+
+* content-only docs hub change: preview with `docker compose up trento-docs`
+* user-facing documentation change: preview both the docs hub and the SUSE output
+* UI-only change: use `npx gulp preview`, then rebuild `build/ui-bundle.zip` with `npx gulp bundle`
+* Antora assembly logic change: preview the docs hub and inspect generated files under `trento-docs-site/build/`
+* workflow/config change: compare the workflow behavior with `CI and Publishing Overview`
+
+== Troubleshooting
+
+=== A component page is missing from the docs hub
+
+Check:
+
+* whether the upstream repository is still listed in `trento-docs-site/antora.yml`
+* whether the upstream repository still contains the expected `README.adoc`, `docs/`, or `guides/` structure
+* whether `trento-docs-site/build/tmp_components/<component>/` was populated during the build
+* whether `trento-docs-site/build/gen_navigation/nav_components.adoc` contains the expected entry
+
+Then review the `Component Documentation Navigation Guide`.
+
+=== The component page exists, but the navigation entry is wrong
+
+Check:
+
+* the page title in the source AsciiDoc file
+* directory naming in the upstream repository
+* whether the file is located under `docs/` or `guides/`
+* whether the content was placed in an ignored directory such as `images/` or `examples/`
+
+=== The `Edit this page` link is wrong or missing
+
+Check:
+
+* whether the page comes from `content/`, `trento/`, or a fetched component repository
+* whether the page source path matches the rules documented in `Edit URL Extension Workflow`
+* whether the repository and relative path are what the extension expects
+* whether the change requires an update to `trento-docs-site/extensions/edit-url.cjs` and its tests
+
+=== A UI change is not visible in the built docs hub
+
+Check:
+
+* whether `npx gulp bundle` was run
+* whether `trento-docs-site-ui/build/ui-bundle.zip` was committed
+* whether the site build is using the updated bundle
+
+=== A `trento/` change looks correct in the docs hub but wrong in the SUSE output
+
+Check:
+
+* the local DAPS preview
+* whether the issue is caused by DocBook or DAPS-specific rendering
+* whether the change relies on docs-hub-specific behavior that is not part of the SUSE toolchain
+
+=== The docs hub build fails while fetching component documentation
+
+Check:
+
+* network availability
+* repository name changes in `trento-docs-site/antora.yml`
+* upstream repository availability
+* path assumptions in generated navigation or scanning rules
+
+== Keep the Documentation in Sync
+
+When the documentation system changes, update the documents that describe it:
+
+* update `README.adoc` when the repository structure, editing model, preview commands, or published outputs change
+* update `content/trento-docs-site/README.adoc` when the Antora site assembly workflow changes
+* update `content/trento-docs-site-ui/README.adoc` when the UI bundle workflow changes
+* update `CI and Publishing Overview` when workflow behavior changes
+* update `Documentation Build Pipeline Overview` when collector, script, or assembly behavior changes
+* update `Edit URL Extension Workflow` when the edit URL rules change
+* update `Component Documentation Navigation Guide` when component navigation generation rules change

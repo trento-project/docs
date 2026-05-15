@@ -1,5 +1,16 @@
 // Trento docs https://github.com/trento-project/docs
-* xref:README.adoc[Developer Documentation]
+* Developer Documentation
+
+**  xref:README.adoc[Trento Documentation]
+*** xref:trento-docs-site/README.adoc[Antora Documentation Site]
+*** xref:trento-docs-site-ui/README.adoc[Antora Documentation Site UI]
+*** xref:trento-docs-site/collaboration-docs-team/docs-git-workflow.adoc[Git Workflow for Trento Documentation]
+*** xref:trento-docs-site/build-pipeline-overview.adoc[Documentation Build Pipeline Overview]
+*** xref:trento-docs-site/ci-and-publishing-overview.adoc[CI and Publishing Overview]
+*** xref:trento-docs-site/maintainer-runbook.adoc[Documentation Maintainer Runbook]
+*** xref:trento-docs-site/edit-url-extension-workflow.adoc[Edit URL Extension Workflow]
+*** xref:trento-docs-site/contribution-upstream/components-nav-guide.adoc[Component Documentation Navigation Guide]
+
 
 ** xref:architecture/trento-architecture.adoc[Trento Architecture]
 *** xref:architecture/adr/README.adoc[Architectural Decision Record]
@@ -44,13 +55,5 @@
 *** xref:internal-notes/release.adoc[Release Process]
 *** xref:internal-notes/trento-container-install.adoc[Containerized deployment]
 *** xref:internal-notes/analytics-setup.adoc[Analytics Google Tag Manager setup]
-
-** Trento Documentation Page
-*** xref:trento-docs-site/README.adoc[Documentation Page]
-*** xref:trento-docs-site/preview-docs-with-docker.adoc[Local Documentation Preview with Docker]
-*** xref:trento-docs-site/edit-url-extension-workflow.adoc[Edit URL Extension Workflow]
-*** xref:trento-docs-site/contribution-upstream/components-nav-guide.adoc[Component Documentation Navigation Guide]
-*** xref:trento-docs-site/collaboration-docs-team/docs-git-workflow.adoc[Git Workflow for Trento Documentation]
-*** xref:trento-docs-site-ui/README.adoc[Documentation Page UI]
 
 include::partial$nav_components.adoc[]
