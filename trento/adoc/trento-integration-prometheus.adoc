@@ -3,7 +3,7 @@ include::product-attributes.adoc[]
 :revdate: 2026-04-30
 == {prometheus} integration
 
-{prometheus} Server is a {trserver} component responsible for retrieving the memory and CPU utilization metrics from the agent hosts and serving them to the web component. The web component renders the metrics as dynamic graphical charts in the details view of the registered hosts.
+{prometheus} Server is a {trserver} component responsible for retrieving host metrics from the agent hosts and serving them to the web component. The web component renders some of these metrics as graphical charts in the details view of the registered hosts. Particularly: memory, CPU, filesystem and swap utilization.
 Note that metrics are stored in UTC in {prometheus} Server; the web UI converts and renders chart axes and hover timestamps using each user's preferred timezone.
 
 === Metrics collection overview
