@@ -110,7 +110,7 @@ For any registered {hana} database, the details view provides the following oper
 *** If there is an application layer ({sap} system) on top of the database, all application server instances must be stopped.
 ** Internal timeout: 12 hours
 
-For any registered {hana} database that is part of a HANA replication system, the details view provides the following operations in the corresponding sections:
+For any registered {hana} database that is part of a HANA replication system, the details view provides the following operations in the different layout sections:
 
 * **Start database**: Enabled when the database site is stopped. It calls `sapcontrol` with the function `StartSystem`.
 ** **Options**:
