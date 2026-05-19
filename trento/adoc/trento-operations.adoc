@@ -91,41 +91,44 @@ For any registered cluster, the details view provides the following operations:
 
 === {hana} operations
 
-For any registered {hana} database that is not part of a HANA replication system, the details view provides the following operations at the top:
+For any registered {hana} database, the details view provides the following operations at the top:
 
-* **Start database**: Enabled when the database is stopped. It calls `sapcontrol` with the function `StartSystem`.
-** **Options**:
-*** **Timeout**: Establishes the time in minutes that {trento} waits for the database to start before initiating a rollback.
-** Activity type: `Database Operation Requested`
-** Internal policies: Not applicable.
-** Internal timeout: 12 hours
-
-* **Stop database**: Enabled when the database is started. It calls `sapcontrol` with the function `StopSystem`.
-** **Options**:
-*** **Timeout**: Establishes the time in minutes that {trento} waits for the database to stop before initiating a rollback.
-** Activity type: `Database Operation Requested`
-** Internal policies: If there is an application layer ({sap} system) on top of the database, all application server instances must be stopped.
-** Internal timeout: 12 hours
-
-For any registered {hana} database that is part of a HANA replication system, the details view provides the following operations in the corresponding sections:
-
-* **Start database**: Enabled when the database is stopped. It calls `sapcontrol` with the function `StartSystem`.
+* **Start database**: Enabled when the database, or any database site in a HANA replication setup, is stopped. It calls `sapcontrol` with the function `StartSystem`. In a HANA replication setup, it starts the entire database layer, calling the `sapcontrol` function in each database site ordered by the tier number from smallest to highest.
 ** **Options**:
 *** **Timeout**: Establishes the time in minutes that {trento} waits for the database to start before initiating a rollback.
 ** Activity type: `Database Operation Requested`
 ** Internal policies:
 *** If the database is managed by a {pace} cluster, the corresponding multistate resource or the cluster itself must be in maintenance mode.
-*** If the database is a secondary one, the corresponding primary database must be started.
 ** Internal timeout: 12 hours
 
-* **Stop database**: Enabled when the database is started. It calls `sapcontrol` with the function `StopSystem`.
+* **Stop database**: Enabled when the database, or any database site in a HANA replication setup, is started. It calls `sapcontrol` with the function `StopSystem`. In a HANA replication setup, it stops the entire database layer, calling the `sapcontrol` function in each database site ordered by the tier number from highest to smallest.
+** **Options**:
+*** **Timeout**: Establishes the time in minutes that {trento} waits for the database to stop before initiating a rollback.
+** Activity type: `Database Operation Requested`
+** Internal policies: 
+*** If the database is managed by a {pace} cluster, the corresponding multistate resource or the cluster itself must be in maintenance mode.
+*** If there is an application layer ({sap} system) on top of the database, all application server instances must be stopped.
+** Internal timeout: 12 hours
+
+For any registered {hana} database that is part of a HANA replication system, the details view provides the following operations in the different layout sections:
+
+* **Start database**: Enabled when the database site is stopped. It calls `sapcontrol` with the function `StartSystem`.
+** **Options**:
+*** **Timeout**: Establishes the time in minutes that {trento} waits for the database to start before initiating a rollback.
+** Activity type: `Database Operation Requested`
+** Internal policies:
+*** If the database is managed by a {pace} cluster, the corresponding multistate resource or the cluster itself must be in maintenance mode.
+*** If the database site is a secondary one, the database site being replicated must be started.
+** Internal timeout: 12 hours
+
+* **Stop database**: Enabled when the database site is started. It calls `sapcontrol` with the function `StopSystem`.
 ** **Options**:
 *** **Timeout**: Establishes the time in minutes that {trento} waits for the database to stop before initiating a rollback.
 ** Activity type: `Database Operation Requested`
 ** Internal policies:
 *** If the database is managed by a {pace} cluster, the corresponding multistate resource or the cluster itself must be in maintenance mode.
-*** If the database is a primary one, the corresponding secondary database must be stopped.
-*** If the database is a primary one and there is an application layer ({sap} system) on top of the database, all application server instances must be stopped.
+*** If the database site is being replicated (by a secondary or disaster recovery site), the replicating database site must be stopped.
+*** If the database site is a primary one and there is an application layer ({sap} system) on top of the database, all application server instances must be stopped.
 ** Internal timeout: 12 hours
 
 === {sap} operations
