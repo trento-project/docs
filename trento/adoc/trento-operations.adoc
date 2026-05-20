@@ -11,7 +11,7 @@ Operations in {trento} follow five principles:
 . **Safety policies:** Internal policies prevent users from executing operations that violate established best practices, even if the user has the permission to so. For example, if a user attempts to stop a {hana} database managed by a cluster, {trento} forbids the operation and displays a reason. Each operation has specific internal policies that are listed in the use cases below.
 . **Target heartbeat:** The execution of an operation depends on the heartbeat status of the target host(s). If the heartbeat is not active the operation is not allowed.
 .. **Single-host resource operations:** The target host must have an active heartbeat. This applies to operations in resources like: Host, Cluster node, SAP instance, etc.
-.. **Multi-host resource operations:** At least one constituent target host must have an active heartbeat. This applies to operations in resources like: Cluster, Database, SAP system, etc
+.. **Multi-host resource operations:** At least one constituent target host must have an active heartbeat. This applies to operations in resources like: Cluster, Database, SAP system, etc.
 
 [IMPORTANT]
 ====
