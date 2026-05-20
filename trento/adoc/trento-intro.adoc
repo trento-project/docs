@@ -16,7 +16,7 @@ include::product-attributes.adoc[]
 * Email alerting for critical events in the monitored landscape.
 * Integration of saptune into the console and specific configuration checks at host and cluster levels.
 * Information about relevant patches and upgradable packages for registered hosts via integration with {smlm}.
-* Monitoring of CPU and memory usage at the host level through basic integration with {prometheus}.
+* Monitoring of CPU, memory, filesystem and swap usage at host level through basic integration with {prometheus}.
 * API-based architecture to facilitate integration with other monitoring tools.
 * Rotating API key to protect communication from the {tragent} to the {trserver}.
 * AI assistance via Model Context Protocol (MCP) integration.

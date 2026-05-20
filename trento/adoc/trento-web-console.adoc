@@ -152,10 +152,8 @@ SUSE Multi-Linux Manager are maintained and the host is managed by the
 SUSE Multi-Linux Manager instance for which connection data has been
 provided. Refer to section <<sec-integration-with-SUSE-Manager>>.
 for further details.
-** Monitoring dashboard shows the CPU and memory usage for the specific
-hosts.
-+
-image::trento-web-hosts-dashboard-cpu-memory.png[trento-web-hosts-dashboard-cpu-memory,scaledwidth=80.0%]
+** *Monitoring dashboards* show the CPU, memory filesystem and swap usage for the specific
+host.
 ** *Provider Details* section shows the name of the cloud provider, the
 name of the virtual machine, the name of the resource group it belongs
 to, the location, the size of the virtual machine, and other
