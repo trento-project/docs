@@ -1,4 +1,4 @@
-== 4. AI Assistant Chatbox
+== 4. AI Assistant
 
 [width="100%",cols="<18%,<82%",]
 |===
