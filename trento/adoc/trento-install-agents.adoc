@@ -133,7 +133,7 @@ These parameters apply when `prometheus-mode` is set to `push`, which is require
 
 `+prometheus-url+`:: The {prometheus} remote write endpoint URL where Alloy will push metrics. Required in push mode.
 
-`+scrape-interval+`:: The interval at which Alloy scrapes local metrics. Defaults to `15s`. Used by `trento-agent generate alloy` only.
+`+prometheus-scrape-interval+`:: The interval at which Alloy scrapes local metrics. Defaults to `15s`. Used by `trento-agent generate alloy` only.
 
 `+prometheus-auth+`:: The authentication method for the {prometheus} remote write endpoint. Valid values are `none`, `basic` (default), `bearer`, or `mtls`. Used by `trento-agent generate alloy` only.
 

@@ -22,7 +22,7 @@ NOTE: In environments where at least one host uses {grafana} Alloy (either {sles
 
 The `node_exporter` must be installed and running in the agent hosts and {prometheus} Server must be able to reach the agent hosts at the IP address and port that the `node_exporter` is bound to.
 
-The IP address and port that {prometheus} Server uses to reach the `node_exporter` can be changed by setting parameter `node-exporter-target` with value `<ip_address>:<port>` in the agent configuration file.
+The IP address and port that {prometheus} Server uses to reach the `node_exporter` can be changed by setting parameter `prometheus-node-exporter-target` with value `<ip_address>:<port>` in the agent configuration file. The legacy parameter name `node-exporter-target` is still supported for backward compatibility.
 
 If the parameter is not set, {prometheus} Server uses the lowest IPv4 address discovered in the host with default port 9100.
 
@@ -220,7 +220,7 @@ For custom deployments not using the official {helm} chart or {ansible} playbook
 
 ===== Enable the {prometheus} remote write receiver
 
-{prometheus} must be started with the `--web.enable-remote-write-receiver` flag. How to set this flag depends on how {prometheus} is managed on your platform (for example, via a sysconfig file, a systemd drop-in, or a command-line argument).
+{prometheus} must be started with the --web.enable-remote-write-receiver flag. How to set this flag depends on how {prometheus} is managed on your platform (for example, via a sysconfig file, a {systemd} drop-in, or a command-line argument). In a sysconfig file scenario, add ARGS="--web.enable-remote-write-receiver" to the /etc/sysconfig/prometheus configuration file.
 
 After enabling the flag, restart {prometheus} and confirm it is healthy:
 
@@ -320,7 +320,7 @@ zypper install alloy
 +
 [source,yaml]
 ----
-prometheus-exporter-mode: push
+prometheus-mode: push
 prometheus-url: https://<trento-server>/prometheus/api/v1/write
 prometheus-auth: basic
 prometheus-auth-username: <username>
