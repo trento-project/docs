@@ -1,6 +1,7 @@
 include::product-attributes.adoc[]
 
 :revdate: 2026-04-30
+[[sec-prometheus-integration]]
 == {prometheus} integration
 
 {prometheus} Server is a {trserver} component responsible for retrieving host metrics from the agent hosts and serving them to the web component. The web component renders some of these metrics as graphical charts in the details view of the registered hosts. Particularly: memory, CPU, filesystem and swap utilization.
@@ -38,9 +39,9 @@ See <<configuring-alloy>> for detailed setup instructions.
 
 === {kube} deployment
 
-When using the {helm} chart to deploy {trserver} on a {kube} cluster, an image of {prometheus} Server is deployed automatically. No further actions are required by the user, other than ensuring that it can reach the `node-exporter` in the agent hosts.
+To enable {prometheus} alongside {trserver} in a {k8s} cluster, see <<enabling-remote-write>>.
 
-In a {kube} cluster with multiple nodes, the user can select on which node to deploy the {prometheus} Server by adding the following flag to the {helm} installation command:
+In a {kube} cluster with multiple nodes, the user can select on which node to deploy {prometheus} Server by adding the following flag to the {helm} installation command:
 
 [source,bash]
 ----
@@ -156,10 +157,12 @@ The {helm} chart enables the {prometheus} remote write receiver and deploys an {
 
 The {nginx} sidecar protects the `/prometheus/api/v1/write` endpoint with HTTP Basic Auth. Other {prometheus} routes (UI and query API) remain accessible without authentication.
 
-To enable basic authentication, add the following values to your {helm} installation:
+To enable {prometheus} with basic authentication, replace flag `--set prometheus.enabled=false` in the 
+{helm} installation command with the following:
 
 [source,bash]
 ----
+--set prometheus.enabled=true \
 --set prometheus.server.auth.type=basic \
 --set prometheus.server.auth.basic.username=<username> \
 --set prometheus.server.auth.basic.password=<password>
