@@ -69,19 +69,6 @@ helm upgrade \
 ----
 ====
 +
-When using a Helm version lower than 3.8.0, an experimental flag must be set as follows:
-+
-====
-[source,bash]
-----
-HELM_EXPERIMENTAL_OCI=1 helm upgrade \
-   --install trento-server oci://registry.suse.com/trento/trento-server \
-   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
-   --set trento-web.adminUser.password=ADMIN_PASSWORD \
-   --set prometheus.enabled=false
-----
-====
-+
 . To verify that the {trserver} installation was successful, open the URL of the {tr_web} (`http://TRENTO_SERVER_HOSTNAME`) from a workstation on the {sap} administrator's LAN.
 
 [[sec-trento-install-trentoserver-on-k3s]]
@@ -149,18 +136,6 @@ helm upgrade \
    --set prometheus.enabled=false
 ----
 ====
-When using a Helm version lower than 3.8.0, an experimental flag must be set as follows:
-+
-====
-[source,bash]
-----
-HELM_EXPERIMENTAL_OCI=1 helm upgrade \
-   --install trento-server oci://registry.suse.com/trento/trento-server \
-   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
-   --set trento-web.adminUser.password=ADMIN_PASSWORD \
-   --set prometheus.enabled=false
-----
-====
 +
 . Monitor the creation and start-up of the {trserver} pods, and wait until they are ready and running:
 +
@@ -183,13 +158,12 @@ If you use a multi-node {k8s} cluster, it is possible to deploy {trserver} image
 ====
 [source,bash]
 ----
-HELM_EXPERIMENTAL_OCI=1 helm upgrade \
+ helm upgrade \
    --install trento-server oci://registry.suse.com/trento/trento-server \
    --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
    --set trento-web.adminUser.password=ADMIN_PASSWORD \
    --set postgresql.primary.nodeSelector.LABEL=VALUE \
    --set trento-web.nodeSelector.LABEL=VALUE \
-   --set trento-runner.nodeSelector.LABEL=VALUE \
    --set prometheus.enabled=false
 ----
 ====
@@ -275,7 +249,7 @@ The command to enable email alerts is as follows:
 
 [source,bash]
 ----
-HELM_EXPERIMENTAL_OCI=1 helm upgrade \
+helm upgrade \
    --install trento-server oci://registry.suse.com/trento/trento-server \
    --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
    --set trento-web.adminUser.password=ADMIN_PASSWORD \
