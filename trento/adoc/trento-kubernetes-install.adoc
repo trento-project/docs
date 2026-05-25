@@ -35,9 +35,15 @@ kubectl create namespace trento
 helm upgrade \
    --install trento-server oci://registry.suse.com/trento/trento-server \
    --namespace trento \
-   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
-   --set trento-web.adminUser.password=ADMIN_PASSWORD
+   ...
+
 ----
+====
+
+[NOTE]
+====
+The examples in this section deliver an installation of {trserver} without {prometheus}. If you want to have {prometheus}
+installed and enabled along {trserver} refer to <<sec-prometheus-integration>>.
 ====
 
 . Install Helm:
@@ -58,19 +64,8 @@ curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bas
 helm upgrade \
    --install trento-server oci://registry.suse.com/trento/trento-server \
    --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
-   --set trento-web.adminUser.password=ADMIN_PASSWORD
-----
-====
-+
-When using a Helm version lower than 3.8.0, an experimental flag must be set as follows:
-+
-====
-[source,bash]
-----
-HELM_EXPERIMENTAL_OCI=1 helm upgrade \
-   --install trento-server oci://registry.suse.com/trento/trento-server \
-   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
-   --set trento-web.adminUser.password=ADMIN_PASSWORD
+   --set trento-web.adminUser.password=ADMIN_PASSWORD \
+   --set prometheus.enabled=false
 ----
 ====
 +
@@ -79,15 +74,12 @@ HELM_EXPERIMENTAL_OCI=1 helm upgrade \
 [[sec-trento-install-trentoserver-on-k3s]]
 ===== Installing {trserver} on K3s
 
-If you do not have a {k8s} cluster, or you have one but you do not want to use it for {trento}, you can use {suse} Rancher's K3s as an alternative. To deploy {trserver} on K3s, you need a server or VM (see <<sec-trento-server-requirements>> for minimum requirements) and follow steps in <<pro-trento-manually-installing>>.
+If you do not have a {k8s} cluster, or you have one but you do not want to use it for {trento}, you can use {suse} Rancher's K3s as an alternative. To deploy {trserver} on K3s, you need a server or VM (see <<sec-trento-server-requirements>> for minimum requirements) and follow the steps in the following procedure.
 
 [IMPORTANT]
 ====
 The following procedure deploys {trserver} on a single-node K3s cluster. Note that this setup is not recommended for production use.
 ====
-
-[[pro-trento-manually-installing]]
-====== Manually installing Trento on a {trserver} host
 
 . Log in to the {trserver} host.
 +
@@ -140,18 +132,8 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 helm upgrade \
    --install trento-server oci://registry.suse.com/trento/trento-server \
    --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
-   --set trento-web.adminUser.password=ADMIN_PASSWORD
-----
-====
-When using a Helm version lower than 3.8.0, an experimental flag must be set as follows:
-+
-====
-[source,bash]
-----
-HELM_EXPERIMENTAL_OCI=1 helm upgrade \
-   --install trento-server oci://registry.suse.com/trento/trento-server \
-   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
-   --set trento-web.adminUser.password=ADMIN_PASSWORD
+   --set trento-web.adminUser.password=ADMIN_PASSWORD \
+   --set prometheus.enabled=false
 ----
 ====
 +
@@ -176,14 +158,13 @@ If you use a multi-node {k8s} cluster, it is possible to deploy {trserver} image
 ====
 [source,bash]
 ----
-HELM_EXPERIMENTAL_OCI=1 helm upgrade \
+ helm upgrade \
    --install trento-server oci://registry.suse.com/trento/trento-server \
    --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
    --set trento-web.adminUser.password=ADMIN_PASSWORD \
-   --set prometheus.server.nodeSelector.LABEL=VALUE \
    --set postgresql.primary.nodeSelector.LABEL=VALUE \
    --set trento-web.nodeSelector.LABEL=VALUE \
-   --set trento-runner.nodeSelector.LABEL=VALUE
+   --set prometheus.enabled=false
 ----
 ====
 
@@ -227,6 +208,7 @@ helm upgrade \
   --install trento-server oci://registry.suse.com/trento/trento-server \
   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
   --set trento-web.adminUser.password=ADMIN_PASSWORD \
+  --set prometheus.enabled=false \
   --set trento-web.pruneEventsOlderThan=30 \
   --set trento-web.pruneEventsCronjobSchedule="0 3 * * *"
 ----
@@ -267,10 +249,11 @@ The command to enable email alerts is as follows:
 
 [source,bash]
 ----
-HELM_EXPERIMENTAL_OCI=1 helm upgrade \
+helm upgrade \
    --install trento-server oci://registry.suse.com/trento/trento-server \
    --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
    --set trento-web.adminUser.password=ADMIN_PASSWORD \
+   --set prometheus.enabled=false \
    --set trento-web.alerting.enabled=true \
    --set trento-web.alerting.smtpServer=SMTP_SERVER \
    --set trento-web.alerting.smtpPort=SMTP_PORT \
