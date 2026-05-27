@@ -2,6 +2,65 @@
 <!-- History -->
 <revhistory xml:id="rh-article-trento">
   <revision>
+    <date>2026-05-27</date>
+    <revdescription>
+      <itemizedlist>
+        <listitem>
+          <para>Operations:</para>
+          <itemizedlist>
+            <listitem>
+              <para>Replacement of cs_clusterstarte with crmadmin</para>
+            </listitem>
+            <listitem>
+              <para>Resource refresh operation</para>
+            </listitem>
+            <listitem>
+              <para>Target hearbeat taken into consideration for the execution of an operation</para>
+            </listitem>
+            <listitem>
+              <para>Stop/start of entire database layer in HANA HA setups</para>
+            </listitem>
+            <listitem>
+              <para>Name change for cluster stop/start operations</para>
+            </listitem>
+            <listitem>
+              <para>Troubleshotting data in Activity Log when operation fails</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para>Using Trento Web:</para>
+          <itemizedlist>
+            <listitem>
+              <para>Visualization of versions in About view</para>
+            </listitem>
+            <listitem>
+              <para>Cluster state information in Cluster Details view</para>
+            </listitem>
+            <listitem>
+              <para>Filesystem and swap utilization dashboards in Host Details view</para>
+            </listitem>
+            <listitem>
+              <para>Timezone awareness across the UI</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para>User management: timezone configuration</para>
+        </listitem>
+        <listitem>
+          <para>Grafana Alloy integration: updates to Prometheus and Trento Agent configuration</para>
+        </listitem>
+        <listitem>
+          <para>Analytics: new section</para>
+        </listitem>
+        <listitem>
+          <para>Problem analysis: scenario dump collected by Trento support plugin in systemd scenarions</para>
+        </listitem>
+      </itemizedlist>
+    </revdescription>
+  </revision>
+  <revision>
     <date>2026-01-12</date>
     <revdescription>
       <para>Revision update for version 3.0:</para>
