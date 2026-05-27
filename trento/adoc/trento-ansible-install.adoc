@@ -112,11 +112,6 @@ Third-party dependencies:
 `{nginx}`::
   HTTP server used as reverse proxy.
 
-Diagnostics tooling:
-
-`supportutils`::
-  Installs the {suse} `supportutils` package and the Trento-specific `supportutils-plugin-trento` plugin on {trserver} and {tragent} hosts, so that `supportconfig` can collect Trento diagnostics.
-
 The `ansible-trento` package provides an {ansible} role for every one of these components.
 
 ==== Playbooks overview
