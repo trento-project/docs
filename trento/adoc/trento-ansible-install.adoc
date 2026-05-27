@@ -301,50 +301,6 @@ For {tragent}, they are:
 The rest of the variables are optional.
 You can find the full listing on the https://github.com/trento-project/ansible[{trento} {ansible}] project page.
 
-==== Support tooling
-
-The `server`, `agent`, and `site` playbooks install the {suse} `supportutils` package together with the Trento-specific `supportutils-plugin-trento` plugin.
-This allows `supportconfig` to collect Trento diagnostics on both {trserver} and {tragent} hosts.
-The installation is performed by the `supportutils` role and is enabled by default; no additional opt-in is required.
-
-===== Configuration
-
-Override the following role-level variables in your inventory to change the default behavior:
-
-[width="100%",cols="35%,30%,35%",options="header",]
-|===
-|Name |Default |Description
-| `supportutils_enabled` | `true` | Set to `false` to skip installation entirely.
-| `supportutils_package_name` | `supportutils` | Base {suse} diagnostics package name.
-| `supportutils_plugin_package_name` | `supportutils-plugin-trento` | Trento plugin package name.
-| `supportutils_update_cache` | `true` | Refresh the {zypper} cache before installing.
-|===
-
-To disable installation on all hosts, set the variable in the `vars:` section of your inventory:
-
-[source,yaml]
-----
-all:
-  vars:
-    supportutils_enabled: false
-----
-
-===== Generating a support archive
-
-After the playbook runs, generate a support archive on any installed host with:
-
-[source,console,subs="attributes"]
-----
-{prompt_sudo} supportconfig
-----
-
-The resulting tarball includes the Trento-specific data collected by the plugin and can be attached to {suse} support cases.
-
-===== Cleanup behavior
-
-The `cleanup` playbook removes only the `supportutils-plugin-trento` package from {trserver} and {tragent} hosts.
-The base `supportutils` package is intentionally retained, because it is general-purpose {suse} tooling that other diagnostic workflows may rely on.
-
 ==== Example scenarios
 
 The playbooks in `ansible-trento` allow for various installation scenarios.
