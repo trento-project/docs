@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: SUSE LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 footer.footer {
   background-color: var(--footer-background);
   color: var(--footer-font-color);

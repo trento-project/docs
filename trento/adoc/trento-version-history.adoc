@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-version-history]]
 == Highlights of {trento} versions
-:revdate: 2025-06-10
+:revdate: 2026-05-27
 
 
 Below is a list of the most important user-facing features in the
@@ -24,6 +24,33 @@ https://github.com/trento-project/checks/releases.
 https://github.com/trento-project/agent/releases.
 
 [indent=-1]
+
+Version 3.1.0 (released on 2026/05/27)::
+ Includes {helm} chart 3.1.0, {tr_web} component 3.1.0, orchestration engine ({wanda}) 2.1.0, compliance checks 1.3.0, {mcp} 1.1.0, and {tragent} 3.1.0, with the following highlights:
+
+  * Opt-in analytics option
+  * Timezone awareness
+  * Integration with {grafana} Alloy
+  * Information about versions of all {trserver} components
+  * Last boot information in Host details view
+  * Improved AI capabilities by exposing collected host metrics to {mcp}
+  * Improved monitoring of cluster shutdown
+  * Filesystem and swap utilization dashboards in Host details view
+  * Improved {saptune} gatherer
+  * Improved UX around operations:
+  ** Cluster state information in Cluster details view
+  ** Troubleshooting information about operation failures in Activity Log
+  ** Heartbeat of target host taken into account when requesting operations
+  ** Direct access from operation forbidden modals to relevant details views
+  * New operations:
+  ** Cluster resource refresh
+  ** Stop/start entire database layer in {hana} {ha} setups
+  * Bug fixes:
+  ** Discovery of {hana} multi-tier setups
+  ** Flaky host heartbeat producing false negatives
+  ** {tragent} requiring restart to connect to message broker
+  ** Enabling alert emails with {helm} chart flags in {k8s} deployments
+
 
 Version 3.0.0 (released on 2025/12/16)::
  Includes Helm chart 3.0.0, {web} Component 3.0.0, orchestration engine ({wanda}) 2.0.0, compliance checks 1.2.0, {mcp} 1.0.0, and agent 3.0.0, with the following highlights:

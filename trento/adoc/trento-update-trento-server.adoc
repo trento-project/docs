@@ -25,16 +25,15 @@ In a {k8s} deployment, you can use Helm to update {trserver}:
 helm upgrade \
    --install trento-server oci://registry.suse.com/trento/trento-server \
    --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
-   --set trento-web.adminUser.password=ADMIN_PASSWORD
+   --set trento-web.adminUser.password=ADMIN_PASSWORD \
+   ...
         
 ----
 ====
 
-If you have configured options like email alerting, the Helm command
-must be adjusted accordingly. In this case, consider the following:
+If you have configured/enabled options, the {helm} command must be adjusted accordingly. In this case, consider the following:
 
-* Remember to set the helm experimental flag if you are using a version
-of Helm lower than 3.8.0.
+* If you are using a version of Helm lower than 3.8.0, you need to set `HELM_EXPERIMENTAL_OCI=1` in front of the `helm` command.
 * When updating {trento} to version 2.0.0 or higher, an additional flag
 must be set in the Helm command:
 +
@@ -53,6 +52,7 @@ helm upgrade \
 * When updating {trento} to version 2.3 or higher, a new API key is
 generated and the configuration of all registered {tragent}s must be
 updated accordingly.
+* When updating to version 3.1 or higher, {prometheus} authentication must be configured.
 
 In a system deployment, you can use zypper to update {trserver}:
 

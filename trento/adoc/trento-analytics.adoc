@@ -1,0 +1,22 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-analytics]]
+== Analytics
+:revdate: 2026-04-09
+
+=== What is Analytics?
+Analytics is the collection of information related to the installation of {trento} and feature usage of the product. This information is used by the {trento} team to help improve the product and it is not shared with third-parties.
+
+=== What information is collected?
+No specific information related to usernames, passwords and the names of user resource addresses will be collected.
+
+Types of information that will be collected include:
+
+* Name of the page URLs.
+* Page links clicked.
+* Names of pages viewed.
+* Name and version of installed {trento} application.
+* Unique randomly-generated identifier for each {trento} Installation.
+
+=== How to opt-in or opt-out analytics collection?
+A user can manage their analytics preference by navigating to the *Profile* screen. They can then click the *Analytics Opt-in* toggle button to update their preference.

@@ -52,7 +52,7 @@ To enable OIDC when using kubernetes deployment with helm, add the following var
 ====
 [source,bash]
 ----
-HELM_EXPERIMENTAL_OCI=1 helm ... \
+helm ... \
    --set trento-web.oidc.enabled=true \
    --set trento-web.oidc.clientId=<OIDC_CLIENT_ID> \
    --set trento-web.oidc.clientSecret=<OIDC_CLIENT_SECRET> \
@@ -127,7 +127,7 @@ installation command:
 ====
 [source,bash]
 ----
-HELM_EXPERIMENTAL_OCI=1 helm ... \
+helm ... \
    --set trento-web.oauth2.enabled=true \
    --set trento-web.oauth2.clientId=<OAUTH2_CLIENT_ID> \
    --set trento-web.oauth2.clientSecret=<OAUTH2_CLIENT_SECRET> \
@@ -143,7 +143,7 @@ Additionally, the following optional values are available:
 ====
 [source,bash]
 ----
-HELM_EXPERIMENTAL_OCI=1 helm ... \
+helm ... \
    --set trento-web.oauth2.scopes=<OAUTH2_SCOPES>
 ----
 ====
@@ -337,7 +337,7 @@ installation command:
 ====
 [source,bash]
 ----
-HELM_EXPERIMENTAL_OCI=1 helm ... \
+helm ... \
    --set trento-web.saml.enabled=true \
    --set trento-web.saml.idpId=<SAML_IDP_ID> \
    --set trento-web.saml.spId=<SAML_SP_ID> \
@@ -351,7 +351,7 @@ To use the `+SAML_METADATA_CONTENT+` option rather than
 ====
 [source,bash]
 ----
-HELM_EXPERIMENTAL_OCI=1 helm ... \
+helm ... \
    --set trento-web.saml.enabled=true \
    --set trento-web.saml.idpId=<SAML_IDP_ID> \
    --set trento-web.saml.spId=<SAML_SP_ID> \
@@ -364,7 +364,7 @@ Additionally, the following optional values are available:
 ====
 [source,bash]
 ----
-HELM_EXPERIMENTAL_OCI=1 helm ... \
+helm ... \
    --set trento-web.saml.idpNameIdFormat=<SAML_IDP_NAMEID_FORMAT> \
    --set trento-web.saml.spDir=<SAML_SP_DIR> \
    --set trento-web.saml.spEntityId=<SAML_SP_ENTITY_ID> \

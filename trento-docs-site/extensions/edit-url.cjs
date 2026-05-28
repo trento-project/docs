@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: SUSE LLC
+// SPDX-License-Identifier: Apache-2.0
+
 "use strict";
 const fs = require("node:fs");
 const path = require("node:path");

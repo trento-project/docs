@@ -11,7 +11,7 @@ There are two tools you can use to collect information and data that can be usef
 
 ==== {trento} support plugin
 
-The {trento} support plugin consists of the `trento-support.sh` script and the support plugin itself. The tool automates the collection of logs and relevant runtime information on the server side. It can be used in two different scenarios:
+The {trento} support plugin consists of the `trento-support.sh` script and the supportconfig plugin. The tool automates the collection of logs and relevant runtime information on the server side. It can be used in two different scenarios:
 
 * A deployment on K3s  
 * A systemd deployment
@@ -69,14 +69,16 @@ To use the plugin in this scenario, proceed as follows:
 ----
 ====
 +
-. Execute supportconfig as described in https://documentation.suse.com/smart/systems-management/html/supportconfig/index.html. The `supportconfig` tool will call the {trento} support plugin.
+. Execute `supportconfig` as described in https://documentation.suse.com/smart/systems-management/html/supportconfig/index.html. The `supportconfig` tool will call the {trento} support plugin.
 . Send the generated output to support for analysis.
 
-=== Scenario dump script
+=== Scenario dump
 
 A scenario dump is a dump of the {trento} database. It helps the {trento} team to recreate the scenario to test it.
 
-A script is available in the {trento} upstream project. The script helps generate a scenario dump when the server is running on a {k8s} cluster. Using this script requires a host with the following setup:
+In {systemd} scenarios, the {trento} support plugin generates a scenario dump when executed.
+
+For {k8s} based scenarios, a script is available in the {trento} upstream project. Using this script requires a host with the following setup:
 
 * `kubectl` is installed and connected to the {k8s} cluster where {trserver} is running.
 
