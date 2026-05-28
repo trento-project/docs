@@ -4,7 +4,7 @@
 name: ROOT
 title: Trento Documentation
 version: latest
-display_version: 'latest: 3.0'
+display_version: 'latest: 3.1'
 nav:
 - modules/user-guide/nav_user_guide.adoc
 - modules/developer/nav_developer.adoc
