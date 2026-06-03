@@ -278,7 +278,7 @@ CONs:
 * possibly higher level of friction in the development and evolution of the agentic runtime
 * we might not get the correct library boundaries from the start, meaning that we might end up with some parts in web that should be in the library, leading to friction and overhead in the development (like: is the Channel implementation part of the library or of web? is the AG-UI protocol implementation part of the library or of web? etc...), however when we realize this we can always move the code in the right place
 
-Given the above, the proposed solution is TBD...
+Given the above, the proposed solution is to simply integrate the agentic core within web.
 
 === UI to Agent Communication
 
