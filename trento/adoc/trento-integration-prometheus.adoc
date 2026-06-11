@@ -60,23 +60,9 @@ If you already have an existing {prometheus} Server that you want to use with {t
 
 The lowest required {prometheus} Server version is 2.28.0.
 
-Use the section Install {prometheus} on {sles4sap} 16.0 as a reference to adjust the {prometheus} Server configuration.
+Use the section "Install {prometheus} on {sles4sap}" as a reference to adjust the {prometheus} Server configuration.
 
-==== Install {prometheus} Server from {ph} on {sles4sap} 15.x
-
-{ph} packages are tested by {suse} but are not officially supported as part of the {sles4sap} base product. Users should assess the suitability of these packages based on their own risk tolerance and support needs.
-
-Enable the {ph} repository (replace `15.x` with the version of your operating system, for example 15.7):
-
-[source,bash]
-----
-SUSEConnect --product PackageHub/15.x/x86_64
-zypper refresh
-----
-
-Now proceed with the same steps as in Install {prometheus} on {sles4sap} 16.0.
-
-==== Install {prometheus} on {sles4sap} 16.0
+==== Install {prometheus} on {sles4sap}
 
 . Create the {prometheus} user and group:
 +
@@ -86,14 +72,24 @@ groupadd --system prometheus
 useradd -s /sbin/nologin --system -g prometheus prometheus
 ----
 
+. Enable the {ph} repository. Replace `VERSION` with the version of your operating system, for example, `15.7` or `16.0`:
++
+[source,bash]
+----
+SUSEConnect --product PackageHub/VERSION/x86_64
+zypper refresh
+----
++
+IMPORTANT: {ph} packages are tested by {suse} but are not officially supported as part of the {sles4sap} base product. Users should assess the suitability of these packages based on their own risk tolerance and support needs.
+
 . Install {prometheus} using {zypper}:
 +
 [source,bash]
 ----
-zypper in golang-github-prometheus-prometheus
+zypper install golang-github-prometheus-prometheus
 ----
 
-. Configure {prometheus} for {trento} by replacing or updating the existing configuration at `/etc/prometheus/prometheus.yml` with:
+. Configure {prometheus} for {trento} by replacing or updating the existing configuration at `/etc/prometheus/prometheus.yml`:
 +
 [source,yaml]
 ----
@@ -114,7 +110,7 @@ scrape_configs:
         url: http://localhost:4000/api/prometheus/targets
 ----
 +
-Note: the value of the `url` parameter above assumes that the {tr_web} service is running in the same host as {prometheus} Server.
+NOTE: the value of the `url` parameter above assumes that the {tr_web} service is running in the same host as {prometheus} Server.
 
 . Enable and start the {prometheus} service:
 +
@@ -131,14 +127,14 @@ firewall-cmd --zone=public --add-port=9090/tcp --permanent
 firewall-cmd --reload
 ----
 
-. Set `CHARTS_ENABLED=true` and `PROMETHEUS_URL=http://localhost:9090` in the {tr_web} configuration file and restart the {tr_web} service.
+. Set `CHARTS_ENABLED=true` and `PROMETHEUS_URL=http://localhost:9090` in the {tr_web} configuration file and restart the {tr_web} service:
 +
 [source,bash]
 ----
 systemctl restart trento-web
 ----
 +
-Note: the value of the `PROMETHEUS_URL` parameter above assumes that the {tr_web} service is running in the same host as {prometheus} Server.
+NOTE: the value of the `PROMETHEUS_URL` parameter above assumes that the {tr_web} service is running in the same host as {prometheus} Server.
 
 ==== Not using {prometheus} Server
 
