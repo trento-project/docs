@@ -76,7 +76,7 @@ When using this option, ensure your configuration file has appropriate permissio
 
 [NOTE]
 ====
-Replace `{tr_mcp_url_https}` with your actual {tr_mcp} endpoint URL from your installation.
+Replace `pass:a[{tr_mcp_url_https}]` with your actual {tr_mcp} endpoint URL from your installation.
 ====
 
 ====== Client options
