@@ -46,9 +46,9 @@ mcpServers:
       - "Authorization: Bearer ${env://TRENTO_PAT}"
 ----
 
-* Replace `{tr_mcp_url_https}` with the actual URL where your {tr_mcp} is accessible:
-  ** For Kubernetes deployments with ingress, use the ingress URL (e.g., `{tr_mcp_url_https}`).
-  ** For local or development setups, use `http://localhost:{tr_mcp_default_port}/mcp` (adjust the port as needed).
+* Replace `pass:a[{tr_mcp_url_https}]` with the actual URL where your {tr_mcp} is accessible:
+  ** For Kubernetes deployments with ingress, use the ingress URL (e.g., `pass:a[{tr_mcp_url_https}]`).
+  ** For local or development setups, use `\http://localhost:{tr_mcp_default_port}/mcp` (adjust the port as needed).
   ** The transport type is configured on the {tr_mcp}, if using Server-Sent Events (SSE) transport instead of the default streamable transport, change the path from `/mcp` to `/sse`.
 * If you configured a custom header name (using `HEADER_NAME` or `--header-name`), update `Authorization` accordingly.
 
@@ -132,7 +132,7 @@ If you encounter issues connecting {mcp_host} to the {tr_mcp}:
 ** Verify that the {tr_mcp} URL in `~/.mcphost.yml` is correct and accessible from your system.
 ** Check if the {tr_mcp} is running by reviewing logs from your {trento} installation.
 ** Ensure network connectivity and that any required firewall rules are in place.
-** Test basic connectivity: `curl -I {tr_mcp_url_https}`.
+** Test basic connectivity: `curl -I pass:a[{tr_mcp_url_https}]`.
 
 * *Authentication errors*
 ** Verify that your personal access token is valid by testing it directly with your {trento} Server API.

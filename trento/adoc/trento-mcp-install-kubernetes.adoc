@@ -110,7 +110,7 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 ----
 ====
 
-The {tr_mcp} endpoint will be: `https://TRENTO_SERVER_HOSTNAME{tr_mcp_ingress_path}/mcp`
+The {tr_mcp} endpoint will be: `\https://TRENTO_SERVER_HOSTNAME{tr_mcp_ingress_path}/mcp`
 
 [[mcp-adjust-log-verbosity]]
 ====== Adjust Log Verbosity
