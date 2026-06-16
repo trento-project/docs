@@ -509,6 +509,11 @@ mkdir -p /etc/nginx/ssl/certs/
 ----
 cp trento.crt /etc/nginx/ssl/certs/trento.crt
 ----
++
+[IMPORTANT]
+====
+Update the CA certificates on the {trserver} host to ensure the self-signed certificate is trusted.
+====
 . Check the NGINX configuration:
 +
 [source,bash]
@@ -526,7 +531,6 @@ nginx: configuration file /etc/nginx/nginx.conf test is successful
 +
 If there are issues with the configuration, the output indicates what
 needs to be adjusted.
-+
 . Enable NGINX:
 +
 [source,bash]
