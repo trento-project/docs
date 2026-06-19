@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-systemd-deployment]]
 ==== systemd deployment
-:revdate: 2025-06-11
+:revdate: 2026-06-19
 
 A systemd-based installation of the {trserver} using RPM packages can be performed manually on the latest supported versions of {sles4sap}, from 15 SP4 up to 16. For installations on service packs other than the current one, make sure to update the repository URL as described in the relevant notes throughout this guide.
 
@@ -509,6 +509,30 @@ mkdir -p /etc/nginx/ssl/certs/
 ----
 cp trento.crt /etc/nginx/ssl/certs/trento.crt
 ----
+
+. Ensure the self-signed certificate is trusted:
+
+.. Convert `trento.crt` to the PEM format:
++
+[source,bash]
+----
+openssl x509 -in trento.crt -out trento.pem -outform PEM
+----
+
+.. Copy the certificate in PEM format to `/etc/pki/trust/anchors/`:
++
+[source,bash]
+----
+cp trento.pem /etc/pki/trust/anchors/
+----
+
+.. Run the `update-ca-certificates` command:
++
+[source,bash]
+----
+update-ca-certificates
+----
+
 . Check the NGINX configuration:
 +
 [source,bash]
@@ -526,7 +550,6 @@ nginx: configuration file /etc/nginx/nginx.conf test is successful
 +
 If there are issues with the configuration, the output indicates what
 needs to be adjusted.
-+
 . Enable NGINX:
 +
 [source,bash]
