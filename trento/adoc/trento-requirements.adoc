@@ -9,9 +9,9 @@ This section describes requirements for the {trserver} and its {tragent}s, as we
 [[sec-trento-server-requirements]]
 === {trserver} requirements
 
-Running all the {trserver} components requires a minimum of 4 GB of RAM, two CPU cores and 64 GB of storage. When using K3s, such storage should be provided under `/var/lib/rancher/k3s`.
+Running all the {trserver} components requires a minimum of 4{nbsp}GB of RAM, two CPU cores and 64{nbsp}GB of storage. When using K3s, such storage should be provided under `/var/lib/rancher/k3s`.
 
-{trento} is based on event-driven technology. Registered events are stored in a {postgresql} database with a default retention period of 10 days. For each host registered with {trento}, you need to allocate at least 1.5GB of space in the {postgresql} database.
+{trento} is based on event-driven technology. Registered events are stored in a {postgresql} database with a default retention period of 10 days. For each host registered with {trento}, allocate at least 3{nbsp}GB of space in the {postgresql} database.
 
 {trserver} supports different deployment scenarios: {k8s} and systemd. A {k8s}-based deployment of {trserver} is cloud-native and OS-agnostic. It can be performed on the following services:
 
