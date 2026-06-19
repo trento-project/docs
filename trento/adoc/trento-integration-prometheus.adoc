@@ -1,6 +1,6 @@
 include::product-attributes.adoc[]
 
-:revdate: 2026-04-30
+:revdate: 2026-06-11
 [[sec-prometheus-integration]]
 == {prometheus} integration
 
