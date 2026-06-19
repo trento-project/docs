@@ -509,11 +509,30 @@ mkdir -p /etc/nginx/ssl/certs/
 ----
 cp trento.crt /etc/nginx/ssl/certs/trento.crt
 ----
+
+. Ensure the self-signed certificate is trusted:
+
+.. Convert `trento.crt` to the PEM format:
 +
-[IMPORTANT]
-====
-Update the CA certificates on the {trserver} host to ensure the self-signed certificate is trusted.
-====
+[source,bash]
+----
+openssl x509 -in trento.crt -out trento.pem -outform PEM
+----
+
+.. Copy the certificate in PEM format to `/etc/pki/trust/anchors/`:
++
+[source,bash]
+----
+cp trento.pem /etc/pki/trust/anchors/
+----
+
+.. Run the `update-ca-certificates` command:
++
+[source,bash]
+----
+update-ca-certificates
+----
+
 . Check the NGINX configuration:
 +
 [source,bash]
