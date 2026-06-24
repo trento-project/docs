@@ -4,7 +4,7 @@ include::product-attributes.adoc[]
 == Reporting an issue
 :revdate: 2026-06-19
 
-To report a {trento} issue to support, first open a support case, collect the required diagnostic data from your {trserver} and gather any relevant {tragent} information.
+To report an issue with {trento}, open a support case through the appropriate channel, collect the required diagnostic data from {trserver} and the relevant {tragent}s, and attach all that information to your support case.
 
 [[opening-support-case]]
 === Opening a support case
@@ -12,9 +12,9 @@ To report a {trento} issue to support, first open a support case, collect the re
 {suse} customers with registered {sles4sap}{nbsp}15 (SP4 or higher) or {sles4sap} 16 distributions can report {trento} issues either directly in the {scc}
 or through the corresponding vendor, depending on their licensing model.
 
-* Report the problems under {sles4sap}{nbsp}15 and component trento.
+* Report the problems under {sles4sap}{nbsp}15 or 16 and component trento.
 
-* Provide the relevant deployment option for {trserver}: {k8s}, or systemd deployment.
+* Specify the relevant deployment option for {trserver}: {k8s}, or systemd deployment.
 
 * Depending on your deployment type, use the corresponding procedure to collect and provide either <<collecting-server-diagnostic-data-k3s, K3s server diagnostic data>> or <<collecting-server-diagnostic-data-systemd, systemd server diagnostic data>>.
 
@@ -25,7 +25,7 @@ or through the corresponding vendor, depending on their licensing model.
 
 For K3s ({k8s}) deployments, provide the output of the {trento} support script, a scenario dump, pod descriptions and pod logs.
 
-Before proceeding, ensure your environment meets the following requirements:
+Before proceeding, ensure your host meets the following requirements:
 
 * A {sles4sap} 15 SP4 or higher is installed.
 * Packages `jq` and `yq` are installed.
@@ -38,17 +38,17 @@ Before proceeding, ensure your environment meets the following requirements:
 
 .. Install the plug-in package:
 +
-[source,subs="attributes"]
+[source,bash]
 ----
-{prompt_root}zypper ref
-{prompt_root}zypper install supportutils-plugin-trento
+zypper ref
+zypper install supportutils-plugin-trento
 ----
 
 .. Run the `trento-support.sh` script:
 +
-[source,subs="attributes"]
+[source,bash]
 ----
-{prompt_root}trento-support --output file-tgz --collect all
+trento-support --output file-tgz --collect all
 ----
 +
 [NOTE]
@@ -68,23 +68,23 @@ The script accepts the following options:
 
 .. Download the latest version of the dump script from the {trento} upstream project:
 +
-[source,subs="attributes"]
+[source,bash]
 ----
-{prompt_user}wget https://raw.githubusercontent.com/trento-project/web/main/hack/dump_scenario_from_k8.sh
+wget https://raw.githubusercontent.com/trento-project/web/main/hack/dump_scenario_from_k8.sh
 ----
 
 .. Make the script executable:
 +
-[source,subs="attributes"]
+[source,bash]
 ----
-{prompt_user}chmod +x dump_scenario_from_k8.sh
+chmod +x dump_scenario_from_k8.sh
 ----
 
 .. Run the script:
 +
-[source,subs="attributes"]
+[source,bash]
 ----
-{prompt_user}./dump_scenario_from_k8.sh --name SCENARIO_NAME --path PATH
+./dump_scenario_from_k8.sh --name SCENARIO_NAME --path PATH
 ----
 
 .. Package all generated JSON files found under `PATH/scenarios/SCENARIO_NAME` to send to support.
@@ -93,37 +93,23 @@ The script accepts the following options:
 
 .. List the pods running in {k8s} cluster to view their statuses and names:
 +
-[source,subs="attributes"]
+[source,bash]
 ----
-{prompt_user}kubectl get pods
-
-NAME                                               READY   STATUS    RESTARTS   AGE
-trento-server-postgresql-0                         1/1     Running   0          87m
-trento-server-prometheus-server-7b5c9474bc-wmv8s   2/2     Running   0          87m
-trento-server-rabbitmq-0                           1/1     Running   0          87m
-trento-server-wanda-67ffbb79dc-7t6xw               1/1     Running   0          87m
-trento-server-web-7df8f65794-vdbhs                 1/1     Running   0          87m
+kubectl get pods
 ----
 
 .. Retrieve the description of a pod:
 +
-[source,subs="attributes"]
+[source,bash]
 ----
-{prompt_user}kubectl describe pod POD_NAME
+kubectl describe pod POD_NAME
 ----
 
 .. Retrieve the log of a pod:
 +
-[source,subs="attributes"]
+[source,bash]
 ----
-{prompt_user}kubectl logs POD_NAME
-----
-
-.. Monitor the log of a pod if required:
-+
-[source,subs="attributes"]
-----
-{prompt_user}kubectl logs POD_NAME --follow
+kubectl logs POD_NAME
 ----
 
 .. Save the generated pod descriptions and log outputs to text files to send to support.
@@ -137,20 +123,13 @@ For systemd environments, provide the output of the {trento} support plug-in, wh
 
 . Install the plug-in package:
 +
-[source,subs="attributes"]
+[source,bash]
 ----
-{prompt_root}zypper ref
-{prompt_root}zypper install supportutils-plugin-trento
+zypper ref
+zypper install supportutils-plugin-trento
 ----
 
-. Run the `supportconfig` command to call the plugin:
-+
-[source,subs="attributes"]
-----
-{prompt_root}supportconfig
-----
-+
-For more information on how to run this command, see https://documentation.suse.com/smart/systems-management/html/supportconfig/index.html.
+. Run the `supportconfig` command to call the plug-in. For more information on how to run this command, see https://documentation.suse.com/smart/systems-management/html/supportconfig/index.html.
 +
 NOTE: In systemd scenarios, the {trento} support plug-in also generates a scenario dump when you run it.
 
