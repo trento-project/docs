@@ -116,7 +116,7 @@ xmlns:its="http://www.w3.org/2005/11/its">Products &amp; Solutions</meta>
     <dm:url>https://bugzilla.suse.com/enter_bug.cgi</dm:url>
     <dm:component>Trento</dm:component>
     <dm:product>Documentation</dm:product>
-    <dm:assignee>dpopov@suse.com</dm:assignee>
+    <dm:assignee>eliska.romanova@suse.com</dm:assignee>
   </dm:bugtracker>
   <!-- <dm:editurl>https://github.com/SUSE/doc-unversioned/edit/main/trento/adoc/</dm:editurl> -->
   <dm:translation>no</dm:translation>
