@@ -102,6 +102,12 @@
       </itemizedlist>
     </revdescription>
   </revision>
+  <revision>
+    <date>2026-06-24</date>
+    <revdescription>
+      <para>Merged chapters "Reporting an Issue" and "Problem Analysis" into one chapter called "Reporting an issue".</para>
+    </revdescription>
+  </revision>
 </revhistory>
 <!-- Series -->
 <meta name="series" its:translate="no"
