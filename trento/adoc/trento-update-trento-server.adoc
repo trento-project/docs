@@ -52,9 +52,9 @@ helm upgrade \
 * When updating {trento} to version 2.3 or higher, a new API key is
 generated and the configuration of all registered {tragent}s must be
 updated accordingly.
-* When updating to version 3.1 or higher, {prometheus} authentication must be configured.
+* When updating to version 3.1 or higher, connection to {prometheus} requires authentication. You must configure authentication to continue using {prometheus}.
 
-In a system deployment, you can use zypper to update {trserver}:
+In a systemd deployment, you can use zypper to update {trserver}:
 
 ====
 [source,bash]
