@@ -1,30 +1,145 @@
 include::product-attributes.adoc[]
 
-[[sec-trento-report-problem]]
-== Reporting an Issue
-:revdate: 2025-10-27
+[[trento-report-issue]]
+== Reporting an issue
+:revdate: 2026-06-19
 
+To report an issue with {trento}, open a support case through the appropriate channel, collect the required diagnostic data from {trserver} and the relevant {tragent}s, and attach all that information to your support case.
 
-{suse} customers with registered {sles4sap} {nbsp} 15 (SP4 or higher) or {sles4sap} 16.0
-distributions can report {trento} issues either directly in the {scc}
+[[opening-support-case]]
+=== Opening a support case
+
+{suse} customers with registered {sles4sap}{nbsp}15 (SP4 or higher) or {sles4sap} 16 distributions can report {trento} issues either directly in the {scc}
 or through the corresponding vendor, depending on their licensing model.
-Problems must be reported under {sles4sap}{nbsp}15 and component
-trento.
 
-When opening a support case for {trento}, provide the relevant
-deployment option for {trserver}: {k8s}, or systemd deployment.
+* Report the problems under {sles4sap}{nbsp}15 or 16 and component trento.
 
-In case of a {k8s} deployment, provide the output of the {trento}
-support script as explained in section
-<<sec-trento-problemanalysis>>.
+* Specify the relevant deployment option for {trserver}: {k8s}, or systemd deployment.
 
-In case of a systemd deployment, provide the output of the {trento} supportconfig plugin, as explained in section <<sec-trento-problemanalysis>>.
+* Depending on your deployment type, use the corresponding procedure to collect and provide either <<collecting-server-diagnostic-data-k3s, K3s server diagnostic data>> or <<collecting-server-diagnostic-data-systemd, systemd server diagnostic data>>.
 
-For issues with a particular {tragent}, or a component discovered by a
-particular {tragent}, also provide the following:
+* If the issue involves a particular {tragent} or a component discovered by it, you must also provide <<collecting-agent-diagnostic-data, {tragent} diagnostic data>>.
 
-* status of the {tragent}
-* journal of the {tragent}
-* output of the command `+supportconfig+` in the {tragent} host. See
-https://documentation.suse.com/sles/html/SLES-all/cha-adm-support.html#sec-admsupport-cli
-for information on how to run this command from command line.
+[[collecting-server-diagnostic-data-k3s]]
+=== Collecting {trserver} diagnostic data: K3s deployments
+
+For K3s ({k8s}) deployments, provide the output of the {trento} support script, a scenario dump, pod descriptions and pod logs.
+
+Before proceeding, ensure your host meets the following requirements:
+
+* A {sles4sap} 15 SP4 or higher is installed.
+* Packages `jq` and `yq` are installed.
+* Helm is installed.
+* `kubectl` is installed and connected to the {k8s} cluster where {trserver} is running.
+
+[.procedure]
+
+. Use the {trento} support plug-in to automate the collection of logs and relevant runtime information on the server side.
+
+.. Install the plug-in package:
++
+[source,bash]
+----
+zypper ref
+zypper install supportutils-plugin-trento
+----
+
+.. Run the `trento-support.sh` script:
++
+[source,bash]
+----
+trento-support --output file-tgz --collect all
+----
++
+[NOTE]
+====
+The script accepts the following options:
+
+* `-o`, `--output` Output type (`stdout`, `file`, `file-tgz`)
+* `-c`, `--collect`  Collection options (`configuration`, `base`, `kubernetes`, `all`)
+* `-r`, `--release-name` Release name to use for the chart installation. Default is `trento-server`
+* `-n`, `--namespace` {k8s} namespace used when installing the chart. Default is `default`
+* `--help` Shows help messages
+====
+
+.. Save the generated archive file to send to support.
+
+. Generate a scenario dump of the database to help the {trento} team re-create and test the scenario.
+
+.. Download the latest version of the dump script from the {trento} upstream project:
++
+[source,bash]
+----
+wget https://raw.githubusercontent.com/trento-project/web/main/hack/dump_scenario_from_k8.sh
+----
+
+.. Make the script executable:
++
+[source,bash]
+----
+chmod +x dump_scenario_from_k8.sh
+----
+
+.. Run the script:
++
+[source,bash]
+----
+./dump_scenario_from_k8.sh --name SCENARIO_NAME --path PATH
+----
+
+.. Package all generated JSON files found under `PATH/scenarios/SCENARIO_NAME` to send to support.
+
+. Collect pod descriptions and logs to provide additional context and details for support.
+
+.. List the pods running in {k8s} cluster to view their statuses and names:
++
+[source,bash]
+----
+kubectl get pods
+----
+
+.. Retrieve the description of a pod:
++
+[source,bash]
+----
+kubectl describe pod POD_NAME
+----
+
+.. Retrieve the log of a pod:
++
+[source,bash]
+----
+kubectl logs POD_NAME
+----
+
+.. Save the generated pod descriptions and log outputs to text files to send to support.
+
+[[collecting-server-diagnostic-data-systemd]]
+=== Collecting {trserver} diagnostic data: systemd deployments
+
+For systemd environments, provide the output of the {trento} support plug-in, which automates the collection of logs and relevant runtime information on the server side.
+
+[.procedure]
+
+. Install the plug-in package:
++
+[source,bash]
+----
+zypper ref
+zypper install supportutils-plugin-trento
+----
+
+. Run the `supportconfig` command to call the plug-in. For more information on how to run this command, see https://documentation.suse.com/smart/systems-management/html/supportconfig/index.html.
++
+NOTE: In systemd scenarios, the {trento} support plug-in also generates a scenario dump when you run it.
+
+. Save the generated output to send to support for analysis.
+
+[[collecting-agent-diagnostic-data]]
+=== Collecting {tragent} diagnostic data
+
+For issues with a particular {tragent}, or a component discovered by a {tragent}, provide the following data:
+
+* Status of the {tragent}
+* Journal of the {tragent}
+* Output of the `supportconfig` command in the {tragent} host. For more information about running this command, see https://documentation.suse.com/smart/systems-management/html/supportconfig/index.html.
