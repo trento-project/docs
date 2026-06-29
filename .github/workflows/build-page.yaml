@@ -17,31 +17,16 @@ permissions:
   id-token: write
 jobs:
   build:
+    uses: ./.github/workflows/reusable-build-docs-site.yaml
+    with:
+      upload-pages-artifact: true
+  deploy:
+    needs: build
     runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      with:
-        fetch-depth: 0
-    - name: Configure Pages
-      uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
-    - name: Install Node.js
-      uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
-      with:
-        node-version: '18'
-    - name: Install Antora with the Antora Lunr Extension
-      working-directory: trento-docs-site
-      run: npm i antora @antora/lunr-extension
-    - name: Generate Site
-      working-directory: trento-docs-site
-      run: npx antora antora-playbook.yml
-    - name: Upload Artifacts
-      uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
-      with:
-        path: trento-docs-site/build/trento-docs-site-public
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4

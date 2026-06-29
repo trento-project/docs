@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: SUSE LLC
+# SPDX-License-Identifier: Apache-2.0
+
+name: Docs CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - '.github/workflows/**'
+      - '.tool-versions'
+      - 'trento/**'
+      - 'trento-docs-site/**'
+      - 'trento-docs-site-ui/**'
+
+jobs:
+  validate-suse-docs:
+    uses: ./.github/workflows/reusable-validate-suse-docs.yaml
+  build-docs-site:
+    uses: ./.github/workflows/reusable-build-docs-site.yaml
+    with:
+      upload-pages-artifact: false
