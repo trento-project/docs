@@ -25,7 +25,7 @@ https://github.com/trento-project/agent/releases.
 
 [indent=-1]
 
-Version 3.1 (released on 2026/05/27, last updated: 2026/06/XX)::
+Version 3.1 (released on 2026/05/27, last updated: 2026/07/07)::
  Includes {helm} chart 3.1.1, {tr_web} component 3.1.2, orchestration engine ({wanda}) 2.1.0, compliance checks 1.3.1, {mcp} 1.1.1, and {tragent} 3.1.1, with the following highlights:
 
   * Opt-in analytics option
