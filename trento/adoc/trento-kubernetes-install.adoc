@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-k8s-deployment]]
 ==== {k8s} deployment
-:revdate: 2026-01-08
+:revdate: 2026-07-09
 
 include::partials/kubernetes-placeholders.adoc[]
 
@@ -54,8 +54,9 @@ installed and enabled along {trserver} refer to <<sec-prometheus-integration>>.
 curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 ----
 ====
-+
+
 . Connect Helm to an existing {k8s} cluster.
+
 . Use Helm to install {trserver} with the {trento} Helm chart:
 +
 ====
@@ -69,6 +70,17 @@ helm upgrade \
 ----
 ====
 +
+Where:
+
+`global.trentoWeb.origin`::::
+Uses the provided hostname to configure internal functionalities such as the interactive API portal, websockets, or certificate generation.
+
+`trento-web.adminUser.password`::::
+Sets the initial password for the default admin account to access the {trento} console.
+
+`prometheus.enabled`::::
+Enables or disables the deployment of Prometheus. For more information, see <<sec-prometheus-integration>>.
+
 . To verify that the {trserver} installation was successful, open the URL of the {tr_web} (`\http://TRENTO_SERVER_HOSTNAME`) from a workstation on the {sap} administrator's LAN.
 
 [[sec-trento-install-trentoserver-on-k3s]]
@@ -137,6 +149,17 @@ helm upgrade \
 ----
 ====
 +
+Where:
+
+`global.trentoWeb.origin`::::
+Uses the provided hostname to configure internal functionalities such as the interactive API portal, websockets, or certificate generation.
+
+`trento-web.adminUser.password`::::
+Sets the initial password for the default admin account to access the {trento} console.
+
+`prometheus.enabled`::::
+Enables or disables the deployment of Prometheus. For more information, see <<sec-prometheus-integration>>.
+
 . Monitor the creation and start-up of the {trserver} pods, and wait until they are ready and running:
 +
 ====
@@ -167,6 +190,8 @@ If you use a multi-node {k8s} cluster, it is possible to deploy {trserver} image
    --set prometheus.enabled=false
 ----
 ====
+
+Replace `LABEL` and `VALUE` with the actual label key and value of your target node.
 
 [[helm-event-pruning]]
 ===== Configuring event pruning
