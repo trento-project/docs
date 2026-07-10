@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-systemd-deployment]]
 ==== systemd deployment
-:revdate: 2026-06-19
+:revdate: 2026-07-10
 
 A systemd-based installation of the {trserver} using RPM packages can be performed manually on the latest supported versions of {sles4sap}, from 15 SP4 up to 16. For installations on service packs other than the current one, make sure to update the repository URL as described in the relevant notes throughout this guide.
 
@@ -202,11 +202,6 @@ You can create the content of the secret variables such as
 ----
 openssl rand -out /dev/stdout 48 | base64
 ----
-
-Also ensure that a valid hostname, FQDN, or IP address is configured in
-`TRENTO_WEB_ORIGIN` when using HTTPS.
-Otherwise, WebSocket connections will fail, preventing real-time updates
-in the web interface.
 ====
 
 ====== trento-web configuration
@@ -233,16 +228,26 @@ OAS_SERVER_URL=https://trento.example.com
 ----
 ====
 
-The `ADMIN_PASSWORD` variable must must meet the following requiements:
+* The `TRENTO_WEB_ORIGIN` configures internal functionalities such as the interactive API portal, websockets, or certificate generation.
++
+[IMPORTANT]
+====
+Ensure that a valid hostname, FQDN, or IP address is configured in
+`TRENTO_WEB_ORIGIN` when using HTTPS.
+Otherwise, websocket connections will fail, preventing real-time updates
+in the web interface.
+====
+
+* The `ADMIN_PASSWORD` variable must meet the following requiements:
 	
-* minimum of 8 characters
-* the password  not contain 3 consecutive identical numbers or letters (for example, 111 or aaa)
-* the password must not contain 4 consecutive  numbers or letters (for example, 1234, abcd, ABCD)
+** Minimum of 8 characters
+** The password  not contain 3 consecutive identical numbers or letters (for example, 111 or aaa)
+** The password must not contain 4 consecutive  numbers or letters (for example, 1234, abcd, ABCD)
 
 
-The `ENABLE_ALERTING` enables the 
-https://www.trento-project.io/docs/web/Alerting/alerting.html[alerting system to receive email notifications]. Set `ENABLE_ALERTING` to `true` and add additional variables to the `/etc/trento/trento-web`, to enable the feature.
-
+* The `ENABLE_ALERTING` enables the 
+https://www.trento-project.io/docs/web/Alerting/alerting.html[alerting system to receive email notifications]. Set `ENABLE_ALERTING` to `true` and add additional variables to the `/etc/trento/trento-web`, to enable the feature:
++
 ====
 [source,bash]
 ----

@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-k8s-deployment]]
 ==== {k8s} deployment
-:revdate: 2026-07-09
+:revdate: 2026-07-10
 
 include::partials/kubernetes-placeholders.adoc[]
 
@@ -73,7 +73,7 @@ helm upgrade \
 Where:
 
 `global.trentoWeb.origin`::::
-Uses the provided hostname to configure internal functionalities such as the interactive API portal, websockets, or certificate generation.
+Uses the provided hostname (for example, `trento.example.com`) to configure internal functionalities such as the interactive API portal, websockets, or certificate generation.
 
 `trento-web.adminUser.password`::::
 Sets the initial password for the default admin account to access the {trento} console.
@@ -152,7 +152,7 @@ helm upgrade \
 Where:
 
 `global.trentoWeb.origin`::::
-Uses the provided hostname to configure internal functionalities such as the interactive API portal, websockets, or certificate generation.
+Uses the provided hostname (for example, `trento.example.com`) to configure internal functionalities such as the interactive API portal, websockets, or certificate generation.
 
 `trento-web.adminUser.password`::::
 Sets the initial password for the default admin account to access the {trento} console.
