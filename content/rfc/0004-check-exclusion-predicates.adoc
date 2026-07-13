@@ -5,7 +5,7 @@
 |Feature Name | Host-level Exclusion Predicates for Check Executions
 |Start Date | Apr 22nd, 2026
 |Category | Architecture, Checks
-|PR | TBD
+|PR | https://github.com/trento-project/wanda/pull/729[Wanda#729] (core logic), https://github.com/trento-project/wanda/pull/731[Wanda#731] (docs), https://github.com/trento-project/web/pull/4188[Web#4188] (UI) |
 |===
 
 == Summary
@@ -40,7 +40,7 @@ We want check authors to express, inside the check definition, a predicate that 
 
 For each host in the execution request, attach a free-form `attributes` map (see link:#_contracts[Contracts]). Initial keys are whatever the catalog asks for — plausible candidates drawn from the existing host read model include `provider`, `os_family`, `arch`, `roles`, `cluster_role`, `is_majority_maker` — but the proto does not fix the set, and Web is free to start emitting new keys when a check author needs them.
 
-No UI change is required for v1: the data is already available server-side; we just need to forward it.
+A corresponding UI change was implemented alongside the server-side changes: the `excluded_by_policy` result status is surfaced in the execution detail view, so users can clearly see why a host was not evaluated for a given check.
 
 ==== Contracts
 
