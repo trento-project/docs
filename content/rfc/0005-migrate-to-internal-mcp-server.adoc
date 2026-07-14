@@ -17,7 +17,7 @@ It is possible to simplify the architecture and installation of Trento by substi
 * As a user, I want to have a similar experience when I am using the internal AI agent (Liz) and when I am using the external MCP agent, so that I can use Trento in a consistent way.
 * As a user, I want to be able to enable/disable the MCP server
 * As a user, I want to be able to configure the MCP server.
-* As a user, I want to use MCPHost to connect to the MCP server in SLES 16.
+* As a user, I want to use MCPHost/Kit to connect to the MCP server in SLES 16.
 * As a user, I want to use both streamable and sse as the transport protocols for the MCP server, so that I can use the one that is more suitable for my environment.
 * As a developer, I want to reduce the maintenance needed for the alignment of tools used by Liz and by the MCP server, so that the customer gets the same capabilities and responses independently of how they use it.
 
@@ -35,17 +35,15 @@ Considering the outlined link:#use-cases-outline[use cases] we need to:
 * define the changes required to migrate to an internal MCP server, and what would be the tradeoffs.
 * define a migration path to move from the current MCP server to the new internal one.
 
-The current MCP server is a Go application that implements the MCP protocol, and it is used by the external agent to communicate with Trento. Installing the MCP server requires independent configuration and connection to an existing installation, introducing a bigger attack surface and configuration problems. The Trento MCP server requires:
+The current MCP server is a Go application that implements the MCP protocol, and it is used by the external agent to communicate with Trento. It is created using a third party dependency (https://pkg.go.dev/github.com/evcc-io/openapi-mcp#section-readme[Go openapi-mcp]), that is not widely used, although we contribute with patches when we find bugs. Installing the MCP server requires independent configuration and connection to an existing installation, introducing a bigger attack surface and configuration problems. The Trento MCP server requires:
 - A running Trento server (version 3.x or later).
-- An MCP-compatible AI assistant
+- An MCP-compatible AI assistant (MCP client)
 - A Trento Personal Access Token (PAT), generated from your Trento user profile for secure API access.
 - Configuration in /etc/trento/mcp-server-trento
 
-The Trento MCP server today is a Go application that acts as a bridge between the MCP clients and the Trento API, automatically generating MCP tools from the OpenAPI specification.
+The Trento MCP server generates automatically the tools available for the MCP clients based on the OpenAPI specification, using labels to define which tools are available for the MCP clients. 
 
-The Trento MCP server generates a list of tools based on the OpenAPI specification, using labels to define which tools are available for the MCP clients.
-
-You can run an MCP server directly using the native Elixir MCP packages. The two main packages are:
+With the addition of the Liz AI assistant in Trento, the same OpenAPI specification is used to generate tools for Liz, using the specification as a way to keep both solutions synchronized. However, you can run an MCP server directly using the native Elixir MCP packages, thus eliminating the need for the configuration and the synchronization, and simplifying the connection. The two main packages are:
 
 - `anubis_mcp` (formerly `hermes_mcp`). A comprehensive, production-ready SDK that supports STDIO (for local clients) and SSE/HTTP (for remote/web clients). It allows for the dynamic registration of tools.
 - `emcp`. A minimalistic, lightweight MCP client/server library designed to be mounted directly as a Plug in your Phoenix router.
