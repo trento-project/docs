@@ -32,7 +32,7 @@ We want check authors to express, inside the check definition, a predicate that 
 * The execution-request contract is extended so each target carries its host data alongside `agent_id` and `checks`.
 * A check definition gains an optional top-level `exclude:` field, containing a Rhai expression evaluated against the host data.
 * Wanda evaluates the `exclude` predicate per (host, check) pair and filters out excluded pairs before dispatching `FactsGatheringRequested` to the agents.
-* Excluded pairs are reported in the execution result with a clear "excluded by policy" status, distinct from failed or skipped, so the UI can render it.
+* Excluded pairs are reported in the execution result with a clear "excluded" status, distinct from failed or skipped, so the UI can render it.
 
 === Component changes
 
@@ -40,7 +40,7 @@ We want check authors to express, inside the check definition, a predicate that 
 
 For each host in the execution request, attach a free-form `attributes` map (see link:#_contracts[Contracts]). Initial keys are whatever the catalog asks for — plausible candidates drawn from the existing host read model include `provider`, `os_family`, `arch`, `roles`, `cluster_role`, `is_majority_maker` — but the proto does not fix the set, and Web is free to start emitting new keys when a check author needs them.
 
-A corresponding UI change was implemented alongside the server-side changes: the `excluded_by_policy` result status is surfaced in the execution detail view, so users can clearly see why a host was not evaluated for a given check.
+A corresponding UI change was implemented alongside the server-side changes: the `excluded` result status is surfaced in the execution detail view, so users can clearly see why a host was not evaluated for a given check.
 
 ==== Contracts
 
@@ -122,7 +122,7 @@ Before dispatching `FactsGatheringRequested` to agents, Wanda:
 
 1. Evaluates each check's `exclude` predicate against each target's host data.
 2. Filters the (host, check) pairs accordingly.
-3. Reports excluded pairs in the execution result with a clear "excluded by policy" status, distinct from failed / skipped, so the UI can render it.
+3. Reports excluded pairs in the execution result with a clear "excluded" status, distinct from failed / skipped, so the UI can render it.
 
 The predicate runs in the same Rhai sandbox Wanda already uses for checks; no new sandboxing is introduced.
 
@@ -153,6 +153,6 @@ The predicate runs in the same Rhai sandbox Wanda already uses for checks; no ne
 
 |Evaluate `exclude` predicates before dispatch
 |Wanda
-|Filter (host, check) pairs before sending `FactsGatheringRequested` to agents. Report excluded pairs in the execution result with a distinct "excluded by policy" status.
+|Filter (host, check) pairs before sending `FactsGatheringRequested` to agents. Report excluded pairs in the execution result with a distinct "excluded" status.
 
 |===
