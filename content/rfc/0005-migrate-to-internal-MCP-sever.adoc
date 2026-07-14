@@ -19,7 +19,7 @@ It is possible to simplify the architecture and installation of Trento by substi
 * As a user, I want to be able to configure the MCP server.
 * As a user, I want to use MCPHost to connect to the MCP server in SLES 16.
 * As a user, I want to use both streamable and sse as the transport protocols for the MCP server, so that I can use the one that is more suitable for my environment.
-* As a developer, I want to reduce the maintenance needed for the alignment of tools used by Liz and by the MCP server, so that the customer gets the same capabitlites and responses indepedently on how to use it.
+* As a developer, I want to reduce the maintenance needed for the alignment of tools used by Liz and by the MCP server, so that the customer gets the same capabilities and responses independently of how they use it.
 
 === Motivation
 
