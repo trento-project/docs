@@ -35,26 +35,26 @@ Considering the outlined link:#use-cases-outline[use cases] we need to:
 * define the changes required to migrate to an internal MCP server, and what would be the tradeoffs.
 * define a migration path to move from the current MCP server to the new internal one.
 
-THe current MCP server is a Go application that implements the MCP protocol, and it is used by the external agent to communicate with Trento. Installing the MCP server requires indepedent configuration and connection to an existing installation, introducing a bigger attack surface and configuration problems. The Trento MCP server requires:
+The current MCP server is a Go application that implements the MCP protocol, and it is used by the external agent to communicate with Trento. Installing the MCP server requires independent configuration and connection to an existing installation, introducing a bigger attack surface and configuration problems. The Trento MCP server requires:
 - A running Trento server (version 3.x or later).
-- An MCP-Compatible AI assitant
+- An MCP-compatible AI assistant
 - A Trento Personal Access Token (PAT), generated from your Trento user profile for secure API access.
 - Configuration in /etc/trento/mcp-server-trento
 
-The Trento MCP server today is a Go applcation, that acts as a bridge between the MCP clients and the Trento API, automatically generating MCP tools from the OpenAPI specification.
+The Trento MCP server today is a Go application that acts as a bridge between the MCP clients and the Trento API, automatically generating MCP tools from the OpenAPI specification.
 
-The trento MCP server generates a list of tools based on the OpenAPI specification, using labels to define which tools are available for the MCP clients.
+The Trento MCP server generates a list of tools based on the OpenAPI specification, using labels to define which tools are available for the MCP clients.
 
-You can run an MCP server directly using on the native Elixir MCP packages. The two main packages are:
+You can run an MCP server directly using the native Elixir MCP packages. The two main packages are:
 
-- `annubis_mcp`` (formely `hermes_mcp`). A comprehensive, production-ready SDK that supports STDIO (for local clients) and SSE/HTTP (for remote/web clients). It allows for the dynamic registration of tools. 
-- `emcp`. A minimalistic, lightweight MCP client/server library designed to be mounted directly as a Plug in your phoenix router.
+- `anubis_mcp` (formerly `hermes_mcp`). A comprehensive, production-ready SDK that supports STDIO (for local clients) and SSE/HTTP (for remote/web clients). It allows for the dynamic registration of tools.
+- `emcp`. A minimalistic, lightweight MCP client/server library designed to be mounted directly as a Plug in your Phoenix router.
 
-Wse also considered using Nodejs, building a tiny Node MCP server, using the official `@modelcontextprotocol/sdk`to build a server that fetches tool definitino for the Elixir backend and proxies execution requests back to an Elixir endpoint.
+We also considered using Node.js, building a tiny Node MCP server that uses the official `@modelcontextprotocol/sdk` to fetch tool definitions from the Elixir backend and proxies execution requests back to an Elixir endpoint.
 
 == Security
 
-The Go mcp-server acts as a multi-user proxy between the client (your IDE or agent) and the Elixir trento-web API. The job of the MCP is to fetch OpenAPI specs
+The Go mcp-server acts as a multi-user proxy between the client (your IDE or agent) and the Elixir trento-web API. The job of the MCP is to fetch OpenAPI specs.
 
 * *Token Delivery*: The MCP client (e.g., VS Code or Claude Desktop) is configured with an Authorization header containing the user's Trento Personal Access Token (PAT).
 * *Session Mapping*: When the client initializes the connection (via SSE/HTTP), the Go mcp-server intercepts the header, associates the PAT with the unique sessionID, and stores it.
@@ -74,7 +74,7 @@ The Trento MCP Server searches for configuration files in the following order:
  NOTE: SLES 16 uses UsrEtc as the configuration scheme for packages. In UsrEtc, packages store the configuration by default as a .conf file or directory in /usr, and the actual configuration is either in a subdirectory of /etc/ or a .conf file in /etc. The configuration file should thus be upgraded to be either mcp-server-trento.conf or mcp-server-trento.d/ to comply with the UsrEtc scheme. Ideally, the configuration should be in /etc/trento/mcp-server-trento.conf.
 
 
-Configuration for the Internal MCP server would be easier, as the following environmental variables would not be needed any more:
+Configuration for the internal MCP server would be easier, as the following environment variables would not be needed any more:
 
 
 
@@ -94,12 +94,12 @@ Configuration for the Internal MCP server would be easier, as the following envi
 |VERBOSITY	|Kept, different form	|Elixir Logger level via config, not a -v flag.
 |===
 
-Not every options is superfluous, but the configuration is simpler and more aligned with the rest of Trento's configuration. The only options that remain are:
+Not every option is superfluous, but the configuration is simpler and more aligned with the rest of Trento's configuration. The only options that remain are:
 
 [cols="3,1,6", options="header"]
 |===
-|Environmental variables | default value | Detail
-| TRENTO_MCP_ENABLEED | false | Whether the internal MCP server is enabled or not. If false, the internal MCP server will not be started.
+|Environment variable | default value | Detail
+| TRENTO_MCP_ENABLED | false | Whether the internal MCP server is enabled or not. If false, the internal MCP server will not be started.
 | TRENTO_MCP_PORT | 5000 | The port on which the MCP server listens for incoming connections with HTTP transport
 | TRENTO_MCP_LOG_LEVEL | info | The verbosity level of the MCP server logs. Possible values are: debug, info, warn, error
 |===
@@ -129,9 +129,9 @@ Anubis config lives in config/*.exs and the supervision tree, not CLI flags/TREN
 
 2. Additional work needs to be done to add a health check endpoint to the internal MCP server, as the current health check is done by the Go bridge. The health check should be implemented in Elixir, reusing the existing liveness/readiness endpoints.
 
-3. There is no way to install the MCP server into a separate applcation. By design, the internal MCP server is part of the Trento application, and it is not possible to install it into a separate application. 
+3. There is no way to install the MCP server as a separate application. By design, the internal MCP server is part of the Trento application, and it is not possible to install it separately.
 
-4. You can't use command-line flags to configure the internal MCP server. THe configuration is done via de Elixir config files or environmental variables. Additional UX design should be done to include them as part of the command line for Trento itself.
+4. You can't use command-line flags to configure the internal MCP server. The configuration is done via the Elixir config files or environment variables. Additional UX design should be done to include them as part of the command line for Trento itself.
 
 
 == Additional considerations
