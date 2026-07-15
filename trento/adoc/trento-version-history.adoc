@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-version-history]]
 == Highlights of {trento} versions
-:revdate: 2026-07-09
+:revdate: 2026-07-16
 
 
 Below is a list of the most important user-facing features in the
@@ -25,8 +25,8 @@ https://github.com/trento-project/agent/releases.
 
 [indent=-1]
 
-Version 3.1 (released on 2026/05/27, last updated: 2026/07/07)::
- Includes {helm} chart 3.1.1, {tr_web} component 3.1.2, orchestration engine ({wanda}) 2.1.0, compliance checks 1.3.1, {mcp} 1.1.1, and {tragent} 3.1.1, with the following highlights:
+Version 3.1 (released on 2026/05/27, last updated: 2026/07/16)::
+ Includes {helm} chart 3.1.2, {tr_web} component 3.1.2, orchestration engine ({wanda}) 2.1.0, compliance checks 1.3.1, {mcp} 1.1.1, and {tragent} 3.1.1, with the following highlights:
 
   * Opt-in analytics option
   * Timezone awareness
