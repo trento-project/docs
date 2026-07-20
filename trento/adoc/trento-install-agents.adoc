@@ -8,7 +8,7 @@ include::product-attributes.adoc[]
 Before you can install a {tragent}, you must obtain the API key of your
 {trserver}. Proceed as follows:
 
-. Open the URL of the Trento Web console. It prompts you for
+. Open the URL of the {tr_web} console. It prompts you for
 a user name and password:
 +
 image::trento-web-login.png[trento-web-login,scaledwidth=30.0%]
@@ -52,8 +52,8 @@ In a systemd deployment, the correct value is
 `+amqp://TRENTO_USER:TRENTO_USER_PASSWORD@TRENTO_SERVER_HOSTNAME:5672/vhost+`.
 If `+TRENTO_USER+` and `+TRENTO_USER_PASSWORD+` have been replaced with
 custom values, you must use them.
-** `+server-url+`: URL for the Trento Server
-(http://TRENTO_SERVER_HOSTNAME)
+** `+server-url+`: URL for the {trserver}
+(`+http://TRENTO_SERVER_HOSTNAME+`)
 ** `+api-key+`: the API key retrieved from the Web console
 ** `+prometheus-mode+`: Determines how metrics are collected. Valid values are `pull` (default) for `node_exporter`-based collection, or `push` for {grafana} Alloy-based collection. See <<prometheus-metrics-configuration>> for details.
 . If SSL termination has been enabled on the server side, you can
