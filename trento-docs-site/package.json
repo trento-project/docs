@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@antora/collector-extension": "^1.0.3",
-    "@antora/lunr-extension": "^1.0.0-alpha.10",
+    "@antora/lunr-extension": "^1.0.0-alpha.13",
     "@sntke/antora-mermaid-extension": "^0.0.9"
   }
 }
