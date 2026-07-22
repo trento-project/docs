@@ -1,4 +1,4 @@
-== 4. Host-level Exclusion Predicates for Check Executions
+== 5. Host-level Exclusion Predicates for Check Executions
 
 [width="100%",cols="<18%,<82%",]
 |===

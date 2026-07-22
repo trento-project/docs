@@ -50,6 +50,7 @@
 *** xref:rfc/0002-personal-access-tokens-management.adoc[2. Personal Access Tokens Management and Authentication]
 *** xref:rfc/0003-grafana-alloy-integration.adoc[3. Grafana Alloy Integration for SLES 16 System Monitoring]
 *** xref:rfc/0004-ai-agent-integration.adoc[4. AI Assistant]
+*** xref:rfc/0005-check-exclusion-predicates.adoc[5. Host-level Exclusion Predicates for Check Executions]
 
 ** Internal Notes
 *** xref:internal-notes/pr-env-ssl-certificate-setup.adoc[SSL Certificate creation and setup Guide for Pull Request Environments]
