@@ -242,6 +242,7 @@ Langchain https://github.com/brainlid/langchain[library] itself provides a set o
 In this regard, the https://github.com/brainlid[same author] of the LangChain Elixir library has also implemented a higher level framework called https://github.com/sagents-ai/sagents[Sagents] which provides more batteries included features and abstractions to build AI agents. Take a look also at its https://github.com/sagents-ai/agents_demo[demo application].
 
 It's worth noting that:
+
 * we can introduce the more advanced features (like HITL) that Sagents provides incrementally
 * Sagents provides a generator/scaffolding tool to create the basic building blocks for the agent
 * Sagents natively addresses LiveView integration, however we can revisit it to suit our needs and work with Channels
