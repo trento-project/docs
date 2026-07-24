@@ -1,10 +1,10 @@
 include::product-attributes.adoc[]
 
-[[sec-managing-trento-server-storage.adoc]]
+[[sec-managing-trento-server-storage]]
 === Managing {trserver} storage
 :revdate: 2026-07-24
 
-To maintain optimal performance and manage disk space, administrators can optimize the storage used by {trserver} by adjusting data retention.
+To preserve peak performance and manage disk space, administrators can optimize the storage used by {trserver} by adjusting data retention.
 
 Several factors impact the amount of storage {trserver} uses, such as:
 
@@ -12,7 +12,7 @@ Database event retention::
 The number of registered events stored in the database. The default retention time is *10 days*. You can change the default retention by following the configuration procedures in this section.
 
 Activity log retention::
-The retention time for entries in the Activity Log. The default retention time is *2 months*. You can change the default retention through the UI as described in <<sec-activity-log>>.
+The retention time for entries in the Activity Log. The default retention time is *1 month*. You can change the default retention through the UI as described in <<sec-activity-log>>.
 
 // Component log level::
 // The log level for the different components of {trserver}. The default is `debug`.

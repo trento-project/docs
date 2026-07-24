@@ -63,7 +63,7 @@ specify the number of entries to display in a page, go to the next or
 previous page of the view, and jump to the last page and back to first
 one.
 
-The default retention time for entries in the Activity Log is *2 months*.
+The default retention time for entries in the Activity Log is one month.
 This can be changed in the Activity Log section under Settings. Changing
 the retention time requires the `+all:settings+` permissions. Entries
 older than the specified retention time are deleted every day at
