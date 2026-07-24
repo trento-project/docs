@@ -1,0 +1,76 @@
+include::product-attributes.adoc[]
+
+[[sec-managing-trento-server-storage]]
+=== Managing {trserver} storage
+:revdate: 2026-07-24
+
+To preserve peak performance and manage disk space, administrators can optimize the storage used by {trserver} by adjusting data retention.
+
+Several factors impact the amount of storage {trserver} uses, such as:
+
+Database event retention:: 
+The number of registered events stored in the database. The default retention time is *10 days*. You can change the default retention by following the configuration procedures in this section.
+
+Activity log retention::
+The retention time for entries in the Activity Log. The default retention time is *1 month*. You can change the default retention through the UI as described in <<sec-activity-log>>.
+
+// Component log level::
+// The log level for the different components of {trserver}. The default is `debug`.
+
+[NOTE]
+====
+A shorter retention time reduces storage consumption but limits the capability to analyze and troubleshoot issues beyond that time frame.
+====
+
+The event pruning feature allows administrators to manage how long registered events are stored in the database and how often the expired events are removed. 
+
+The following configuration options are available:
+
+[options="header"]
+|===
+| {k8s} option | systemd option | Description | Default value
+
+| `pruneEventsOlderThan` | `PRUNE_EVENTS_OLDER_THAN` | The number of days registered events are stored in the database. | `10`
+
+| `pruneEventsCronjobSchedule` | `PRUNE_EVENTS_INTERVAL` | The frequency of the cron job that deletes expired events. The default runs daily at midnight. | `"0{nbsp}0{nbsp}*{nbsp}*{nbsp}*"`
+|===
+
+[[event-retention-k8s]]
+==== Configuring event retention on {k8s} deployments
+
+For {k8s} deployments, use the `helm upgrade` command to set the configuration options.
+
+*Example* command to retain events for 30 days and schedule pruning daily at 3 AM:
+
+[source,bash]
+----
+helm upgrade \
+   --install trento-server oci://registry.suse.com/trento/trento-server \
+   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
+   --set trento-web.adminUser.password=ADMIN_PASSWORD \
+   --set prometheus.enabled=false \
+   --set trento-web.pruneEventsOlderThan=30 \
+   --set trento-web.pruneEventsCronjobSchedule="0 3 * * *"
+----
+
+[[event-retention-systemd]]
+==== Configuring event retention on systemd deployments
+
+For systemd deployments, perform the following steps:
+
+. Add or modify the environment variables in the `/etc/trento/trento-web` {tr_web} configuration file:
++
+*Example* values that retain events for 30 days and schedules pruning daily at 3 AM:
++
+[source,env]
+----
+PRUNE_EVENTS_OLDER_THAN=30
+PRUNE_EVENTS_INTERVAL="0 3 * * *"
+----
+
+. Restart the `trento-web` service for the changes to take effect:
++
+[source,bash]
+----
+systemctl restart trento-web
+----
