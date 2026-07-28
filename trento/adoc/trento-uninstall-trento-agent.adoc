@@ -13,7 +13,7 @@ To uninstall a {tragent}, perform the following steps:
 ====
 [source,bash,subs="attributes"]
 ----
-{prompt_sudo}systemctl stop trento-agent
+{sudo} systemctl stop trento-agent
 ----
 ====
 * Remove the package:
@@ -21,6 +21,6 @@ To uninstall a {tragent}, perform the following steps:
 ====
 [source,bash,subs="attributes"]
 ----
-{prompt_sudo}zypper remove trento-agent
+{sudo} zypper remove trento-agent
 ----
 ====

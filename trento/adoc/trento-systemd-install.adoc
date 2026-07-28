@@ -37,15 +37,16 @@ https://www.postgresql.org/docs/[PostgreSQL documentation].
 
 . Install PostgreSQL server:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-zypper in postgresql-server
+{sudo} zypper install postgresql-server
 ----
+
 . Enable and start PostgreSQL server:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-systemctl enable --now postgresql
+{sudo} systemctl enable --now postgresql
 ----
 
 ====== Configure PostgreSQL
@@ -53,11 +54,12 @@ systemctl enable --now postgresql
 . Start `+psql+` with the `+postgres+` user to open a connection to the
 database:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-su - postgres
+{sudo} su - postgres
 psql
 ----
+
 . Initialize the databases in the `+psql+` console:
 +
 [source,sql]
@@ -66,88 +68,106 @@ CREATE DATABASE wanda;
 CREATE DATABASE trento;
 CREATE DATABASE trento_event_store;
 ----
+
 . Create the users:
++
+[NOTE]
+====
+The values `WANDA_USER`, `WANDA_PASSWORD`, `TRENTO_USER`, and `WEB_PASSWORD` are placeholders. Replace them with your own secure values before running these commands.
+====
 +
 [source,sql]
 ----
-CREATE USER wanda_user WITH PASSWORD 'wanda_password';
-CREATE USER trento_user WITH PASSWORD 'web_password';
+CREATE USER WANDA_USER WITH PASSWORD 'WANDA_PASSWORD';
+CREATE USER TRENTO_USER WITH PASSWORD 'WEB_PASSWORD';
 ----
+
 . Grant required privileges to the users and close the connection:
 +
 [source,sql]
 ----
 \c wanda
-GRANT ALL ON SCHEMA public TO wanda_user;
+GRANT ALL ON SCHEMA public TO WANDA_USER;
 \c trento
-GRANT ALL ON SCHEMA public TO trento_user;
-\c trento_event_store;
-GRANT ALL ON SCHEMA public TO trento_user;
+GRANT ALL ON SCHEMA public TO TRENTO_USER;
+\c trento_event_store
+GRANT ALL ON SCHEMA public TO TRENTO_USER;
 \q
 ----
+
+. Exit the `+postgres+` user session:
 +
-You can exit from the `+psql+` console and `+postgres+` user.
+[source,sql]
+----
+exit
+----
+
 . Allow the PostgreSQL database to receive connections to the respective
 databases and users. To do this, add the following to
 `+/var/lib/pgsql/data/pg_hba.conf+`:
 +
-[source,bash]
-----
-host   wanda                      wanda_user    0.0.0.0/0     scram-sha-256
-host   trento,trento_event_store  trento_user   0.0.0.0/0     scram-sha-256
-----
-+
-[NOTE]
+[IMPORTANT]
 ====
 The `+pg_hba.conf+` file works sequentially. This means that the rules
-on the top have preference over the ones below. The example above shows
+on the top have preference over the ones below. The following example shows
 a permissive address range. So for this to work, the entires must be
 written at the top of the `+host+` entries. For further information,
 refer to the
 https://www.postgresql.org/docs/current/auth-pg-hba-conf.html[pg_hba.conf]
 documentation.
 ====
++
+[source,text]
+----
+host   wanda                      WANDA_USER    0.0.0.0/0     scram-sha-256
+host   trento,trento_event_store  TRENTO_USER   0.0.0.0/0     scram-sha-256
+----
+
 . Allow PostgreSQL to bind on all network interfaces in
 `+/var/lib/pgsql/data/postgresql.conf+` by changing the following line:
 +
-[source,bash]
+[source,ini]
 ----
 listen_addresses = '*'
 ----
+
 . Restart PostgreSQL to apply the changes:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-systemctl restart postgresql
+{sudo} systemctl restart postgresql
 ----
 
 ====== Install RabbitMQ
 
 . Install RabbitMQ server:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-zypper install rabbitmq-server
+{sudo} zypper install rabbitmq-server
 ----
+
 . Allow connections from external hosts by modifying
 `+/etc/rabbitmq/rabbitmq.conf+`, so the {trento}-agent can reach RabbitMQ:
 +
-[source,ini files]
+[source,ini]
 ----
 listeners.tcp.default = 5672
 ----
+
 . If firewalld is running, add a rule to firewalld:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-firewall-cmd --zone=public --add-port=5672/tcp --permanent;
-firewall-cmd --reload
+{sudo} firewall-cmd --zone=public --add-port=5672/tcp --permanent
+{sudo} firewall-cmd --reload
 ----
+
 . Enable the RabbitMQ service:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-systemctl enable --now rabbitmq-server
+{sudo} systemctl enable --now rabbitmq-server
 ----
 
 ====== Configure RabbitMQ
@@ -158,21 +178,28 @@ https://www.rabbitmq.com/production-checklist.html[RabbitMQ guide].
 
 . Create a new RabbitMQ user:
 +
-[source,bash]
+[NOTE]
+====
+The values `TRENTO_USER` and `TRENTO_USER_PASSWORD` are placeholders. Replace them with your own secure values before running these commands.
+====
++
+[source,bash,subs="attributes"]
 ----
-rabbitmqctl add_user trento_user trento_user_password
+{sudo} rabbitmqctl add_user TRENTO_USER TRENTO_USER_PASSWORD
 ----
+
 . Create a virtual host:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-rabbitmqctl add_vhost vhost
+{sudo} rabbitmqctl add_vhost vhost
 ----
+
 . Set permissions for the user on the virtual host:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
+{sudo} rabbitmqctl set_permissions -p vhost TRENTO_USER ".*" ".*" ".*"
 ----
 
 ===== Install {trento} using RPM packages
@@ -181,9 +208,9 @@ The `trento-web` and `trento-wanda` packages are available by default on support
 
 Install {trento} web, wanda and checks:
 
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-zypper install trento-web trento-wanda
+{sudo} zypper install trento-web trento-wanda
 ----
 
 ====== Create the configuration files
@@ -204,15 +231,19 @@ openssl rand -out /dev/stdout 48 | base64
 ----
 ====
 
-====== trento-web configuration
-
+. Create the `/etc/trento/trento-web` configuration file. For example:
++
+[NOTE]
 ====
+The values `TRENTO_USER`, `TRENTO_USER_PASSWORD`, and `WEB_PASSWORD` are placeholders. Replace them with your own secure values before running these commands.
+====
++
 [source,bash]
 ----
 # /etc/trento/trento-web
-AMQP_URL=amqp://trento_user:trento_user_password@localhost:5672/vhost
-DATABASE_URL=ecto://trento_user:web_password@localhost/trento
-EVENTSTORE_URL=ecto://trento_user:web_password@localhost/trento_event_store
+AMQP_URL=amqp://TRENTO_USER:TRENTO_USER_PASSWORD@localhost:5672/vhost
+DATABASE_URL=ecto://TRENTO_USER:WEB_PASSWORD@localhost/trento
+EVENTSTORE_URL=ecto://TRENTO_USER:WEB_PASSWORD@localhost/trento_event_store
 ENABLE_ALERTING=false
 CHARTS_ENABLED=false
 ADMIN_USER=admin
@@ -226,9 +257,8 @@ REFRESH_TOKEN_ENC_SECRET=some-secret
 CHECKS_SERVICE_BASE_URL=/wanda
 OAS_SERVER_URL=https://trento.example.com
 ----
-====
 
-* The `TRENTO_WEB_ORIGIN` configures internal functionalities such as the interactive API portal, websockets, or certificate generation.
+** The `TRENTO_WEB_ORIGIN` configures internal functionalities such as the interactive API portal, websockets, or certificate generation.
 +
 [IMPORTANT]
 ====
@@ -238,17 +268,16 @@ Otherwise, websocket connections will fail, preventing real-time updates
 in the web interface.
 ====
 
-* The `ADMIN_PASSWORD` variable must meet the following requiements:
+** The `ADMIN_PASSWORD` variable must meet the following requirements:
 	
-** Minimum of 8 characters
-** The password  not contain 3 consecutive identical numbers or letters (for example, 111 or aaa)
-** The password must not contain 4 consecutive  numbers or letters (for example, 1234, abcd, ABCD)
+*** Minimum of 8 characters
+*** The password  not contain 3 consecutive identical numbers or letters (for example, 111 or aaa)
+*** The password must not contain 4 consecutive  numbers or letters (for example, 1234, abcd, ABCD)
 
 
-* The `ENABLE_ALERTING` enables the 
-https://www.trento-project.io/docs/web/Alerting/alerting.html[alerting system to receive email notifications]. Set `ENABLE_ALERTING` to `true` and add additional variables to the `/etc/trento/trento-web`, to enable the feature:
+** The `ENABLE_ALERTING` enables the 
+https://www.trento-project.io/docs/web/Alerting/alerting.html[alerting system to receive email notifications]. Set `ENABLE_ALERTING` to `true` and add additional variables to the `/etc/trento/trento-web` to enable the feature:
 +
-====
 [source,bash]
 ----
 # /etc/trento/trento-web
@@ -260,23 +289,35 @@ SMTP_PORT=<<SMTP_PORT>>
 SMTP_USER=<<SMTP_USER>>
 SMTP_PASSWORD=<<SMTP_PASSWORD>>
 ----
-====
 
-====== trento-wanda configuration
-
+. Create the `/etc/trento/trento-wanda` configuration file. For example:
++
+[NOTE]
 ====
+The values `WANDA_USER`, `WANDA_PASSWORD`, `TRENTO_USER`, and `TRENTO_USER_PASSWORD` are placeholders. Replace them with your own secure values before running these commands.
+====
++
 [source,bash]
 ----
 # /etc/trento/trento-wanda
 CORS_ORIGIN=http://localhost
-AMQP_URL=amqp://trento_user:trento_user_password@localhost:5672/vhost
-DATABASE_URL=ecto://wanda_user:wanda_password@localhost/wanda
+AMQP_URL=amqp://TRENTO_USER:TRENTO_USER_PASSWORD@localhost:5672/vhost
+DATABASE_URL=ecto://WANDA_USER:WANDA_PASSWORD@localhost/wanda
 PORT=4001
 SECRET_KEY_BASE=some-secret
 OAS_SERVER_URL=https://trento.example.com/wanda
 AUTH_SERVER_URL=http://localhost:4000
 ----
-====
+
+. Secure the configuration files.
++
+To protect sensitive information, the configuration files must have `600` permissions so that only the `root` user can read them:
++
+[source,bash,subs="attributes"]
+----
+{sudo} chmod 600 /etc/trento/trento-web
+{sudo} chmod 600 /etc/trento/trento-wanda
+----
 
 ====== Start the services
 
@@ -285,37 +326,35 @@ AUTH_SERVER_URL=http://localhost:4000
 In some {sles4sap} environments, SELinux may be enabled and set to *enforcing* mode by default.  
 If {trento} services fail to start or show permission-related errors, check the SELinux status:
 
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-getenforce
+{sudo} getenforce
 ----
 
 If SELinux is set to *enforcing*, switch it to *permissive* mode either temporarily or permanently:
 
 * **Temporary change (until reboot):**
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-setenforce 0
+{sudo} setenforce 0
 ----
 
 * **Permanent change (persists after reboot):**
 +
 Edit `/etc/selinux/config` and set:
 +
-[source]
+[source,ini]
 ----
 SELINUX=permissive
 ----
-+
-
 ====
 
 Enable and start the services:
 
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-systemctl enable --now trento-web trento-wanda
+{sudo} systemctl enable --now trento-web trento-wanda
 ----
 
 ====== Monitor the services
@@ -323,16 +362,26 @@ systemctl enable --now trento-web trento-wanda
 Use `+journalctl+` to check if the services are up and running
 correctly. For example:
 
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-journalctl -fu trento-web
+{sudo} journalctl -fu trento-web
 ----
 
 [[validate-the-health-status-of-trento-web-and-wanda]]
 ===== Check the health status of {tr_web} and {tr_wanda}
 
 You can check if {tr_web} and {tr_wanda} services function correctly by
-accessing accessing the `+healthz+` and `+readyz+` API.
+accessing the `+healthz+` and `+readyz+` API.
+
+If {trento} web and wanda are ready, and the database connection is set up
+correctly, the output should be as follows:
+
+====
+[source,bash]
+----
+{"ready":true}{"database":"pass"}
+----
+====
 
 . Check {tr_web} health status using `+curl+`:
 +
@@ -345,7 +394,7 @@ curl http://localhost:4000/api/readyz
 ----
 curl http://localhost:4000/api/healthz
 ----
-. Check {trento} wanda health status using `+curl+`:
+. Check {tr_wanda} health status using `+curl+`:
 +
 [source,bash]
 ----
@@ -357,38 +406,27 @@ curl http://localhost:4001/api/readyz
 curl http://localhost:4001/api/healthz
 ----
 
-If {trento} web and wanda are ready, and the database connection is set up
-correctly, the output should be as follows:
-
-====
-[source,bash]
-----
-{"ready":true}{"database":"pass"}
-----
-====
-
-
 ===== Install and configure NGINX
 
 . Install NGINX package:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-zypper install nginx
+{sudo} zypper install nginx
 ----
 . If firewalld is running, add firewalld rules for HTTP and HTTPS:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-firewall-cmd --zone=public --add-service=https --permanent
-firewall-cmd --zone=public --add-service=http --permanent
-firewall-cmd --reload
+{sudo} firewall-cmd --zone=public --add-service=https --permanent
+{sudo} firewall-cmd --zone=public --add-service=http --permanent
+{sudo} firewall-cmd --reload
 ----
 . Start and enable NGINX:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-systemctl enable --now nginx
+{sudo} systemctl enable --now nginx
 ----
 . Create a `+/etc/nginx/conf.d/trento.conf+` {trento} configuration file:
 +
@@ -476,10 +514,16 @@ server {
 ===== Prepare SSL certificate for NGINX
 
 Create or provide a certificate for https://nginx.org/en/[NGINX] to
-enable SSL for {trento}.
+enable SSL for {trento}. Choose one of the following methods:
+
+* To manually generate a self-signed certificate, see <<option-1-creating-a-self-signed-certificate>>.
+* To automate obtaining a signed certificate with Let's Encrypt, see <<option-2-using-lets-encrypt-for-a-signed-certificate-using-packagehub-repository>>.
+* To provide an existing signed certificate, you can use the procedure in <<option-1-creating-a-self-signed-certificate>>, skipping step 1 and adapting the remaining steps to use your own files.
 
 [[option-1-creating-a-self-signed-certificate]]
 ====== Create a self-signed certificate
+
+Manually generate a self-signed certificate and ensure it is trusted by the system.
 
 . Generate a self-signed certificate:
 +
@@ -495,24 +539,27 @@ example, `+-days 365+` for one year.
 ----
 openssl req -newkey rsa:2048 --nodes -keyout trento.key -x509 -days 5 -out trento.crt -addext "subjectAltName = DNS:trento.example.com"
 ----
+
 . Copy the generated `+trento.key+` to a location accessible by NGINX:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-cp trento.key /etc/ssl/private/trento.key
+{sudo} cp trento.key /etc/ssl/private/trento.key
 ----
+
 . Create a directory for the generated `+trento.crt+` file. The
 directory must be accessible by NGINX:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-mkdir -p /etc/nginx/ssl/certs/
+{sudo} mkdir -p /etc/nginx/ssl/certs/
 ----
+
 . Copy the generated `+trento.crt+` file to the created directory:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-cp trento.crt /etc/nginx/ssl/certs/trento.crt
+{sudo} cp trento.crt /etc/nginx/ssl/certs/trento.crt
 ----
 
 . Ensure the self-signed certificate is trusted:
@@ -526,23 +573,23 @@ openssl x509 -in trento.crt -out trento.pem -outform PEM
 
 .. Copy the certificate in PEM format to `/etc/pki/trust/anchors/`:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-cp trento.pem /etc/pki/trust/anchors/
+{sudo} cp trento.pem /etc/pki/trust/anchors/
 ----
 
 .. Run the `update-ca-certificates` command:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-update-ca-certificates
+{sudo} update-ca-certificates
 ----
 
 . Check the NGINX configuration:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-nginx -t
+{sudo} nginx -t
 ----
 +
 If the configuration is correct, the output should be as follows:
@@ -557,45 +604,59 @@ If there are issues with the configuration, the output indicates what
 needs to be adjusted.
 . Enable NGINX:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-systemctl restart nginx
+{sudo} systemctl restart nginx
 ----
 
 [[option-2-using-lets-encrypt-for-a-signed-certificate-using-packagehub-repository]]
 ====== Create a signed certificate with Let's Encrypt using PackageHub repository
 
+Automate obtaining a signed certificate with Let's Encrypt and configure NGINX to use it.
+
 . Enable the PackageHub repository (replace `x.x` with your OS version, for example `15.7`):
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-SUSEConnect --product PackageHub/x.x/x86_64
-zypper refresh
+{sudo} SUSEConnect --product PackageHub/x.x/x86_64
+{sudo} zypper refresh
 ----
-+
-. Install Certbot and its NGINX plugin:
-+
-[NOTE]
-====
-Service Packs include version-specific Certbot NGINX plugin packages, for example `+python311-certbot-nginx+`, `+python313-certbot-nginx+` or `+python3-certbot-nginx+`. Install the package available in the Service Pack you currently use.
-====
+
+. Find the Certbot NGINX plug-in package available in your current Service Pack:
 +
 [source,bash]
 ----
-zypper install certbot python311-certbot-nginx
+zypper search certbot-nginx
 ----
++
+Example output:
++
+[source,bash]
+----
+S  | Name                    | Summary                  | Type
+---+-------------------------+--------------------------+--------
+   | python313-certbot-nginx | Nginx plugin for Certbot | package
+----
+
+. Install Certbot and its NGINX plug-in. Use the specific package name returned in the output of the previous step. For example:
++
+[source,bash,subs="attributes"]
+----
+{sudo} zypper install certbot python313-certbot-nginx
+----
+
 . Obtain a certificate and configure NGINX with Certbot:
 +
 [NOTE]
 ====
-Replace `+example.com+` with your domain. For more information, refer to
+Replace `+trento.example.com+` with your domain. For more information, refer to
 https://certbot.eff.org/instructions?ws=nginx&os=leap[Certbot
 instructions for NGINX]
 ====
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-certbot --nginx -d trento.example.com
+{sudo} certbot --nginx -d trento.example.com
 ----
 +
 [NOTE]
