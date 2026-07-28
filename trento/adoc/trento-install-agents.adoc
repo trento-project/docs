@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-installing-trentoagent]]
 === Installing {tragent}s
-:revdate: 2026-02-05
+:revdate: 2026-07-28
 
 
 Before you can install a {tragent}, you must obtain the API key of your
