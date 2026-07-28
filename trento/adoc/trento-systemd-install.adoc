@@ -73,13 +73,13 @@ CREATE DATABASE trento_event_store;
 +
 [NOTE]
 ====
-The following commands use `wanda_user`, `wanda_password`, `trento_user`, and `trento_password` as example values. For a secure environment, replace the passwords (and user names, if needed) with your own secure values.
+The values `WANDA_USER`, `WANDA_PASSWORD`, `TRENTO_USER`, and `WEB_PASSWORD` are placeholders. Replace them with your own secure values before running these commands.
 ====
 +
 [source,sql]
 ----
-CREATE USER wanda_user WITH PASSWORD 'wanda_password';
-CREATE USER trento_user WITH PASSWORD 'web_password';
+CREATE USER WANDA_USER WITH PASSWORD 'WANDA_PASSWORD';
+CREATE USER TRENTO_USER WITH PASSWORD 'WEB_PASSWORD';
 ----
 
 . Grant required privileges to the users and close the connection:
@@ -87,11 +87,11 @@ CREATE USER trento_user WITH PASSWORD 'web_password';
 [source,sql]
 ----
 \c wanda
-GRANT ALL ON SCHEMA public TO wanda_user;
+GRANT ALL ON SCHEMA public TO WANDA_USER;
 \c trento
-GRANT ALL ON SCHEMA public TO trento_user;
+GRANT ALL ON SCHEMA public TO TRENTO_USER;
 \c trento_event_store
-GRANT ALL ON SCHEMA public TO trento_user;
+GRANT ALL ON SCHEMA public TO TRENTO_USER;
 \q
 ----
 
@@ -119,8 +119,8 @@ documentation.
 +
 [source,text]
 ----
-host   wanda                      wanda_user    0.0.0.0/0     scram-sha-256
-host   trento,trento_event_store  trento_user   0.0.0.0/0     scram-sha-256
+host   wanda                      WANDA_USER    0.0.0.0/0     scram-sha-256
+host   trento,trento_event_store  TRENTO_USER   0.0.0.0/0     scram-sha-256
 ----
 
 . Allow PostgreSQL to bind on all network interfaces in
@@ -180,7 +180,7 @@ https://www.rabbitmq.com/production-checklist.html[RabbitMQ guide].
 +
 [source,bash,subs="attributes"]
 ----
-{sudo} rabbitmqctl add_user trento_user trento_user_password
+{sudo} rabbitmqctl add_user TRENTO_USER TRENTO_USER_PASSWORD
 ----
 
 . Create a virtual host:
@@ -194,7 +194,7 @@ https://www.rabbitmq.com/production-checklist.html[RabbitMQ guide].
 +
 [source,bash,subs="attributes"]
 ----
-{sudo} rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
+{sudo} rabbitmqctl set_permissions -p vhost TRENTO_USER ".*" ".*" ".*"
 ----
 
 ===== Install {trento} using RPM packages
@@ -231,9 +231,9 @@ openssl rand -out /dev/stdout 48 | base64
 [source,bash]
 ----
 # /etc/trento/trento-web
-AMQP_URL=amqp://trento_user:trento_user_password@localhost:5672/vhost
-DATABASE_URL=ecto://trento_user:web_password@localhost/trento
-EVENTSTORE_URL=ecto://trento_user:web_password@localhost/trento_event_store
+AMQP_URL=amqp://TRENTO_USER:TRENTO_USER_PASSWORD@localhost:5672/vhost
+DATABASE_URL=ecto://TRENTO_USER:WEB_PASSWORD@localhost/trento
+EVENTSTORE_URL=ecto://TRENTO_USER:WEB_PASSWORD@localhost/trento_event_store
 ENABLE_ALERTING=false
 CHARTS_ENABLED=false
 ADMIN_USER=admin
@@ -286,8 +286,8 @@ SMTP_PASSWORD=<<SMTP_PASSWORD>>
 ----
 # /etc/trento/trento-wanda
 CORS_ORIGIN=http://localhost
-AMQP_URL=amqp://trento_user:trento_user_password@localhost:5672/vhost
-DATABASE_URL=ecto://wanda_user:wanda_password@localhost/wanda
+AMQP_URL=amqp://TRENTO_USER:TRENTO_USER_PASSWORD@localhost:5672/vhost
+DATABASE_URL=ecto://WANDA_USER:WANDA_PASSWORD@localhost/wanda
 PORT=4001
 SECRET_KEY_BASE=some-secret
 OAS_SERVER_URL=https://trento.example.com/wanda
