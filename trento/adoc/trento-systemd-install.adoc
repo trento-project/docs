@@ -37,16 +37,16 @@ https://www.postgresql.org/docs/[PostgreSQL documentation].
 
 . Install PostgreSQL server:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo zypper install postgresql-server
+{sudo} zypper install postgresql-server
 ----
 
 . Enable and start PostgreSQL server:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo systemctl enable --now postgresql
+{sudo} systemctl enable --now postgresql
 ----
 
 ====== Configure PostgreSQL
@@ -54,9 +54,9 @@ sudo systemctl enable --now postgresql
 . Start `+psql+` with the `+postgres+` user to open a connection to the
 database:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo su - postgres
+{sudo} su - postgres
 psql
 ----
 
@@ -133,18 +133,18 @@ listen_addresses = '*'
 
 . Restart PostgreSQL to apply the changes:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo systemctl restart postgresql
+{sudo} systemctl restart postgresql
 ----
 
 ====== Install RabbitMQ
 
 . Install RabbitMQ server:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo zypper install rabbitmq-server
+{sudo} zypper install rabbitmq-server
 ----
 
 . Allow connections from external hosts by modifying
@@ -157,17 +157,17 @@ listeners.tcp.default = 5672
 
 . If firewalld is running, add a rule to firewalld:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo firewall-cmd --zone=public --add-port=5672/tcp --permanent
-sudo firewall-cmd --reload
+{sudo} firewall-cmd --zone=public --add-port=5672/tcp --permanent
+{sudo} firewall-cmd --reload
 ----
 
 . Enable the RabbitMQ service:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo systemctl enable --now rabbitmq-server
+{sudo} systemctl enable --now rabbitmq-server
 ----
 
 ====== Configure RabbitMQ
@@ -178,23 +178,23 @@ https://www.rabbitmq.com/production-checklist.html[RabbitMQ guide].
 
 . Create a new RabbitMQ user:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo rabbitmqctl add_user trento_user trento_user_password
+{sudo} rabbitmqctl add_user trento_user trento_user_password
 ----
 
 . Create a virtual host:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo rabbitmqctl add_vhost vhost
+{sudo} rabbitmqctl add_vhost vhost
 ----
 
 . Set permissions for the user on the virtual host:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
+{sudo} rabbitmqctl set_permissions -p vhost trento_user ".*" ".*" ".*"
 ----
 
 ===== Install {trento} using RPM packages
@@ -203,9 +203,9 @@ The `trento-web` and `trento-wanda` packages are available by default on support
 
 Install {trento} web, wanda and checks:
 
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo zypper install trento-web trento-wanda
+{sudo} zypper install trento-web trento-wanda
 ----
 
 ====== Create the configuration files
@@ -298,10 +298,10 @@ AUTH_SERVER_URL=http://localhost:4000
 +
 To protect sensitive information, the configuration files must have `600` permissions so that only the `root` user can read them:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo chmod 600 /etc/trento/trento-web
-sudo chmod 600 /etc/trento/trento-wanda
+{sudo} chmod 600 /etc/trento/trento-web
+{sudo} chmod 600 /etc/trento/trento-wanda
 ----
 
 ====== Start the services
@@ -311,18 +311,18 @@ sudo chmod 600 /etc/trento/trento-wanda
 In some {sles4sap} environments, SELinux may be enabled and set to *enforcing* mode by default.  
 If {trento} services fail to start or show permission-related errors, check the SELinux status:
 
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo getenforce
+{sudo} getenforce
 ----
 
 If SELinux is set to *enforcing*, switch it to *permissive* mode either temporarily or permanently:
 
 * **Temporary change (until reboot):**
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo setenforce 0
+{sudo} setenforce 0
 ----
 
 * **Permanent change (persists after reboot):**
@@ -337,9 +337,9 @@ SELINUX=permissive
 
 Enable and start the services:
 
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo systemctl enable --now trento-web trento-wanda
+{sudo} systemctl enable --now trento-web trento-wanda
 ----
 
 ====== Monitor the services
@@ -347,9 +347,9 @@ sudo systemctl enable --now trento-web trento-wanda
 Use `+journalctl+` to check if the services are up and running
 correctly. For example:
 
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo journalctl -fu trento-web
+{sudo} journalctl -fu trento-web
 ----
 
 [[validate-the-health-status-of-trento-web-and-wanda]]
@@ -395,23 +395,23 @@ curl http://localhost:4001/api/healthz
 
 . Install NGINX package:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo zypper install nginx
+{sudo} zypper install nginx
 ----
 . If firewalld is running, add firewalld rules for HTTP and HTTPS:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo firewall-cmd --zone=public --add-service=https --permanent
-sudo firewall-cmd --zone=public --add-service=http --permanent
-sudo firewall-cmd --reload
+{sudo} firewall-cmd --zone=public --add-service=https --permanent
+{sudo} firewall-cmd --zone=public --add-service=http --permanent
+{sudo} firewall-cmd --reload
 ----
 . Start and enable NGINX:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo systemctl enable --now nginx
+{sudo} systemctl enable --now nginx
 ----
 . Create a `+/etc/nginx/conf.d/trento.conf+` {trento} configuration file:
 +
@@ -526,24 +526,24 @@ openssl req -newkey rsa:2048 --nodes -keyout trento.key -x509 -days 5 -out trent
 
 . Copy the generated `+trento.key+` to a location accessible by NGINX:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo cp trento.key /etc/ssl/private/trento.key
+{sudo} cp trento.key /etc/ssl/private/trento.key
 ----
 
 . Create a directory for the generated `+trento.crt+` file. The
 directory must be accessible by NGINX:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo mkdir -p /etc/nginx/ssl/certs/
+{sudo} mkdir -p /etc/nginx/ssl/certs/
 ----
 
 . Copy the generated `+trento.crt+` file to the created directory:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo cp trento.crt /etc/nginx/ssl/certs/trento.crt
+{sudo} cp trento.crt /etc/nginx/ssl/certs/trento.crt
 ----
 
 . Ensure the self-signed certificate is trusted:
@@ -557,23 +557,23 @@ openssl x509 -in trento.crt -out trento.pem -outform PEM
 
 .. Copy the certificate in PEM format to `/etc/pki/trust/anchors/`:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo cp trento.pem /etc/pki/trust/anchors/
+{sudo} cp trento.pem /etc/pki/trust/anchors/
 ----
 
 .. Run the `update-ca-certificates` command:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo update-ca-certificates
+{sudo} update-ca-certificates
 ----
 
 . Check the NGINX configuration:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo nginx -t
+{sudo} nginx -t
 ----
 +
 If the configuration is correct, the output should be as follows:
@@ -588,9 +588,9 @@ If there are issues with the configuration, the output indicates what
 needs to be adjusted.
 . Enable NGINX:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo systemctl restart nginx
+{sudo} systemctl restart nginx
 ----
 
 [[option-2-using-lets-encrypt-for-a-signed-certificate-using-packagehub-repository]]
@@ -600,10 +600,10 @@ Automate obtaining a signed certificate with Let's Encrypt and configure NGINX t
 
 . Enable the PackageHub repository (replace `x.x` with your OS version, for example `15.7`):
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo SUSEConnect --product PackageHub/x.x/x86_64
-sudo zypper refresh
+{sudo} SUSEConnect --product PackageHub/x.x/x86_64
+{sudo} zypper refresh
 ----
 
 . Find the Certbot NGINX plug-in package available in your current Service Pack:
@@ -624,9 +624,9 @@ S  | Name                    | Summary                  | Type
 
 . Install Certbot and its NGINX plug-in. Use the specific package name returned in the output of the previous step. For example:
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo zypper install certbot python313-certbot-nginx
+{sudo} zypper install certbot python313-certbot-nginx
 ----
 
 . Obtain a certificate and configure NGINX with Certbot:
@@ -638,9 +638,9 @@ https://certbot.eff.org/instructions?ws=nginx&os=leap[Certbot
 instructions for NGINX]
 ====
 +
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo certbot --nginx -d trento.example.com
+{sudo} certbot --nginx -d trento.example.com
 ----
 +
 [NOTE]
