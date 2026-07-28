@@ -178,6 +178,11 @@ https://www.rabbitmq.com/production-checklist.html[RabbitMQ guide].
 
 . Create a new RabbitMQ user:
 +
+[NOTE]
+====
+The values `TRENTO_USER` and `TRENTO_USER_PASSWORD` are placeholders. Replace them with your own secure values before running these commands.
+====
++
 [source,bash,subs="attributes"]
 ----
 {sudo} rabbitmqctl add_user TRENTO_USER TRENTO_USER_PASSWORD
@@ -227,6 +232,11 @@ openssl rand -out /dev/stdout 48 | base64
 ====
 
 . Create the `/etc/trento/trento-web` configuration file. For example:
++
+[NOTE]
+====
+The values `TRENTO_USER`, `TRENTO_USER_PASSWORD`, and `WEB_PASSWORD` are placeholders. Replace them with your own secure values before running these commands.
+====
 +
 [source,bash]
 ----
@@ -281,6 +291,11 @@ SMTP_PASSWORD=<<SMTP_PASSWORD>>
 ----
 
 . Create the `/etc/trento/trento-wanda` configuration file. For example:
++
+[NOTE]
+====
+The values `WANDA_USER`, `WANDA_PASSWORD`, `TRENTO_USER`, and `TRENTO_USER_PASSWORD` are placeholders. Replace them with your own secure values before running these commands.
+====
 +
 [source,bash]
 ----
@@ -499,10 +514,11 @@ server {
 ===== Prepare SSL certificate for NGINX
 
 Create or provide a certificate for https://nginx.org/en/[NGINX] to
-enable SSL for {trento}. To create the certificate, you can choose one of the following methods:
+enable SSL for {trento}. Choose one of the following methods:
 
 * To manually generate a self-signed certificate, see <<option-1-creating-a-self-signed-certificate>>.
 * To automate obtaining a signed certificate with Let's Encrypt, see <<option-2-using-lets-encrypt-for-a-signed-certificate-using-packagehub-repository>>.
+* To provide an existing signed certificate, you can use the procedure in <<option-1-creating-a-self-signed-certificate>>, skipping step 1 and adapting the remaining steps to use your own files.
 
 [[option-1-creating-a-self-signed-certificate]]
 ====== Create a self-signed certificate
