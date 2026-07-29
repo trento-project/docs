@@ -64,7 +64,7 @@ Control node package requirements:
 +
 [source,console,subs="attributes"]
 ----
-{prompt_sudo} zypper install ansible
+{sudo} zypper install ansible
 ----
 
 Target node package requirements:
@@ -73,7 +73,7 @@ Target node package requirements:
 +
 [source,console,subs="attributes"]
 ----
-{prompt_sudo} zypper install python311
+{sudo} zypper install python311
 ----
 
 ==== Installation
@@ -82,7 +82,7 @@ For {slsa}-based operating systems, install the `ansible-trento` package using {
 
 [source,console,subs="attributes"]
 ----
-{prompt_sudo} zypper install ansible-trento
+{sudo} zypper install ansible-trento
 ----
 
 ==== Components

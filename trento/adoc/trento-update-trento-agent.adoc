@@ -13,7 +13,7 @@ To update the {tragent}, follow the procedure below:
 ====
 [source,bash,subs="attributes"]
 ----
-{prompt_sudo}systemctl stop trento-agent
+{sudo} systemctl stop trento-agent
 ----
 ====
 +
@@ -22,8 +22,8 @@ To update the {tragent}, follow the procedure below:
 ====
 [source,bash,subs="attributes"]
 ----
-{prompt_sudo}zypper ref
-{prompt_sudo}zypper install trento-agent
+{sudo} zypper ref
+{sudo} zypper install trento-agent
 ----
 ====
 +
@@ -36,16 +36,16 @@ To update the {tragent}, follow the procedure below:
 ====
 [source,bash,subs="attributes"]
 ----
-{prompt_sudo}systemctl start trento-agent
+{sudo} systemctl start trento-agent
 ----
 ====
 +
 . Check the status of the {tragent}:
 +
 ====
-[source,bash]
+[source,bash,subs="attributes"]
 ----
-sudo systemctl status trento-agent
+{sudo} systemctl status trento-agent
 ● trento-agent.service - Trento Agent service
    Loaded: loaded (/usr/lib/systemd/system/trento-agent.service; enabled; vendor preset: disabled)
    Active: active (running) since Wed 2021-11-24 17:37:46 UTC; 4s ago

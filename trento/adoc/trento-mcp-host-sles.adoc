@@ -21,10 +21,10 @@ include::partials/mcp-host-prerequisites.adoc[]
 
 To install {mcp_host}, open a terminal and run the following commands:
 
-[source,console]
+[source,console,subs="attributes"]
 ----
-sudo zypper refresh
-sudo zypper install mcphost
+{sudo} zypper refresh
+{sudo} zypper install mcphost
 ----
 
 After installation, verify that {mcp_host} is available and working by checking its version:
