@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-ansible-deployment]]
 === Automated Installation with {ansible}
-:revdate: 2026-05-12
+:revdate: 2026-07-30
 
 You can perform an automated installation of {trento} using RPM packages with {ansible} playbooks provided by the `ansible-trento` package.
 
@@ -11,7 +11,7 @@ You can perform an automated installation of {trento} using RPM packages with {a
 Execute the playbooks only on _target nodes_ running {sles4sap} 15-SP5 and higher, or 16.0 and higher.
 The supported {sles4sap} systems for the _control node_ are the same.
 However, the requirements for the control nodes are less strict.
-You can use any operating system as long as the installed {ansible} version is compatible with the Python interpreter available on the managed target nodes.
+You can use any operating system if the installed {ansible} version is compatible with the Python interpreter available on the managed target nodes.
 Refer to the support matrix in the link:https://docs.ansible.com/projects/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix[{ansible} documentation].
 
 [NOTE]
@@ -30,7 +30,7 @@ Control node module requirements:
 +
 [source,console,subs="attributes"]
 ----
-$ {suseconnect} -p sle-module-systems-management/15.x/x86_64
+{suseconnect} -p sle-module-systems-management/15.x/x86_64
 ----
 +
 This repository contains {ansible}.
@@ -41,7 +41,7 @@ Target node module requirements:
 +
 [source,console,subs="attributes"]
 ----
-$ {suseconnect} -p sle-module-python3/15.x/x86_64
+{suseconnect} -p sle-module-python3/15.x/x86_64
 ----
 +
 This repository contains essential Python dependencies.
@@ -50,7 +50,7 @@ This repository contains essential Python dependencies.
 +
 [source,console,subs="attributes"]
 ----
-$ {suseconnect} -p PackageHub/15.x/x86_64
+{suseconnect} -p PackageHub/15.x/x86_64
 ----
 +
 This module is optional.
@@ -115,7 +115,7 @@ Third-party dependencies:
 Diagnostics tooling:
 
 `supportutils`::
-  Installs the {suse} `supportutils` package and the Trento-specific `supportutils-plugin-trento` plugin on {trserver} and {tragent} hosts, so that `supportconfig` can collect Trento diagnostics.
+  Installs the {suse} `supportutils` package and the {trento}-specific `supportutils-plugin-trento` plug-in on {trserver} and {tragent} hosts, so that `supportconfig` can collect {trento} diagnostics.
 
 The `ansible-trento` package provides an {ansible} role for every one of these components.
 
@@ -184,7 +184,7 @@ all:
 In this example, every component is installed on the same host, named `vitellone`.
 Adapt this example to your concrete case.
 
-You can skip some of the host groups if you are not provisioning them with `ansible-trento`.
+You can skip certain host groups if you are not provisioning them with `ansible-trento`.
 For example, skip defining `postgres_hosts` if you use a {postgresql} installation managed by an external team.
 If you only use the `agent` playbook, define only `agents` in your inventory.
 Refer to the <<Configuration>> section to see how to make `ansible-trento` skip provisioning a given component.
@@ -195,7 +195,7 @@ To copy your public key from the control node to the target node, use the follow
 
 [source,console]
 ----
-$ ssh-copy-id <username>@<ip-or-domain-name-of-the-node>
+ssh-copy-id USERNAME@IP_OR_DOMAIN_NAME_OF_THE_NODE
 ----
 
 ==== Running the playbooks
@@ -204,10 +204,10 @@ To run a playbook, use the following command:
 
 [source,console]
 ----
-$ ansible-playbook -i <path-to-inventory> suse.trento.<playbook-name>
+ansible-playbook -i PATH_TO_INVENTORY suse.trento.PLAYBOOK_NAME
 ----
 
-Replace `<playbook-name>` with one of the following: `server`, `agent`, or
+Replace `PLAYBOOK_NAME` with one of the following: `server`, `agent`, or
 `site`.
 
 ==== Configuration
@@ -234,7 +234,7 @@ Supply playbook-level variables using `--extra-vars` or `-e` on the command line
 
 [source,console]
 ----
-$ ansible-playbook -i <path-to-inventory> suse.trento.site -e provision_postgres=false -e provision_rabbitmq=false
+ansible-playbook -i PATH_TO_INVENTORY suse.trento.site -e provision_postgres=false -e provision_rabbitmq=false
 ----
 
 [NOTE]
@@ -264,16 +264,16 @@ all:
       hosts: ...
 
   vars:
-    trento_server_name: "trento-deployment.example.com",
-    trento_web_admin_password: "adminpassword",
-    trento_web_postgres_password: "postgres",
-    trento_wanda_postgres_password: "postgres",
-    trento_rabbitmq_password: "guest",
-    rproxy_ssl_cert: "<SSL certificate in base64>",
-    rproxy_ssl_key: "<SSL certificate key in base64>"
+    trento_server_name: "trento-deployment.example.com"
+    trento_web_admin_password: "adminpassword"
+    trento_web_postgres_password: "postgres"
+    trento_wanda_postgres_password: "postgres"
+    trento_rabbitmq_password: "guest"
+    rproxy_ssl_cert: "SSL_CERTIFICATE_IN_BASE64"
+    rproxy_ssl_key: "SSL_CERTIFICATE_KEY_IN_BASE64"
 ----
 
-Some role-level variables are mandatory.
+Certain role-level variables are mandatory.
 
 For {trserver}, these are:
 
@@ -308,8 +308,8 @@ You can find the full listing on the https://github.com/trento-project/ansible[{
 
 ==== Support tooling
 
-The `server`, `agent`, and `site` playbooks install the {suse} `supportutils` package together with the Trento-specific `supportutils-plugin-trento` plugin.
-This allows `supportconfig` to collect Trento diagnostics on both {trserver} and {tragent} hosts.
+The `server`, `agent`, and `site` playbooks install the {suse} `supportutils` package together with the {trento}-specific `supportutils-plugin-trento` plug-in.
+This allows `supportconfig` to collect {trento} diagnostics on both {trserver} and {tragent} hosts.
 The installation is performed by the `supportutils` role and is enabled by default; no additional opt-in is required.
 
 ===== Configuration
@@ -321,7 +321,7 @@ Override the following role-level variables in your inventory to change the defa
 |Name |Default |Description
 | `supportutils_enabled` | `true` | Set to `false` to skip installation entirely.
 | `supportutils_package_name` | `supportutils` | Base {suse} diagnostics package name.
-| `supportutils_plugin_package_name` | `supportutils-plugin-trento` | Trento plugin package name.
+| `supportutils_plugin_package_name` | `supportutils-plugin-trento` | {trento} plug-in package name.
 | `supportutils_update_cache` | `true` | Refresh the {zypper} cache before installing.
 |===
 
@@ -343,7 +343,7 @@ After the playbook runs, generate a support archive on any installed host with:
 {sudo} supportconfig
 ----
 
-The resulting tarball includes the Trento-specific data collected by the plugin and can be attached to {suse} support cases.
+The resulting tarball includes the {trento}-specific data collected by the plug-in and can be attached to {suse} support cases.
 
 ===== Cleanup behavior
 
@@ -352,7 +352,7 @@ The base `supportutils` package is intentionally retained, because it is general
 
 ==== Example scenarios
 
-The playbooks in `ansible-trento` allow for various installation scenarios.
+The playbooks in `ansible-trento` allow for different installation scenarios.
 
 ===== Every component on a dedicated node
 
@@ -424,7 +424,7 @@ Execute {ansible} by running the following command:
 
 [source,console]
 ----
-$ ansible-playbook -i <path-to-inventory> suse.trento.site
+ansible-playbook -i PATH_TO_INVENTORY suse.trento.site
 ----
 
 ===== {trento} with externally managed {postgresql}, {rabbitmq} and {prometheus}
@@ -485,7 +485,7 @@ Execute {ansible} using the following command:
 
 [source,console]
 ----
-$ ansible-playbook -i <path-to-inventory> suse.trento.site -e provision_postgres=false -e provision_rabbitmq=false -e provision_prometheus=false
+ansible-playbook -i PATH_TO_INVENTORY suse.trento.site -e provision_postgres=false -e provision_rabbitmq=false -e provision_prometheus=false
 ----
 
 ===== Deploy only {trento} agents
@@ -515,7 +515,7 @@ Execute {ansible} by specifying the `agent` playbook:
 
 [source,console]
 ----
-$ ansible-playbook -i <path-to-inventory> suse.trento.agent
+ansible-playbook -i PATH_TO_INVENTORY suse.trento.agent
 ----
 
 [NOTE]
