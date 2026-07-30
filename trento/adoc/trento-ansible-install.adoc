@@ -30,7 +30,7 @@ Control node module requirements:
 +
 [source,console,subs="attributes"]
 ----
-{suseconnect} -p sle-module-systems-management/15.x/x86_64
+{sudo} {suseconnect} -p sle-module-systems-management/15.x/x86_64
 ----
 +
 This repository contains {ansible}.
@@ -41,7 +41,7 @@ Target node module requirements:
 +
 [source,console,subs="attributes"]
 ----
-{suseconnect} -p sle-module-python3/15.x/x86_64
+{sudo} {suseconnect} -p sle-module-python3/15.x/x86_64
 ----
 +
 This repository contains essential Python dependencies.
@@ -50,7 +50,7 @@ This repository contains essential Python dependencies.
 +
 [source,console,subs="attributes"]
 ----
-{suseconnect} -p PackageHub/15.x/x86_64
+{sudo} {suseconnect} -p PackageHub/15.x/x86_64
 ----
 +
 This module is optional.
