@@ -17,7 +17,7 @@ It is possible to simplify the architecture and installation of Trento by substi
 * As a user, I want to have a similar experience when I am using the internal AI agent (Liz) and when I am using the external MCP agent, so that I can use Trento in a consistent way.
 * As a user, I want to be able to enable/disable the MCP server
 * As a user, I want to be able to configure the MCP server.
-* As a user, I want to use MCPHost/Kit to connect to the MCP server in SLES 16.
+* As a user, I want to use the https://github.com/mark3labs/kit[MCPHost/Kit] package included in SLES 16 to connect to the MCP server in Trento.
 * As a user, I want to use both streamable and sse as the transport protocols for the MCP server, so that I can use the one that is more suitable for my environment.
 * As a developer, I want to reduce the maintenance needed for the alignment of tools used by Liz and by the MCP server, so that the customer gets the same capabilities and responses independently of how they use it.
 
@@ -117,7 +117,7 @@ Anubis config lives in config/*.exs and the supervision tree, not CLI flags/TREN
 |===
 | Setting | Default | Notes 
 |`config :trento, :mcp_server, enabled` | `false` | Gates the supervised server + makes `/mcp` inert when off 
-| `ENABLE_MCP_SERVER` (runtime env) | `false` | Sets the above in `config/runtime.exs` |
+| `ENABLE_MCP_SERVER` (runtime env) | `false` | Sets the above in `config/runtime.exs`
 |===
 
 
@@ -133,6 +133,8 @@ Anubis config lives in config/*.exs and the supervision tree, not CLI flags/TREN
 
 
 == Additional considerations
-- It would be optional to create a solution that can provide the MCP server as an application inside the BEAM (umbrella application). In that case, it would be possible to define via configuration if the MCP server is started or not, and it would be possible to run it standalone. In an umbrella application, tests for each application are independent. Umbrella applications would imply additional complexity, and it is not clear if it would be worth the effort. The current proposal is to have the MCP server as part of the Trento application, and it would be started automatically when Trento is started. An application inside the BEAM would be a nice to have, but it would require additional work to transition from a single application to a series of applications, in which case the MCP would be one of them.
+- It could be beneficial for the project to isolate the MCP server from the rest of Trento, running the MCP server as an application inside the BEAM (umbrella application) and define at runtime if the MCP server is running or not. However, that is out of scope for this proposal as it would require additional architectural changes. The current proposal is to keep the MCP server as part of the Trento application, but it would be nice to have the option to run it as a separate application in the future if we decide to do so.
 
--  The endpoint is currently defined as `trento-server/mcp-server_endpoint/mcp`. It would make sense to simplify the endpoint to be `trento-server/mcp`, as the endpoint is already defined in the Trento application, and it is not necessary to have a separate endpoint for the MCP server. The current proposal is to keep the endpoint as it is, but it would be nice to have a simpler endpoint or even double it and deprecate the old one. 
+-  The endpoint is currently defined as `trento-server/mcp-server_endpoint/mcp` and published in port 5000. We should consider in the implementation if that could be simplified so the endpoint is `trento-server/mcp` in the same port as a new route in the Trento server. The implementation should decide the best way to do this. 
+
+- The MCP server currently has a log level that is independent of the Trento server log level. We should consider if that is the best approach or if we should unify the log level for both servers. The implementation should decide the best way to do this.
