@@ -11,7 +11,7 @@
 
 It is possible to simplify the architecture and installation of Trento by substituting the MCP server with an Elixir MCP server that reuses the tools developed for Liz.
 
-==== Use Cases outline
+=== Use Cases outline
 
 * As a user, I want to be able to publish capabilities of Trento using the MCP protocol, so that it can be used by an external agent.
 * As a user, I want to have a similar experience when I am using the internal AI agent (Liz) and when I am using the external MCP agent, so that I can use Trento in a consistent way.
