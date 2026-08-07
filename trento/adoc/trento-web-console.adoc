@@ -1,309 +1,409 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-use-webconsole]]
-== Using {tr_web}
-:revdate: 2026-04-30
+== Monitoring {sap} health in the {tr_web} console
+:revdate: 2026-08-07
+
+{tr_web} combines the individual states of your {sap} landscape into one aggregated health value per host, cluster, {hana} database and {sap} system. You can therefore use the {tr_web} console to identify which parts of your {sap} landscape need attention.
+
+This document explains what the health values mean, which factors {trento} combines to calculate them, how to recognize outdated data, and how to trace a warning or a critical state back to its source.
+
+To access this data, use the left sidebar in the {tr_web} console. It contains the following entries:
+
+Dashboard::
+Identify at a glance which {sap} systems need attention, and filter systems by health state.
+
+Hosts::
+Review all hosts that run the {tragent}, including, for example, their tuning status, available software updates or check results.
+
+Clusters::
+Review all discovered {pace} clusters, their configuration and their node states.
+
+{sap} Systems::
+Review all discovered {sap} systems by system ID, including the status of each
+instance.
+
+{hana} Databases::
+Review all discovered {hana} databases by system ID, including the status of each database instance.
+
+Checks catalog::
+Browse the configuration checks that {trento} can run, by target type (hosts or clusters), cluster type (HANA scale up, HANA scale out or ASCS/ERS) and supported platform (Azure, AWS, GCP, Nutanix, on-premises/KVM or VMware).
+
+Activity Log::
+Review system events and user actions, with the timestamp, message, user, and severity of each entry.
+
+Settings::
+Modify user-defined settings, including API keys, the SUSE Multi-Linux Manager connection, Activity Log retention, and email alerts.
+
+About::
+View the {trserver} component versions, a link to the {tr_web} GitHub repository, and the number of discovered {sles4sap}{nbsp}subscriptions.
 
 
-The left sidebar in the {tr_web} contains the following entries:
+[[sec-about-trento-health]]
+=== Understanding health status in {trento}
 
-* *Dashboard* Determine at a glance the health status of your {sap} environment.
-* *Hosts* Overview of all registered hosts running the {tragent}.
-* *Clusters* Overview of all discovered {pace} clusters.
-* *{sap} Systems* Overview of all discovered {sap} Systems; identified by the
-corresponding system IDs.
-* *HANA Databases* Overview of all discovered {hana} databases; identified by the
-corresponding system IDs.
-* *Checks catalog* Overview of the catalog of configuration checks that {trento} may
-perform on the different targets (hosts or clusters), cluster types
-(HANA scale up, HANA scale out or ASCS/ERS) and supported platforms
-(Azure, AWS, GCP, Nutanix, on-premises/KVM or VMware).
-* *Settings* Allows you to modify user-defined settings.
-* *About* Shows the versions of the different components of {trserver}, a link to the GitHub repository of the {tr_web} component, and the number of registered {sles4sap}{nbsp}subscriptions that have been discovered.
+Every host, cluster, {hana} database and {sap} system in {tr_web} displays one health icon, which represents its aggregated health value. This value is the combination of several factors that {trento} discovers separately.
 
-[[sec-trento-health]]
-=== Getting the global health state
+To know why a component requires your attention, you need to know which factors contribute to its health. The following sections explain the health status icons, factors for each component, and the rule that combines the factors into a single status.
 
-The dashboard allows you to determine at a glance the health status of
-your {sap} environment. It is the main page of the {tr_web}, and you
-can always switch to it by clicking on Dashboard in the left sidebar.
+[[sec-trento-health-status-icons]]
+==== Health status icons in {tr_web} 
 
-The health status of a registered {sap} system is the sum of its health
-status at three different layers representing the {sap} architecture:
+Every health icon in {tr_web} console shows one of the following states.
 
-* *Hosts* Reflects the heartbeat of the  {tragent} and the tuning status returned
-by {saptune} (where applicable).
-* *{pace} Clusters* The status based on the running status of the cluster and the results of
-the configuration checks.
-* *Database* Collects the status of the HANA instances as returned by `+sapcontrol+`.
-* *Application instances* Summarizes the status of the application instances as returned by
-`+sapcontrol+`.
+.Health status in {tr_web} console
+[options="header"]
+|===
+|Status |Icon color |Meaning
 
-In addition to the operating system layer, there is also information
-about the health status of the HA components, where they exist:
+|passing
+|Green
+|No action needed. 
 
-* *Database cluster* The status based on the running status of the database cluster and the
-results of the selected configuration checks.
-* *Application cluster* The status based on the running status of the ASCS/ERS cluster and,
-eventually, the results of the selected configuration checks.
+|warning
+|Yellow
+|Needs attention, but not urgently. 
 
-The dashboard groups systems in three different health boxes (see link:#fig-trento-web-home[Dashboard with the global health state]):
+|critical
+|Red
+|Needs immediate attention.
+
+|stopped/unknown
+|Gray
+|A contributing component is not running, or {trento} cannot determine its value. For example, when the connection to SUSE Multi-Linux Manager fails.
+
+|stale
+|Any of the previous colors, with a clock overlay
+|The value shown in the console is the last one received. The responsible {tragent} has stopped
+reporting. For more information, see <<sec-trento-stale-data>>.
+|===
+
+[NOTE]
+====
+A dash `—` in the dashboard means that no {pace} cluster manages the corresponding
+layer of that {sap} system. It is not a health state and it needs no action.
+====
+
+//TO DO: Add a screenshot
+
+[[sec-trento-health-calculation]]
+==== How {trento} calculates health state
+
+{trento} evaluates each factor separately, then reduces the results to one aggregated
+value and reflects that value in the health status in the {tr_web} console. The factors are combined as follows:
+
+passing::
+All factors passing
+
+warning::
+At least one warning, all others passing
+
+critical::
+At least one critical, all others warning or passing
+
+stopped or unknown::
+At least one stopped or unknown, where applicable
+
+Depending on the component, the aggregated health is calculated as a compound of different factors:
+
+.Health factors per component
+[options="header"]
+[#tab-trento-component-health-factors]
+|===
+|Component |Contributing factors
+
+|Hosts
+|`{saptune}` tuning status, available software updates, check results
+
+|{hana} clusters
+|{hana} secondary sync state, check results
+
+|ASCS/ERS clusters
+|ASCS/ERS distribution status, check results
+
+|{hana} databases
+|Status of {hana} instances
+
+|{sap} systems
+|Status of {sap} instances, aggregated health of the {hana} database
+
+|Application instances in the dashboard
+|Status of {sap} instances
+
+|Hosts in the dashboard
+|Aggregated health of hosts that belong to the {sap} system and its database
+|===
+
+Each factor is evaluated on its own, as follows:
+
+`{saptune}` tuning status::
+Contributes only when {trento} discovers an {sap} workload on the host. `{saptune}` ships with {sles4sap} and verifies that a host is configured for the workload it runs.
++
+[options="header"]
+|===
+|Condition |Status
+
+|`{saptune}` is not installed, or the version is lower than 3.1
+|warning
+
+|Version 3.1 or higher, but no solution applied
+|warning
+
+|Version 3.1 or higher, solution applied, tuning status compliant
+|passing
+
+|Version 3.1 or higher, solution applied, tuning status not compliant
+|critical
+|===
+
+Available software updates::
+Contributes only when connection data for SUSE Multi-Linux Manager is saved under
+the *Settings* menu. For more information, see <<sec-integration-with-SUSE-Manager>>.
++
+[options="header"]
+|===
+|Condition |Status
+
+|The connection fails, the host is not found, or the data cannot be retrieved
+|unknown
+
+|No software updates are available
+|passing
+
+|Updates are available, none of them security related
+|warning
+
+|At least one available update is security related
+|critical
+|===
+
+Check results::
+Contributes only when checks are selected to run on the target.
++
+[options="header"]
+|===
+|Condition |Status
+
+|All checks passing
+|passing
+
+|At least one check warning, all others passing
+|warning
+
+|At least one check critical, all others warning or passing
+|critical
+|===
+
+{hana} secondary sync state::
+Applies to {hana} clusters only.
++
+[options="header"]
+|===
+|Condition |Status
+
+|`SOK`, meaning the secondary site is in sync
+|passing
+
+|`SFAIL`, meaning replication has failed
+|critical
+|===
+
+ASCS/ERS distribution status::
+Applies to ASCS/ERS clusters only.
++
+[options="header"]
+|===
+|Condition |Status
+
+|ASCS and ERS instances run on different hosts
+|passing
+
+|Both run on the same host
+|critical
+|===
+
+Instance status::
+`sapcontrol` reports a status for each {hana} database instance and each {sap} application instance, which {tr_web} shows as a color.
++
+[options="header"]
+|===
+|Condition |Status
+
+|All green
+|passing
+
+|At least one yellow, all others green
+|warning
+
+|At least one red, all others green or yellow
+|critical
+
+|At least one gray
+|stopped or unknown
+|===
+
+[[sec-trento-health-dashboard]]
+==== Aggregated health in the dashboard
+
+The dashboard is the main page of {tr_web}, and you can always return to it by clicking
+*Dashboard* in the left sidebar. It presents the health of each {sap} system across
+the layers of the {sap} architecture, and groups the systems in three health boxes:
+
+Passing::
+  Systems whose layers all report passing.
+Warning::
+  Systems with at least one layer in warning state and all remaining layers passing.
+Critical::
+  Systems with at least one layer in critical state.
 
 .Dashboard with the global health state
 [#fig-trento-web-home]
-image::trento-web-home.png[trento-web-home,scaledwidth=80.0%]
+image::trento-web-home.png[{trento} dashboard showing the Passing, Warning and Critical health boxes above the list of SAP systems,scaledwidth=80.0%]
 
-Passing::
-  Shows the number of systems with all layers with passing (green)
-  status.
-Warning::
-  Shows the number of systems with at least one layer with warning
-  (yellow) status and the rest with passing (green) status.
-Critical::
-  Shows the number of systems with at least one layer with critical
-  (red) status.
+The boxes are clickable. Clicking a box filters the dashboard by systems in that health
+state, which is the fastest way to isolate the affected systems in a large landscape.
 
-The health boxes in the dashboard are clickable. Clicking on a box
-filters the dashboard by systems with the corresponding health status.
-In large {sap} environments, this feature can help the {sap}
-administrator to determine which systems are in a given status.
+Two dashboard columns carry aggregated values of their own:
 
-The icons representing the health summary of a particular layer contain
-links to the views in the {trento} console that can help determine the
-source of the issue:
+* The *Application instances* value combines the status of the individual {sap}
+instances of the system.
+* The *Hosts* value combines the aggregated health of all hosts that belong to the
+system and to its database.
 
-* *Hosts health icon:* Link to the Hosts overview filtered by SID equal to the SAPSID and the
-DBSID of the corresponding {sap} system.
-* *Database cluster health icon:* Link to the corresponding {hana} Cluster Details view.
-* *Database health icon:* Link to the corresponding HANA Database Details view.
-* *Application cluster health icon:* Link to the corresponding ASCS/ERS Cluster Details view.
-* *Application Instances health icon:* Link to the corresponding {sap} System Details view.
+For more information on how the aggregated health is calculated for those columns, see <<sec-trento-health-calculation>>.
 
-Grey status is returned when either a component does not exist, or it is
-stopped (as returned by `+sapcontrol+`), or its status is unknown (for
-instance, if a command to determine the status fails).
+[[sec-trento-stale-data]]
+=== Identifying stale data
 
-Grey statuses are not yet counted in the calculation of the global
-health status.
+A {tragent} is continuously sending up-to-date data to {tr_web}. When an agent stops reporting, for example due to a connectivity issue, service crash, or host crash, {tr_web} keeps displaying the last data it received from that
+agent.
 
-[[sec-trento-status]]
-=== Viewing the status
+Data that is no longer refreshed is marked as _stale_. A stale value was correct when it was last received, but it does not reflect the current state of the component. Therefore, the stale value should be treated as unverified until the agent reports again.
 
-The status allows you to see if any of the systems need to be examined
-further.
+{tr_web} marks stale data in the following ways:
 
-The following subsection gives you an overview of specific parts of your
-{sap} Landscape to show their state. Each status site shows an overview
-of the health states.
+* *Stale icon.* The regular status or health icon is shown with a clock overlay.
+* *Tooltip.* When you hover over a stale icon, it displays the date and time the value became stale.
+* *Warning banner.* The _Details_ views of affected hosts, clusters, {hana} databases and
+{sap} systems display a warning banner.
+* *Grayed-out rows.* In relevant views, the row of the affected host, instance or node is grayed out.
+* *Activity log entry.* {trento} creates an entry with severity `info` when a value becomes stale.
 
-[[sec-trento-status-hosts]]
-=== Viewing the status of hosts
+// .Stale status icon with tooltip
+// [#fig-trento-stale-icon]
+// image::PLACEHOLDER-trento-stale-icon.png[Health icon with a clock overlay and a tooltip showing the time since the value became stale,scaledwidth=50.0%]
 
-To display the lists of registered hosts and their details, proceed as
-follows:
+.How stale status affects each component
+[options="header"]
+|===
+|Component |When it becomes stale |Where you see it
 
-* Log in to the {tr_web}.
-* Click the Hosts entry in the left sidebar to show a summary of the
-state for all hosts.
-+
-.Hosts entry
-[#fig-trento-status-hosts]
-image::trento-web-hosts-view.png[trento-web-hosts-view,scaledwidth=80.0%]
-* To look into the specific host details, click the host name in the
-respective column to open the corresponding Host details view. If the
-list is too long, shorten it using the filters.
-+
-Clicking on a host name opens the corresponding Host details view the
-Clicking on a host name opens the corresponding Host details view the
-following information. Note that subscription dates, last reboot and other timestamps
-are shown in the user's timezone:
+|Host
+|The agent of the host stops reporting
+|Stale icon in the relevant views, warning banner in the _Host Details_ view, grayed-out row
 
-** The top left of the *Hosts Details* view shows the status of both the {tragent} and the
-Node Exporter/Grafana Alloy and provides the host name, the cluster name (when
-applicable), the {tragent} version, last boot information and the host IP addresses.
-** *{saptune} Summary* section provides information generated by
-{saptune}. {saptune} comes with {sles4sap}, and it allows {sap}
-administrators to ensure that their {sap} hosts are properly configured
-to run the corresponding {sap} workloads. The integration of {saptune}
-in the {trento} console gives the {sap} administrator access to the
-{saptune} information even when they are not working at operating
-system level. The integration supports {saptune} 3.1.0 and higher, and
-includes the addition of the host tuning status in the aggregated health
-status of the host.
-+
-.saptune Summary section
-[#fig-saptune-summary-section]
-image::saptune-summary-section.png[saptune-summary-section,scaledwidth=80.0%]
-+
-If an {sap} workload is running on the host but no saptune or a version
-lower than 3.1.0 is installed, a warning is added to the aggregated
-health status of the host. When {saptune} version 3.1.0 or higher is
-installed, a details view shows detailed information about the
-{saptune} status:
-+
-.saptune details view
-[#fig-saptune-details-view]
-image::saptune-details-view.png[saptune-details-view,scaledwidth=80.0%]
-** *Check Results* summary section shows a summary of the checks
-execution results for the current host.
-** *Available Software Updates* section shows a summary of the available
-patches and upgradable packages for the current host when settings for
-SUSE Multi-Linux Manager are maintained and the host is managed by the
-SUSE Multi-Linux Manager instance for which connection data has been
-provided. Refer to section <<sec-integration-with-SUSE-Manager>>.
-for further details.
-** *Monitoring dashboards* show the CPU, memory filesystem and swap usage for the specific
-host.
-** *Provider Details* section shows the name of the cloud provider, the
-name of the virtual machine, the name of the resource group it belongs
-to, the location, the size of the virtual machine, and other
-information.
-** *{sap} Instances* section lists the ID, SID, type, features, and
-instance number of any {sap} instance running on the host ({netweaver}
-or {hana}).
-** *{suse} Subscription Details* section lists the different components
-or modules that are part of the subscription. For each component and
-module, the section shows the architecture, the version and type, the
-registration and subscription status as well as the start and end dates
-of the subscription.
+|Cluster
+|The agent of one of the cluster hosts stops reporting
+|Stale icon in the relevant views and in the dashboard, warning banner in the _Cluster Details_ view, grayed-out node rows in the _Cluster Details_ view
 
-[[sec-trento-status-pacemakerclusters]]
-=== Viewing the {pace} cluster status
+|{hana} database instance
+|The agent of the host that runs the instance stops reporting
+|Stale status icon in the relevant views, grayed-out row
 
-To display a list of all available {pace} clusters and their details,
-proceed as follows:
+|{sap} instance
+|The agent of the host that runs the instance stops reporting
+|Stale status icon in the relevant views, grayed-out row
 
-* Log in to the {tr_web}.
-* Click the Clusters entry in the left sidebar to show a state summary
-for all {pace} clusters.
-+
-.{pace} clusters
-[#fig-trento-status-pacemakerclusters]
-image::trento-web-pacemaker-view.png[trento-web-pacemaker-view,scaledwidth=80.0%]
-* To view the specific {pace} cluster details, click the cluster name
-in the appropriate column to open the corresponding {pace} cluster
-details view. If the list is too long, shorten it using filters.
-Note that timestamps in the Cluster details view are shown in the user's timezone.
-+
-The detail views of a HANA cluster and an ASCS/ERS cluster are
-different:
+|{hana} database
+|The status of any of its instances becomes stale
+|Stale icon in the relevant views and in the dashboard, warning banner in the _{hana} Database Details_ view
 
-** The *Settings*, *Show Results*, and *Start Execution* buttons are used to
-enable or disable checks and to start them. To execute specific checks,
-follow the instructions in <<step-5>> of the <<checks-procedure>> procedure.
-** The **State** pill indicates the cluster's current activity.
-`Idle` value signifies a stable state where no transitions are occurring.
-Any other value indicates an active transition or internal recalcuations are happening.
-To ensure consistency and safety, cluster operations can only be initiated
-when the state is `Idle`.
-** Top section displays the cloud provider, the cluster type, the HANA
-log replication mode, the DBSID, the cluster maintenance status, the
-HANA secondary sync state, the fencing type, when the CIB was last
-written, and the HANA log operation mode.
-** The *Checks Results* section provides a summary of the check execution
-results for the particular cluster.
-** The *{pace} Site Details* section is split in three subsections: one for
-each HANA site, and another one for cluster nodes without a HANA
-workload. For example, in case of a majority maker in a HANA scale out
-cluster, each HANA site subsection informs about the site role (Primary
-or Secondary or Failed) and lists the different nodes in the site. Each
-node entry displays the node status (Online or Maintenance or Other),
-the roles of the nameserver and indexserver services in that node, the
-local IPs and any assigned virtual IP address. To view the attributes of
-that node, the resources running on it and their statuses, click the
-Details button. Close the view using the key.
-** The *Stopped Resources* section provides a summary of resources which have
-been stopped on the cluster.
-** The *SBD/Fencing* section shows the status of each SBD device when
-applicable.
-** A top section on the left shows the cloud provider, the cluster type,
-fencing type, when the CIB was last written and the cluster maintenance
-status.
-** The next top-center multi-tab section shows the SAP SID, the Enqueue
-Server version, whether the ASCS and ERS are running on different hosts
-or not, and whether the instance filesystems are resource based or not.
-When multiple systems share the same cluster, there is a tab for each
-system in the cluster, and you can scroll left and right to go through
-the different systems.
-** The *Checks Results* section shows a summary of the results of the last
-check execution, when applicable.
-** The *Node Details* section shows the following for each node in the
-cluster: the node status (Online or Maintenance or Other), the host
-name, the role of the node in the cluster, the assigned virtual IP
-address and, in case of resource managed filesystems, the full mounting
-path. To view the attributes and resources associated to that particular
-node, click Details. Close the view using the key.
-+
-This section is system-specific. It shows the information corresponding
-to the system selected in the multi-tab section above.
-** The *Stopped Resources* section displays a summary of resources which have
-been stopped on the cluster.
-** The *SBD/Fencing* section shows the status of each SBD device when
-applicable.
+|{sap} system
+|The status of any of its instances becomes stale, including database instances
+|Stale icon in the relevant views, warning banner in the _{sap} System Details_ view
 
-[[sec-trento-status-sapsystems]]
-=== Viewing the SAP Systems status
+|Application instances in the dashboard
+|The status of any application instance of the {sap} system becomes stale
+|Stale icon in the dashboard
 
-To display a list of all available SAP Systems and their details,
-proceed as follows:
+|Hosts in the dashboard
+|The status of any host of the {sap} system or of its database becomes stale
+|Stale icon in the dashboard
+|===
 
-* Log in to the {tr_web}.
-* Click the SAP Systems entry in the left sidebar to show a state
-summary for all {sap} Systems.
-+
-.{sap} Systems
-[#fig-trento-status-sapsystems]
-image::trento-web-sapsystems-view.png[trento-web-sapsystems-view,scaledwidth=70.0%]
-* To open the SAP System Details view, click the corresponding SID. This
-view provides the following:
-** The name and type of the current {sap} System.
-** The *Layout* section lists all instances and their virtual host names,
-instance numbers, features (processes), HTTP and HTTPS ports, start
-priorities, and SAPControl statuses.
-** The *Hosts* section shows the host name, the IP address, the cloud provider
-(when applicable), the cluster name (when applicable), and the
- {tragent} version for each listed host. Click the host name to go to
-the corresponding *Host details* view.
-+
-.{sap} System Details
-image::trento-web-sapsystemsdetails-view.png[trento-web-sapsystemsdetails-view,scaledwidth=80.0%]
+When you find a stale value, verify the reporting path before you investigate the component itself: check if the host is reachable and running, and whether the {tragent} service is running on it.
 
-[[sec-trento-status-hanadatabases]]
-=== Viewing the {hana} database status
+Once the agent reports again, {tr_web} replaces the stale value with the current one and removes the clock marker.
 
-To display a list of all available {hana} databases and their details,
-proceed as follows:
+[[sec-trento-finding-health-issue]]
+=== Finding the cause of a health issue
 
-* Log in to the {tr_web}.
-* Click the HANA databases entry in the left sidebar to show a summary
-of the state for all {hana} databases.
-+
-.HANA databases
-[#fig-trento-status-hanadb]
-image::trento-web-hanadb-view.png[trento-web-hanadb-view,scaledwidth=80.0%]
-* Click one of the SIDs to open the corresponding HANA Databases detail
-view. This view provides the following:
+An aggregated health value indicates when something needs attention. To find out what, follow the aggregation from the dashboard to the factor that caused the state.
 
-** The name and type of this {sap} System.
-** The *Layout* section lists all related {hana} instances with their virtual
-host names, instance numbers, features (roles), HTTP/HTTPS ports, start
-priorities, and SAPControl statuses.
-** The *Hosts* section lists the hosts where all related instances are
-running. For each host, it shows the host name, the local IP
-address(es), the cloud provider (when applicable), the cluster name
-(when applicable), the system ID, and the  {tragent} version.
-+
-Click on a host name to go to the corresponding *Host details* view.
-+
-.HANA Database details
-image::trento-web-hana-database-details-view.png[trento-web-hana-database-details-view,scaledwidth=70.0%]
+. In the {tr_web} console *Dashboard*, click the health box that matches the state you want to investigate, for example *Critical*.
+The dashboard now lists only the systems in that state.
+. Identify the layer that carries the state and select the desired view. Each layer icon links to the view that
+holds the underlying data:
+
+** The *application instances* health icon opens the {sap} System Detail view.
+** The *application cluster* health icon opens the ASCS/ERS Cluster Details view.
+** The *database* health icon opens the {hana} Database Details view.
+** The *database cluster* health icon opens the {hana} Cluster Details view.
+** The *hosts* health icon opens the Hosts overview, filtered by SID equal to the SAPSID and the DBSID of the corresponding SAP system.
+
+. Check whether a stale banner is displayed. If it is, investigate the reporting problem first. For more information, see <<sec-trento-stale-data>>.
+. Identify the factor that caused the state and investigate, using the information in <<sec-trento-health-calculation>>.
 
 [[sec-trento-settings-webconsole]]
 === Configuring {tr_web} settings
 
-Users with the `all:settings` permissions can use the **Settings** view of {tr_web} to modify the following:
+Users with the `all:settings` permission can use the *Settings* view of {tr_web} to modify the following:
 
-- API key. See <<sec-trento-rotating-apikeys>>.
-- Connection data for SUSE Multi-Linux Manager. See <<sec-integration-with-SUSE-Manager>>.
-- Retention time for Activity Log entries. See <<sec-activity-log>>.
-- Settings required for sending alerts via email. Note that if _any_ of the email settings are specified via environment variables (see <<sec-trento-enabling-email-alerts>>), the web-based configuration is disabled.
+* API key. See <<sec-trento-rotating-apikeys>>.
+* Connection data for SUSE Multi-Linux Manager. See <<sec-integration-with-SUSE-Manager>>.
+* Retention time for Activity Log entries. See <<sec-activity-log>>.
+* Settings required for sending alerts via email.
+
+If any of the email settings are specified through environment variables, the
+web-based email configuration is disabled. For more information, see
+<<sec-trento-enabling-email-alerts>>.
+
+[[sec-trento-webconsole-troubleshooting]]
+=== Troubleshooting
+
+When monitoring your {sap} landscape in the {tr_web} console, you might encounter unfamiliar health icons, unexpected system states, or sudden alerts. The following frequently asked questions address common scenarios and provide immediate starting points for your investigation.
+
+Why is a status icon gray?::
+A gray icon means either _stopped_ or _unknown_ status. Stopped means the component exists but is not running, as reported by `sapcontrol`. Unknown means {trento} cannot determine the value, most often because the connection to SUSE Multi-Linux Manager fails, the host is not found, or the data cannot be retrieved.
+
+// TODO: do we have some basic steps user can do here to investigate? Maybe as simple as checking the MLM settings in the console, etc.
+
+// TODO: The draft said a tooltip distinguishes the two. Verify against the running product, then either
+// mention the tooltip or tell the reader how else to tell them apart.
+
+Why does a status icon show a clock?::
+The clock marks a _stale_ value. This happens when the responsible {tragent} stops reporting. The console shows the last known state. Hover over the icon to see exactly when the value became stale. For more information on how to investigate stale data, see <<sec-trento-stale-data>>.
+
+Why does the dashboard show a dash (`—`) instead of a cluster health state?::
+The dash means that no {pace} cluster manages that layer of the {sap} system. The dash is not an error and requires no action.
+
+The status of a host or cluster is warning or critical, but all checks pass. Where does the status come from?::
+Check results are only one of the factors {trento} evaluates. Investigate the other contributing factors. For more information, see <<sec-trento-finding-health-issue>>.
+
+An {sap} system is critical, but all its instances are green. Why?::
+The aggregated health of the {hana} database contributes to the health of the {sap} system. Investigate the _{hana} Database Details_ view to find the root cause.
+
+Why is the host showing a warning for `{saptune}`?::
+This happens if `{saptune}` is not installed, the installed version is older than 3.1, no tuning solution is applied to the host, or tuning status is not compliant. Run `saptune note verify` in the host for further details.
+
+The Activity Log is becoming cluttered with old events. Can old events be cleared automatically?::
+{tr_web} allows you to configure automatic retention limits to manage storage consumption and reduce clutter. For steps on how to do this, see <<sec-activity-log>>.
+
+What is the fastest way to investigate critical email alerts, such as "Host heartbeat failed" or "Cluster health detected critical"?::
+These alerts are triggered by {trento}'s event-driven architecture when a _critical_ status is detected. For the fastest way to investigate, see <<sec-trento-finding-health-issue>>.
+
+How are pending software updates applied for hosts shown in {trento}?::
+While {tr_web} shows when updates are missing and flags the state as a _warning_ or _critical_, the actual patching is managed by SUSE Multi-Linux Manager. Log into your SUSE Multi-Linux Manager interface to view and apply the specific packages for that host.
+
+Which data should be collected before reporting an issue?::
+For information on which data to collect for support, see <<trento-report-issue>>.
