@@ -193,7 +193,7 @@ enable or disable checks and to start them. To execute specific checks,
 follow the instructions in <<step-5>> of the <<checks-procedure>> procedure.
 ** The **State** pill indicates the cluster's current activity.
 `Idle` value signifies a stable state where no transitions are occurring.
-Any other value indicates an active transition or internal recalcuations are happening.
+Any other value indicates an active transition or internal recalculations are happening.
 To ensure consistency and safety, cluster operations can only be initiated
 when the state is `Idle`.
 ** Top section displays the cloud provider, the cluster type, the HANA

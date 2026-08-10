@@ -45,9 +45,9 @@ authenticate users accessing the {trento} web console.
 
 By default, OIDC is disabled.
 
-===== Enabling OpenID Connect when using kubernetes deployment
+===== Enabling OpenID Connect when using a Kubernetes deployment
 
-To enable OIDC when using kubernetes deployment with helm, add the following variables to the previously documented helm installation command:
+To enable OIDC when using a Kubernetes deployment with helm, add the following variables to the previously documented helm installation command:
 
 ====
 [source,bash]
@@ -115,9 +115,9 @@ authenticate users accessing the {trento} web console.
 By default, OAuth 2.0 is disabled.
 
 [[enabling-oauth-20-when-using-kubernetes-deployment]]
-===== Enabling OAuth 2.0 when using kubernetes deployment
+===== Enabling OAuth 2.0 when using a Kubernetes deployment
 
-To enable OAuth 2.0 when using kubernetes deployment with helm, proceed
+To enable OAuth 2.0 when using a Kubernetes deployment with helm, proceed
 as follows:
 
 [arabic]
@@ -325,9 +325,9 @@ The endpoint for SLS in {trento} is: `+https://#{TRENTO_WEB_ORIGIN}/sso/sp/logou
 The endpoint for metadata in {trento} is: `+https://#{TRENTO_WEB_ORIGIN}/sso/sp/metadata/#{SAML_IDP_ID}+`.
 This URL is used as default value for `+SAML_SP_ENTITY_ID+` if the configuration variable is not set
 
-===== Enabling SAML when using kubernetes deployment
+===== Enabling SAML when using a Kubernetes deployment
 
-To enable SAML when using kubernetes deployment with helm, proceed as
+To enable SAML when using a Kubernetes deployment with helm, proceed as
 follows:
 
 [arabic]
