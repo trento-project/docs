@@ -110,8 +110,8 @@ databases and users. To do this, add the following to
 ====
 The `+pg_hba.conf+` file works sequentially. This means that the rules
 on the top have preference over the ones below. The following example shows
-a permissive address range. So for this to work, the entires must be
-written at the top of the `+host+` entries. For further information,
+a permissive address range. So for this to work, the new entries must be
+written at the top of the `+host+` section. For further information,
 refer to the
 https://www.postgresql.org/docs/current/auth-pg-hba-conf.html[pg_hba.conf]
 documentation.
