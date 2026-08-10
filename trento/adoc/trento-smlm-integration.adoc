@@ -5,7 +5,7 @@ include::product-attributes.adoc[]
 :revdate: 2025-06-10
 
 
-{trento} can be inegrated with {smlm} to provide the
+{trento} can be integrated with {smlm} to provide the
 {sap} administrator with information about relevant patches and
 upgradable packages for any host that is registered with both
 applications.
