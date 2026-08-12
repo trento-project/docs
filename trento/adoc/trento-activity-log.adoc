@@ -76,9 +76,8 @@ offering a chronological, linear view of a chain of events in multi-step workflo
 triggered by a user action.
 
 For example, the clean-up action in a host that runs a single instance
-HANA database of an {sap} system de-registers the database instance,
-de-registers the database itself, de-reregisters the {sap}system and its
-instances and then de-registers the host. These correlated entries are
+HANA database of an {sap} system de-registers the database instance, the database itself, the {sap} system and its
+instances and then the host. These correlated entries are
 displayed in a linked, linear view, when you navigate to the host
 clean-up entry modal in the Activity Log and then click the link in the
 Related Events section named **Show Events**.
