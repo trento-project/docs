@@ -14,7 +14,7 @@
     "last 2 versions"
   ],
   "devDependencies": {
-    "@asciidoctor/core": "~2.2",
+    "@asciidoctor/core": "~4.0",
     "@fontsource/lato": "^5.3.0",
     "@fontsource/roboto": "~4.5",
     "@fontsource/roboto-mono": "~4.5",
