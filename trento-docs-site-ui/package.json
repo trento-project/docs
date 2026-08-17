@@ -21,7 +21,7 @@
     "@vscode/gulp-vinyl-zip": "~2.5",
     "autoprefixer": "~10.5",
     "browser-pack-flat": "~3.4",
-    "browserify": "~16.5",
+    "browserify": "~17.0",
     "cssnano": "~8.0",
     "eos-icons": "^5.4.0",
     "eslint": "~6.8",
