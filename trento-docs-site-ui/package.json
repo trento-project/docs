@@ -52,7 +52,7 @@
     "require-directory": "~2.1",
     "require-from-string": "~2.0",
     "stylelint": "~17.14",
-    "stylelint-config-standard": "~20.0",
+    "stylelint-config-standard": "~40.0",
     "vinyl-fs": "~4.0"
   }
 }
