@@ -83,7 +83,9 @@ A dash `—` in the dashboard means that no {pace} cluster manages the correspon
 layer of that {sap} system. It is not a health value and it needs no action.
 ====
 
-//TO DO: Add a screenshot
+.Dashboard with the dash indicators
+[#fig-trento-web-dash]
+image::trento-web-dash.png[{trento} dashboard showing the passing, warning and critical health boxes together with dash indicators,scaledwidth=100.0%]
 
 [[sec-trento-health-calculation]]
 ==== How {trento} calculates aggregated health
@@ -271,7 +273,7 @@ Critical::
 
 .Dashboard with the global health
 [#fig-trento-web-home]
-image::trento-web-home.png[{trento} dashboard showing the Passing, Warning and Critical health boxes above the list of SAP systems,scaledwidth=80.0%]
+image::trento-web-home.png[{trento} dashboard showing the Passing, Warning and Critical health boxes above the list of SAP systems,scaledwidth=100.0%]
 
 The boxes are clickable. Clicking a box filters the dashboard by systems with that aggregated health, which is the fastest way to isolate the affected systems in a large landscape.
 
@@ -296,14 +298,17 @@ Data that is no longer refreshed is marked as _stale_. A stale value was correct
 
 * *Stale icon.* The regular health icon is shown with a clock overlay.
 * *Tooltip.* When you hover over a stale icon, it displays the date and time the value became stale.
-* *Warning banner.* The _Details_ views of affected hosts, clusters, {hana} databases and
-{sap} systems display a warning banner.
+* *Warning banner.* The _Details_ views of affected hosts, clusters, {hana} databases and {sap} systems display a warning banner.
 * *Grayed-out rows.* In relevant views, the row of the affected host, cluster, database, system or instance is grayed out.
 * *Activity log entry.* {trento} creates an entry with severity `debug` when a value becomes stale.
 
-// .Stale health icon with tooltip
-// [#fig-trento-stale-icon]
-// image::PLACEHOLDER-trento-stale-icon.png[Health icon with a clock overlay and a tooltip showing the time since the value became stale,scaledwidth=50.0%]
+.Stale health icons
+[#fig-trento-stale-icons]
+image::trento-stale-icons.png[Health icons with a clock overlay,scaledwidth=100.0%]
+
+.Stale warning banner
+[#fig-trento-stale-banner]
+image::trento-stale-banner.png[A banner with warning about agent not reporting,scaledwidth=100.0%]
 
 .How stale data affects each component
 [options="header"]
@@ -385,8 +390,6 @@ When monitoring your {sap} landscape in the {tr_web} console, you might encounte
 
 Why is a health icon gray?::
 A gray icon means either _stopped_ or _unknown_ health. Stopped means the component exists but is not running, as reported by `sapcontrol`. Unknown means {trento} cannot determine the value, most often because the connection to SUSE Multi-Linux Manager fails, the host is not found, or the data cannot be retrieved.
-
-// TODO: do we have some basic steps user can do here to investigate? Maybe as simple as checking the MLM settings in the console, etc.
 
 // TODO: The draft said a tooltip distinguishes the two. Verify against the running product, then either
 // mention the tooltip or tell the reader how else to tell them apart.
