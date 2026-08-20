@@ -4,24 +4,23 @@ include::product-attributes.adoc[]
 == Monitoring {sap} health in the {tr_web} console
 :revdate: 2026-08-07
 
-{tr_web} combines the individual states of your {sap} landscape into one aggregated health value per host, cluster, {hana} database and {sap} system. You can therefore use the {tr_web} console to identify which parts of your {sap} landscape need attention.
+{tr_web} combines the individual values of your {sap} landscape into one aggregated health value per host, cluster, {hana} database and {sap} system. You can therefore use the {tr_web} console to identify which parts of your {sap} landscape need attention.
 
-This document explains what the health values mean, which factors {trento} combines to calculate them, how to recognize outdated data, and how to trace a warning or a critical state back to its source.
+This document explains what the health values mean, which factors {trento} combines to calculate them, how to recognize outdated data, and how to trace a warning or a critical value back to its source.
 
 To access this data, use the left sidebar in the {tr_web} console. It contains the following entries:
 
 Dashboard::
-Identify at a glance which {sap} systems need attention, and filter systems by health state.
+Identify at a glance which {sap} systems need attention, and filter systems by health value.
 
 Hosts::
 Review all hosts that run the {tragent}, including, for example, their tuning status, available software updates or check results.
 
 Clusters::
-Review all discovered {pace} clusters, their configuration and their node states.
+Review all discovered {pace} clusters, their configuration and their node health.
 
 {sap} Systems::
-Review all discovered {sap} systems by system ID, including the status of each
-instance.
+Review all discovered {sap} systems by system ID, including the status of each instance.
 
 {hana} Databases::
 Review all discovered {hana} databases by system ID, including the status of each database instance.
@@ -40,21 +39,21 @@ View the {trserver} component versions, a link to the {tr_web} GitHub repository
 
 
 [[sec-about-trento-health]]
-=== Understanding health status in {trento}
+=== Understanding aggregated health in {trento}
 
 Every host, cluster, {hana} database and {sap} system in {tr_web} displays one health icon, which represents its aggregated health value. This value is the combination of several factors that {trento} discovers separately.
 
-To know why a component requires your attention, you need to know which factors contribute to its health. The following sections explain the health status icons, factors for each component, and the rule that combines the factors into a single status.
+To know why a component requires your attention, you need to know which factors contribute to its health. The following sections explain the aggregated health icons, factors for each component, and the rule that combines the factors into a single health value.
 
-[[sec-trento-health-status-icons]]
-==== Health status icons in {tr_web} 
+[[sec-trento-aggregated-health-icons]]
+==== Aggregated health icons in {tr_web} 
 
-Every health icon in {tr_web} console shows one of the following states.
+Every health icon in {tr_web} console shows one of the following values.
 
-.Health status in {tr_web} console
+.Aggregated health in {tr_web} console
 [options="header"]
 |===
-|Status |Icon color |Meaning
+|Value |Icon color |Meaning
 
 |passing
 |Green
@@ -81,16 +80,16 @@ reporting. For more information, see <<sec-trento-stale-data>>.
 [NOTE]
 ====
 A dash `—` in the dashboard means that no {pace} cluster manages the corresponding
-layer of that {sap} system. It is not a health state and it needs no action.
+layer of that {sap} system. It is not a health value and it needs no action.
 ====
 
 //TO DO: Add a screenshot
 
 [[sec-trento-health-calculation]]
-==== How {trento} calculates health state
+==== How {trento} calculates aggregated health
 
 {trento} evaluates each factor separately, then reduces the results to one aggregated
-value and reflects that value in the health status in the {tr_web} console. The factors are combined as follows:
+value and reflects that value in the corresponding aggregated health icon in the {tr_web} console. The factors are combined as follows:
 
 passing::
 All factors passing
@@ -116,10 +115,10 @@ Depending on the component, the aggregated health is calculated as a compound of
 |`{saptune}` tuning status, available software updates, check results
 
 |{hana} clusters
-|{hana} secondary sync state, check results
+|{hana} secondary sync state, check results, health of SBD devices
 
 |ASCS/ERS clusters
-|ASCS/ERS distribution status, check results
+|ASCS/ERS distribution status, check results, health of SBD devices
 
 |{hana} databases
 |Status of {hana} instances
@@ -141,7 +140,7 @@ Contributes only when {trento} discovers an {sap} workload on the host. `{saptun
 +
 [options="header"]
 |===
-|Condition |Status
+|Condition |Health value
 
 |`{saptune}` is not installed, or the version is lower than 3.1
 |warning
@@ -162,7 +161,7 @@ the *Settings* menu. For more information, see <<sec-integration-with-SUSE-Manag
 +
 [options="header"]
 |===
-|Condition |Status
+|Condition |Health value
 
 |The connection fails, the host is not found, or the data cannot be retrieved
 |unknown
@@ -182,7 +181,7 @@ Contributes only when checks are selected to run on the target.
 +
 [options="header"]
 |===
-|Condition |Status
+|Condition |Health value
 
 |All checks passing
 |passing
@@ -199,7 +198,7 @@ Applies to {hana} clusters only.
 +
 [options="header"]
 |===
-|Condition |Status
+|Condition |Health value
 
 |`SOK`, meaning the secondary site is in sync
 |passing
@@ -213,7 +212,7 @@ Applies to ASCS/ERS clusters only.
 +
 [options="header"]
 |===
-|Condition |Status
+|Condition |Health value
 
 |ASCS and ERS instances run on different hosts
 |passing
@@ -222,24 +221,38 @@ Applies to ASCS/ERS clusters only.
 |critical
 |===
 
+Health of SBD devices::
+Applies to clusters using file-based SDB fencing.
++
+[options="header"]
+|===
+|Condition |Health value
+
+|All devices healthy
+|passing
+
+|At least one device not healthy
+|critical
+|===
+
 Instance status::
 `sapcontrol` reports a status for each {hana} database instance and each {sap} application instance, which {tr_web} shows as a color.
 +
 [options="header"]
 |===
-|Condition |Status
+|Condition |Health value
 
-|All green
+|All GREEN
 |passing
 
-|At least one yellow, all others green
+|At least one YELLOW, all others GREEN
 |warning
 
-|At least one red, all others green or yellow
+|At least one RED, all others GREEN or YELLOW
 |critical
 
-|At least one gray
-|stopped or unknown
+|At least one GRAY
+|stopped
 |===
 
 [[sec-trento-health-dashboard]]
@@ -252,16 +265,15 @@ the layers of the {sap} architecture, and groups the systems in three health box
 Passing::
   Systems whose layers all report passing.
 Warning::
-  Systems with at least one layer in warning state and all remaining layers passing.
+  Systems with at least one layer with warning health and all remaining layers passing.
 Critical::
-  Systems with at least one layer in critical state.
+  Systems with at least one layer with critical health.
 
-.Dashboard with the global health state
+.Dashboard with the global health
 [#fig-trento-web-home]
 image::trento-web-home.png[{trento} dashboard showing the Passing, Warning and Critical health boxes above the list of SAP systems,scaledwidth=80.0%]
 
-The boxes are clickable. Clicking a box filters the dashboard by systems in that health
-state, which is the fastest way to isolate the affected systems in a large landscape.
+The boxes are clickable. Clicking a box filters the dashboard by systems with that aggregated health, which is the fastest way to isolate the affected systems in a large landscape.
 
 Two dashboard columns carry aggregated values of their own:
 
@@ -278,56 +290,56 @@ For more information on how the aggregated health is calculated for those column
 A {tragent} is continuously sending up-to-date data to {tr_web}. When an agent stops reporting, for example due to a connectivity issue, service crash, or host crash, {tr_web} keeps displaying the last data it received from that
 agent.
 
-Data that is no longer refreshed is marked as _stale_. A stale value was correct when it was last received, but it does not reflect the current state of the component. Therefore, the stale value should be treated as unverified until the agent reports again.
+Data that is no longer refreshed is marked as _stale_. A stale value was correct when it was last received, but it might not reflect the current health of the component. Therefore, the stale value should be treated as unverified until the agent reports again.
 
 {tr_web} marks stale data in the following ways:
 
-* *Stale icon.* The regular status or health icon is shown with a clock overlay.
+* *Stale icon.* The regular health icon is shown with a clock overlay.
 * *Tooltip.* When you hover over a stale icon, it displays the date and time the value became stale.
 * *Warning banner.* The _Details_ views of affected hosts, clusters, {hana} databases and
 {sap} systems display a warning banner.
-* *Grayed-out rows.* In relevant views, the row of the affected host, instance or node is grayed out.
-* *Activity log entry.* {trento} creates an entry with severity `info` when a value becomes stale.
+* *Grayed-out rows.* In relevant views, the row of the affected host, cluster, database, system or instance is grayed out.
+* *Activity log entry.* {trento} creates an entry with severity `debug` when a value becomes stale.
 
-// .Stale status icon with tooltip
+// .Stale health icon with tooltip
 // [#fig-trento-stale-icon]
 // image::PLACEHOLDER-trento-stale-icon.png[Health icon with a clock overlay and a tooltip showing the time since the value became stale,scaledwidth=50.0%]
 
-.How stale status affects each component
+.How stale data affects each component
 [options="header"]
 |===
 |Component |When it becomes stale |Where you see it
 
 |Host
 |The agent of the host stops reporting
-|Stale icon in the relevant views, warning banner in the _Host Details_ view, grayed-out row
+|Stale icon in the relevant views, grayed-out row in the Hosts overview, warning banner in the _Host Details_ view
 
 |Cluster
 |The agent of one of the cluster hosts stops reporting
-|Stale icon in the relevant views and in the dashboard, warning banner in the _Cluster Details_ view, grayed-out node rows in the _Cluster Details_ view
+|Stale icon in the relevant views and in the dashboard, grayed-out row in the Clusters overview, warning banner in the _Cluster Details_ view
 
 |{hana} database instance
 |The agent of the host that runs the instance stops reporting
-|Stale status icon in the relevant views, grayed-out row
+|Stale icon and grayed-out rows in the relevant views
 
 |{sap} instance
 |The agent of the host that runs the instance stops reporting
-|Stale status icon in the relevant views, grayed-out row
+|Stale icon and grayed-out rows in the relevant views
 
 |{hana} database
 |The status of any of its instances becomes stale
-|Stale icon in the relevant views and in the dashboard, warning banner in the _{hana} Database Details_ view
+|Stale icon in the relevant views and in the dashboard, grayed-out row in the Databases overview, warning banner in the _{hana} Database Details_ view
 
 |{sap} system
 |The status of any of its instances becomes stale, including database instances
-|Stale icon in the relevant views, warning banner in the _{sap} System Details_ view
+|Stale icon in the relevant views, grayed-out row in the {sap} systems overview, warning banner in the _{sap} System Details_ view
 
 |Application instances in the dashboard
 |The status of any application instance of the {sap} system becomes stale
 |Stale icon in the dashboard
 
 |Hosts in the dashboard
-|The status of any host of the {sap} system or of its database becomes stale
+|The aggregated health of any host of the {sap} system or of its database becomes stale
 |Stale icon in the dashboard
 |===
 
@@ -338,12 +350,10 @@ Once the agent reports again, {tr_web} replaces the stale value with the current
 [[sec-trento-finding-health-issue]]
 === Finding the cause of a health issue
 
-An aggregated health value indicates when something needs attention. To find out what, follow the aggregation from the dashboard to the factor that caused the state.
+A non-passing aggregated health value indicates that something needs attention. To find out what, follow the aggregation from the dashboard to the factor that caused the non-passing health.
 
-. In the {tr_web} console *Dashboard*, click the health box that matches the state you want to investigate, for example *Critical*.
-The dashboard now lists only the systems in that state.
-. Identify the layer that carries the state and select the desired view. Each layer icon links to the view that
-holds the underlying data:
+. In the {tr_web} console *Dashboard*, click the health box that matches the value you want to investigate, for example *Critical*. The dashboard now lists only the systems with matching health value.
+. Identify the layer that carries the value and select the desired view. Each layer icon links to the view that holds the underlying data:
 
 ** The *application instances* health icon opens the {sap} System Detail view.
 ** The *application cluster* health icon opens the ASCS/ERS Cluster Details view.
@@ -352,7 +362,7 @@ holds the underlying data:
 ** The *hosts* health icon opens the Hosts overview, filtered by SID equal to the SAPSID and the DBSID of the corresponding SAP system.
 
 . Check whether a stale banner is displayed. If it is, investigate the reporting problem first. For more information, see <<sec-trento-stale-data>>.
-. Identify the factor that caused the state and investigate, using the information in <<sec-trento-health-calculation>>.
+. Identify the factor that caused the value and investigate, using the information in <<sec-trento-health-calculation>>.
 
 [[sec-trento-settings-webconsole]]
 === Configuring {tr_web} settings
@@ -371,39 +381,39 @@ web-based email configuration is disabled. For more information, see
 [[sec-trento-webconsole-troubleshooting]]
 === Troubleshooting
 
-When monitoring your {sap} landscape in the {tr_web} console, you might encounter unfamiliar health icons, unexpected system states, or sudden alerts. The following frequently asked questions address common scenarios and provide immediate starting points for your investigation.
+When monitoring your {sap} landscape in the {tr_web} console, you might encounter unfamiliar health icons, unexpected system values, or sudden alerts. The following frequently asked questions address common scenarios and provide immediate starting points for your investigation.
 
-Why is a status icon gray?::
-A gray icon means either _stopped_ or _unknown_ status. Stopped means the component exists but is not running, as reported by `sapcontrol`. Unknown means {trento} cannot determine the value, most often because the connection to SUSE Multi-Linux Manager fails, the host is not found, or the data cannot be retrieved.
+Why is a health icon gray?::
+A gray icon means either _stopped_ or _unknown_ health. Stopped means the component exists but is not running, as reported by `sapcontrol`. Unknown means {trento} cannot determine the value, most often because the connection to SUSE Multi-Linux Manager fails, the host is not found, or the data cannot be retrieved.
 
 // TODO: do we have some basic steps user can do here to investigate? Maybe as simple as checking the MLM settings in the console, etc.
 
 // TODO: The draft said a tooltip distinguishes the two. Verify against the running product, then either
 // mention the tooltip or tell the reader how else to tell them apart.
 
-Why does a status icon show a clock?::
-The clock marks a _stale_ value. This happens when the responsible {tragent} stops reporting. The console shows the last known state. Hover over the icon to see exactly when the value became stale. For more information on how to investigate stale data, see <<sec-trento-stale-data>>.
+Why does a health icon show a clock?::
+The clock marks a _stale_ value. This happens when the responsible {tragent} stops reporting. The console shows the last known value. Hover over the icon to see exactly when the value became stale. For more information on how to investigate stale data, see <<sec-trento-stale-data>>.
 
-Why does the dashboard show a dash (`—`) instead of a cluster health state?::
+Why does the dashboard show a dash (`—`) instead of a cluster health?::
 The dash means that no {pace} cluster manages that layer of the {sap} system. The dash is not an error and requires no action.
 
-The status of a host or cluster is warning or critical, but all checks pass. Where does the status come from?::
+The health of a host or cluster is warning or critical, but all checks pass. Where does the value come from?::
 Check results are only one of the factors {trento} evaluates. Investigate the other contributing factors. For more information, see <<sec-trento-finding-health-issue>>.
 
 An {sap} system is critical, but all its instances are green. Why?::
 The aggregated health of the {hana} database contributes to the health of the {sap} system. Investigate the _{hana} Database Details_ view to find the root cause.
 
 Why is the host showing a warning for `{saptune}`?::
-This happens if `{saptune}` is not installed, the installed version is older than 3.1, no tuning solution is applied to the host, or tuning status is not compliant. Run `saptune note verify` in the host for further details.
+This happens if `{saptune}` is not installed, the installed version is older than 3.1, no tuning solution is applied to the host, or tuning status is not compliant. In this last case, run `saptune note verify` in the host for further details.
 
 The Activity Log is becoming cluttered with old events. Can old events be cleared automatically?::
 {tr_web} allows you to configure automatic retention limits to manage storage consumption and reduce clutter. For steps on how to do this, see <<sec-activity-log>>.
 
-What is the fastest way to investigate critical email alerts, such as "Host heartbeat failed" or "Cluster health detected critical"?::
-These alerts are triggered by {trento}'s event-driven architecture when a _critical_ status is detected. For the fastest way to investigate, see <<sec-trento-finding-health-issue>>.
+What is the fastest way to investigate email alerts, such as "Host stopped reporting" or "Cluster needs attention"?::
+These alerts are triggered by {trento}'s event-driven architecture when a _stale_ or _critical_ value is detected. For the fastest way to investigate, see <<sec-trento-finding-health-issue>>.
 
 How are pending software updates applied for hosts shown in {trento}?::
-While {tr_web} shows when updates are missing and flags the state as a _warning_ or _critical_, the actual patching is managed by SUSE Multi-Linux Manager. Log into your SUSE Multi-Linux Manager interface to view and apply the specific packages for that host.
+While {tr_web} shows when updates are missing and flags the health as a _warning_ or _critical_, the actual patching is managed by SUSE Multi-Linux Manager. Log into your SUSE Multi-Linux Manager interface to view and apply the specific packages for that host.
 
-Which data should be collected before reporting an issue?::
+Which data should be collected before reporting an issue with {trento} itself?::
 For information on which data to collect for support, see <<trento-report-issue>>.
