@@ -305,5 +305,5 @@ Users with the `all:settings` permissions can use the **Settings** view of {tr_w
 
 - API key. See <<sec-trento-rotating-apikeys>>.
 - Connection data for SUSE Multi-Linux Manager. See <<sec-integration-with-SUSE-Manager>>.
-- Retention time for Activity Log entries. See <<sec-activity-log>>.
+- Retention time for Activity Log entries. See <<sec-activity-log-retention>>.
 - Settings required for sending alerts via email. Note that if _any_ of the email settings are specified via environment variables (see <<sec-trento-enabling-email-alerts>>), the web-based configuration is disabled.

@@ -12,7 +12,7 @@ Database event retention::
 The number of registered events stored in the database. The default retention time is *10 days*. You can change the default retention by following the configuration procedures in this section.
 
 Activity log retention::
-The retention time for entries in the Activity Log. The default retention time is *1 month*. You can change the default retention through the UI as described in <<sec-activity-log>>.
+The retention time for entries in the Activity Log. The default retention time is *1 month*. You can change the default retention through the UI as described in <<sec-activity-log-retention>>.
 
 // Component log level::
 // The log level for the different components of {trserver}. The default is `debug`.
