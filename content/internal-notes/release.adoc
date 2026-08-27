@@ -104,7 +104,7 @@ Hotfix releases require more preparation work from the person performing the rel
 There are two paths you can take when making changes for a hotfix.
 However, regardless of which path you choose, the changes introduced on the `release` branch must be made using a pull request (PR).
 
-==== Back-Porting
+==== Back-Porting (TODO)
 
 In general, if a problem is discovered in the release code, it exists on both the `main` and `release` branches.
 Therefore, apply the fix in both places.
