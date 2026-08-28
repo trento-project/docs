@@ -104,14 +104,39 @@ Hotfix releases require more preparation work from the person performing the rel
 There are two paths you can take when making changes for a hotfix.
 However, regardless of which path you choose, the changes introduced on the `release` branch must be made using a pull request (PR).
 
-==== Back-Porting (TODO)
+==== Back-Porting
 
 In general, if a problem is discovered in the release code, it exists on both the `main` and `release` branches.
 Therefore, apply the fix in both places.
 It is recommended to first make the fix on `main` and then back-port it to `release`.
 This lowers the possibility of anomalies when auto-resolving merges in the CI.
 
-When back-porting, follow this procedure:
+===== Automated back-porting
+
+There is an automation in place to ease the process of back-porting changes.
+The automation works on a per-PR basis.
+When you want to back-port a change, mark the original PR (targeting `main` branch) with `backport` label.
+The back-porting process will start depending on the merge status of the original PR:
+
+* In case the PR is already merged when adding the label, the process will start right away.
+* If the PR is yet to be merged, the back-porting will happen once the PR is merged.
+
+The automation will conduct all the necessary steps enumerated in the following section, and additionally will copy the labels from the original PR to the backport one.
+The team member that is carrying away the process should manually merge the backport PR after ensuring everything is correct.
+
+In case of a merge conflict, a draft PR will be created instead of a normal PR.
+A team member is expected to checkout the branch created for the backport PR and resolve the conflict manually.
+Then, he needs to remove the draft status of the PR and merge it.
+
+[NOTE]
+====
+If there is a merge conflict and if resolving the conflict is too complex, the team might decide to drop the back-port.
+In that case, don't forget to also remove the `released-as-hotfix` label from the original PR.
+====
+
+===== Manual back-porting
+
+If for some reason you need to create the backport manually, follow these steps:
 
 . Find the PR that introduced the change on `main` that you want to back-port.
 . Add the `released-as-hotfix` label to the already closed or merged PR.
