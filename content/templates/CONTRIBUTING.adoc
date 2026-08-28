@@ -42,7 +42,7 @@ effort required and allow us to merge your changes faster.
 Be sure to complete it and remove the non-relevant parts.
 . Keep PRs as small as possible. When the PR gets too big, consider
 splitting it into multiple parts. A PR should ideally be between 100 and
-500 additions.
+500 lines of code.
 . Check that the tests are passing.
 . Check that your code is not generating new warnings.
 . Check that any dependent changes have been merged and published in
