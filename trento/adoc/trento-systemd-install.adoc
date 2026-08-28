@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-systemd-deployment]]
 ==== systemd deployment
-:revdate: 2026-07-28
+:revdate: 2026-08-28
 
 A systemd-based installation of the {trserver} using RPM packages can be performed manually on the latest supported versions of {sles4sap}, from 15 SP4 up to 16. For installations on service packs other than the current one, make sure to update the repository URL as described in the relevant notes throughout this guide.
 
@@ -250,6 +250,7 @@ ADMIN_USER=admin
 ADMIN_PASSWORD=trentodemo
 ENABLE_API_KEY=true
 PORT=4000
+LOG_LEVEL=info
 TRENTO_WEB_ORIGIN=trento.example.com
 SECRET_KEY_BASE=some-secret
 ACCESS_TOKEN_ENC_SECRET=some-secret
@@ -257,6 +258,8 @@ REFRESH_TOKEN_ENC_SECRET=some-secret
 CHECKS_SERVICE_BASE_URL=/wanda
 OAS_SERVER_URL=https://trento.example.com
 ----
+
+** The `LOG_LEVEL` sets how much detail {tr_web} writes to the log. The default value is `info`. For more information, see <<sec-configuring-log-levels>>.
 
 ** The `TRENTO_WEB_ORIGIN` configures internal functionalities such as the interactive API portal, websockets, or certificate generation.
 +
@@ -304,6 +307,7 @@ CORS_ORIGIN=http://localhost
 AMQP_URL=amqp://TRENTO_USER:TRENTO_USER_PASSWORD@localhost:5672/vhost
 DATABASE_URL=ecto://WANDA_USER:WANDA_PASSWORD@localhost/wanda
 PORT=4001
+LOG_LEVEL=info
 SECRET_KEY_BASE=some-secret
 OAS_SERVER_URL=https://trento.example.com/wanda
 AUTH_SERVER_URL=http://localhost:4000

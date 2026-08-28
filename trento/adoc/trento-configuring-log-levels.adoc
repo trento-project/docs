@@ -1,0 +1,129 @@
+include::product-attributes.adoc[]
+
+[[sec-configuring-log-levels]]
+=== Configuring log levels
+:revdate: 2026-08-28
+
+You can adjust the level of detail that {trserver} components write to their logs to manage disk space, capture more detailed information, for example for troubleshooting purposes, or to reduce log noise. The available log levels are `debug`, `info`, `warning` and `error`, and the default level is `info` for every component and deployment type. You can change log levels for {tr_web}, {tr_wanda} and {tr_mcp}.
+
+[NOTE]
+====
+The {tr_mcp} has a separate implementation with its own configuration options and naming conventions, using verbosity instead of log level. The configuration settings described in this section, such as `global.logLevel` in Helm or `trento_log_level` in Ansible, do not influence {tr_mcp}.
+
+To set the log level of the {tr_mcp} with its own options, see the documentation at <<sec-trento-mcp-integration>>.
+====
+
+[[available-log-levels]]
+==== Available log levels
+
+Every trace starts with its log level, so you can identify which level produced each line. For example:
+
+[source]
+----
+08:56:57.668 [info] Access TrentoWeb.Endpoint at http://localhost:4000
+08:56:57.760 [debug] Attempting to start Postgrex
+----
+
+A component outputs logs for the configured level and all higher-severity levels. For example, setting the level to `warning` also includes `error` traces.
+
+The following log levels are available, listed from lowest to highest severity:
+
+`debug`:: Troubleshooting level. Prints low-level traces that help analyze the behavior of the system. We recommend this level when you prepare a support case.
++
+[IMPORTANT]
+====
+Log level changes apply only to new traces. Diagnostic data collected from a component that ran at the `info` level does not contain the `debug` traces that support might need.
+
+To gather the needed logs, set the log level to `debug` and reproduce the issue. For more information about collecting diagnostic data, see <<trento-report-issue>>.
+
+After the diagnostic data is collected, we recommend setting the level back to `info` to prevent excessive disk consumption.
+====
+
+`info`:: Default level. Prints traces of standard actions that serve informative purposes.
+
+`warning`:: Prints traces about potentially dangerous situations that require attention. These traces do not mean that the system works incorrectly.
+
+`error`:: Prints traces about failures or about data that a component receives but cannot process. These traces require attention. Certain `error` traces can also indicate an incorrect setup of your SAP systems.
+
+[[log-levels-kubernetes]]
+==== Configuring log levels on {k8s} deployments
+
+For {k8s} deployments, use the `helm upgrade` command to set the log level.
+
+* To use the same log level for {tr_web} and {tr_wanda}, set `global.logLevel`:
++
+[source,bash]
+----
+helm upgrade \
+   --install trento-server oci://registry.suse.com/trento/trento-server \
+   --set global.logLevel=warning \
+   ...
+----
+
+* To use a different log level for each component, set the component-specific flags: `trento-web.logLevel` and `trento-wanda.logLevel`. A component option takes precedence over `global.logLevel`:
++
+[source,bash]
+----
+helm upgrade \
+   --install trento-server oci://registry.suse.com/trento/trento-server \
+   --set trento-web.logLevel=info \
+   --set trento-wanda.logLevel=debug \
+   ...
+----
+
+To set the log level of the {tr_mcp}, see <<mcp-adjust-log-verbosity>>.
+
+[[log-levels-systemd]]
+==== Configuring log levels on systemd deployments
+
+For systemd deployments, perform the following steps:
+
+. Add or modify the `LOG_LEVEL` variable in the configuration file of the
+component.
++
+To set the log level for {tr_web}, edit `/etc/trento/trento-web`. To set the log level for {tr_wanda}, edit `/etc/trento/trento-wanda`:
++
+----
+LOG_LEVEL=debug
+----
+
+. Restart the services for the changes to take effect:
++
+[source,bash]
+----
+systemctl restart trento-web
+systemctl restart trento-wanda
+----
+
+To set the log level of the {tr_mcp}, see <<mcp-systemd-configure>>.
+
+[[configuring-log-levels-ansible]]
+==== Configuring log levels with Ansible
+
+For Ansible deployments, the log level is a role-level variable. Set it in the `vars:` section of the inventory file, or pass it on the command line with `--extra-vars`. For more information about role-level variables, see <<ansible-role-level-configuration>>.
+
+* To use the same log level for {tr_web} and {tr_wanda}, set the `trento_log_level` variable:
++
+[source,yaml]
+----
+all:
+  vars:
+    trento_log_level: "debug"
+----
+
+* To use a different log level for each component, set the component-specific variables: `web_log_level` and `wanda_log_level`. A component variable takes precedence over `trento_log_level`:
++
+[source,yaml]
+----
+all:
+  vars:
+    web_log_level: "info"
+    wanda_log_level: "debug"
+----
+
+* To set the variables during a playbook run, use the `--extra-vars` option:
++
+[source,bash]
+----
+ansible-playbook -i PATH_TO_INVENTORY suse.trento.site --extra-vars trento_log_level=debug
+----
