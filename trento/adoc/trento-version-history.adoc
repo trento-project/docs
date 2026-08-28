@@ -115,7 +115,7 @@ Version 2.2.0 (released on 2023/12/04)::
   Consisting of Helm chart 2.2.0, Web component 2.2.0, checks engine
   (wanda) 1.2.0 and agent 2.2.0.
   * saptune Web integration.
-  * Intance clean-up capabilities.
+  * Instance clean-up capabilities.
   * Ability to run host-level configuration checks.
 
 Version 2.1.0 (released on 2023/08/02)::
@@ -134,10 +134,10 @@ Version 2.1.0 (released on 2023/08/02)::
 Version 2.0.0 (released on 2023/04/26)::
   Consisting of Helm chart 2.0.0, Web component 2.0.0, checks engine
   (wanda) 1.0.0 and agent 2.0.0.
-  * A brand-new safer, faster, ligher SSH-less configuration checks
+  * A brand-new safer, faster, lighter SSH-less configuration checks
   engine (wanda) which not only opens the door to configuration checks
-  for other HA scenarios (ASCS/ER, HANA scale-up cost optimized, {hana}
-  scale-out) and other targes in the environment (hosts, {hana}
+  for other HA scenarios (ASCS/ERS, HANA scale-up cost optimized, {hana}
+  scale-out) and other targets in the environment (hosts, {hana}
   databases, {netweaver} instances), but also will allow customization
   of existing checks and addition of custom checks.
   * Addition of VMware to the list of known platforms.

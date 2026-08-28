@@ -1,91 +1,124 @@
 include::product-attributes.adoc[]
 
 [[sec-activity-log]]
-=== Activity Log
-:revdate: 2026-04-30
+=== Tracking events and user actions with the Activity Log
+:revdate: 2026-08-21
 
+{trento} collects system events and user actions in the Activity Log. It records what
+happened in the monitored landscape and who triggered the event. With the Activity Log, you can discover health and heartbeat changes, host de-registrations, login attempts, user updates and more.
 
-{trento} collects system events and user actions in the Activity Log.
-It can be accessed from the left-hand side panel of the {trento}
-console.
+The Activity Log can be accessed from the left-hand side panel of the {trento} console.
 
-Each entry in the Activity Log includes the following:
+[[sec-activity-log-entries]]
+==== Understanding an Activity Log entry
 
-* A timestamp: the day and time the system event or user action occurred.
-Timestamps are displayed using the user's preferred timezone (set in the user profile).
-If no preference is set, times default to UTC.
-* A message: type of the occurred event or user action
-* The user that triggered the event or performed the action. User system
-is used for events triggered by the system itself.
-* Severity status (Info, Warning, and Critical are selected by default)
+Entries are listed from newest to oldest. Each entry in the Activity Log includes the following information:
 
-Clicking on the chevron icon in the activity log entry opens a modal
-window containing the activity metadata.
+Timestamp:: When the system event or user action occurred.
+Timestamps are displayed in the user's preferred timezone, which is set in the user
+profile. If no preference is set, times default to UTC.
 
-It is possible to search the activity metadata of the activity log entries. You
-can use wildcards as well as the OR and AND logical operators for advanced
-search queries. The OR operator is applied by default, meaning that a query like
-`term1 term2 term3` is treated as `term1 OR term2 OR term3`. You can combine
-multiple logical operators, keeping in mind that they are parsed from left to
-right.
+Message:: Type of the occurred event or user action.
 
-The Activity Log allows you to filter by the type of event or user action
-(commonly referred to as resource type), by the user that triggered the event or
-performed the action, and by severity status. Only active users are available
-for filtering. The Activity Log also allows you to filter out entries that are
-newer and/or older than a specific date and time. Date/time inputs in the UI are interpreted according to the user's preferred timezone; if no preference is set, UTC is assumed.
+User:: The user that triggered the event or performed the action. User `system`
+marks events triggered by the system itself.
 
-Once a filter has been set, click Apply to filter out the undesired
-entries and Reset to remove all the filters.
+Severity status:: The log shows Info, Warning and Critical entries by default.
 
-Entries related to user management can only be displayed by users that
-have the `+all:all+` or `+all:users+` permissions. This includes the
-following:
+The list view is a summary. To see the full context of an entry, such as the affected
+resource and the values involved, click the chevron icon (`>`) on the entry. This opens the *Activity Details* window with the activity metadata.
 
+[[sec-activity-log-filtering]]
+==== Filtering for relevant log entries
+
+You can use filters to isolate the entries you are interested in. For more specific queries, use the search field to find exact terms from the activity metadata, such as a specific host name or setting value.
+
+. In the Activity Log view, set one or more of the following filters:
++
+* *User*: The user who triggered the entry. Only active users are available for filtering.
+* *Type*: The type of event or user action.
+* *Severity*: Info, Warning, Critical, or Debug.
+* *From date* and *To date*: A date and time range. Both accept user's
+preferred timezone. If no preference is set, time defaults to UTC.
+
+. To match the content of the activity metadata, enter a query in the search field.
++
+The field supports wildcards and the `OR` and `AND` logical operators, which you can
+combine in a single query. Operators are parsed from left to right, and `OR` is
+applied by default. For example, the query `term1 term2 term3` is treated as
+`term1 OR term2 OR term3`.
+
+. Click *Apply Filter*.
+
+To remove all the filters, click *Reset Filters*.
+
+[[sec-activity-log-correlation]]
+==== Following a chain of related events
+
+Certain user actions and system events trigger a multi-step workflow that produces
+several log entries. {trento} correlates those entries, so that you can review the
+workflow as one chronological, linear chain instead of reconstructing it from
+individual entries.
+
+Example workflows that produce such chains include:
+
+* De-registration of hosts
+* API key re-generation
+* {smlm} settings save or update
+* Host, cluster and {sap} operations
+
+For example, cleaning up a host that runs a single-instance {hana} database
+de-registers the database instance, the database itself, the {sap} system and its
+instances, and then the host. 
+
+To review the whole chain:
+
+. Click the chevron icon (`>`) for the action that is a part of the workflow to open the *Activity Details* window.
+. In the *Related Events* section, click *Show Events*.
++
+The Activity Log is then automatically filtered by `correlation_id` to show you the chain of related events.
+
+[NOTE]
+====
+Not every entry must belong to a chain. If an entry is not part of a larger workflow, clicking *Show Events* filters the log to display only that single entry.
+====
+
+[[sec-activity-log-refreshing]]
+==== Refreshing the Activity Log
+
+New entries are not automatically added to an open view. Click *Refresh* to load any new entries generated since the view was opened or last refreshed.
+If you are monitoring an ongoing operation, select an auto-refresh interval instead and let the view update itself.
+
+[[sec-activity-log-user-data]]
+==== Getting access to user data
+
+Not every user sees the same Activity Log. Permissions govern which entries are listed, and whether the user names in them are readable.
+
+`all:all` and `all:users`::
+Entries related to user management can only be displayed by users that have the `all:all` or `all:users` permissions.
++
+This includes for example:
++
 * Login attempts
 * User creations
 * User modifications
 * User deletions
 * Profile updates
 
-The Activity Log features a privacy-related access level controlled through the
-_activity_log:users_ permission. For users without this permission, user-related
-info in the Activity Log is redacted. Unprivileged users can only see their own
-user names as well as user system.
+`activity_log:users`::
+This permission controls a privacy-related access level. For
+users without this permission, only their own user name and the user `system` is visible in the Activity Log.
 
-Entries in the Activity Log are sorted from newer to older. Click **Refresh** to
-update the Activity Log view with entries generated since they accessed the view
-or after the last refresh. You can also enable the auto-refresh feature by
-selecting the desired auto-refresh interval.
+For more information about permissions, see <<sec-trento-user-management>>.
 
-The pagination features at the bottom of the Activity Log allow you to
-specify the number of entries to display in a page, go to the next or
-previous page of the view, and jump to the last page and back to first
-one.
+[[sec-activity-log-retention]]
+==== Modifying log retention time
 
-The default retention time for entries in the Activity Log is one month.
-This can be changed in the Activity Log section under Settings. Changing
-the retention time requires the `+all:settings+` permissions. Entries
-older than the specified retention time are deleted every day at
-midnight (UTC timezone).
-Note that the cleanup schedule uses UTC, but timestamps shown in the UI are
-adjusted to each user's preferred timezone for display purposes.
+Entries are retained for one month by default. Increase the retention time if you need a longer audit history, or reduce it to limit database growth. Changing it requires the `all:settings` permission.
 
-The correlation functionality of the Activity Log links related events together,
-offering a chronological, linear view of a chain of events in multi-step workflows
-triggered by a user action.
+. In the left sidebar of the {tr_web} console, click *Settings*.
+. In the *Activity Logs* section, click *Edit Settings*.
+. Set the desired retention time and save the change.
 
-For example, the clean-up action in a host that runs a single instance
-HANA database of an {sap} system de-registers the database instance,
-de-registers the database itself, de-reregisters the {sap}system and its
-instances and then de-registers the host. These correlated entries are
-displayed in a linked, linear view, when you navigate to the host
-clean-up entry modal in the Activity Log and then click the link in the
-Related Events section named **Show Events**.
-
-The following categories of Activity Log entries provide a view of linked or related events:
-
-* entries caused by de-registration of hosts
-* entries caused by API key re-generation
-* entries caused by SMLM settings save/update
-* entries caused by host, cluster and {sap} operations
+Entries older than the retention time are deleted every day at midnight UTC. The cleanup schedule always uses UTC, regardless of the preferred timezone that the
+console uses to display timestamps.
