@@ -34,7 +34,7 @@ jobs:
         node-version: '18'
     - name: Install Antora with the Antora Lunr Extension
       working-directory: trento-docs-site
-      run: npm i antora @antora/lunr-extension
+      run: npm i antora@3.2 @antora/lunr-extension
     - name: Generate Site
       working-directory: trento-docs-site
       run: npx antora antora-playbook.yml
