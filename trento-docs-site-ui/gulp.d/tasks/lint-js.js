@@ -3,13 +3,15 @@
 
 'use strict'
 
-const eslint = require('gulp-eslint')
-const vfs = require('vinyl-fs')
+const { ESLint } = require('eslint')
+const log = require('fancy-log')
 
-module.exports = (files) => (done) =>
-  vfs
-    .src(files)
-    .pipe(eslint())
-    .pipe(eslint.format())
-    .pipe(eslint.failAfterError())
-    .on('error', done)
+module.exports = (files) => async () => {
+  const eslint = new ESLint()
+  const results = await eslint.lintFiles(files)
+  const formatter = await eslint.loadFormatter('stylish')
+  const output = formatter.format(results)
+  if (output) log(output)
+  const errorCount = results.reduce((count, result) => count + result.errorCount, 0)
+  if (errorCount > 0) throw new Error(`eslint found ${errorCount} error${errorCount === 1 ? '' : 's'}`)
+}

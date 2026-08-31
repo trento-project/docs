@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-@media screen and (max-width: 1023.5px) {
+@media screen and (width <= 1023.5px) {
   html.is-clipped--navbar {
     overflow-y: hidden;
   }
@@ -58,7 +58,7 @@ body {
 
 .navbar-brand .navbar-item:first-child a {
   color: inherit;
-  word-wrap: normal;
+  overflow-wrap: normal;
 }
 
 .navbar-brand .navbar-item:first-child :not(:last-child) {
@@ -172,7 +172,7 @@ body {
 
 .navbar-item .icon img,
 .navbar-item .icon svg {
-  fill: currentColor;
+  fill: currentcolor;
   width: inherit;
   height: inherit;
 }
@@ -241,20 +241,20 @@ body {
   color: var(--navbar-font-color);
 }
 
-@media screen and (max-width: 768.5px) {
+@media screen and (width <= 768.5px) {
   .navbar-brand .navbar-item.search {
     padding-left: 0;
     padding-right: 0;
   }
 }
 
-@media screen and (min-width: 769px) {
+@media screen and (width >= 769px) {
   #search-input {
     width: 200px;
   }
 }
 
-@media screen and (max-width: 1023.5px) {
+@media screen and (width <= 1023.5px) {
   .navbar-brand {
     height: inherit;
   }
@@ -266,7 +266,7 @@ body {
 
   .navbar-menu {
     background: var(--navbar-menu-background);
-    box-shadow: 0 8px 16px rgba(10, 10, 10, 0.1);
+    box-shadow: 0 8px 16px rgb(10 10 10 / 10%);
     max-height: var(--body-min-height);
     overflow-y: auto;
     overscroll-behavior: none;
@@ -292,7 +292,7 @@ body {
     right: 0;
     top: 58px;
     z-index: 99;
-    box-shadow: 0 8px 16px rgba(10, 10, 10, 0.1);
+    box-shadow: 0 8px 16px rgb(10 10 10 / 10%);
   }
 
   #search-input {
@@ -304,7 +304,7 @@ body {
   .hidden.medium { display: none !important; }
 }
 
-@media screen and (min-width: 1024px) {
+@media screen and (width >= 1024px) {
   .navbar-burger {
     display: none;
   }
@@ -360,7 +360,7 @@ body {
   }
 
   .navbar-end .navbar-link::after {
-    border-color: currentColor;
+    border-color: currentcolor;
   }
 
   .navbar-end > a.navbar-item:last-child {

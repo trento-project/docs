@@ -17,7 +17,7 @@ html {
   scroll-behavior: smooth;
 }
 
-@media screen and (min-width: 1024px) {
+@media screen and (width >= 1024px) {
   html {
     font-size: var(--body-font-size--desktop);
   }
@@ -30,7 +30,7 @@ body {
   line-height: var(--body-line-height);
   margin: 0;
   tab-size: 4;
-  word-wrap: anywhere; /* aka overflow-wrap; used when hyphens are disabled or aren't sufficient */
+  overflow-wrap: anywhere; /* aka overflow-wrap; used when hyphens are disabled or aren't sufficient */
 }
 
 a {
@@ -42,7 +42,7 @@ a:hover {
 }
 
 a:active {
-  background-color: none;
+  background-color: transparent;
 }
 
 code,
@@ -103,7 +103,7 @@ summary {
 
 table {
   border-collapse: collapse;
-  word-wrap: normal; /* table widths aren't computed as expected when word-wrap is enabled */
+  overflow-wrap: normal; /* table widths aren't computed as expected when word-wrap is enabled */
 }
 
 object[type="image/svg+xml"]:not([width]) {

@@ -3,11 +3,13 @@
 
 'use strict'
 
-const prettier = require('../lib/gulp-prettier-eslint')
-const vfs = require('vinyl-fs')
+const { ESLint } = require('eslint')
+const log = require('fancy-log')
 
-module.exports = (files) => () =>
-  vfs
-    .src(files)
-    .pipe(prettier())
-    .pipe(vfs.dest((file) => file.base))
+module.exports = (files) => async () => {
+  const eslint = new ESLint({ fix: true })
+  const results = await eslint.lintFiles(files)
+  await ESLint.outputFixes(results)
+  const changed = results.filter((result) => result.output != null).length
+  log(`eslint --fix: formatted ${changed} file${changed === 1 ? '' : 's'}`)
+}

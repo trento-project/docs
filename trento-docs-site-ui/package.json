@@ -8,7 +8,7 @@
     "url": "https://gitlab.com/antora/antora-ui-default.git"
   },
   "engines": {
-    "node": ">= 8.0.0"
+    "node": ">= 18.0.0"
   },
   "browserslist": [
     "last 2 versions"
@@ -24,35 +24,31 @@
     "browserify": "~17.0",
     "cssnano": "~8.0",
     "eos-icons": "^5.4.0",
-    "eslint": "^8.57.0",
-    "eslint-config-standard": "~17.1",
-    "eslint-plugin-import": "~2.32",
-    "eslint-plugin-node": "~11.1",
-    "eslint-plugin-promise": "^6.0.0",
-    "eslint-plugin-standard": "~5.0",
+    "eslint": "~9.39",
     "fancy-log": "~2.0",
     "fs-extra": "~11.4",
     "gulp": "~5.0",
     "gulp-concat": "~2.6",
-    "gulp-connect": "^5.0.0",
-    "gulp-eslint": "^5.0.0",
-    "gulp-imagemin": "^7.1.0",
+    "gulp-connect": "~5.7",
     "gulp-postcss": "~10.0",
-    "gulp-stylelint": "~13.0",
     "gulp-uglify": "~3.0",
     "handlebars": "~4.7",
     "highlight.js": "11.11.2",
-    "js-yaml": "~5.2",
+    "js-yaml": "~4.3",
     "merge-stream": "~2.0",
+    "neostandard": "~0.13",
     "postcss-calc": "~10.1",
     "postcss-custom-properties": "~15.0",
     "postcss-import": "~17.0",
     "postcss-url": "~10.1",
-    "prettier-eslint": "~17.1",
     "require-directory": "~2.1",
     "require-from-string": "~2.0",
     "stylelint": "~17.14",
     "stylelint-config-standard": "~40.0",
     "vinyl-fs": "~4.0"
+  },
+  "overrides": {
+    "elliptic": "^6.6.1",
+    "send": "^0.19.2"
   }
 }
