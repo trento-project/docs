@@ -224,7 +224,7 @@ Applies to ASCS/ERS clusters only.
 |===
 
 Health of SBD devices::
-Applies to clusters using file-based SDB fencing.
+Applies to clusters using file-based SBD fencing.
 +
 [options="header"]
 |===
@@ -407,7 +407,7 @@ An {sap} system is critical, but all its instances are green. Why?::
 The aggregated health of the {hana} database contributes to the health of the {sap} system. Investigate the _{hana} Database Details_ view to find the root cause.
 
 Why is the host showing a warning for `{saptune}`?::
-This happens if `{saptune}` is not installed, the installed version is older than 3.1, no tuning solution is applied to the host, or tuning status is not compliant. In this last case, run `saptune note verify` in the host for further details.
+This happens if `{saptune}` is not installed, the installed version is older than 3.1, no tuning solution is applied to the host, or tuning status is not compliant. In this last case, run `saptune note verify` on the host for further details.
 
 The Activity Log is becoming cluttered with old events. Can old events be cleared automatically?::
 {tr_web} allows you to configure automatic retention limits to manage storage consumption and reduce clutter. For steps on how to do this, see <<sec-activity-log>>.
