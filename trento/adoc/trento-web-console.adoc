@@ -123,10 +123,10 @@ Depending on the component, the aggregated health is calculated as a compound of
 |ASCS/ERS distribution status, check results, health of SBD devices
 
 |{hana} databases
-|Status of {hana} instances
+|Overall status of {hana} instances
 
 |{sap} systems
-|Status of {sap} instances, aggregated health of the {hana} database
+|Overall status of {sap} instances, aggregated health of the {hana} database
 
 |Application instances in the dashboard
 |Status of {sap} instances
@@ -237,7 +237,7 @@ Applies to clusters using file-based SBD fencing.
 |critical
 |===
 
-Instance status::
+Overall status of {hana} database instances / {sap} instances:
 `sapcontrol` reports a status for each {hana} database instance and each {sap} application instance, which {tr_web} shows as a color.
 +
 [options="header"]
@@ -275,12 +275,12 @@ Critical::
 [#fig-trento-web-home]
 image::trento-web-home.png[{trento} dashboard showing the Passing, Warning and Critical health boxes above the list of SAP systems,scaledwidth=100.0%]
 
-The boxes are clickable. Clicking a box filters the dashboard by systems with that aggregated health, which is the fastest way to isolate the affected systems in a large landscape.
+The boxes are clickable. Clicking a box filters the dashboard by systems with a layer with that aggregated health, which is the fastest way to isolate the affected systems in a large landscape.
 
 Two dashboard columns carry aggregated values of their own:
 
 * The *Application instances* value combines the status of the individual {sap}
-instances of the system.
+instances of the system. Database instances are not taken into consideration here.
 * The *Hosts* value combines the aggregated health of all hosts that belong to the
 system and to its database.
 
@@ -357,7 +357,7 @@ Once the agent reports again, {tr_web} replaces the stale value with the current
 
 A non-passing aggregated health value indicates that something needs attention. To find out what, follow the aggregation from the dashboard to the factor that caused the non-passing health.
 
-. In the {tr_web} console *Dashboard*, click the health box that matches the value you want to investigate, for example *Critical*. The dashboard now lists only the systems with matching health value.
+. In the {tr_web} console *Dashboard*, click the health box that matches the value you want to investigate, for example *Critical*. The dashboard now lists only the systems with a layer matching health value.
 . Identify the layer that carries the value and select the desired view. Each layer icon links to the view that holds the underlying data:
 
 ** The *application instances* health icon opens the {sap} System Detail view.
@@ -407,7 +407,7 @@ An {sap} system is critical, but all its instances are green. Why?::
 The aggregated health of the {hana} database contributes to the health of the {sap} system. Investigate the _{hana} Database Details_ view to find the root cause.
 
 Why is the host showing a warning for `{saptune}`?::
-This happens if `{saptune}` is not installed, the installed version is older than 3.1, no tuning solution is applied to the host, or tuning status is not compliant. In this last case, run `saptune note verify` on the host for further details.
+This happens when {trento} discovers an {sap} workload on the host, and either `{saptune}` is not installed, the installed version is older than 3.1, or no tuning solution is applied to the host. If the host shows a _critical_ value instead, it means the tuning status is not compliant. In this last case, run `saptune note verify` on the host for further details.
 
 The Activity Log is becoming cluttered with old events. Can old events be cleared automatically?::
 {tr_web} allows you to configure automatic retention limits to manage storage consumption and reduce clutter. For steps on how to do this, see <<sec-activity-log>>.
