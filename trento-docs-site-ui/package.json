@@ -35,7 +35,6 @@
     "handlebars": "~4.7",
     "highlight.js": "11.11.2",
     "js-yaml": "~4.3",
-    "merge-stream": "~2.0",
     "neostandard": "~0.13",
     "postcss-calc": "~10.1",
     "postcss-custom-properties": "~15.0",

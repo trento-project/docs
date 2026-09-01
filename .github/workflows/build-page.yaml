@@ -18,6 +18,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    # openSUSE-based SUSE BCI image with Node.js 24 preinstalled
+    container:
+      image: registry.suse.com/bci/nodejs:24
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -28,13 +31,9 @@ jobs:
         fetch-depth: 0
     - name: Configure Pages
       uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
-    - name: Install Node.js
-      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-      with:
-        node-version: '18'
-    - name: Install Antora with the Antora Lunr Extension
+    - name: Install dependencies
       working-directory: trento-docs-site
-      run: npm i antora@3.2 @antora/lunr-extension
+      run: npm ci
     - name: Generate Site
       working-directory: trento-docs-site
       run: npx antora antora-playbook.yml
