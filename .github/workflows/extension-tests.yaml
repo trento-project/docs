@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install dependencies
         working-directory: trento-docs-site
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
       - name: Run extension tests
         working-directory: trento-docs-site
         run: npm test
