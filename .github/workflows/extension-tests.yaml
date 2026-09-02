@@ -11,8 +11,7 @@ on:
       - 'trento-docs-site/package.json'
       - 'trento-docs-site/package-lock.json'
       - '.github/workflows/extension-tests.yaml'
-      - '.github/workflows/build-page.yaml'
-      - '.github/workflows/validate-suse-docs.yaml'
+
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
@@ -20,8 +19,6 @@ on:
       - 'trento-docs-site/package.json'
       - 'trento-docs-site/package-lock.json'
       - '.github/workflows/extension-tests.yaml'
-      - '.github/workflows/build-page.yaml'
-      - '.github/workflows/validate-suse-docs.yaml'
 
   workflow_dispatch:
 
