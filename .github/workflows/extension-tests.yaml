@@ -8,10 +8,16 @@ on:
     branches: [main]
     paths:
       - 'trento-docs-site/extensions/**'
+      - 'trento-docs-site/package.json'
+      - 'trento-docs-site/package-lock.json'
+      - '.github/workflows/extension-tests.yaml'
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
       - 'trento-docs-site/extensions/**'
+      - 'trento-docs-site/package.json'
+      - 'trento-docs-site/package-lock.json'
+      - '.github/workflows/extension-tests.yaml'
   workflow_dispatch:
 
 jobs:
