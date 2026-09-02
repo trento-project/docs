@@ -18,6 +18,9 @@
   "overrides": {
     "@antora/collector-extension": {
       "js-yaml": "^4.3.2"
+    },
+    "test-exclude": {
+      "glob": "^13.0.6"
     }
   }
 }
