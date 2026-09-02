@@ -29,6 +29,7 @@ The amount of time spent by maintainers reviewing low-quality or AI-generated co
 * As a maintainer, I want to ensure that all contributions, whether internal or external, adhere to the same quality standards, so that the codebase remains maintainable and secure.
 * As a maintainer, I want to make sure that the contributions do not introduce vulnerabilities or security risks and do not affect the maintainability of the project, so that the project remains safe for users.
 * As a maintainer, I want to ensure that the code is supportable and maintainable, so that future development and maintenance can be carried out effectively.
+* As a maintainer, I want to have enough context about the PR to understand the rationale behind the changes, and participate in the design and refinement conversation when they are needed.
 
 == Considerations
 The following considerations should be added to the code standards. Whenever possible, they also should be included in the workflows to create PR (for instance, with specific templates, pre-commit hooks, and CI/CD checks).
@@ -57,20 +58,35 @@ Instead, wait for a break point in your work before you respond to a request for
 
 == Updated Pull Request Workflow (for reviewers)
 
-=== Step 0: Initial assignment
+=== Step 0: Pre-work
+Before a PR is submitted, the developer needs to have a clear understaning of the scope and requirements. If refinement work is needed, consider both including the refinement documentation as context in the PR and choosing reviewers that have participated in the refinement and design of the solution. For that reason, it is important to involve the relevant stakeholders early in the process to ensure that the PR is well-informed and aligned with the project's goals.
+
+=== Step 1: Initial assignment
 The PR can be assigned to a squad (preferably) or to one or several individuals, or left unassigned for maintainers to pick up. In the last case where it is left unassigned, maintainers will review the PR and assign it to the appropriate person or team for further review and action. Unless it is specifically requested, the PR needs to have one successful maintainer review before merging and no rejections, so assigning it to a squad will generally help streamline this process. AI approval does not replace the requirement for a human maintainer review.
 
-=== Step 1: Take a broad view of the change
+=== Step 2: Take a broad view of the change
 Look at the PR description and what the PR does in general. Does this change even make sense? If this change shouldn't have happened in the first place, please respond immediately with an explanation and why the change should not be happening. It is a good idea to suggest to the developer what they should have done instead.
 
 If the code is not understandable, it is clearly not ready for review or it manifests AI hallucinations, it should be immediately flagged and the PR should be closed. The developer can open a new pull request after addressing the issues.
 
-=== Step 2: Pre-review automation gate
+=== Step 3: Pre-review automation gate
 Once step 1 is done, the reviewer will include an AI-assisted verification step to automatically check for code quality, maintainability, and security issues. This step will help ensure that only high-quality contributions proceed to the manual review stage. Step 1 will ensure that AI is not engaged inappropriately or without proper oversight.
 
-=== Step 3: Manual review
+=== Step 4: Manual review
 After the automatic verification step is successfully completed, the reviewer will manually review the code changes. This includes checking for correctness, adherence to project guidelines, code readability, and overall quality. The reviewer will provide feedback, request changes if necessary, and approve the pull request once it meets all standards.
 During this phase, AI-assisted verification tools may still be used to support the review process, but the final judgment and approval rest with the human reviewer.
+
+When the AI identifies the PR as low risk and trivial, and if the CI is passing, the reviewer may choose to expedite the approval process, potentially merging the PR with minimal manual intervention. In order to do so, the reviewer should document the rationale for the expedited approval in the PR comments, ensuring transparency and traceability for future reference. If the merge of the PR imples that the build is broken, additional CI tests will need to be put in place to avoid errors in the future.
+
+It is foreseeable that CI test suite will have to be improved to reduce the likelihood of breaking the build when trivial or low-risk PRs are merged with minimal manual intervention and to avoid regressions.
+
+=== Step 4: Merge
+
+Once the PR has passed all required reviews and checks, and any necessary changes have been made, the reviewer or maintainer will approve the PR. The writer of the code will proceed to merge the PR into the main branch. The merge should be done in a way that maintains the integrity of the project’s history and ensures that the CI tests continue to pass.
+
+If the PR was expedited due to being low risk and trivial, the rationale for the expedited merge should be documented in the PR comments, as mentioned in Step 3. After merging, it is important to monitor the CI results to catch any unexpected issues early. We should evaluate the possibility of automatically merging dependabot updates if they meet the low-risk and trivial criteria.
+
+If the PR addresses a critical bug or security vulnerability, the developer will be responsible for ensuring that the code can be merged into the release branch for backporting.
 
 == Alternative workflows for PR review
 === Dependency Review
