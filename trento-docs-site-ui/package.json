@@ -8,7 +8,7 @@
     "url": "https://gitlab.com/antora/antora-ui-default.git"
   },
   "engines": {
-    "node": ">= 8.0.0"
+    "node": "^22.22.3 || ^24.15.0 || >= 26.0.0"
   },
   "browserslist": [
     "last 2 versions"
@@ -18,41 +18,43 @@
     "@fontsource/lato": "^5.3.0",
     "@fontsource/roboto": "~5.3",
     "@fontsource/roboto-mono": "~5.3",
-    "@vscode/gulp-vinyl-zip": "~2.6",
+    "@vscode/gulp-vinyl-zip": "~2.7",
     "autoprefixer": "~10.5",
     "browser-pack-flat": "~3.5",
     "browserify": "~17.0",
-    "cssnano": "~8.0",
+    "cssnano": "~9.0",
     "eos-icons": "^5.4.0",
-    "eslint": "~10.8",
-    "eslint-config-standard": "~17.1",
-    "eslint-plugin-import": "~2.32",
-    "eslint-plugin-node": "~11.1",
-    "eslint-plugin-promise": "~7.3",
-    "eslint-plugin-standard": "~5.0",
+    "eslint": "^10.9.1",
     "fancy-log": "~2.0",
     "fs-extra": "~11.4",
     "gulp": "~5.0",
     "gulp-concat": "~2.6",
     "gulp-connect": "~5.7",
-    "gulp-eslint": "~6.0",
-    "gulp-imagemin": "~9.2",
     "gulp-postcss": "~10.0",
-    "gulp-stylelint": "~13.0",
     "gulp-uglify": "~3.0",
     "handlebars": "~4.7",
-    "highlight.js": "11.11.2",
-    "js-yaml": "~5.2",
-    "merge-stream": "~2.0",
-    "postcss-calc": "~10.1",
+    "highlight.js": "11.12.0",
+    "js-yaml": "~5.4",
+    "neostandard": "^0.14.0-next.1",
+    "postcss-calc": "~11.0",
     "postcss-custom-properties": "~15.0",
     "postcss-import": "~17.0",
     "postcss-url": "~10.1",
-    "prettier-eslint": "~17.1",
     "require-directory": "~2.1",
     "require-from-string": "~2.0",
     "stylelint": "~17.14",
     "stylelint-config-standard": "~40.0",
     "vinyl-fs": "~4.0"
+  },
+  "overrides": {
+    "elliptic": "^6.6.1",
+    "send": "^0.19.2",
+    "browserify": {
+      "glob": "^13.0.6"
+    },
+    "magic-string": "^0.30.21",
+    "body": {
+      "raw-body": "^3.0.2"
+    }
   }
 }

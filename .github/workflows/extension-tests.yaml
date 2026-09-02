@@ -8,27 +8,32 @@ on:
     branches: [main]
     paths:
       - 'trento-docs-site/extensions/**'
+      - 'trento-docs-site/package.json'
+      - 'trento-docs-site/package-lock.json'
+      - '.github/workflows/extension-tests.yaml'
+
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
       - 'trento-docs-site/extensions/**'
+      - 'trento-docs-site/package.json'
+      - 'trento-docs-site/package-lock.json'
+      - '.github/workflows/extension-tests.yaml'
+
   workflow_dispatch:
 
 jobs:
   test-extensions:
     runs-on: ubuntu-24.04
+    # openSUSE-based SUSE BCI image with Node.js 24 preinstalled
+    container:
+      image: registry.suse.com/bci/nodejs:24
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Install Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: trento-docs-site/package-lock.json
       - name: Install dependencies
         working-directory: trento-docs-site
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
       - name: Run extension tests
         working-directory: trento-docs-site
         run: npm test

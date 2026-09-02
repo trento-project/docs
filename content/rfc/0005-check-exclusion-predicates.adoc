@@ -5,7 +5,7 @@
 |Feature Name | Host-level Exclusion Predicates for Check Executions
 |Start Date | Apr 22nd, 2026
 |Category | Architecture, Checks
-|PR | https://github.com/trento-project/wanda/pull/729[Wanda#729] (core logic), https://github.com/trento-project/wanda/pull/731[Wanda#731] (docs), https://github.com/trento-project/web/pull/4188[Web#4188] (UI) |
+|PR | https://github.com/trento-project/wanda/pull/729[Wanda#729] (core logic), https://github.com/trento-project/wanda/pull/731[Wanda#731] (docs), https://github.com/trento-project/web/pull/4188[Web#4188] (UI)
 |===
 
 == Summary

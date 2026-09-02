@@ -5,11 +5,13 @@ name: Validate user facing documentation
 
 on:
   push:
+    branches: [main]
     paths:
       - 'trento/DC-*'
       - 'trento/xml/**'
       - 'trento/adoc/**'
       - 'trento/images/src/**'
+      - '.github/workflows/validate-suse-docs.yaml'
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
@@ -17,6 +19,7 @@ on:
       - 'trento/xml/**'
       - 'trento/adoc/**'
       - 'trento/images/src/**'
+      - '.github/workflows/validate-suse-docs.yaml'
   workflow_dispatch:
 
 jobs:

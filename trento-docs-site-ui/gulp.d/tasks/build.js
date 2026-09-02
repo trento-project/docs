@@ -8,8 +8,6 @@ const browserify = require('browserify')
 const concat = require('gulp-concat')
 const cssnano = require('cssnano')
 const fs = require('fs-extra')
-const imagemin = require('gulp-imagemin')
-const merge = require('merge-stream')
 const ospath = require('path')
 const path = ospath.posix
 const postcss = require('gulp-postcss')
@@ -39,7 +37,7 @@ module.exports = (src, dest, preview) => () => {
       }),
     postcssUrl([
       {
-        filter: (asset) => new RegExp('^[~][^/]*(?:font|typeface)[^/]*/.*/files/.+[.](?:ttf|woff2?)$').test(asset.url),
+        filter: (asset) => /^[~][^/]*(?:font|typeface)[^/]*\/.*\/files\/.+[.](?:ttf|woff2?)$/.test(asset.url),
         url: (asset) => {
           const relpath = asset.pathname.slice(1)
           const abspath = require.resolve(relpath)
@@ -50,7 +48,7 @@ module.exports = (src, dest, preview) => () => {
         },
       },
       {
-        filter: (asset) => new RegExp('^[~]eos-icons/dist/fonts/.+[.](?:ttf|woff|woff2|eot|svg?)$').test(asset.url),
+        filter: (asset) => /^[~]eos-icons\/dist\/fonts\/.+[.](?:ttf|woff|woff2|eot|svg?)$/.test(asset.url),
         url: (asset) => {
           const relpath = asset.pathname.slice(1)
           const abspath = require.resolve(relpath)
@@ -66,13 +64,14 @@ module.exports = (src, dest, preview) => () => {
     //postcssVar({ importFrom: path.join(src, 'css', 'vars.css'), preserve: preview }),
     preview ? postcssCalc : () => {}, // cssnano already applies postcssCalc
     autoprefixer,
-    preview
-      ? () => {}
-      : (css, result) => cssnano({ preset: 'default' })(css, result).then(() => postcssPseudoElementFixer(css, result)),
   ]
+  if (!preview) {
+    // cssnano is a postcss 8 plugin object; add it (and the pseudo-element fixer that
+    // runs after it) directly to the plugin list instead of invoking it manually.
+    postcssPlugins.push(cssnano({ preset: 'default' }), postcssPseudoElementFixer)
+  }
 
-  return merge(
-    vfs.src('ui.yml', { ...opts, allowEmpty: true }),
+  const sources = [
     vfs
       .src('js/+([0-9])-*.js', { ...opts, read: false, sourcemaps })
       .pipe(bundle(opts))
@@ -91,30 +90,39 @@ module.exports = (src, dest, preview) => () => {
     vfs
       .src(['css/site.css', 'css/vendor/*.css'], { ...opts, sourcemaps })
       .pipe(postcss((file) => ({ plugins: postcssPlugins, options: { file } }))),
-    vfs.src('font/*.{ttf,woff*(2)}', opts),
-    vfs.src('img/**/*.{gif,ico,jpg,png,svg}', opts).pipe(
-      preview
-        ? through()
-        : imagemin(
-          [
-            imagemin.gifsicle(),
-            imagemin.jpegtran(),
-            imagemin.optipng(),
-            imagemin.svgo({
-              plugins: [
-                { cleanupIDs: { preservePrefixes: ['icon-', 'view-'] } },
-                { removeViewBox: false },
-                { removeDesc: false },
-              ],
-            }),
-          ].reduce((accum, it) => (it ? accum.concat(it) : accum), [])
-        )
-    ),
+    vfs.src('img/**/*.{gif,ico,jpg,png,svg}', opts).pipe(through()),
     vfs.src('helpers/*.js', opts),
     vfs.src('layouts/*.hbs', opts),
     vfs.src('partials/*.hbs', opts),
-    vfs.src('static/**/*[!~]', { ...opts, base: ospath.join(src, 'static'), dot: true })
-  ).pipe(vfs.dest(dest, { sourcemaps: sourcemaps && '.' }))
+  ]
+  // These sources are optional; an empty vinyl-fs stream collapses the merge, and a
+  // missing base folder makes vinyl-fs throw ENOENT, so only add them when present.
+  if (fs.existsSync(ospath.join(src, 'ui.yml'))) {
+    sources.push(vfs.src('ui.yml', opts))
+  }
+  if (fs.existsSync(ospath.join(src, 'font'))) {
+    sources.push(vfs.src('font/*.{ttf,woff*(2)}', opts))
+  }
+  if (fs.existsSync(ospath.join(src, 'static'))) {
+    sources.push(vfs.src('static/**/*[!~]', { ...opts, base: ospath.join(src, 'static'), dot: true }))
+  }
+
+  // NOTE vinyl-fs 4 uses streamx internally, which merge-stream cannot combine reliably
+  // (empty sources collapse the merge), so write each source independently and await all.
+  const destOpts = { sourcemaps: sourcemaps && '.' }
+  return Promise.all(sources.map((source) => streamToPromise(source.pipe(vfs.dest(dest, destOpts)))))
+}
+
+function streamToPromise (stream) {
+  return new Promise((resolve, reject) => {
+    let settled = false
+    const settle = (err) => {
+      if (settled) return
+      settled = true
+      err ? reject(err) : resolve()
+    }
+    stream.on('error', settle).on('finish', settle).on('end', settle).on('close', settle)
+  })
 }
 
 function bundle ({ base: basedir, ext: bundleExt = '.bundle.js' }) {
