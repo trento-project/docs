@@ -11,7 +11,7 @@ include::partials/supported-versions.adoc[]
 [[mcp-systemd-install-rpm]]
 ===== Installing {tr_mcp} using RPM packages
 
-. Install the {tr_mcp} package:
+* Install the {tr_mcp} package:
 +
 [source,bash,subs="attributes"]
 ----
@@ -76,8 +76,8 @@ If `OAS_PATH` is set, it takes precedence and `TRENTO_URL` is ignored.
 [[mcp-systemd-start]]
 ====== Start the {tr_mcp} service
 
-Enable and start the {tr_mcp} service:
-
+* Enable and start the {tr_mcp} service:
++
 [source,bash,subs="attributes"]
 ----
 systemctl enable --now {tr_mcp_binary}
