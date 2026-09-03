@@ -11,6 +11,8 @@ on:
       - 'trento-docs-site/package.json'
       - 'trento-docs-site/package-lock.json'
       - '.github/workflows/extension-tests.yaml'
+      - 'versions.yml'
+      - 'scripts/**'
 
   pull_request:
     types: [opened, synchronize, reopened]
@@ -19,18 +21,34 @@ on:
       - 'trento-docs-site/package.json'
       - 'trento-docs-site/package-lock.json'
       - '.github/workflows/extension-tests.yaml'
+      - 'versions.yml'
+      - 'scripts/**'
 
   workflow_dispatch:
 
 jobs:
-  test-extensions:
+  prepare:
     runs-on: ubuntu-24.04
-    # openSUSE-based SUSE BCI image with Node.js 24 preinstalled
-    container:
-      image: registry.suse.com/bci/nodejs:24
+    outputs:
+      node_image: ${{ steps.read-image.outputs.image }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Read Node.js image from versions.yml
+        id: read-image
+        run: echo "image=$(scripts/check-node-version.sh image)" >> "$GITHUB_OUTPUT"
+
+  test-extensions:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    # SUSE BCI image taken from versions.yml, the same one docker-compose.yml uses
+    container:
+      image: ${{ needs.prepare.outputs.node_image }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check the Node.js version against .tool-versions
+        run: scripts/check-node-version.sh
       - name: Install dependencies
         working-directory: trento-docs-site
         run: npm ci --no-audit --no-fund
