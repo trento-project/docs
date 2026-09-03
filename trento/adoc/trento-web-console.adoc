@@ -237,7 +237,7 @@ Applies to clusters using file-based SBD fencing.
 |critical
 |===
 
-Overall status of {hana} database instances / {sap} instances:
+Overall status of {hana} database instances / {sap} instances::
 `sapcontrol` reports a status for each {hana} database instance and each {sap} application instance, which {tr_web} shows as a color.
 +
 [options="header"]
