@@ -11,6 +11,8 @@ on:
       - 'trento-docs-site/**'
       - 'trento-docs-site-ui/build/ui-bundle.zip'
       - '.github/workflows/build-page.yaml'
+      - 'versions.yml'
+      - 'scripts/**'
   workflow_dispatch:
   schedule:
     - cron: '0 13 * * 4' # Every Thursday at 1:00 PM UTC
@@ -22,16 +24,30 @@ concurrency:
 permissions:
   contents: read
 jobs:
-  build:
+  prepare:
     runs-on: ubuntu-24.04
-    # openSUSE-based SUSE BCI image with Node.js 24 preinstalled
+    outputs:
+      node_image: ${{ steps.read-image.outputs.image }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Read Node.js image from versions.yml
+        id: read-image
+        run: echo "image=$(scripts/check-node-version.sh image)" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    # SUSE BCI image taken from versions.yml, the same one docker-compose.yml uses
     container:
-      image: registry.suse.com/bci/nodejs:24
+      image: ${{ needs.prepare.outputs.node_image }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
+    - name: Check the Node.js version against .tool-versions
+      run: scripts/check-node-version.sh
     - name: Configure Pages
       if: github.event_name != 'pull_request'
       uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0

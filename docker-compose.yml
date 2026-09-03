@@ -1,8 +1,13 @@
 # SPDX-FileCopyrightText: SUSE LLC
 # SPDX-License-Identifier: Apache-2.0
 
+# Every Node.js service imports the image from versions.yml, so they all run the
+# same Node.js and none of them can pin a different one. Each service verifies
+# on start that the image matches .tool-versions.
 x-node-base: &node-base
-  image: registry.suse.com/bci/nodejs:24-base
+  extends:
+    file: versions.yml
+    service: node
 
 x-http-health: &http-health
   interval: 5s
@@ -19,6 +24,7 @@ services:
       - trento-docs-node-modules:/workspace/trento-docs-site/node_modules
     command: >
       bash -lc "
+        /workspace/scripts/check-node-version.sh &&
         npm ci &&
         npx antora antora-playbook.yml
       "
@@ -31,6 +37,7 @@ services:
       - .:/workspace:z
     command: >
       bash -lc "
+        /workspace/scripts/check-node-version.sh &&
         npx --yes http-server build/trento-docs-site-public/ -c-1 -p 3000
       "
     ports:
@@ -61,8 +68,15 @@ services:
       - "${PORT:-3001}:3001"
     volumes:
       - ./trento/build/SLES-SAP-trento/html/SLES-SAP-trento:/srv:ro
+      # Only what the version check needs; the repository is not mounted here
+      - ./scripts:/workspace/scripts:ro
+      - ./versions.yml:/workspace/versions.yml:ro
+      - ./.tool-versions:/workspace/.tool-versions:ro
     command: >
-      bash -lc "npx --yes http-server /srv -c-1 -p 3001"
+      bash -lc "
+        /workspace/scripts/check-node-version.sh &&
+        npx --yes http-server /srv -c-1 -p 3001
+      "
     depends_on:
       suse-daps-build:
         condition: service_completed_successfully
@@ -77,8 +91,15 @@ services:
       - "${PORTPDF:-3002}:3002"
     volumes:
       - ./trento/build/SLES-SAP-trento/:/srv:ro
+      # Only what the version check needs; the repository is not mounted here
+      - ./scripts:/workspace/scripts:ro
+      - ./versions.yml:/workspace/versions.yml:ro
+      - ./.tool-versions:/workspace/.tool-versions:ro
     command: >
-      bash -lc "npx --yes http-server /srv -c-1 -p 3002"
+      bash -lc "
+        /workspace/scripts/check-node-version.sh &&
+        npx --yes http-server /srv -c-1 -p 3002
+      "
     depends_on:
       suse-daps-build:
         condition: service_completed_successfully

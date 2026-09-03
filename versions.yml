@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: SUSE LLC
+# SPDX-License-Identifier: Apache-2.0
+
+# Single source of truth for the Node.js image used by every container.
+#
+# It is shaped as a Compose file so that docker-compose.yml can import it
+# directly with `extends`, which means the compose services cannot define a
+# different image by accident. The CI workflows read the same value into their
+# job container, so local previews and CI always run the same Node.js.
+#
+# The image below is the only place the registry, the repository, the version
+# and the flavour are written down. scripts/check-node-version.sh derives
+# everything from it: `check` verifies it against the nodejs entry in
+# .tool-versions and against the running Node.js, and `latest` reports the
+# newest matching tag published in registry.suse.com.
+#
+# Set CONTAINER_IMAGE_TAG to try another version without editing this file:
+#
+#   CONTAINER_IMAGE_TAG=24.18.0 docker compose up trento-docs
+#
+# Note that ARG and ENV are Dockerfile directives; they are not valid here and
+# Compose would refuse to load this file. Interpolation is the only mechanism
+# Compose supports, and it reads the environment, never this file.
+services:
+  node:
+    # Update the default version in the CONTAINER_IMAGE_TAG environment variable to align.
+    image: registry.suse.com/bci/nodejs:${CONTAINER_IMAGE_TAG:-24.18.1}-base
