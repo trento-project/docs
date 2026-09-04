@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[trento-report-issue]]
 == Reporting an issue
-:revdate: 2026-06-19
+:revdate: 2026-08-28
 
 To report an issue with {trento}, open a support case through the appropriate channel, collect the required diagnostic data from {trserver} and the relevant {tragent}s, and attach all that information to your support case.
 
@@ -17,6 +17,11 @@ or through the corresponding vendor, depending on their licensing model.
 * Specify the relevant deployment option for {trserver}: {k8s}, or systemd deployment.
 
 * Depending on your deployment type, use the corresponding procedure to collect and provide either <<collecting-server-diagnostic-data-k3s, K3s server diagnostic data>> or <<collecting-server-diagnostic-data-systemd, systemd server diagnostic data>>.
++
+[NOTE]
+====
+If the issue is reproducible, set the log level of the affected components to `debug`, reproduce the issue and then collect the diagnostic data. Traces written before the change are not affected by the new level. For more information, see <<sec-configuring-log-levels>>.
+====
 
 * If the issue involves a particular {tragent} or a component discovered by it, you must also provide <<collecting-agent-diagnostic-data, {tragent} diagnostic data>>.
 
