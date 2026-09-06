@@ -1,0 +1,291 @@
+== 5. Persistent Filter and Pagination Settings
+
+[width="100%",cols="<18%,<82%",]
+|===
+|Feature Name | Persistent Filter and Pagination Settings
+|Start Date | May 19th, 2026
+|Category | Architecture, UI
+|PR | TBD
+|===
+
+== Summary
+
+Filter selections and pagination state (current page, page size) in Trento's overview views should survive navigation, browser restarts, and re-logins. State is scoped per-user, and the URL always reflects what the user is currently looking at so that views remain shareable.
+
+This RFC defines the user-observable behaviour. It is deliberately silent on implementation details (storage layer, framework hooks, file layout).
+
+=== Use Cases outline
+
+ * As a user, I want my filter and pagination choices on a view to be restored when I navigate away and come back, so I don't have to reconfigure them every time
+ * As a user, I want my choices to survive closing and reopening the browser, and logging out and back in, so my working context is preserved
+ * As a user, I want my choices to be private to me, so other users on the same Trento instance don't see or affect my view state
+ * As a user, I want the URL in the address bar to always describe what I'm currently looking at, so I can copy and share a link to a specific filtered/paginated view
+ * As a user opening a shared link, I want the URL to take precedence over my own saved settings for that load only, so I can inspect a colleague's view without losing my own preferences
+
+== Motivation
+
+Today, every time a user opens a Trento overview view, the filters and pagination reset to their defaults. Users who routinely work with a specific subset of the data (e.g. clusters in a given environment, hosts with critical issues) must reapply the same filters on every visit. The Checks results views already persist filters today, but the mechanism is ad-hoc and the behaviour does not extend to other views.
+
+This RFC proposes a uniform model so that every overview view in scope behaves consistently, and so that view state becomes shareable via URL.
+
+=== Glossary
+
+These terms appear throughout the RFC with the meaning given here.
+
+[width="100%",cols="<25%,<75%",]
+|===
+|Term |Definition
+
+|*View*
+|A distinct page in the Trento UI reached by a single route (e.g. Hosts overview, Clusters overview, Activity log). Not a browser tab.
+
+|*Browser tab*
+|A single tab in the user's browser, with its own URL, history, and loaded copy of the application. The same view in two tabs is two independent workspaces.
+
+|*Settings*
+|The combination of (a) the active filter selection and (b) the active pagination state (current page number and current page size) for a given view. Sort order is out of scope.
+
+|*Default settings*
+|The state in which a view loads when no filter has ever been chosen and pagination is untouched. Defined by each view's existing implementation; this RFC does not change defaults.
+
+|*Persisted settings*
+|The settings most recently applied by the user in a given view, stored such that they can be restored later. One record per (user, view).
+|===
+
+== Goals
+
+* Filter and pagination choices in each in-scope view survive navigation, browser restart, and re-login
+* Different users on the same Trento instance do not see each other's settings
+* The URL always reflects the currently visible view state, so any view is shareable by copying the URL
+* Opening a shared URL never destroys the recipient's own saved preferences
+
+=== Non-goals
+
+* Synchronising settings across devices or across different browsers on the same machine
+* An undoable history of filter changes (explicitly rejected by the Product Owner)
+* Real-time synchronisation of state between two browser tabs already open on the same view
+* Sort order persistence (deferred to a future RFC)
+* A user-visible "reset to defaults" control (deferred)
+
+== Detailed Design
+
+=== Scope: which views and which settings
+
+==== Views with persistent filters
+
+The following views MUST persist filter selections:
+
+ * Dashboard
+ * Hosts overview
+ * Relevant patches overview
+ * Upgradable packages overview
+ * Clusters overview
+ * HANA databases overview
+ * SAP systems overview
+ * Activity log
+ * Checks catalog
+ * Checks results view — hosts
+ * Checks results view — clusters
+
+==== Views with persistent pagination
+
+The following views MUST persist pagination state (current page and page size):
+
+ * Hosts overview
+ * Relevant patches overview
+ * Upgradable packages overview
+ * Clusters overview
+ * HANA databases overview
+ * SAP systems overview
+ * Activity log
+
+Views that persist filters but not pagination (Dashboard, Checks catalog, Checks results) are out of scope for pagination persistence.
+
+==== Existing Checks results behaviour
+
+The two Checks results views already persist filters. Existing behaviour MUST be preserved. The underlying mechanism may remain different from the other views, provided the externally observable behaviour described in this RFC is satisfied.
+
+==== What is persisted
+
+For each in-scope view, the persisted filter state is the *complete current selection* across all filterable controls on that view. Partial persistence is not permitted: if a view has three filter dropdowns and the user has set values in two, all three filter states (including the empty one) are part of the settings.
+
+The persisted pagination state is exactly two values: the current page number and the current page size.
+
+Sort order is *not* persisted by this RFC.
+
+=== Core behavioural rules
+
+==== Last-write-wins
+
+There is exactly *one* persisted settings record per (user, view). Each change overwrites it. There is no history.
+
+==== Per-view independence
+
+Changing the settings of view X has no effect on the settings of view Y. This is true for every pair of distinct views, with no exceptions.
+
+==== Per-user isolation
+
+A user's persisted settings are invisible and inaccessible to any other user. When user A is signed in, no settings from any other user influence any view A sees.
+
+==== Default-on-first-encounter
+
+The first time a given user opens a given view, no persisted settings record exists for (user, view) and the view loads with default settings. The record is created the first time the user makes any explicit change to a filter or pagination control on that view, and is overwritten on every subsequent change. What is stored is always the user's current complete settings, regardless of whether they happen to coincide with the view's defaults.
+
+==== Survival across reloads and sessions
+
+If a user has persisted settings for a view, those settings MUST be applied the next time the user opens that view, including:
+
+ * after navigating away to another view and back
+ * after refreshing the browser
+ * after closing the browser and reopening it
+ * after logging out and back in as the same user
+ * after the browser is restarted following a crash or reboot
+
+==== Filter changes reset pagination
+
+When a user changes a filter on a view that also has persistent pagination, the current page number resets to 1. The page size does not reset. This matches conventional paginated-list behaviour and avoids landing the user on an empty page when the filtered result set shrinks.
+
+==== Pagination changes do not affect filters
+
+Changing the page number or page size never modifies any filter selection.
+
+==== The URL always reflects the currently visible view state
+
+While the user is on a view, the URL in the address bar MUST accurately describe what the user is currently looking at, such that copying the URL and opening it in a different browser, tab, or session produces a view with the same filter and pagination state.
+
+When the user changes a filter or pagination value, the URL is updated *in place* to encode the new state. The URL update MUST NOT add a new browser-history entry — back/forward must navigate between visited views, not between intermediate filter/pagination states.
+
+=== Behavioural specification
+
+==== Opening a view without filter or pagination parameters
+
+This covers all of the following, which behave identically:
+
+ * clicking the view's entry in the top or side navigation
+ * clicking a breadcrumb that leads to the view
+ * clicking an in-app link or button that leads to the view
+ * typing or pasting the bare URL of the view into the address bar
+ * following a bookmark whose URL has no filter or pagination parameters
+
+In every one of these cases, the view loads with:
+
+ * the persisted settings for (current user, that view), if such a record exists;
+ * otherwise the view's default settings.
+
+The method of arrival does NOT affect what is shown.
+
+==== Opening a view via a URL that contains parameters
+
+When the view is loaded via a URL that explicitly encodes one or more filter or pagination values (a bookmark, a shared link, address-bar entry, a back/forward navigation that lands on such a URL):
+
+ * *Per-key precedence.* Precedence is decided independently for each setting key. For any key present in the URL, the URL value wins. For any key absent, the persisted value is used if a record exists, otherwise the default. This makes partial URLs work as expected: a colleague who shares "just the critical filter" does not blow away the recipient's preferred page size.
+ * The persisted settings record for (user, view) MUST NOT be modified by loading such a URL.
+
+*Rationale:* opening a shared link must show the sender's filter, but must not silently overwrite the recipient's own saved preferences.
+
+==== The user changes a filter or pagination setting
+
+Three things happen, and all three MUST happen:
+
+ . The view updates to reflect the new setting
+ . The URL is updated in place (no new history entry) to reflect the new complete settings
+ . The persisted settings record for (current user, that view) is updated to the new complete settings; if no such record existed, it is created
+
+This is the only interaction that writes to persisted settings. The URL update and the persisted-settings update are independent: failure of one MUST NOT prevent the other.
+
+==== Browser back / forward
+
+Back/forward navigates between previously- and next-visited views. When a destination view loads, it follows the rules above based on the URL of that history entry:
+
+ * If the URL has no filter/pagination parameters, the view loads with the current persisted settings
+ * If the URL has parameters, the view loads with what the URL describes (per-key precedence)
+ * A back/forward navigation never modifies persisted settings
+ * Changing a filter or pagination value does *not* add a new browser-history entry — users cannot use back/forward to undo a filter change within the same view (intentional, requested by the Product Owner)
+
+Because filter/pagination changes update the URL in place, the history entry the back button restores already encodes the latest state — so the practical outcome is that visiting a view via back/forward shows the settings the user most recently had there.
+
+==== Multi-tab semantics
+
+Each browser tab is an independent workspace. Each tab loads from URL and/or storage at its own moment of loading and then remains stable in memory until it loads again. Tabs share storage but do not share live state.
+
+*At load time:* every load applies the rules above based on that tab's OWN URL at that moment. No other tab influences this load. Two tabs that load at different moments may show different state, because storage may have been written between the two loads.
+
+*After another tab makes a change:* storage is updated immediately, but other tabs displaying the same view are NOT required to update their visible state. Each tab picks up the latest storage on its next load (refresh, in-app navigation away and back, back/forward landing on the view).
+
+*Concurrent writes ("last writer wins"):* when two tabs both write, the write that happens LAST wins in its entirety. There is no merging. Worked example:
+
+ . Initial storage: `{ filter: critical, page_size: 20 }`
+ . Tab 1 loads — shows `{ critical, 20 }`
+ . Tab 2 loads — shows `{ critical, 20 }`
+ . User changes filter in tab 2 to "warning". Storage is now `{ warning, 20 }`
+ . User then changes page size in tab 1 to 50. Tab 1's in-memory state was `{ critical, 20 }`; after the change it writes its complete state. *Storage is now `{ critical, 50 }`. Tab 2's filter change has been wiped.*
+
+This is accepted as a known edge case.
+
+*Per-tab URL evolution:* every change a user makes in a tab updates THAT tab's URL in place. Other tabs' URLs are not affected. Copying the URL from one tab gives that tab's state and does not leak the other tab's state.
+
+==== Sign-out and sign-in
+
+Sign-out does NOT clear persisted settings. When a user signs back in as the same user, all their persisted settings MUST be restored. When a different user signs in on the same browser, they see their own persisted settings (or defaults if none); the first user's settings remain stored and are restored on that user's next sign-in.
+
+==== Forward compatibility: filters added, removed, or renamed
+
+If a deployed change adds, removes, or renames a filter on a view, the loading behaviour for users with old persisted settings MUST be:
+
+ * Filter values whose keys no longer exist on the view are ignored
+ * Filter values whose keys exist but whose stored value is no longer valid (e.g. references a deleted enum option) are ignored for that filter key
+ * The remaining valid filter values are applied normally
+ * Stored page size: applied if it matches one of the view's current page-size options, otherwise the view falls back to its default page size
+ * Stored page number: applied if positive and ≤ the number of pages in the (filtered) result set; otherwise clamped to the last available page (or page 1 if empty); zero, negative, missing, or non-numeric values fall back to page 1
+
+The view MUST NOT fail to load because of stale or malformed persisted settings, and the user MUST NOT see an error. Whenever loaded values are normalised away from what was stored, the next change made by the user writes the normalised state back, so stored state self-heals over time.
+
+==== Storage failures
+
+If reading persisted settings fails, the view loads with default settings as if the user had never visited it. No error is shown.
+
+If writing persisted settings fails, the change is still applied to the view in memory and is still reflected in the URL, so within-session behaviour — including share-by-URL and browser back/forward — continues to work. Only cross-session persistence is lost. No error is shown. The session degrades gracefully to URL-only persistence for the remainder of the session.
+
+=== Acceptance criteria
+
+Each criterion below is a single, independently verifiable test. The implementation is correct only when every criterion passes, for each in-scope view.
+
+ . *Navigate-away-and-back preserves settings.* Configure non-default settings, navigate away, navigate back. Settings are restored.
+ . *Refresh preserves settings.* Configure non-default settings, refresh the browser. Settings are restored.
+ . *Close-and-reopen preserves settings.* Configure non-default settings, close the browser entirely, reopen and return to the view. Settings are restored.
+ . *Logout-and-back-in preserves settings.* Configure non-default settings, log out, log back in as the same user. Settings are restored.
+ . *Defaults on first encounter.* Sign in as a user who has never opened the view. Defaults apply; nothing is pre-filtered.
+ . *Per-user isolation.* As user A configure non-default settings, sign out, sign in as user B (never having configured this view). View loads with defaults for B. Sign back in as A; A's settings are restored.
+ . *Per-view independence.* Configuring view X has no effect on view Y, and vice versa.
+ . *Back button shows current state, not historical state.* Configure F1 in view X, navigate to view Y, return to X by another route, change to F2, navigate to Y, press back. View X shows F2, not F1.
+ . *Shared URL takes precedence on load; storage is not overwritten.* As a user with persisted F1, open a URL encoding F2. View shows F2. Navigate away and back via the nav link. View shows F1.
+ . *Filter change resets pagination to page 1; page size unchanged.* Set page size 50, navigate to page 3, change a filter. Page is 1; page size is still 50.
+ . *Pagination change does not modify filters.* Filter is unchanged in UI and in storage after a page or page-size change.
+ . *Stale stored settings degrade gracefully.* Simulate a stored filter referencing a no-longer-existing option, or a stored page number beyond the result set. The view loads without error; invalid parts are ignored; the rest applies.
+ . *Storage failure degrades gracefully.* With localStorage unavailable (private browsing, quota exceeded), the view loads with defaults; no error is shown.
+ . *Two tabs, second tab loads from current storage.* Open view X in tab 1, configure F1. Open view X in tab 2 via the nav link. Tab 2 shows F1.
+ .. *Change in one tab does not auto-update the other.* In tab 2 change to F2. Tab 1's currently displayed state is unchanged. Refresh tab 1; it now shows F2.
+ .. *Last-writer-wins concurrent edit.* Reproduce the worked example above; verify tab 2's filter change is overwritten by tab 1's page-size change.
+ .. *Per-tab URL independence.* Each tab's URL reflects its own filter; copying either gives that tab's state.
+ .. *Duplicating a tab.* Tab duplication produces the same URL and the same state.
+ .. *In-app link in new tab loads from storage.* Ctrl/Cmd-clicking an in-app link opens a new tab with no URL parameters; it loads from storage.
+ .. *Tabs on different views are independent.* No interaction between tab 1 on view X and tab 2 on view Y.
+ . *Existing Checks results filter persistence not regressed.* Pre-existing behaviour on Hosts and Clusters checks-results views continues exactly as today.
+ . *URL reflects current state.* Copying the URL from user A and opening it as user B reproduces A's view; B's own stored settings are not modified.
+ . *Partial URL parameters honour the rest from storage.* As user A with persisted F and page size 50, open a URL encoding F2 but no page-size parameter. View shows F2 and page size 50; storage unchanged.
+ . *Filter and pagination changes do not pollute browser history.* After several filter and pagination changes within a view, pressing back navigates away from the view, not through intermediate states.
+ . *Page number is clamped, never errors.* A stored page number larger than the current result set loads as the last valid page (or page 1 if empty); no error.
+
+== Drawbacks
+
+* *Concurrent multi-tab writes can silently overwrite each other.* Two tabs editing the same view independently will resolve last-writer-wins with no warning. The application does not surface a "settings changed in another tab" indicator. Workarounds available to the user: refresh the older tab before editing, or close one of the tabs.
+
+* *URLs can drift from stored state.* Because opening a shared URL does not modify stored settings, a user's bookmark may not match what is currently in storage. The drift is bounded: the next user-initiated change writes the current settings back to storage.
+
+* *Forward-compatibility behaviour is implicit.* Stored values that no longer match the current view definition are silently ignored or clamped. Users are not told that some of their saved preferences were dropped; the next change self-heals storage.
+
+== Unresolved questions
+
+ * *Sort order persistence.* Not in this RFC. Worth considering as a follow-up; the same model would extend naturally to sort, with the same caveats.
+ * *Reset-to-defaults control.* No user-visible action to clear persisted settings is included. Worth considering as a follow-up.
+ * *Cross-device sync.* Settings are scoped to the user but stored in the browser. A user signing in from a different machine sees defaults on that machine. Server-side storage of preferences could lift this limitation in the future but is out of scope here.
