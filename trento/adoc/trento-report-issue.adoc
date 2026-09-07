@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[trento-report-issue]]
 == Reporting an issue
-:revdate: 2026-08-28
+:revdate: 2026-09-07
 
 To report an issue with {trento}, open a support case through the appropriate channel, collect the required diagnostic data from {trserver} and the relevant {tragent}s, and attach all that information to your support case.
 

@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-configuring-log-levels]]
 === Configuring log levels
-:revdate: 2026-08-28
+:revdate: 2026-09-07
 
 You can adjust the level of detail that {trserver} components write to their logs to manage disk space, capture more detailed information, for example for troubleshooting purposes, or to reduce log noise. The available log levels are `debug`, `info`, `warning` and `error`, and the default level is `info` for every component and deployment type. You can change log levels for {tr_web}, {tr_wanda} and {tr_mcp}.
 
@@ -43,7 +43,7 @@ After the diagnostic data is collected, we recommend setting the level back to `
 
 `warning`:: Prints traces about potentially dangerous situations that require attention. These traces do not mean that the system works incorrectly.
 
-`error`:: Prints traces about failures or about data that a component receives but cannot process. These traces require attention. Certain `error` traces can also indicate an incorrect setup of your SAP systems.
+`error`:: Prints traces about failures or about data that a component receives but cannot process. These traces require attention.
 
 [[log-levels-kubernetes]]
 ==== Configuring log levels on {k8s} deployments

@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-managing-trento-server-storage]]
 === Managing {trserver} storage
-:revdate: 2026-08-28
+:revdate: 2026-09-07
 
 To preserve peak performance and manage disk space, administrators can optimize the storage used by {trserver} by adjusting data retention.
 
