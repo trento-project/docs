@@ -119,7 +119,7 @@ Third-party dependencies:
 Diagnostics tooling:
 
 `supportutils`::
-  Installs the {suse} `supportutils` package and the Trento-specific `supportutils-plugin-trento` plugin on {trserver} and {tragent} hosts, so that `supportconfig` can collect Trento diagnostics.
+  Installs the {suse} `supportutils` package and the {trento}-specific `supportutils-plugin-trento` plug-in on {trserver} and {tragent} hosts, so that `supportconfig` can collect {trento} diagnostics.
 
 The `ansible-trento` package provides an {ansible} role for every one of these components.
 
@@ -319,8 +319,8 @@ You can find the full listing on the https://github.com/trento-project/ansible[{
 [[ansible-support-tooling]]
 ==== Support tooling
 
-The `server`, `agent`, and `site` playbooks install the {suse} `supportutils` package together with the Trento-specific `supportutils-plugin-trento` plugin.
-This allows `supportconfig` to collect Trento diagnostics on both {trserver} and {tragent} hosts.
+The `server`, `agent`, and `site` playbooks install the {suse} `supportutils` package together with the {trento}-specific `supportutils-plugin-trento` plug-in.
+This allows `supportconfig` to collect {trento} diagnostics on both {trserver} and {tragent} hosts.
 The installation is performed by the `supportutils` role and is enabled by default; no additional opt-in is required.
 
 [[ansible-support-tooling-configuration]]
@@ -333,7 +333,7 @@ Override the following role-level variables in your inventory to change the defa
 |Name |Default |Description
 | `supportutils_enabled` | `true` | Set to `false` to skip installation entirely.
 | `supportutils_package_name` | `supportutils` | Base {suse} diagnostics package name.
-| `supportutils_plugin_package_name` | `supportutils-plugin-trento` | Trento plugin package name.
+| `supportutils_plugin_package_name` | `supportutils-plugin-trento` | {trento} plug-in package name.
 | `supportutils_update_cache` | `true` | Refresh the {zypper} cache before installing.
 |===
 
@@ -353,10 +353,10 @@ After the playbook runs, generate a support archive on any installed host with:
 
 [source,console,subs="attributes"]
 ----
-{prompt_sudo} supportconfig
+{sudo} supportconfig
 ----
 
-The resulting tarball includes the Trento-specific data collected by the plugin and can be attached to {suse} support cases.
+The resulting tarball includes the {trento}-specific data collected by the plug-in and can be attached to {suse} support cases.
 
 [[ansible-cleanup]]
 ===== Cleanup behavior
