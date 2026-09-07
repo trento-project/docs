@@ -12,6 +12,7 @@ on:
       - 'trento-docs-site/package-lock.json'
       - '.github/workflows/extension-tests.yaml'
       - 'versions.yml'
+      - '.tool-versions'
       - 'scripts/**'
 
   pull_request:
@@ -22,6 +23,7 @@ on:
       - 'trento-docs-site/package-lock.json'
       - '.github/workflows/extension-tests.yaml'
       - 'versions.yml'
+      - '.tool-versions'
       - 'scripts/**'
 
   workflow_dispatch:

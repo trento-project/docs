@@ -11,6 +11,7 @@ on:
       - 'trento-docs-site/**'
       - 'trento-docs-site-ui/build/ui-bundle.zip'
       - '.github/workflows/build-page.yaml'
+      - '.tool-versions'
       - 'versions.yml'
       - 'scripts/**'
   workflow_dispatch:

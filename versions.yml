@@ -16,12 +16,9 @@
 #
 # Set CONTAINER_IMAGE_TAG to try another version without editing this file:
 #
-#   CONTAINER_IMAGE_TAG=24.18.0 docker compose up trento-docs
+#   CONTAINER_IMAGE_TAG=24.18.0 podman compose up trento-docs
 #
-# Note that ARG and ENV are Dockerfile directives; they are not valid here and
-# Compose would refuse to load this file. Interpolation is the only mechanism
-# Compose supports, and it reads the environment, never this file.
 services:
   node:
-    # Update the default version in the CONTAINER_IMAGE_TAG environment variable to align.
+    # Update the default version below for CONTAINER_IMAGE_TAG or an environment variable to update this.
     image: registry.suse.com/bci/nodejs:${CONTAINER_IMAGE_TAG:-24.18.1}-base

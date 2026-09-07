@@ -47,19 +47,93 @@ $offenders
 ARG and ENV are Dockerfile directives; use \${NAME:-default} interpolation instead."
 }
 
-# Resolve Compose interpolation the way Compose does: an environment variable
-# wins, otherwise the :- default written in the file is used.
+# Resolve Compose interpolation exactly as Compose does, so this script can
+# never report a different image from the one Compose would pull.
+#
+#   $NAME           the value, empty when unset
+#   ${NAME}         the same
+#   ${NAME:-alt}    NAME when non-empty, otherwise alt
+#   ${NAME-alt}     NAME when set, even if empty, otherwise alt
+#   ${NAME:+alt}    alt when NAME is non-empty, otherwise empty
+#   ${NAME+alt}     alt when NAME is set, even if empty, otherwise empty
+#   ${NAME:?msg}    NAME when non-empty, otherwise an error
+#   ${NAME?msg}     NAME when set, even if empty, otherwise an error
+#   $$              a literal $
+#
+# The colon matters: the :- and :+ forms treat a set-but-empty variable as
+# empty, while - and + only ask whether the variable is set at all.
+#
+# The input is consumed once, left to right, appending to `out`. Two properties
+# fall out of that and neither is optional:
+#
+#   - $$ is recognised before the text after it is examined, so the {NAME} in
+#     $${NAME} stays literal instead of being read as a reference;
+#   - a substituted value is appended and never looked at again, so a variable
+#     whose value happens to contain ${...} is not expanded a second time.
+#     Compose does not re-expand either, and doing so would let the environment
+#     redirect which image is used.
 resolve_interpolation() {
-  local text="$1" name default value
+  local out="" rest="$1" literal match name op arg value resolved is_set
 
-  while [[ "$text" =~ \$\{([A-Za-z_][A-Za-z0-9_]*)(:?-([^}]*))?\} ]]; do
-    name="${BASH_REMATCH[1]}"
-    default="${BASH_REMATCH[3]}"
-    value="${!name:-$default}"
-    text="${text/"${BASH_REMATCH[0]}"/$value}"
+  while [ -n "$rest" ]; do
+    case "$rest" in
+    '$$'*)
+      out+='$'
+      rest="${rest:2}"
+      continue
+      ;;
+    '$'*)
+      if [[ "$rest" =~ ^\$\{([A-Za-z_][A-Za-z0-9_]*)(:?[-?+])?([^}]*)\} ]]; then
+        match="${BASH_REMATCH[0]}"
+        name="${BASH_REMATCH[1]}"
+        op="${BASH_REMATCH[2]}"
+        arg="${BASH_REMATCH[3]}"
+      elif [[ "$rest" =~ ^\$([A-Za-z_][A-Za-z0-9_]*) ]]; then
+        match="${BASH_REMATCH[0]}"
+        name="${BASH_REMATCH[1]}"
+        op=""
+        arg=""
+      else
+        die "malformed interpolation in $versions_file: $rest
+Use \$NAME, \${NAME:-default} or \$\$ for a literal \$."
+      fi
+      ;;
+    *)
+      # Literal run up to the next $, which the branches above then handle.
+      literal="${rest%%\$*}"
+      out+="$literal"
+      rest="${rest#"$literal"}"
+      continue
+      ;;
+    esac
+
+    if [ -n "${!name+set}" ]; then is_set=yes; else is_set=no; fi
+    value="${!name-}"
+
+    case "$op" in
+    "")
+      [ -z "$arg" ] || die "unsupported interpolation in $versions_file: $match"
+      resolved="$value"
+      ;;
+    ":-") [ -n "$value" ] && resolved="$value" || resolved="$arg" ;;
+    "-") [ "$is_set" = yes ] && resolved="$value" || resolved="$arg" ;;
+    ":+") [ -n "$value" ] && resolved="$arg" || resolved="" ;;
+    "+") [ "$is_set" = yes ] && resolved="$arg" || resolved="" ;;
+    ":?")
+      [ -n "$value" ] || die "$name is unset or empty in $versions_file: ${arg:-required}"
+      resolved="$value"
+      ;;
+    "?")
+      [ "$is_set" = yes ] || die "$name is unset in $versions_file: ${arg:-required}"
+      resolved="$value"
+      ;;
+    esac
+
+    out+="$resolved"
+    rest="${rest:${#match}}"
   done
 
-  echo "$text"
+  echo "$out"
 }
 
 # The single image reference in versions.yml, with interpolation applied.
