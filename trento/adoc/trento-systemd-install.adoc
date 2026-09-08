@@ -311,10 +311,16 @@ AMQP_URL=amqp://TRENTO_USER:TRENTO_USER_PASSWORD@localhost:5672/vhost
 DATABASE_URL=ecto://WANDA_USER:WANDA_PASSWORD@localhost/wanda
 PORT=4001
 LOG_LEVEL=info
+IPV4_OR_IPV6=ipv4
 SECRET_KEY_BASE=some-secret
 OAS_SERVER_URL=https://trento.example.com/wanda
 AUTH_SERVER_URL=http://localhost:4000
 ----
++
+[NOTE]
+====
+Ensure the `IPV4_OR_IPV6` variable matches the value you configured for the {tr_web} service in the previous step.
+====
 
 . Secure the configuration files.
 +
@@ -516,6 +522,14 @@ server {
     }
 }
 ----
+====
++
+[NOTE]
+====
+The previous example reaches {tr_web} and {tr_wanda} over IPv4. If you set `IPV4_OR_IPV6=ipv6` in the service configuration files, adjust the NGINX configuration accordingly:
+
+* Change the upstream addresses from `127.0.0.1` to `[::1]`.
+* Add IPv6 listeners to the `server` blocks: `listen [::]:80;` and `listen [::]:443 ssl;`.
 ====
 
 ===== Prepare SSL certificate for NGINX
