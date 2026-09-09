@@ -2,7 +2,7 @@
 ifndef::site-gen-antora[:relfileprefix: /content/]
 
 This repository is the central documentation source for the Trento project.
-It brings together multiple documentation sources and publishes them to the link:https://www.trento-project.io/docs/[Trento documentation hub] and the official user-facing SUSE documentation at link:https://documentation.suse.com/de-de/sles-sap/trento/[documentation.suse.com].
+It brings together multiple documentation sources and publishes them to the link:https://www.trento-project.io/docs/[Trento documentation hub] and the official user-facing SUSE documentation at link:https://documentation.suse.com/sles-sap/trento/[documentation.suse.com].
 
 == Repository Overview
 
@@ -106,6 +106,37 @@ Examples:
 +
 ** link:https://github.com/trento-project/web/tree/main/guides[`trento-project/web/guides`]
 ** link:https://github.com/trento-project/agent/tree/main/docs[`trento-project/agent/docs`]
+
+=== Node.js version
+
+The Node.js version is defined once and reused everywhere:
+
+* link:https://github.com/trento-project/docs/blob/main/versions.yml[`versions.yml`] holds the container image. `docker-compose.yml` imports it with `extends`, so all container services run the same image, and the CI workflows read it into their job container.
+* link:https://github.com/trento-project/docs/blob/main/.tool-versions[`.tool-versions`] holds the same version for the local toolchain (`asdf`, `mise`).
+
+`scripts/check-node-version.sh` keeps the two in sync.
+It runs when each container starts and as a CI step, and fails the build if `versions.yml`, `.tool-versions`, and the running Node.js do not all agree:
+
+[source,bash]
+----
+scripts/check-node-version.sh
+----
+
+To see the newest image tag published in `registry.suse.com`:
+
+[source,bash]
+----
+scripts/check-node-version.sh latest
+----
+
+To upgrade Node.js, set the new version in both `versions.yml` and `.tool-versions`.
+
+To try another version without editing any file, override the tag:
+
+[source,bash]
+----
+CONTAINER_IMAGE_TAG=24.18.0 docker compose up trento-docs
+----
 
 === Preview the Trento docs hub
 
