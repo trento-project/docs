@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-systemd-deployment]]
 ==== systemd deployment
-:revdate: 2026-07-28
+:revdate: 2026-09-08
 
 A systemd-based installation of the {trserver} using RPM packages can be performed manually on the latest supported versions of {sles4sap}, from 15 SP4 up to 16. For installations on service packs other than the current one, make sure to update the repository URL as described in the relevant notes throughout this guide.
 
@@ -251,6 +251,7 @@ ADMIN_PASSWORD=trentodemo
 ENABLE_API_KEY=true
 PORT=4000
 TRENTO_WEB_ORIGIN=trento.example.com
+IPV4_OR_IPV6=ipv4
 SECRET_KEY_BASE=some-secret
 ACCESS_TOKEN_ENC_SECRET=some-secret
 REFRESH_TOKEN_ENC_SECRET=some-secret
@@ -258,7 +259,7 @@ CHECKS_SERVICE_BASE_URL=/wanda
 OAS_SERVER_URL=https://trento.example.com
 ----
 
-** The `TRENTO_WEB_ORIGIN` configures internal functionalities such as the interactive API portal, websockets, or certificate generation.
+** The `TRENTO_WEB_ORIGIN` variable configures internal functionalities such as the interactive API portal, websockets, or certificate generation.
 +
 [IMPORTANT]
 ====
@@ -268,6 +269,8 @@ Otherwise, websocket connections will fail, preventing real-time updates
 in the web interface.
 ====
 
+** The `IPV4_OR_IPV6` variable defines whether the {tr_web} service binds to an IPv4 or IPv6 address. Set it according to what is available on the host at the time the service starts. The accepted values are `ipv4` and `ipv6` (case-insensitive). If the variable is not set, {tr_web} binds to IPv4.
+
 ** The `ADMIN_PASSWORD` variable must meet the following requirements:
 	
 *** Minimum of 8 characters
@@ -275,7 +278,7 @@ in the web interface.
 *** The password must not contain 4 consecutive  numbers or letters (for example, 1234, abcd, ABCD)
 
 
-** The `ENABLE_ALERTING` enables the 
+** The `ENABLE_ALERTING` variable enables the 
 https://www.trento-project.io/docs/web/Alerting/alerting.html[alerting system to receive email notifications]. Set `ENABLE_ALERTING` to `true` and add additional variables to the `/etc/trento/trento-web` to enable the feature:
 +
 [source,bash]
@@ -304,10 +307,16 @@ CORS_ORIGIN=http://localhost
 AMQP_URL=amqp://TRENTO_USER:TRENTO_USER_PASSWORD@localhost:5672/vhost
 DATABASE_URL=ecto://WANDA_USER:WANDA_PASSWORD@localhost/wanda
 PORT=4001
+IPV4_OR_IPV6=ipv4
 SECRET_KEY_BASE=some-secret
 OAS_SERVER_URL=https://trento.example.com/wanda
 AUTH_SERVER_URL=http://localhost:4000
 ----
++
+[NOTE]
+====
+Ensure the `IPV4_OR_IPV6` variable matches the value you configured for the {tr_web} service in the previous step.
+====
 
 . Secure the configuration files.
 +
@@ -509,6 +518,14 @@ server {
     }
 }
 ----
+====
++
+[NOTE]
+====
+The previous example reaches {tr_web} and {tr_wanda} over IPv4. If you set `IPV4_OR_IPV6=ipv6` in the service configuration files, adjust the NGINX configuration accordingly:
+
+* Change the upstream addresses from `127.0.0.1` to `[::1]`.
+* Add IPv6 listeners to the `server` blocks: `listen [::]:80;` and `listen [::]:443 ssl;`.
 ====
 
 ===== Prepare SSL certificate for NGINX
