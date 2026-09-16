@@ -1,0 +1,99 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-liz-ai-assistant]]
+== {liz} AI assistant in {tr_web}
+:revdate: 2026-09-16
+
+{liz} is a chat-based AI assistant built directly into {tr_web}. It lets you ask questions about your SAP landscape in natural language. By analyzing the live state of your systems and best-practice validations, {liz} helps you actively monitor health and troubleshoot issues, all without requiring any additional deployment.
+
+[[sec-about-liz]]
+=== About the {liz} AI assistant
+
+Unlike the {tr_mcp}, which is an optional component you install separately to connect external AI tools to {trento}, {liz} is part of {tr_web} itself. You only need to supply an API key for a supported large language model (LLM) provider.
+
+[[sec-liz-providers]]
+==== Which providers and models are supported
+
+{liz} AI assistant currently supports the following LLM providers:
+
+* Anthropic Claude
+* Google Gemini
+* OpenAI GPT
+
+Each provider offers several models. To ensure compatibility, {liz} only displays models capable of powering the assistant.
+
+[[sec-liz-data-access]]
+==== How does {liz} access data
+
+{liz} answers using the same tools the {tr_mcp} exposes: live SAP landscape state from {tr_web}, and check results from {tr_wanda}. 
+
+Access is bound to your {trento} user account. When you open a chat session, {liz} can only access data you are authorized to see. Your existing {trento} roles and permissions remain unchanged. 
+
+[[sec-liz-limitations]]
+==== What are {liz}'s current limitations
+
+In the current release, {liz} does not offer the following capabilities:
+
+* Keeping conversation history or resuming previous threads. Conversation state is held in memory only. Closing the session discards it, and you cannot resume an earlier conversation.
+* Using the page you are viewing as context. You must state what you are asking about.
+* Searching documentation or knowledge bases.
+* Logging conversations to the Activity Log. Only AI settings changes are logged.
+
+[[sec-configuring-liz]]
+=== Configuring {liz}
+
+You can configure {liz} from your user profile in {tr_web}.
+
+Requirements:
+
+* A user account in {tr_web}. AI configuration is per user and each user configures their own provider and model.
+* An API key for one of the supported providers.
+
+To configure {liz}:
+
+[.procedure]
+. In the {tr_web} console, click your user icon and select *Profile* to open your profile page.
+
+. Go to the *AI Configuration* section and click *Edit Settings*.
+
+. Select a provider and model from the supported list.
+
+. Enter your API key for the chosen provider.
+
+. Click *Save* to save your configuration.
+
+{liz} becomes available as soon as the configuration is saved.
+
+[NOTE]
+====
+You can change your model or provider at any time from the *Profile* page. Changes
+apply to an active conversation immediately without the need to reload the web console.
+====
+
+To stop using {liz}, clear your AI configuration from the *Profile* page. The chat launcher is disabled after the configuration is removed.
+
+[[sec-using-liz]]
+=== Using {liz}
+
+Open the chat launcher in {tr_web} and type your question. Your chat session remains active as long as you are logged into the {tr_web} console.
+
+*Example queries:*
+
+* _What is the status of the HANA database clusters?_
+* _Which hosts are failing and why?_
+* _Why is the Pacemaker cluster in a critical state, and how can I troubleshoot it?_
+
+If you did not configure a provider and model, the launcher is disabled. See <<sec-configuring-liz>> for more information.
+
+[WARNING]
+====
+Clicking *New chat* in {liz} immediately ends the active conversation and clears its history. Previous chats cannot be recovered once a new session starts.
+====
+
+
+
+
+
+
+
+
