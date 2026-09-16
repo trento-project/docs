@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: SUSE LLC
+# SPDX-License-Identifier: Apache-2.0
+
+name: Dependabot auto-merge
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  auto-merge:
+    uses: trento-project/.github/.github/workflows/dependabot-auto-merge.yaml@main # v1.9.0
