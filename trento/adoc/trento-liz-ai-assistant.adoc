@@ -2,14 +2,22 @@ include::product-attributes.adoc[]
 
 [[sec-trento-liz-ai-assistant]]
 == {liz} AI assistant in {tr_web}
-:revdate: 2026-09-16
+:revdate: 2026-09-17
 
-{liz} is a chat-based AI assistant built directly into {tr_web}. It lets you ask questions about your SAP landscape in natural language. By analyzing the live state of your systems and best-practice validations, {liz} helps you actively monitor health and troubleshoot issues, all without requiring any additional deployment.
+{liz} is a chat-based AI assistant built directly into {tr_web}. It lets you ask questions about your SAP landscape in natural language. By analyzing the live state of your systems and best-practice validations, {liz} helps you actively monitor health and identify issues, all without requiring any additional deployment.
 
 [[sec-about-liz]]
 === About the {liz} AI assistant
 
 Unlike the {tr_mcp}, which is an optional component you install separately to connect external AI tools to {trento}, {liz} is part of {tr_web} itself. You only need to supply an API key for a supported large language model (LLM) provider.
+
+{liz} is guided by built-in system instructions tailored for {trento}, ensuring it understands your SAP landscape right out of the box.
+
+[IMPORTANT]
+.Data privacy
+====
+{liz} sends your prompts and the system data needed to answer them to the third-party LLM provider you configure. Review your organization's data handling policy before enabling this feature..
+====
 
 [[sec-liz-providers]]
 ==== Which providers and models are supported
@@ -28,16 +36,6 @@ Each provider offers several models. To ensure compatibility, {liz} only display
 {liz} answers using the same tools the {tr_mcp} exposes: live SAP landscape state from {tr_web}, and check results from {tr_wanda}. 
 
 Access is bound to your {trento} user account. When you open a chat session, {liz} can only access data you are authorized to see. Your existing {trento} roles and permissions remain unchanged. 
-
-[[sec-liz-limitations]]
-==== What are {liz}'s current limitations
-
-In the current release, {liz} does not offer the following capabilities:
-
-* Keeping conversation history or resuming previous threads. Conversation state is held in memory only. Closing the session discards it, and you cannot resume an earlier conversation.
-* Using the page you are viewing as context. You must state what you are asking about.
-* Searching documentation or knowledge bases.
-* Logging conversations to the Activity Log. Only AI settings changes are logged.
 
 [[sec-configuring-liz]]
 === Configuring {liz}
@@ -79,11 +77,27 @@ Open the chat launcher in {tr_web} and type your question. Your chat session rem
 
 *Example queries:*
 
-* _What is the status of the HANA database clusters?_
-* _Which hosts are failing and why?_
-* _Why is the Pacemaker cluster in a critical state, and how can I troubleshoot it?_
+* _What is the tuning status of the registered hosts?_
+* _Which hosts are affected by patch XYZ?_
+* _Provide a summary of checks not passing for cluster XYZ and step-by-step remediation instructions._
 
 If you did not configure a provider and model, the launcher is disabled. See <<sec-configuring-liz>> for more information.
+
+While a conversation is open you can perform the following actions:
+
+[cols="1,7", options="header"]
+|===
+| Action | Description
+| *Stop*
+| Stop {liz} processing the current question. The assistant stays available for your next question.
+| *Retry*
+| Re-send your last prompt.
+| *Copy*
+| Copy a reply to the clipboard. {liz} formats its responses in Markdown, so pasting into compatible tools (like wikis or issue trackers) preserves the text formatting.
+|===
+
+Selecting **Learn more** in the assistant opens the {trento} documentation in a new
+browser tab.
 
 [WARNING]
 ====
