@@ -1,7 +1,4 @@
-include::../product-attributes.adoc[]
-
-:revdate: 2026-01-08
-===== Prerequisites
+:revdate: 2026-09-18
 
 * An LLM provider and credentials.
 ** Public hosted options, such as Google Gemini, OpenAI, etc.
