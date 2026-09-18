@@ -36,7 +36,7 @@ Which providers and models are supported?::
 * OpenAI GPT
 --
 +
-Each provider offers several models. To ensure compatibility, {liz} only displays models capable of powering the assistant.
+Each provider offers several models. To ensure compatibility, {trento} only displays models capable of powering the assistant.
 
 [[sec-liz-data-access]]
 How does {liz} access data?::
