@@ -8,15 +8,17 @@ A systemd-based installation of the {tr_mcp} using RPM packages can be performed
 
 include::partials/supported-versions.adoc[]
 
+[[mcp-systemd-install-rpm]]
 ===== Installing {tr_mcp} using RPM packages
 
-. Install the {tr_mcp} package:
+* Install the {tr_mcp} package:
 +
 [source,bash,subs="attributes"]
 ----
 zypper install {tr_mcp_binary}
 ----
 
+[[mcp-systemd-configure]]
 ===== Configure {tr_mcp}
 
 . Create the {tr_mcp} configuration file `{tr_mcp_config_file}` by copying the example:
@@ -71,16 +73,17 @@ If `OAS_PATH` is set, it takes precedence and `TRENTO_URL` is ignored.
 * You want to connect directly to internal services without autodiscovery.
 * You need to bypass reverse proxy configurations.
 
-
+[[mcp-systemd-start]]
 ====== Start the {tr_mcp} service
 
-Enable and start the {tr_mcp} service:
-
+* Enable and start the {tr_mcp} service:
++
 [source,bash,subs="attributes"]
 ----
 systemctl enable --now {tr_mcp_binary}
 ----
 
+[[mcp-systemd-verify]]
 ===== Verify the {tr_mcp} service
 
 . Verify the service is running:
