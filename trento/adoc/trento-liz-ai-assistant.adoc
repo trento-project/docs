@@ -1,0 +1,120 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-liz-ai-assistant]]
+=== {liz} AI assistant in {tr_web}
+:revdate: 2026-09-18
+
+{liz} is a chat-based AI assistant built directly into {tr_web}. It lets you ask questions about your SAP landscape in natural language. By analyzing the live state of your systems and best-practice validations, {liz} helps you actively monitor health and identify issues, all without requiring any additional deployment.
+
+This section covers the following topics:
+
+* <<sec-about-liz, About the {liz} AI assistant>>
+* <<sec-configuring-liz, Configuring {liz}>>
+* <<sec-using-liz, Using {liz}>>
+
+[[sec-about-liz]]
+==== About the {liz} AI assistant
+
+{liz} is part of {tr_web} itself and requires no additional deployment. You only need to supply an API key for a <<sec-liz-providers, supported large language model (LLM) provider>>.
+
+{liz} is guided by built-in system instructions tailored for {trento}, ensuring it understands your SAP landscape right out of the box.
+
+[IMPORTANT]
+.Data privacy
+====
+{liz} sends your prompts and the system data needed to answer them to the third-party LLM provider you configure. Review your organization's data handling policy before enabling this feature.
+====
+
+[[sec-liz-providers]]
+Which providers and models are supported?::
++
+{liz} AI assistant currently supports the following LLM providers:
++
+--
+* Anthropic Claude
+* Google Gemini
+* OpenAI GPT
+--
++
+Each provider offers several models. To ensure compatibility, {trento} only displays models capable of powering the assistant.
+
+[[sec-liz-data-access]]
+How does {liz} access data?::
++
+{liz} answers queries using live SAP landscape state from {tr_web}, and check results from {tr_wanda}. 
++
+Access is bound to your {trento} user account. When you open a chat session, {liz} can only access data you are authorized to see. Your existing {trento} roles and permissions remain unchanged. 
+
+[[sec-configuring-liz]]
+==== Configuring {liz}
+
+You can configure {liz} from your user profile in {tr_web}.
+
+*Requirements:*
+
+* A user account in {tr_web}. AI configuration is per user and each user configures their own provider and model.
+* An API key for one of the <<sec-liz-providers, supported providers>>.
+
+To configure {liz}:
+
+[.procedure]
+. In the {tr_web} console, click your user icon and select *Profile* to open your profile page.
+
+. Go to the *AI Configuration* section and click *Edit Settings*.
+
+. Select a provider and model from the supported list.
+
+. Enter your API key for the chosen provider.
+
+. Click *Save* to save your configuration.
+
+{liz} becomes available as soon as the configuration is saved.
+
+[NOTE]
+====
+You can change your model or provider at any time from the *Profile* page without the need to reload the web console. Changes apply starting with your next prompt; any prompt currently processing finishes using the previous configuration.
+====
+
+To stop using {liz}, clear your AI configuration from the *Profile* page. If the chat window is open, {liz} goes offline and the conversation becomes read-only. Once the window is closed, the chat launcher is disabled.
+
+[[sec-using-liz]]
+==== Using {liz}
+
+Open the chat launcher in {tr_web} and type your question. Your chat session remains active as long as you are logged into the {tr_web} console.
+
+*Example queries:*
+
+* _What is the tuning status of the registered hosts?_
+* _Which hosts are affected by patch XYZ?_
+* _Provide a summary of checks not passing for cluster XYZ and step-by-step remediation instructions._
+
+If you did not configure a provider and model, the launcher is disabled. See <<sec-configuring-liz>> for more information.
+
+While a conversation is open you can perform the following actions:
+
+[cols="1,7", options="header"]
+|===
+| Action | Description
+| *Stop*
+| Stop {liz} processing the current question. The assistant stays available for your next question.
+| *Retry*
+| Re-send your last prompt.
+| *Copy*
+| Copy a reply to the clipboard. {liz} formats its responses in Markdown, so pasting into compatible tools (like wikis or issue trackers) preserves the text formatting.
+|===
+
+Selecting **Learn more** in the assistant opens the {trento} documentation in a new
+browser tab.
+
+[WARNING]
+====
+Clicking *New chat* in {liz} immediately ends the active conversation and clears its history. Previous chats cannot be recovered once a new session starts.
+====
+
+
+
+
+
+
+
+

@@ -1,8 +1,8 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-mcp-config]]
-=== Configuring {tr_mcp}
-:revdate: 2026-01-08
+==== Configuring {tr_mcp}
+:revdate: 2026-09-18
 
 This section provides an overview of how to configure the {tr_mcp} depending on the deployment method.
 
@@ -10,9 +10,9 @@ This section provides an overview of how to configure the {tr_mcp} depending on 
 * <<sec-trento-mcp-systemd-config>>
 
 [[sec-trento-mcp-kubernetes-config]]
-==== Configuration in a {k8s} deployment
+===== Configuration in a {k8s} deployment
 
-===== Configuration Sources
+====== Configuration Sources
 
 The {tr_mcp} supports multiple configuration sources with the following priority order (highest to lowest):
 
@@ -20,7 +20,7 @@ The {tr_mcp} supports multiple configuration sources with the following priority
 2. **Built-in defaults** - Fallback values.
 
 [[sec-trento-mcp-kubernetes-config-sources]]
-===== Configuration Overview
+====== Configuration Overview
 
 [width="100%",options="header"]
 |===
@@ -79,7 +79,7 @@ The {tr_mcp} supports multiple configuration sources with the following priority
 |Log level: `debug`, `info`, `warning`, or `error`.
 |===
 
-===== {k8s} Deployment Example
+====== {k8s} Deployment Example
 
 [source,yaml,subs="attributes"]
 ----
@@ -113,17 +113,17 @@ spec:
 
 
 [[sec-trento-mcp-systemd-config]]
-==== Configuration in an systemd deployment
+===== Configuration in an systemd deployment
 
 [[sec-trento-mcp-systemd-config-sources]]
-===== Configuration Sources
+====== Configuration Sources
 
 The {tr_mcp} supports multiple configuration sources with the following priority order (highest to lowest):
 
 1. **Command-line flags** - Override config for the current process.
 2. **Configuration file** - Persistent settings configuration.
 
-===== Configuration Overview
+====== Configuration Overview
 
 The `{tr_mcp_binary}` binary accepts several command-line flags to configure its behavior. The following table lists all available configuration options, their corresponding flags, configuration variables, and default values.
 
@@ -197,7 +197,7 @@ The `{tr_mcp_binary}` binary accepts several command-line flags to configure its
 |Log level: `debug`, `info`, `warning`, or `error`.
 |===
 
-===== Configure {tr_mcp} with Command-Line Flags
+====== Configure {tr_mcp} with Command-Line Flags
 
 {tr_mcp} allows you to override configuration settings using command-line flags for temporary changes. These overrides are not persistent and are lost when the process stops or the system is rebooted. To make configuration changes permanent for the systemd service, update `{tr_mcp_config_file}` and restart the service.
 
@@ -230,7 +230,7 @@ Enable health checks on a custom port:
 ----
 
 [[sec-trento-mcp-help-validation]]
-===== Help and Validation
+====== Help and Validation
 
 You can see all available flags by running:
 
@@ -242,7 +242,7 @@ You can see all available flags by running:
 The server will validate the configuration on startup and log any issues with debug verbosity enabled.
 
 [[sec-trento-mcp-health-checks]]
-==== Health Check Configuration
+===== Health Check Configuration
 
 The {tr_mcp} includes built-in health check endpoints for systemd and {k8s} integration.
 
@@ -251,7 +251,7 @@ The {tr_mcp} includes built-in health check endpoints for systemd and {k8s} inte
 Health check functionality is disabled by default and must be explicitly enabled using the `--enable-health-check` flag or the `TRENTO_MCP_ENABLE_HEALTH_CHECK` environment variable.
 ====
 
-===== Health Check Endpoints
+====== Health Check Endpoints
 
 The health check server provides the following endpoints:
 
@@ -264,7 +264,7 @@ The readiness endpoint performs comprehensive health checks, including:
 * `api-server` - Verifies connectivity to the configured {trento} API server.
 
 [[sec-trento-mcp-k3s-health-helm]]
-===== Enable Health Checks with {helm} on a {k8s} deployment
+====== Enable Health Checks with {helm} on a {k8s} deployment
 
 Enable health checks when deploying on {k8s} with {helm}:
 
@@ -289,7 +289,7 @@ kubectl port-forward --namespace NAMESPACE \
 ----
 With the port forward active, test the endpoints in <<sec-trento-mcp-health-testing,Testing Health Endpoints>>.
 
-===== Enable Health Checks with the command-line for systemd deployment
+====== Enable Health Checks with the command-line for systemd deployment
 
 [source,console,subs="attributes"]
 ----
@@ -302,7 +302,7 @@ With the port forward active, test the endpoints in <<sec-trento-mcp-health-test
 ----
 
 [[sec-trento-mcp-health-testing]]
-===== Testing Health Endpoints
+====== Testing Health Endpoints
 
 [source,console,subs="attributes"]
 ----
@@ -320,11 +320,11 @@ curl http://localhost:{tr_mcp_health_port}/readyz
 ----
 
 [[sec-trento-mcp-troubleshooting]]
-==== Troubleshooting
+===== Troubleshooting
 
 This section provides solutions for common issues when deploying and using the {tr_mcp}.
 
-===== Connection Issues
+====== Connection Issues
 
 * **{tr_mcp} cannot connect to {trento} API**
 ** Verify the `TRENTO_URL` or `OAS_PATH` configuration points to accessible endpoints
@@ -336,7 +336,7 @@ This section provides solutions for common issues when deploying and using the {
 ** Check firewall rules allow access to the {tr_mcp} port
 ** Ensure the {tr_mcp} endpoint URL is correctly configured in client applications
 
-===== Authentication Issues
+====== Authentication Issues
 
 * **API token authentication fails**
 ** Verify the Personal Access Token is valid and not expired
@@ -347,7 +347,7 @@ This section provides solutions for common issues when deploying and using the {
 ** Confirm the token was generated from the correct {trento} instance
 ** Verify the token format and ensure it includes the "Bearer " prefix if required
 
-===== Configuration Issues
+====== Configuration Issues
 
 * **OpenAPI specification not found**
 ** Check that `TRENTO_URL` or `OAS_PATH` point to valid {trento} API endpoints
@@ -359,7 +359,7 @@ This section provides solutions for common issues when deploying and using the {
 ** Verify the OpenAPI specifications are accessible and valid
 ** Ensure the {tr_mcp} can parse the API documentation
 
-===== Performance Issues
+====== Performance Issues
 
 * **Slow response times**
 ** Check network latency between {tr_mcp} and {trento} components
@@ -371,14 +371,14 @@ This section provides solutions for common issues when deploying and using the {
 ** Check for memory leaks in long-running processes
 ** Consider adjusting logging verbosity to reduce I/O overhead
 
-===== Health Check Issues
+====== Health Check Issues
 
 * **Health checks failing**
 ** Verify health check endpoints are accessible
 ** Check that all required services ({trento} API, {tr_mcp}) are responding
 ** Review health check configuration and timeouts
 
-===== Logging and Debugging
+====== Logging and Debugging
 
 * **Enable debug logging**
 ** Set `VERBOSITY=debug` to get detailed logs
@@ -390,7 +390,7 @@ This section provides solutions for common issues when deploying and using the {
 ** "Authentication failed" - Verify API token configuration
 ** "No tools available" - Check tag filtering and API documentation
 
-===== Getting Help
+====== Getting Help
 
 If you continue to experience issues:
 
