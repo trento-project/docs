@@ -3,7 +3,7 @@ include::product-attributes.adoc[]
 
 [[trento-ai-integrations]]
 == {trento} AI integrations
-:revdate: 2026-09-18
+:revdate: 2026-09-21
 
 {trento} provides AI-driven capabilities to help you monitor and troubleshoot your SAP landscape using natural language. You can use these features directly within the web console, or connect {trento} data to your own external AI tools.
 

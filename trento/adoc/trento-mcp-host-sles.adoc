@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-mcp-sles]]
 ===== Integrating the {tr_mcp} with {mcp_host}
-:revdate: 2026-09-18
+:revdate: 2026-09-21
 
 This guide explains how to connect the {tr_mcp} to {sles} 16 using {mcp_host}, a lightweight CLI tool for the Model Context Protocol (MCP).
 

@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-liz-ai-assistant]]
 === {liz} AI assistant in {tr_web}
-:revdate: 2026-09-18
+:revdate: 2026-09-21
 
 {liz} is a chat-based AI assistant built directly into {tr_web}. It lets you ask questions about your SAP landscape in natural language. By analyzing the live state of your systems and best-practice validations, {liz} helps you actively monitor health and identify issues, all without requiring any additional deployment.
 

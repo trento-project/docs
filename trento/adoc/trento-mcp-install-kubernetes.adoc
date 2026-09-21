@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-mcp-server-k8s]]
 ===== {k8s} deployment of {tr_mcp}
-:revdate: 2026-09-18
+:revdate: 2026-09-21
 
 include::partials/kubernetes-placeholders.adoc[]
 

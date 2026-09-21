@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-mcp-integration]]
 === MCP Integration
-:revdate: 2026-09-18
+:revdate: 2026-09-21
 
 While {trento} provides the built-in {liz} assistant for AI conversations directly inside the {tr_web} console, you can also integrate {trento}'s data into your own external AI tools and workflows. The {tr_mcp} is an optional component that enables this external AI-assisted infrastructure management for your SAP landscape. 
 

@@ -1,4 +1,4 @@
-:revdate: 2026-09-18
+:revdate: 2026-09-21
 
 * An LLM provider and credentials.
 ** Public hosted options, such as Google Gemini, OpenAI, etc.

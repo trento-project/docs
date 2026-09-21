@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-mcp-install]]
 ==== Installing {tr_mcp}
-:revdate: 2026-09-18
+:revdate: 2026-09-21
 
 The {tr_mcp} can be deployed in different ways depending on your infrastructure and requirements.
 
