@@ -85,7 +85,7 @@ Example output:
 
 The {tr_mcp} {helm} chart supports various configuration options:
 
-[[mcp-customize-ingress-path]]
+[[mcp-customize-ingress-path, Customize Ingress Path]]
 Customize Ingress Path::
 +
 By default, ingress is enabled.
@@ -106,7 +106,7 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 +
 The {tr_mcp} endpoint will be: `\https://TRENTO_SERVER_HOSTNAME{tr_mcp_ingress_path}/mcp`
 
-[[mcp-adjust-log-verbosity]]
+[[mcp-adjust-log-verbosity, Adjust Log Verbosity]]
 Adjust Log Verbosity::
 +
 The default log level is `info`. Adjust it for debugging:
@@ -122,7 +122,7 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 ----
 ====
 
-[[mcp-adjust-resource-limits]]
+[[mcp-adjust-resource-limits, Adjust Resource Limits]]
 Adjust Resource Limits::
 +
 For production deployments with different resource requirements:
@@ -141,7 +141,7 @@ helm upgrade --install trento-server oci://registry.suse.com/trento/trento-serve
 ----
 ====
 
-[[mcp-disable-health-check-probes]]
+[[mcp-disable-health-check-probes, Disable Health Check Probes]]
 Disable Health Check Probes::
 +
 Health check probes are enabled by default. To disable them if needed, run the following command:

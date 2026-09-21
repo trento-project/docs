@@ -6,11 +6,11 @@ include::product-attributes.adoc[]
 
 {liz} is a chat-based AI assistant built directly into {tr_web}. It lets you ask questions about your SAP landscape in natural language. By analyzing the live state of your systems and best-practice validations, {liz} helps you actively monitor health and identify issues, all without requiring any additional deployment.
 
-This section covers the following topics:
+This chapter covers the following topics:
 
-* <<sec-about-liz, About the {liz} AI assistant>>
-* <<sec-configuring-liz, Configuring {liz}>>
-* <<sec-using-liz, Using {liz}>>
+* <<sec-about-liz>>
+* <<sec-configuring-liz>>
+* <<sec-using-liz>>
 
 [[sec-about-liz]]
 ==== About the {liz} AI assistant
