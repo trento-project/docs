@@ -42,7 +42,7 @@
     "postcss-url": "~10.1",
     "require-directory": "~2.1",
     "require-from-string": "~2.0",
-    "stylelint": "~17.14",
+    "stylelint": "~17.15",
     "stylelint-config-standard": "~40.0",
     "vinyl-fs": "~4.0"
   },
