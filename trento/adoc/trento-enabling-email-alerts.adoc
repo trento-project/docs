@@ -6,32 +6,50 @@ include::product-attributes.adoc[]
 
 The email alerting feature notifies the {sap} Basis administrator about important changes in the {sap} Landscape being monitored by {trento}.
 
-The reported events include the following:
+Examples of reported events include the following:
 
 * Host heartbeat failed
 * Cluster health detected critical
 * Database health detected critical
 * {sap} System health detected critical
 
-The email alerting feature is disabled by default. To enable the feature, replace the following placeholders in the configuration examples with your actual information:
+The email alerting feature is disabled by default. You can configure it either through the {tr_web} console or at the deployment level. 
 
-YOUR_SMTP_SERVER::
+Both methods require the following information:
+
+SMTP Server::
 The SMTP server designated to send email alerts.
 
-YOUR_SMTP_PORT::
+SMTP Port::
 Port on the SMTP server.
 
-YOUR_SMTP_USER::
-User name to access SMTP server.
+SMTP User::
+User name to access the SMTP server.
 
-YOUR_SMTP_PASSWORD::
-Password to access SMTP server.
+SMTP Password::
+Password to access the SMTP server.
 
-YOUR_ALERT_SENDER::
+Alert Sender::
 Sender email for alert notifications.
 
-YOUR_ALERT_RECIPIENT::
+Alert Recipient::
 Email address to receive alert notifications.
+
+[NOTE]
+====
+If you specify any email settings through your deployment configuration, the Web-based email configuration is disabled.
+====
+
+[[email-alerts-web]]
+==== Configuring email alerts in the {tr_web} console
+
+You can manage your email alerting configuration directly within the {tr_web} console. To do this, you must have the `all:settings` permission.
+
+. In the left sidebar of the {tr_web} console, click *Settings*.
+. In the *Email Alerts* section, click *Edit Settings*.
+. Toggle *Send Email Alerts* to turn the feature on.
+. Enter your SMTP server details, sender and recipient addresses.
+. Click *Save Settings*.
 
 [[email-alerts-k8s]]
 ==== Enabling email alerts on {k8s} deployments
