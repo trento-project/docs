@@ -1,0 +1,100 @@
+include::product-attributes.adoc[]
+
+[[sec-enabling-email-alerts]]
+=== Enabling email alerts
+:revdate: 2026-09-23
+
+The email alerting feature notifies the {sap} Basis administrator about important changes in the {sap} Landscape being monitored by {trento}.
+
+The reported events include the following:
+
+* Host heartbeat failed
+* Cluster health detected critical
+* Database health detected critical
+* {sap} System health detected critical
+
+The email alerting feature is disabled by default. To enable the feature, replace the following placeholders in the configuration examples with your actual information:
+
+YOUR_SMTP_SERVER::
+The SMTP server designated to send email alerts.
+
+YOUR_SMTP_PORT::
+Port on the SMTP server.
+
+YOUR_SMTP_USER::
+User name to access SMTP server.
+
+YOUR_SMTP_PASSWORD::
+Password to access SMTP server.
+
+YOUR_ALERT_SENDER::
+Sender email for alert notifications.
+
+YOUR_ALERT_RECIPIENT::
+Email address to receive alert notifications.
+
+[[email-alerts-k8s]]
+==== Enabling email alerts on {k8s} deployments
+
+For {k8s} deployments, use the `helm upgrade` command to enable email alerts:
+
+[source,bash]
+----
+helm upgrade \
+   --install trento-server oci://registry.suse.com/trento/trento-server \
+   --set trento-web.alerting.enabled=true \
+   --set trento-web.alerting.smtpServer=YOUR_SMTP_SERVER \
+   --set trento-web.alerting.smtpPort=YOUR_SMTP_PORT \
+   --set trento-web.alerting.smtpUser=YOUR_SMTP_USER \
+   --set trento-web.alerting.smtpPassword=YOUR_SMTP_PASSWORD \
+   --set trento-web.alerting.sender=YOUR_ALERT_SENDER \
+   --set trento-web.alerting.recipient=YOUR_ALERT_RECIPIENT
+   ...
+----
+
+[[email-alerts-systemd]]
+==== Enabling email alerts on systemd deployments
+
+For systemd deployments, perform the following steps:
+
+. Enable and configure alerting by adding the following variables in `/etc/trento/trento-web`:
++
+[source,bash]
+----
+# /etc/trento/trento-web
+ENABLE_ALERTING=true
+ALERT_SENDER=YOUR_ALERT_SENDER
+ALERT_RECIPIENT=YOUR_ALERT_RECIPIENT
+SMTP_SERVER=YOUR_SMTP_SERVER
+SMTP_PORT=YOUR_SMTP_PORT
+SMTP_USER=YOUR_SMTP_USER
+SMTP_PASSWORD=YOUR_SMTP_PASSWORD
+----
+
+. Restart the service for the changes to take effect:
++
+[source,bash]
+----
+systemctl restart trento-web
+----
+
+[[email-alerts-test]]
+==== Testing your email alert configuration
+
+You can verify your configuration by using the *Send Test Email* feature in the {tr_web} console.
+
+You must have the `all:settings` permission to use this feature.
+
+. In the left sidebar of the {tr_web} console, click *Settings*.
+. In the *Email Alerts* section, click *Send Test Email*.
++
+[NOTE]
+====
+If alerting is disabled or not configured, this button is unavailable.
+====
++
+A notification appears on the screen to inform you if the email delivery succeeded or failed.
+
+The system also records the test results in the activity log. Successful tests are logged with an `info` severity, while failed tests are logged as `critical`.
+
+If a test fails, you can check the `"reason"` field in the activity log metadata for troubleshooting details. See <<sec-activity-log-entries>> for how to view this metadata inside the *Activity Details* window.

@@ -381,7 +381,7 @@ Users with the `all:settings` permission can use the *Settings* view of {tr_web}
 
 If any of the email settings are specified through environment variables, the
 web-based email configuration is disabled. For more information, see
-<<sec-trento-enabling-email-alerts>>.
+<<sec-enabling-email-alerts>>.
 
 [[sec-trento-webconsole-troubleshooting]]
 === Troubleshooting

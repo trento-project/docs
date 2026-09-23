@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-k8s-deployment]]
 ==== {k8s} deployment
-:revdate: 2026-07-10
+:revdate: 2026-09-23
 
 include::partials/kubernetes-placeholders.adoc[]
 
@@ -192,56 +192,6 @@ If you use a multi-node {k8s} cluster, it is possible to deploy {trserver} image
 ====
 
 Replace `LABEL` and `VALUE` with the actual label key and value of your target node.
-
-[[sec-trento-enabling-email-alerts]]
-===== Enabling email alerts
-
-Email alerting feature notifies the {sap} Basis administrator about important changes in the {sap} Landscape being monitored by {trento}.
-
-The reported events include the following:
-
-* Host heartbeat failed
-* Cluster health detected critical
-* Database health detected critical
-* {sap} System health detected critical
-
-This feature is disabled by default. It can be enabled at installation time or anytime at a later stage. In both cases, the procedure is the same and uses the following placeholders:
-
-`SMTP_SERVER`::
-The SMTP server designated to send email alerts
-
-`SMTP_PORT`::
-Port on the SMTP server
-
-`SMTP_USER`::
-User name to access SMTP server
-
-`SMTP_PASSWORD`::
-Password to access SMTP server
-
-`ALERTING_SENDER`::
-Sender email for alert notifications
-
-`ALERTING_RECIPIENT`::
-Email address to receive alert notifications.
-
-The command to enable email alerts is as follows:
-
-[source,bash]
-----
-helm upgrade \
-   --install trento-server oci://registry.suse.com/trento/trento-server \
-   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
-   --set trento-web.adminUser.password=ADMIN_PASSWORD \
-   --set prometheus.enabled=false \
-   --set trento-web.alerting.enabled=true \
-   --set trento-web.alerting.smtpServer=SMTP_SERVER \
-   --set trento-web.alerting.smtpPort=SMTP_PORT \
-   --set trento-web.alerting.smtpUser=SMTP_USER \
-   --set trento-web.alerting.smtpPassword=SMTP_PASSWORD \
-   --set trento-web.alerting.sender=ALERTING_SENDER \
-   --set trento-web.alerting.recipient=ALERTING_RECIPIENT
-----
 
 [[sec-trento-enabling-ssl]]
 ===== Enabling SSL

@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-systemd-deployment]]
 ==== systemd deployment
-:revdate: 2026-09-08
+:revdate: 2026-09-23
 
 A systemd-based installation of the {trserver} using RPM packages can be performed manually on the latest supported versions of {sles4sap}, from 15 SP4 up to 16. For installations on service packs other than the current one, make sure to update the repository URL as described in the relevant notes throughout this guide.
 
@@ -280,21 +280,8 @@ in the web interface.
 *** The password  not contain 3 consecutive identical numbers or letters (for example, 111 or aaa)
 *** The password must not contain 4 consecutive  numbers or letters (for example, 1234, abcd, ABCD)
 
-
 ** The `ENABLE_ALERTING` variable enables the 
-https://www.trento-project.io/docs/web/Alerting/alerting.html[alerting system to receive email notifications]. Set `ENABLE_ALERTING` to `true` and add additional variables to the `/etc/trento/trento-web` to enable the feature:
-+
-[source,bash]
-----
-# /etc/trento/trento-web
-ENABLE_ALERTING=true
-ALERT_SENDER=<<SENDER_EMAIL_ADDRESS>>
-ALERT_RECIPIENT=<<RECIPIENT_EMAIL_ADDRESS>>
-SMTP_SERVER=<<SMTP_SERVER_ADDRESS>>
-SMTP_PORT=<<SMTP_PORT>>
-SMTP_USER=<<SMTP_USER>>
-SMTP_PASSWORD=<<SMTP_PASSWORD>>
-----
+https://www.trento-project.io/docs/web/Alerting/alerting.html[alerting system to receive email notifications]. For more information, see <<sec-enabling-email-alerts>>.
 
 . Create the `/etc/trento/trento-wanda` configuration file. For example:
 +
