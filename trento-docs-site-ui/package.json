@@ -19,7 +19,7 @@
     "@fontsource/roboto": "~5.3",
     "@fontsource/roboto-mono": "~5.3",
     "@vscode/gulp-vinyl-zip": "~2.7",
-    "autoprefixer": "~10.5",
+    "autoprefixer": "~10.6",
     "browser-pack-flat": "~3.5",
     "browserify": "~17.0",
     "cssnano": "~9.0",
