@@ -159,7 +159,7 @@ Contributes only when {trento} discovers an {sap} workload on the host. `{saptun
 
 Available software updates::
 Contributes only when connection data for SUSE Multi-Linux Manager is saved under
-the *Settings* menu. For more information, see <<sec-integration-with-SUSE-Multi-Linux-Manager>>.
+the *Settings* menu. For more information, see <<sec-integration-with-suse-multi-linux-manager>>.
 +
 [options="header"]
 |===
@@ -375,7 +375,7 @@ A non-passing aggregated health value indicates that something needs attention. 
 Users with the `all:settings` permission can use the *Settings* view of {tr_web} to modify the following:
 
 * API key. See <<sec-trento-rotating-apikeys>>.
-* Connection data for SUSE Multi-Linux Manager. See <<sec-integration-with-SUSE-Multi-Linux-Manager>>.
+* Connection data for SUSE Multi-Linux Manager. See <<sec-integration-with-suse-multi-linux-manager>>.
 * Retention time for Activity Log entries. See <<sec-activity-log-retention>>.
 * Settings required for sending alerts via email.
 

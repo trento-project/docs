@@ -1,6 +1,6 @@
 include::product-attributes.adoc[]
 
-[[sec-integration-with-SUSE-Multi-Linux-Manager]]
+[[sec-integration-with-suse-multi-linux-manager]]
 == Integration with {smlm}
 :revdate: 2025-06-10
 
