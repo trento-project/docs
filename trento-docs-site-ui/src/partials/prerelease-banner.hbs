@@ -1,0 +1,18 @@
+{{#if page.componentVersion.prerelease}}
+<div class="admonitionblock warning prerelease-banner">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Pre-release"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>You are viewing pre-release documentation, which may describe unreleased features.</p>
+<p>For production use,
+<a href="{{{relativize page.latest.url}}}">switch to the latest released version ({{page.latest.displayVersion}})</a>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+{{/if}}

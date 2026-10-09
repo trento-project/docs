@@ -473,6 +473,10 @@
   color: var(--warning-on-color);
 }
 
+.doc .prerelease-banner td.content {
+  background: var(--prerelease-banner-background);
+}
+
 .doc .imageblock,
 .doc .videoblock {
   display: flex;

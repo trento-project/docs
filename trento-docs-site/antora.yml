@@ -3,8 +3,9 @@
 
 name: ROOT
 title: Trento Documentation
-version: ~
+version: main
 display_version: pre-release
+prerelease: true
 nav:
 - modules/user-guide/nav_user_guide.adoc
 - modules/developer/nav_developer.adoc

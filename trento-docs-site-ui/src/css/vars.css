@@ -79,6 +79,7 @@
   --tip-on-color: var(--color-white);
   --warning-color: #e18114;
   --warning-on-color: var(--color-white);
+  --prerelease-banner-background: #fcf2e8;
   /* doc */
   --doc-font-color: var(--color-jet-50);
   --doc-font-size: inherit;
