@@ -74,7 +74,7 @@ Combine permissions to match specific team responsibilities. You can create the 
 * *User managers:* users with `all:users` permissions
 * *{sap} Basis administrator with {trento} display-only access:* users with default permissions
 * *{sap} Basis administrator with {trento} configuration access*: users with `all:checks_selection`, `all:tags` and `all:settings` permissions
-* *{sap} Basis administrator with {trento} operation access:* users with `all:checks_execution` and `cleanup:all` permissions
+* *{sap} Basis administrator with {trento} operation access:* users with `all:checks_execution`, `cleanup:all` and `operation:all` permissions
 
 [[sec-trento-user-default-admin]]
 ==== Initial configuration with the default admin user
