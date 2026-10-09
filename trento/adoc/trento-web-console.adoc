@@ -28,6 +28,9 @@ Review all discovered {hana} databases by system ID, including the status of eac
 Checks catalog::
 Browse the configuration checks that {trento} can run, by target type (hosts or clusters), cluster type (HANA scale up, HANA scale out or ASCS/ERS) and supported platform (Azure, AWS, GCP, Nutanix, on-premises/KVM or VMware).
 
+Users::
+Create and edit users, assign user permissions and configure other user settings. This entry is only visible to users with the required administrative permissions.
+
 Activity Log::
 Review system events and user actions, with the timestamp, message, user, and severity of each entry.
 

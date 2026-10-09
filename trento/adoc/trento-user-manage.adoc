@@ -1,103 +1,159 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-user-management]]
-=== User management
-:revdate: 2026-04-30
+=== User management and access permissions
+:revdate: 2026-10-08
 
+{trento} provides local, permission-based user management to secure your console. With this feature, you can create accounts, enforce strict password policies, and assign role-based permissions. This ensures only authorized users perform protected actions such as running checks or managing {sap} systems.
 
-{trento} provides a local permission-based user management feature with
-optional multi-factor authentication. This feature enables segregation
-of duties in the {trento} interface and ensures that only authorized
-users with the right permissions can access it.
+User management actions are performed in the *Users* view in the left-hand side panel of the {trento} console. This entry is only visible to users with the required administrative permissions.
 
-User management actions are performed in the Users view in the left-hand
-side panel of the {trento} UI.
+[[sec-trento-user-access]]
+==== How {trento} user access works
 
-By default, a newly created user is granted display access rights except
-for the Users view. Where available, a user with default access can
-configure filters and pagination settings matching their preferences.
+Access to the {trento} console relies on authentication to verify the user identity, and permissions to define what the user can do.
 
-To perform protected actions, the user must have additional permissions
-added to their user profile. Below is the list of currently available
-permissions:
+[[sec-trento-user-authentication]]
+===== Available authentication methods
 
-* `+all:users+`: grants full access to user management actions under the
-Users view
-* `+all:checks_selection+`: grants check selection capabilities for any
-target in the registered environment for which checks are available
-* `+all:checks_execution+`: grants check execution capabilities for any
-target in the registered environment for which checks are available and
-have been previously selected
-* `+all:tags+`: allows creation and deletion of the available tags
-* `+cleanup:all+`: allows triggering housekeeping actions on hosts where
-agents heartbeat is lost and SAP or HANA instances that are no longer
-found
-* `+all:settings+`: grants changing capabilities on any system settings
-under the Settings view
-* `+all:all+`: grants all the permissions above
+{trento} secures user profiles with strict password rules and optional multi-factor authentication (MFA). Authentication responsibilities differ based on the login method.
 
-Using the described permissions, it is possible to create the following
-types of users:
+Local passwords::
+Access requires a local account and password by default. User managers with the `all:users` permission generate compliant passwords during the account setup. Users change these passwords securely from their profiles later.
++
+[NOTE]
+====
+All passwords must contain at least 8 characters. They cannot contain 3 identical sequential characters (such as 111 or aaa). They cannot contain 4 consecutive characters (such as 1234 or abcd).
+====
 
-* *User managers:* users with `+all:users+` permissions
-*  *SAP Basis administrator with {trento} display-only access:* users with default permissions
-*  *SAP Basis administrator with {trento} configuration access*: users with `+all:checks_selection+`, `+all:tags+` and `+all:settings+`
-permissions
-* *SAP Basis administrator with {trento} operation access:* users with `+all:check_execution+` and `+cleanup:all+` permissions.
+Multi-factor authentication::
+For added security, local users can enable MFA in their *Profile* view. User managers cannot enable MFA for other users, but they can disable MFA for accounts to restore lost access.
 
-The default admin user created during the installation process is
-granted `+all:all+` permissions and cannot be modified or deleted. Use
-it only to create the first user manager (a user with `+all:users+`
-permissions who creates all the other required users). Once a user with
-`+all:users+` permissions is created, the default admin user must be
-treated as a fallback user in case all other access to the console is
-lost. If the password of the default admin user is lost, it can be reset
-by updating the Helm chart or the web component configuration, depending
-on which deployment method was used to install {trserver}.
+Single Sign-On accounts::
+Third-party identity providers (IDP) manage authentication entirely when configured. {trento} user managers only control the local permissions for these SSO users. For more information, see <<integrating-single-sign-on>>.
 
-User passwords, including the default admin user password, must follow
-the rules below:
+[[sec-trento-user-authorization]]
+===== Default access and permissions
 
-* Password must contain at least 8 characters
-* The same number or letter must not be repeated three or more times in
-a row (for example: 111 or aaa)
-* Password must not contain four consecutive numbers or letters (for
-example: 1234, abcd or ABCD)
+Newly created users receive default display access to all views except the *Users* view. Default users can adjust filters and pagination settings to match their preferences. 
 
-The *Create User* and *Edit User* views provide a built-in password
-generation button that allows user managers to easily generate secure
-and compliant passwords. The user manager must provide the user with
-their password through an authorized secure channel.
+To perform protected actions, the user must have additional permissions added to their user profile.
 
-User managers may also set a preferred timezone for the
-account from the *Create User* and *Edit User* views. Individual users
-can configure their own preference later in the *Profile* view. The
-web console displays dates and times according to each user's preferred
-timezone for presentation; if no preference is set, UTC is used. This
-preference affects only how timestamps are presented in the UI —
-backend storage, API payloads, logs and scheduled tasks continue to use
-UTC.
+[[sec-trento-user-permissions]]
+===== Available permissions
 
-A user can reset their password in the Profile view. In this view, they
-can also update their name and email address as well as activate
-multi-factor authentication using an authenticator app. Multi-factor
-authentication increases the security of a user account by requesting a
-temporary second password or code when logging in the console. User
-managers can disable multi-factor authentication for any given user that
-has it enabled. However, user managers cannot enable multi-factor
-authentication on their behalf. The default admin user cannot enable its
-own multi-factor authentication.
+You can grant the following permissions to a user:
+
+`all:users`:: Full access to user management actions under the *Users* view.
+
+`all:checks_selection`:: Check selection capabilities for any target in the registered environment that has checks available.
+
+`all:checks_execution`:: Check execution capabilities for any target in the registered environment that has checks available and selected.
+
+`all:checks_customization`:: Customization of the expected values for configuration checks.
+
+`all:tags`:: Creation and deletion of the available tags.
+
+`cleanup:all`:: Housekeeping actions on hosts whose agent heartbeat is lost, and on {sap} or {hana} instances that are no longer found.
+
+`operation:cluster`, `operation:database`, `operation:host`, `operation:sap_system`:: Performing operations on the specified resource type (clusters, databases, hosts or {sap} systems).
+
+`operation:all`:: Performing operations in all resources.
+
+`all:settings`:: Changes to any system settings in the *Settings* view.
+
+`activity_log:users`:: Visibility of all users in the Activity Log. Without this permission, a user only sees their own user name and the user `system`.
+
+`all:all`:: All the previous permissions.
+
+[[sec-trento-user-roles]]
+===== Example user roles
+
+Combine permissions to match specific team responsibilities. You can create the following common user roles:
+
+* *User managers:* users with `all:users` permissions
+* *{sap} Basis administrator with {trento} display-only access:* users with default permissions
+* *{sap} Basis administrator with {trento} configuration access*: users with `all:checks_selection`, `all:tags` and `all:settings` permissions
+* *{sap} Basis administrator with {trento} operation access:* users with `all:checks_execution`, `cleanup:all` and `operation:all` permissions
+
+[[sec-trento-user-default-admin]]
+==== Initial configuration with the default admin user
+
+The installation process creates a default admin user with the `all:all` permissions. This user cannot be modified or deleted. 
+
+The default admin user is intended only for the initial configuration of user access:
+
+* Use it only to create the first user manager, that is, a user with the `all:users` permission. The user manager then creates all other required users.
+
+* Treat the admin user as a fallback account. Use it only if all other access to the console is lost.
+
+[IMPORTANT]
+====
+You cannot enable Multi-factor authentication for the default admin user. The password provides the only security. You must keep this password safe.
+
+If the password is lost or compromised, reset it immediately through Helm or Web component configuration, depending on which deployment method was used to install {trserver}.
+====
+
+[[sec-trento-manage-users]]
+==== Managing user access and accounts
+
+User managers with the `all:users` permission can create and maintain accounts and permissions, control system access by enabling or disabling users or intervene if a user account is compromised.
+
+[[sec-trento-user-create]]
+===== Creating and editing users
+
+Create and maintain accounts from the *Users* view. It requires the `all:users` permission.
+
+. In the left sidebar of the {tr_web} console, click *Users*.
+. Click *Create User*, or select an existing user to edit.
+. Enter the user details.
+. Set a password or click *Generate Password* for a compliant one. For more information, see <<sec-trento-user-authentication>>.
+. Select the permissions to grant.
+. Enable or disable the user by setting their status.
+. Optionally, set a preferred timezone. If no preference is set, the console defaults to UTC. This setting only affects how timestamps are displayed in the console. Backend storage, API payloads, logs and scheduled tasks always use UTC.
+. Click *Create* for a new user, or *Save* for an existing user.
+. Share the password with the user through an authorized secure channel.
 
 [NOTE]
-.Security Tip for Multi-Factor Authentication
 ====
-Since multi-factor authentication cannot be enabled for the default
-admin user, keeping its password safe is imperative. If the default
-admin user's password is compromised, reset it immediately by updating
-the Helm chart or the web component configuration, depending on which
-deployment method was used to install {trserver}.
+When editing an existing user, the view provides additional capabilities:
+
+** Disable multi-factor authentication.
+** View information about the user, such as the account creation date, last login or whether they are opted into analytics collection.
 ====
 
-User managers can enable and disable users. When a user logged in the
-console is disabled by a user admin, their session is terminated
-immediately.
+[[sec-trento-user-access-recovery]]
+===== Resolving access and security issues
+
+User managers with the `all:users` permission can intervene when users lose access or compromise their accounts. You can perform the following security actions from the *Edit User* view:
+
+Disable the user::
+Change the user status to disabled. This terminates active sessions immediately.
+
+Reset the password::
+Generate a new password and share it with the user through a secure channel.
+
+Disable multi-factor authentication:: 
+Turn off the MFA setting if the user loses access to their authenticator app. The user can log in with password and re-enable MFA afterward.
+
+Delete the user::
+From the main *Users* view, remove unnecessary accounts entirely by clicking *Delete* (except for the default admin user, which cannot be deleted).
+
+[[sec-trento-user-profile]]
+==== Managing personal profile settings
+
+Every user can manage their own profile settings. You do not need additional permissions for these actions.
+
+. In the {tr_web} console, click your user icon and select *Profile*. In the profile view, users can edit the following options:
+
+** Update name and email address.
+** Change password.
+** Enable multi-factor authentication.
+** Set preferred timezone. This adjusts how dates and times are displayed for your user in the console. Backend storage, API payloads, logs and scheduled tasks always use UTC.
+. Click *Save*.
+
+Additionally, the *Profile* view also provides settings for the following features:
+
+* Personal access tokens for API access. For more information, see <<sec-trento-personal-access-tokens>>.
+* Analytics collection. For more information, see <<sec-trento-analytics>>.
+* The {liz} AI assistant. For more information, see <<sec-trento-liz-ai-assistant>>.
