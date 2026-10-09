@@ -389,10 +389,7 @@ web-based email configuration is disabled. For more information, see
 When monitoring your {sap} landscape in the {tr_web} console, you might encounter unfamiliar health icons, unexpected system values, or sudden alerts. The following frequently asked questions address common scenarios and provide immediate starting points for your investigation.
 
 Why is a health icon gray?::
-A gray icon means either _stopped_ or _unknown_ health. Stopped means the component exists but is not running, as reported by `sapcontrol`. Unknown means {trento} cannot determine the value, most often because the connection to SUSE Multi-Linux Manager fails, the host is not found, or the data cannot be retrieved.
-
-// TODO: The draft said a tooltip distinguishes the two. Verify against the running product, then either
-// mention the tooltip or tell the reader how else to tell them apart.
+A gray icon means either _stopped_ or _unknown_ health. Stopped means the component exists but is not running, as reported by `sapcontrol`. Unknown means {trento} cannot determine the value, most often because the connection to SUSE Multi-Linux Manager fails, the host is not found, or the data cannot be retrieved. You can verify which state applies by checking the component's **Type** column in the console.
 
 Why does a health icon show a clock?::
 The clock marks a _stale_ value. This happens when the responsible {tragent} stops reporting. The console shows the last known value. Hover over the icon to see exactly when the value became stale. For more information on how to investigate stale data, see <<sec-trento-stale-data>>.
@@ -417,6 +414,9 @@ These alerts are triggered by {trento}'s event-driven architecture when a _stale
 
 How are pending software updates applied for hosts shown in {trento}?::
 While {tr_web} shows when updates are missing and flags the health as a _warning_ or _critical_, the actual patching is managed by SUSE Multi-Linux Manager. Log into your SUSE Multi-Linux Manager interface to view and apply the specific packages for that host.
+
+Why is the host name of a registered host rotating among different names?::
+This behavior happens when different hosts with the same machine ID are registered with {trento}. Machine IDs must be unique across the {trento} landscape. For more information, see <<sec-trento-agent-requirements>>.
 
 Which data should be collected before reporting an issue with {trento} itself?::
 For information on which data to collect for support, see <<trento-report-issue>>.
