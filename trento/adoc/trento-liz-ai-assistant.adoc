@@ -80,7 +80,12 @@ To stop using {liz}, clear your AI configuration from the *Profile* page. If the
 [[sec-using-liz]]
 ==== Using {liz}
 
-Open the chat launcher in {tr_web} and type your question. Your chat session remains active as long as you are logged into the {tr_web} console.
+Open the chat launcher in {tr_web} and type your question.
+
+[NOTE]
+====
+A conversation expires after 30 minutes of inactivity. {liz} then shows a notice and the conversation becomes read-only. Click *New chat* to start a new conversation.
+====
 
 *Example queries:*
 
