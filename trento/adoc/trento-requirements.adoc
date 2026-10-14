@@ -2,70 +2,84 @@ include::product-attributes.adoc[]
 
 [[sec-trento-requirements]]
 == Requirements
-:revdate: 2026-06-19
+:revdate: 2026-10-09
 
-This section describes requirements for the {trserver} and its {tragent}s, as well as the {sap} systems and clusters that we want to monitor in the backend environment.
+Ensure your environment satisfies all {trserver}, {tragent}, network, cluster and {sap} requirements before installation.
 
 [[sec-trento-server-requirements]]
 === {trserver} requirements
 
-Running all the {trserver} components requires a minimum of 4{nbsp}GB of RAM, two CPU cores and 64{nbsp}GB of storage. When using K3s, such storage should be provided under `/var/lib/rancher/k3s`.
+Before deploying {trserver}, ensure your environment meets the following requirements:
 
-{trento} is based on event-driven technology. Registered events are stored in a {postgresql} database with a default retention period of 10 days. For each host registered with {trento}, allocate at least 3{nbsp}GB of space in the {postgresql} database.
+Minimum hardware requirements::
+* 4{nbsp}GB of RAM.
+* 2 CPU cores.
+* 64{nbsp}GB of storage. When using K3s, provide the storage under `/var/lib/rancher/k3s`.
+* 3{nbsp}GB of {postgresql} database space allocated per registered host (based on default retention period of 10 days).
 
-{trserver} supports different deployment scenarios: {k8s} and systemd. A {k8s}-based deployment of {trserver} is cloud-native and OS-agnostic. It can be performed on the following services:
-
+Deployment-specific requirements::
+* *systemd deployment:* Requires packages from {sles4sap} 15 SP4 (or higher) or {sles4sap} 16.0 repositories.
+* *{k8s} deployment:* Cloud-native and OS-agnostic deployment. Supported environments include:
++
+--
 * RKE2
 * A {k8s} service in a cloud provider
-* Any other CNCF-certified {k8s} running on x86_64 architecture
-
+* Any CNCF-certified {k8s} running on `x86_64` architecture
+--
++
+[NOTE]
+====
 The Helm chart and the container images required for a {k8s}-based deployment are available in {suse} public registry.
 
-A production-ready {k8s}-based deployment of {trserver} requires {k8s} knowledge. The Helm chart is intended to be used by customers without in-house {k8s} expertise, or as a way to try {trento} with a minimum of effort. However, Helm chart delivers a basic deployment of the {trserver} with all the components running on a single node of the cluster.
-
-The packages required for a systemd deployment are available in the repositories of {sles4sap} 15 (SP4 or higher) or {sles4sap} 16.0.
+The provided Helm chart deploys a basic, single-node instance intended to be used by customers without in-house {k8s} expertise, or as a way to try {trento} with a minimum of effort. Production-grade {k8s} deployments require custom configuration and advanced {k8s} knowledge.
+====
 
 [[sec-trento-agent-requirements]]
 === {tragent} requirements
 
-The resource footprint of the {tragent} is designed to not impact the performance of the host it runs on.
+Before installing and running {tragent}, ensure your environment meets the following requirements:
 
-The {tragent} component needs to interact with several low-level system components that are part of the {sles4sap} distribution.
+* Supported operating system: {sles4sap} 15 (SP4 or higher) or {sles4sap} 16.0.
+* Every host registered with {trento} must have unique machine identifiers (IDs). If you clone a host, make sure to change the clone's machine ID before starting the {tragent} on it.
+* Every cluster registered with {trento} must have a unique authentication key (`authkey`).
 
-The hosts must have unique machine identifiers (ids) to be registered in {trento}. This means that if a host in your environment is built as a clone of another one, make sure to change the machine's identifier as part of the cloning process before starting the {tragent} on it.
-
-Similarly, the clusters must have unique authkeys to be registered in {trento}.
-
-The {tragent} package is available in the repositories of {sles4sap} 15 (SP4 or higher) or {sles4sap} 16.0.
+[NOTE]
+====
+{tragent} interacts with low-level system components in {sles4sap} and maintains a minimal resource footprint to avoid impacting host performance.
+====
 
 [[sec-trento-network-requirements]]
 === Network requirements
 
-Required inbound connectivity:
+Before deploying {trento}, ensure your network allows the following inbound connectivity:
 
 * From any {tragent} host to {trserver} at port TCP/80 (HTTP), or TCP/443 (HTTPS) if SSL is enabled.
-* From any {tragent} host to {trserver} at port TCP/5672 (Advanced Message Queuing Protocol or AMQP)
+* From any {tragent} host to {trserver} at port TCP/5672 (Advanced Message Queuing Protocol or AMQP).
 * From the user network to {trserver} at port TCP/80 (HTTP), or TCP/443 (HTTPS) if SSL is enabled.
 * If the {tr_mcp} is installed and enabled:
 ** For a {k8s} deployment, from the MCP client to the {trserver} ingress at TCP/80 or TCP/443. Internally, the {mcp} Pod uses TCP/{tr_mcp_default_port} and TCP/8080 if the health check is enabled.
 ** For a systemd deployment, from the user network to {tr_mcp} at TCP/{tr_mcp_default_port}.
 * Optionally: From the user network to {trserver} at ports TCP/4000, TCP/4001 and TCP/8080 (health checks for web, wanda and MCP, respectively).
-* From Prometheus server, when it exists, to each {tragent} host at the port used by the Node Exporter.
+* From the Prometheus server, when it exists, to each {tragent} host at the port used by the Node Exporter.
 
 [[sec-sap-requirements]]
 === {sap} requirements
 
-An {sap} system must run on a HANA database to be discovered by {trento}. In addition, the parameter `dbs/hdb/dbname` must be set in the DEFAULT profile of the {sap} system to the correct database (tenant) name.
+To enable {trento} to discover and monitor your {sap} systems, ensure your {sap} environments meet the following requirements:
 
-The agent must be installed in all the hosts that are part of the SAP system architecture. Particularly:
-
-* The host where the ASCS instance is running
-* The host where the ERS instance, if it exists, is running
-* All the hosts where an application server instance is running
-* All the database hosts
+* An {sap} system must run on a HANA database to be discovered by {trento}. Additionally, the `dbs/hdb/dbname` parameter in the {sap} system's `DEFAULT` profile must be set to the correct database (tenant) name.
+* The {tragent} must be installed in all the hosts that are part of the {sap} system architecture, specifically:
+** The host running the ASCS instance.
+** The host running the ERS instance (if it exists).
+** All hosts running an application server instance.
+** All database hosts.
 
 [[sec-trento-cluster-requirements]]
 === Cluster requirements
 
-The initial discovery of a {pace} cluster requires all cluster nodes to be online. After the cluster is discovered, all nodes can be stopped and {trento} continues to discover the cluster. 
+Ensure the cluster meets the following requirement:
+
+* All cluster nodes must be online during the initial discovery phase.
++
+After the cluster is discovered, all nodes can be stopped. {trento} continues to monitor the cluster. 
 
