@@ -1,3 +1,8 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-core-features]]
+[revdate="2026-10-15"]
+[description="Discover how to configure Trento core features including user management, single sign-on, activity logging and email alerts for your SAP landscape"]
 == Core Features
 
 include::trento-user-manage.adoc[]
@@ -10,4 +15,3 @@ include::trento-enabling-email-alerts.adoc[]
 include::trento-manage-tags.adoc[]
 include::trento-rotate-api-keys.adoc[]
 include::trento-personal-access-tokens.adoc[]
-

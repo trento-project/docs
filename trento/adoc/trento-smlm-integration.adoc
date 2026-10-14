@@ -1,9 +1,9 @@
 include::product-attributes.adoc[]
 
 [[sec-integration-with-suse-multi-linux-manager]]
+[revdate="2026-10-15"]
+[description="Learn how to integrate Trento with SUSE Multi-Linux Manager to monitor relevant patches, upgradable packages and security advisories for your SAP hosts"]
 == Integration with {smlm}
-:revdate: 2025-06-10
-
 
 {trento} can be integrated with {smlm} to provide the
 {sap} administrator with information about relevant patches and

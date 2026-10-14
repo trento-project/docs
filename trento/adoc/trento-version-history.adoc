@@ -1,9 +1,9 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-version-history]]
+[revdate="2026-10-15"]
+[description="Explore the key features, architectural enhancements and component updates introduced across different releases of Trento"]
 == Highlights of {trento} versions
-:revdate: 2026-09-18
-
 
 Below is a list of the most important user-facing features in the
 different versions of {trento}. For a more detailed information about

@@ -1,6 +1,7 @@
 include::product-attributes.adoc[]
-:revdate: 2026-01-09
-
+[[sec-trento-operations]]
+[revdate="2026-10-15"]
+[description="Learn how to securely run host, cluster and SAP database operations in Trento using built-in safety policies to prevent critical misconfigurations"]
 == Operations
 
 Operations in {trento} follow five principles:
@@ -178,6 +179,3 @@ For any registered {sap} system, the details view provides the following operati
 *** If the instance is managed by a cluster, the corresponding resource or the cluster itself must be in maintenance mode.
 *** In the case of an ASCS instance, the application server instances and, if it exists, the ERS instance must be stopped.
 ** Internal timeout: 5m
-
-
-

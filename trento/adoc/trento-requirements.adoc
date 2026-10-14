@@ -1,8 +1,9 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-requirements]]
+[revdate="2026-10-15"]
+[description="Discover the essential hardware, software and network requirements needed to successfully deploy the Trento Server and Trento Agent for SAP monitoring"]
 == Requirements
-:revdate: 2026-10-09
 
 Ensure your environment satisfies all {trserver}, {tragent}, network, cluster and {sap} requirements before installation.
 
@@ -82,4 +83,3 @@ Ensure the cluster meets the following requirement:
 * All cluster nodes must be online during the initial discovery phase.
 +
 After the cluster is discovered, all nodes can be stopped. {trento} continues to monitor the cluster. 
-
