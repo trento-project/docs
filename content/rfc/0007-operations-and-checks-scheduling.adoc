@@ -1,0 +1,354 @@
+== 7. Scheduling of Operations and Checks Execution
+
+[width="100%",cols="<18%,<82%",]
+|===
+|Feature Name |Scheduling of operations and checks execution
+|Start Date |Oct 14th, 2026
+|Category |Architecture, Operations, Checks
+|PR |To be opened from branch `rfc-operations-checks-scheduling`
+|===
+
+== Summary
+
+Let users run operations and checks executions at a time of their choice, once or periodically, by introducing a persistent job scheduler (https://github.com/oban-bg/oban[Oban]) in Trento Web, replacing https://github.com/quantum-elixir/quantum-core[Quantum].
+
+== Motivation
+
+Two features ask Trento to act at a given time, without a user clicking a button:
+
+* *Operations scheduling*: request an operation (reboot a host, apply a saptune solution, start a HANA database, ...) for one target at a future date and time, once or periodically, with the same preconditions as a manual request. Later, do the same for a set of targets (bulk scheduling).
+* *Customization of check execution frequency*: today every registered host and cluster runs its checks every 5 minutes. Users want to change the global frequency (environment variable, helm flag, Settings view), override it per host or cluster, and define exception windows: time windows in which checks are not executed for a target.
+
+A third feature, *mass/bulk operations*, is related: it requests the same operation for a set of targets, and bulk scheduling builds on it. It is not designed here, but some decisions in this RFC are taken with it in mind.
+
+The features share the same building blocks:
+
+* something that fires at a given time and survives restarts
+* recurrence rules: every X days, every X weeks on some weekdays, every X months, every X years, with an end condition
+* the evaluation of the operation preconditions outside of an HTTP request
+
+This RFC answers:
+
+* which component owns the scheduling: Web, Wanda, or both
+* which scheduling technology to use
+* how scheduled requests interact with the existing messaging between Web, Wanda and the agents
+
+=== Use Cases Outline
+
+* As a user, I want to schedule an operation for a target at a future date and time, so that it runs in a maintenance window without me being there.
+* As a user, I want to schedule an operation periodically (every X days, weeks on some weekdays, months, years) until a date or for a number of occurrences.
+* As a user, I want to change or cancel a schedule.
+* As a user, I want the activity log to tell me when an operation was scheduled, when it was requested, and why a scheduled request failed (target not ready, policy not met, Trento not available).
+* As an administrator, I want to set the global check execution frequency from the environment, from helm, or from the Settings view.
+* As a user, I want a different check execution frequency for a specific host or cluster.
+* As a user, I want exception windows (one-time or recurring) in which checks are not executed for a host or cluster, and I want manual executions to be refused during a window.
+
+NOTE: The use cases are intentionally high level. Exact UI wording, the list of schedulable operations and the premium distinction are product decisions that do not change the architecture described here.
+
+== Detailed design
+
+=== Current state
+
+Scheduling touches the interaction between Web, Wanda and the agents, so a precise picture of today matters.
+
+[width="100%",cols="<20%,<27%,<27%,<26%",options="header"]
+|===
+| |Web |Wanda |Agent
+|Checks execution
+|Quantum runs `*/N * * * *` for all hosts and checkable clusters. Manual runs use the same function. Publishes `ExecutionRequested`, fire-and-forget
+|Reacts only. One execution per `group_id`, held in memory (`:global` name). A request for a running group is rejected
+|Runs one request at a time. Drops expired requests without a reply
+|Operations
+|Policies (heartbeat, saptune state, ...) run only in `OperationsPolicyPlug`, tied to the HTTP request. Publishes `OperationRequested`, returns 202
+|Reacts only. One operation per `group_id`. A request for a running group gets `OperationCompleted` `REQUEST_FAILED/ALREADY_RUNNING`
+|Runs one request at a time: plan, commit, verify, rollback on failure
+|Stored state
+|No record of running executions or operations. The UI reads them from Wanda
+|`executions` and `operations` tables
+|None
+|Time based work
+|Quantum: 7 static jobs, including a 10 seconds heartbeat check
+|Only per-run timeouts (`Process.send_after`)
+|Discovery and heartbeat loops
+|===
+
+Facts that matter for this design:
+
+* Wanda has no notion of time. Web owns the target registry, the checks selection, the operation policies, the users and their timezone, the activity log, the alerting and the settings.
+* A checks execution request for a group that is already running is rejected by Wanda and dead-lettered to `trento.checks.executions_error`. Web gets no reply. Nothing consumes that queue.
+* Web encodes every message with a CloudEvent `expiration` of 5 minutes (`Trento.Contracts.to_event/2`). The agents check it. Wanda does not (`Contracts.from_event/1` with `validate_expiration: false`). If Wanda or RabbitMQ is down, a request waits in the queue and runs whenever Wanda comes back.
+* `CHECKS_INTERVAL` exists only in `runtime.exs`, as a number of minutes pasted into a cron expression. It cannot express hours or weeks and is not exposed by helm or ansible.
+* Web and Wanda run as a single replica. Web is not clustered.
+
+=== Where the scheduling belongs
+
+==== Option 1: Web only
+
+PROs:
+
+* Web already decides when to request: the periodic checks job and every manual request live there
+* the data needed at fire time is in Web: targets, selection, policies, users, timezone, activity log
+* Wanda and the agents stay as they are: reactive executors
+* the inter-service messages do not change
+
+CONs:
+
+* Web gets one more responsibility, the job scheduler
+
+==== Option 2: Wanda only
+
+PROs:
+
+* Wanda already orchestrates executions and operations
+
+CONs:
+
+* Wanda knows neither the targets, the users nor the policies. It would need them from Web at fire time, over a channel that does not exist today
+* the activity log and the alerting live in Web, so every scheduled outcome would travel back to Web anyway
+
+==== Option 3: Both
+
+CONs:
+
+* two schedulers to operate and to keep consistent, for no benefit identified
+
+'''
+
+Proposed option is *Option 1: Web only*. Wanda and the agent need no change to support scheduling. Wanda gets one small hardening change, described in link:#_wanda_changes[Wanda changes].
+
+=== Scheduling technology
+
+==== Option 1: Keep Quantum
+
+Quantum keeps jobs in memory. It cannot persist a one-time job at a future date, nor tell after a restart that an occurrence was missed. Its last release dates back to February 2024 and its repository has only received automated dependency updates since July 2025.
+
+==== Option 2: Quantum plus database "tick"
+
+A Quantum job every minute reads schedules with `next_run_at <= now` from our own tables and runs them.
+
+PROs:
+
+* no new dependency
+
+CONs:
+
+* we write and maintain our own scheduler: claiming due rows, retries, history, cleanup
+* still depends on an unmaintained library
+
+==== Option 3: Oban
+
+Oban stores jobs in Postgres. Jobs can be scheduled at a given time, survive restarts, and run once even with several nodes (leader election, database locks). It has built-in cron, retries, pruning and telemetry. The open source edition is Apache-2.0 licensed and covers our needs; the paid Pro edition is not needed. https://github.com/oban-bg/oban_web[Oban Web], a dashboard, is also Apache-2.0 and could be added later.
+
+PROs:
+
+* persistent one-time and periodic jobs
+* active project (v2.24.2 released in October 2026)
+* replaces Quantum for all existing periodic jobs
+
+CONs:
+
+* two new tables (`oban_jobs`, `oban_peers`) and a migration
+* requires PostgreSQL 14 or later. The oldest PostgreSQL version Trento documents is 14.10 (SLES for SAP 15 SP4)
+* Oban cron has a one minute resolution. The 10 seconds heartbeat check (and the 5 seconds heartbeat faker of the demo) move to a small supervised process with `Process.send_after`
+
+'''
+
+Proposed option is *Option 3: Oban*, configured on `Trento.Repo`:
+
+* cron entries replace the Quantum jobs: software updates discovery, API key expiration alert, activity log cleaning, discovery events pruning, and a new one minute checks execution evaluator (see link:#_checks_execution_frequency[Checks execution frequency])
+* queues: `default`, `checks` (concurrency 1), `operations`
+* `pruner` keeps 7 days of finished jobs, `lifeline` rescues jobs orphaned by a crash
+* tests run Oban in `:manual` testing mode
+
+Nothing changes in the deployment besides the database migration.
+
+=== Recurrence rules
+
+Both features need the same rules. They are implemented once, in a small module (`Trento.Scheduling.Recurrence`), and used by operation schedules and by recurring exception windows.
+
+Cron expressions are not enough: "every 2 weeks", "every 3 months on the 31st" or "for 5 occurrences" cannot be expressed. RRULE (RFC 5545) libraries exist for Elixir but are not well maintained and implement much more than we need.
+
+A schedule is: a start (UTC instant), a timezone (the user timezone at creation time), a frequency (none, daily, weekly, monthly, yearly), an interval (every X), weekdays (weekly only), and an end condition (never, end date, number of occurrences). Rules:
+
+* occurrences keep the local time of the start across daylight saving time changes (03:00 in Berlin is 01:00Z in summer and 02:00Z in winter)
+* a local time that does not exist (spring forward) moves to the first valid time, a local time that exists twice (fall back) uses the first one
+* weekly: weeks are counted from the week of the start. With no weekday selected, the weekday of the start is used
+* monthly on a day the month does not have (31): the last day of the month
+* yearly on 29 February: 28 February in non leap years
+* end date: no occurrence on that date or after it (see link:#_unresolved_questions[Unresolved questions])
+
+=== Checks execution frequency
+
+==== Global frequency
+
+* *Environment*: `CHECKS_INTERVAL` stays, with the same meaning (minutes), so existing installations keep working. It gets documented, and exposed as a helm value and an ansible variable. When set, it is enforced: the Settings view shows it read-only, as alerting settings already do (`enforced_from_env`).
+* *Settings*: a new settings entry stores the global frequency. Allowed values: 5, 15, 30 minutes, 1, 6, 12, 24 hours, 1, 2, 4 weeks. A new ability (`all:checks_execution_settings`) protects it.
+* *Default*: 5 minutes.
+
+==== Per target frequency and exception windows
+
+A `checks_schedules` table holds, per host or cluster, the optional interval override and the time of the last periodic request. A `checks_exception_windows` table holds the windows of a target: start, duration, timezone and recurrence.
+
+Changing the frequency of a target and its windows requires the same ability as changing its checks selection.
+
+==== Evaluation
+
+===== Option 1: one evaluator every minute
+
+An Oban cron job runs every minute. For each registered host and checkable cluster with selected checks, it requests an execution when the interval of the target elapsed since its last periodic request, unless the target is in an exception window.
+
+PROs:
+
+* evolution of today's periodic job: same request function, one more filter
+* changing a frequency, adding a window, registering or deregistering a target needs no job management
+* a target leaving an exception window is executed at the next minute when due
+
+CONs:
+
+* one query over the targets per minute, which is fine for the expected number of targets
+
+===== Option 2: one self-rescheduling job per target
+
+PROs:
+
+* no work when nothing is due
+
+CONs:
+
+* every change (frequency, window, registration, deregistration, selection) must find, cancel and reinsert jobs
+* more state to keep consistent
+
+'''
+
+Proposed option is *Option 1*. Manual requests (UI, API, AI assistant tools) use the same request function, which refuses an execution inside an exception window with a `422`. The UI disables "Start Execution" with a tooltip; the backend computes whether the target is in a window, so the rules live in one place.
+
+==== Overlapping executions
+
+The worry that executions pile up when an execution lasts longer than the frequency does not apply to Wanda: it refuses a second execution for a running group, and its execution timeout is 5 minutes, which is the shortest frequency. What does grow is the dead letter queue, with one rejected message per overlap. With the evaluator, Web records the last periodic request and never sends two requests within one interval, so overlaps only happen at the shortest frequency. Cleaning the dead letter queues (TTL or max length) is a separate, existing issue.
+
+A frequency per check or per group of checks is out of scope. Wanda executes all the selected checks of a group in one execution, and the health of a target is computed from that execution. Running subsets at different frequencies changes that model and needs its own design.
+
+=== Operations scheduling
+
+==== Schedules
+
+An `operation_schedules` table holds: target type and id, operation and its arguments, the recurrence fields, the number of occurrences already run, `next_run_at` (null once the schedule has ended) and the user who created it.
+
+Each schedule has at most one pending Oban job, scheduled at `next_run_at` and unique per schedule and occurrence:
+
+* *create*: insert the schedule, compute the first occurrence, insert its job, log "operation scheduled". The start must be in the future.
+* *change*: cancel the pending job, update the schedule, insert the job of the new first occurrence, log "operation schedule changed".
+* *cancel*: cancel the pending job, delete the schedule, log "operation schedule cancelled".
+* *run an occurrence*: the job checks that it is still the pending occurrence (a changed schedule leaves stale jobs cancelled), requests the operation, logs the outcome, then inserts the job of the next occurrence.
+
+Whether a target can have two schedules of the same operation is still open. The POC allows one (unique index on target and operation).
+
+==== Preconditions at fire time
+
+A scheduled request honors the same preconditions as a manual one. Today they run in `OperationsPolicyPlug`, tied to the HTTP connection. They move to a context function (`Trento.Operations.Requests`) that loads the target, runs the policy and requests the operation. The plug keeps working by calling the same loader. Bulk operations need the same function.
+
+At fire time:
+
+* *the creator*: the schedule runs on behalf of its creator. The creator must still exist, not be locked, and still hold the ability for the operation. Otherwise the request fails with reason "unauthorized".
+* *the policies*: agent heartbeat (stale target), saptune state, instances state and the other existing rules. A failure is recorded with the same reasons the forbidden modal shows.
+* *Trento not available*: if the job runs more than a tolerance (5 minutes in the POC) after its scheduled time, Web was down at that time. The occurrence is recorded as failed with reason "Trento not available" and is not requested. Missed occurrences are not caught up: the next occurrence is computed after the current time.
+
+==== Another operation already running
+
+Web does not know which operations are running: only Wanda does. Two options:
+
+===== Option A: let Wanda decide
+
+Web requests the operation as today. If another operation runs on the same group, Wanda replies `OperationCompleted` with `REQUEST_FAILED/ALREADY_RUNNING`.
+
+PROs:
+
+* no duplicate state, Wanda stays the only source of truth
+* no contract change for this case
+* the existing "operation completed" activity log entry already finds the request entry by `operation_id`, so the failure is correlated to the schedule without new code
+
+CONs:
+
+* the API cannot answer "already running" synchronously
+* Wanda's scope is the `group_id`: a host reboot (group = host) and a cluster host operation on the same host (group = cluster) do not block each other. That is today's behavior
+
+===== Option B: Web keeps its own list of running operations
+
+Web records an operation as requested when it publishes, running on `OperationStarted`, done on `OperationCompleted`, and adds a "no operation running" rule to the policies.
+
+PROs:
+
+* a synchronous answer for manual, scheduled, bulk and API requests, shown in the forbidden modal
+* conflicts can be defined per resource, not per `group_id`
+
+CONs:
+
+* a copy of Wanda's state that can drift: a Wanda crash leaves no `OperationCompleted`, so Web needs timeouts, and the step timeouts live in Wanda (a database start can last up to 36 hours). `OperationStarted` would need to carry a `timeout_at`
+* check-then-publish races remain, so Option A handling is needed anyway
+
+'''
+
+Proposed approach: *Option A now, Option B together with bulk operations*.
+
+A single scheduled request does not need a synchronous answer. Bulk operations do: the whole bulk request must be refused, through the UI and the API, when one target has an operation running. Option B is therefore planned with bulk operations, once, as one more policy rule in the context function introduced here. The frontend can show "already running" for manual requests from the running operations it already loads from Wanda.
+
+==== Activity log and alerts
+
+New entries, correlated by the schedule id:
+
+* operation scheduled, operation schedule changed, operation schedule cancelled (info)
+* scheduled operation requested (info), carrying the `operation_id`. Its type contains `operation_requested`, so the existing "operation completed" entry correlates to it, including Wanda's `REQUEST_FAILED` replies
+* scheduled operation request failed (warning), with the reason: Trento not available, unauthorized, policy not met (with the policy messages), target not found
+
+Alert emails for failed scheduled requests and failed scheduled operations are added to the existing alerting.
+
+==== User interface
+
+* The operation modal gets a "Now / Schedule" choice with start (in the user timezone), repeat, every X, weekdays, and end condition.
+* The schedules of a target are listed in its details view, with change and cancel. Overviews and dashboard show that a schedule exists.
+* The operation menu must open even when an operation is running or the target is stale, to let users schedule. "Request now" then relies on the forbidden modal (stale, policies) and on the running state already known to the frontend.
+* The frontend handles `operation_started` (today it only handles `operation_completed`), so an operation requested by the server shows as running.
+
+==== Bulk scheduling
+
+Bulk scheduling creates one schedule per selected target, so it reuses everything above. It depends on bulk operations and on Option B.
+
+=== Wanda changes
+
+Not required for scheduling, but recommended: Wanda checks the CloudEvent expiration of `OperationRequested`. An expired request is answered with `OperationCompleted` `REQUEST_FAILED` and a new detail value `EXPIRED` (adding a protobuf enum value is backward compatible). Web records it as "Trento not available". Without it, a scheduled operation requested while Wanda or RabbitMQ is down runs whenever Wanda comes back, possibly hours later.
+
+NOTE: `Contracts.from_event(payload, validate_expiration: true)` returns `{:error, :event_expired}` without the decoded message, so it cannot be used as is to reply: Wanda needs the `operation_id` and `group_id`. Wanda decodes the message as today and checks the expiration attribute (`Contracts.attributes_from_event/1`) before starting the operation.
+
+The same validation for `ExecutionRequested` avoids a burst of stale checks executions after a Wanda downtime. No reply is needed there.
+
+=== Agent changes
+
+None. The agent has no notion of schedules.
+
+=== Proofs of concept
+
+* https://github.com/trento-project/web/tree/poc-oban-checks-scheduling[poc-oban-checks-scheduling]: Oban replaces Quantum, heartbeat check on a ticker process, one minute checks execution evaluator, global frequency (environment and settings), per target frequency, exception windows, `422` for manual executions in a window, barebone UI.
+* https://github.com/trento-project/web/tree/poc-operation-scheduling[poc-operation-scheduling] (on top of the previous one): recurrence module with daylight saving time handling, operation schedules for hosts (reboot, saptune apply and change), fire-time checks (lateness, creator, policies), activity log entries, correlation of Wanda's `ALREADY_RUNNING` reply to the schedule, recurring exception windows, barebone UI in the operation modal and host details view, `operation_started` handling.
+
+Not covered by the POCs: other target types, bulk scheduling, alert emails, catalog based activity logging (the POC writes entries directly), the always-open operation menu, overviews and dashboard, helm and ansible changes, the Wanda expiration change.
+
+== Summary
+
+* Scheduling lives in Trento Web. Wanda and the agent keep their reactive role.
+* Oban replaces Quantum. Sub-minute tasks move to a ticker process.
+* One recurrence module serves operation schedules and exception windows.
+* Checks: a one minute evaluator applies the global or per target frequency and the exception windows. `CHECKS_INTERVAL` stays and becomes documented and exposed in helm and ansible.
+* Operations: one pending Oban job per schedule. Preconditions move out of the HTTP plug into a shared context function. "Already running" is left to Wanda now (Option A). A synchronous check in Web (Option B) is planned with bulk operations.
+* Wanda validates request expiration, so late requests fail cleanly.
+
+== Unresolved questions
+
+* Can a target have two schedules of the same operation? The POC allows one per operation and target.
+* End date: the individual scheduling requirement excludes the end date, the bulk scheduling one includes it. One rule is needed for both.
+* Lateness tolerance: how late can an occurrence run before it counts as "Trento not available"? The POC uses 5 minutes.
+* Do missed occurrences count towards "after X occurrences"? The POC counts the late one and skips the rest.
+* What happens to the schedules of a deleted user, of a deregistered target, and of an operation that is no longer schedulable?
+* Does a scheduled operation run on behalf of its creator (POC) or of a system actor with the creator recorded?
+* Which operations are schedulable? For example, applying a saptune solution only makes sense once.
+* Should exception windows also block scheduled operations, or only checks?
+* How is the "premium" distinction shown? There is no mechanism today.
