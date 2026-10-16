@@ -1,6 +1,10 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-installation]]
+[revdate="2026-10-15"]
+[description="Learn how to install the Trento Server and Trento Agent using Kubernetes, systemd or Ansible playbooks to effectively monitor your SAP infrastructure"]
 == Installation
 
 include::trento-install-server.adoc[]
 include::trento-install-agents.adoc[]
 include::trento-ansible-install.adoc[]
-

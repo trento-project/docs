@@ -1,8 +1,9 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-use-webconsole]]
+[revdate="2026-10-15"]
+[description="Learn how the Trento Web console aggregates health data across hosts, clusters and SAP systems to help administrators monitor system reliability"]
 == Monitoring {sap} health in the {tr_web} console
-:revdate: 2026-08-07
 
 {tr_web} combines the individual values of your {sap} landscape into one aggregated health value per host, cluster, {hana} database and {sap} system. You can therefore use the {tr_web} console to identify which parts of your {sap} landscape need attention.
 
