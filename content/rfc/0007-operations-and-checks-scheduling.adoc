@@ -8,6 +8,8 @@
 |PR |To be opened from branch `rfc-operations-checks-scheduling`
 |===
 
+:poc-repo: https://github.com/nelsonkopliku/web
+
 == Summary
 
 Let users run operations and checks executions at a time of their choice, once or periodically, for one target or for a set of targets.
@@ -132,11 +134,15 @@ The three implementations share everything except two things: where a schedule l
 * the HTTP API, described in link:#_http_api[HTTP API]
 * the correlation of Wanda's replies to scheduled requests
 
+Proof of concept: {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20shared%22%20sort%3Acreated-asc[`scheduling: shared` pull requests], one pull request per item of the list above ({poc-repo}/pull/8[#8], {poc-repo}/pull/9[#9], {poc-repo}/pull/10[#10], {poc-repo}/pull/11[#11], {poc-repo}/pull/12[#12]).
+
 Every implementation runs the same steps when a schedule is due: check the grace period, run the policies on fresh data, request the operation, log the outcome, then move the schedule to its next occurrence or delete it.
 
 ==== Option 1: Keep Quantum
 
 Schedules are rows in Ecto tables, with their `next_run_at`. One Quantum job runs every minute. It selects the due rows with `FOR UPDATE SKIP LOCKED`, runs them, and moves each to its next occurrence. A second Quantum job, also every minute, evaluates the checks executions (see link:#_checks_execution_frequency[Checks execution frequency]).
+
+Proof of concept: {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20quantum%22%20sort%3Acreated-asc[`scheduling: quantum` pull requests]. The runner is in {poc-repo}/pull/18[#18].
 
 PROs:
 
@@ -155,6 +161,8 @@ CONs:
 ==== Option 2: Oban
 
 Oban replaces Quantum for every periodic job, with its built-in cron. Jobs that run more often than once a minute (the heartbeat check, and the heartbeat faker of the demo) move to a small supervised process with `Process.send_after`. Each schedule row has one pending Oban job at `next_run_at`. The job is inserted, replaced or cancelled in the same transaction as the row. When the job runs, it checks that it is still the pending occurrence, requests the operation, and inserts the job of the next occurrence. A request that cannot be sent snoozes the job for one minute. The checks evaluator is an Oban cron entry.
+
+Proof of concept: {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20oban%22%20sort%3Acreated-asc[`scheduling: oban` pull requests]. Oban replaces Quantum in {poc-repo}/pull/24[#24]. The job per occurrence is in {poc-repo}/pull/30[#30].
 
 PROs:
 
@@ -177,6 +185,8 @@ NOTE: An intermediate path exists: the data model of Option 1, with an Oban cron
 An operation schedule is a Commanded aggregate (`Trento.Operations.Schedule`). Its commands are: schedule, change, cancel, start a run, complete a run. A projector writes the `operation_schedules` read model. The activity log entries come from the events, through the existing activity catalog. A Quantum job every minute dispatches "start a run" for the due schedules. An event handler runs the policies, requests the operation and dispatches the outcome. If the request cannot be sent, the handler retries every minute until the grace period ends.
 
 The checks settings of a target are events on the Host and Cluster aggregates, as the checks selection is. A projector writes them to their own read model. The time of the last periodic request stays in a plain table: an event every few minutes for every target adds no value to the event store.
+
+Proof of concept: {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20event%20sourced%22%20sort%3Acreated-asc[`scheduling: event sourced` pull requests]. The aggregate is in {poc-repo}/pull/36[#36], the runs in {poc-repo}/pull/41[#41], the checks settings as host and cluster events in {poc-repo}/pull/43[#43].
 
 PROs:
 
@@ -226,7 +236,7 @@ The three implementations serve the same API and the same frontend, so the choic
 
 === Recurrence rules
 
-Both features need the same rules. They are implemented once, in `Trento.Scheduling.Recurrence`, and used by operation schedules and by recurring exception windows.
+Both features need the same rules. They are implemented once, in `Trento.Scheduling.Recurrence`, and used by operation schedules and by recurring exception windows. Proof of concept: {poc-repo}/pull/8[#8].
 
 Cron expressions are not enough: "every 2 weeks", "every 3 months on the 31st" or "for 5 occurrences" cannot be expressed. RRULE (RFC 5545) libraries exist for Elixir but are not well maintained and implement much more than we need.
 
@@ -247,6 +257,8 @@ A schedule is a start (UTC instant), a timezone (the user timezone at creation t
 * *Settings*: a new settings entry stores the global frequency. A new ability (`all:checks_execution_settings`) protects it.
 * *Default*: 5 minutes.
 
+Proof of concept: {poc-repo}/pull/10[#10] (backend), {poc-repo}/pull/48[#48] (Settings view).
+
 ==== Per target frequency and exception window
 
 Each host and cluster can have:
@@ -255,6 +267,8 @@ Each host and cluster can have:
 * one exception window: a start, a duration, a timezone and an optional recurrence. Windows have no end condition
 
 Changing them requires the same ability as changing the checks selection of the target (`all:host_checks_selection`, `all:cluster_checks_selection`).
+
+Proof of concept: storage in {poc-repo}/pull/20[#20] (Quantum), {poc-repo}/pull/32[#32] (Oban), {poc-repo}/pull/43[#43] (event sourced). API endpoints in {poc-repo}/pull/21[#21], {poc-repo}/pull/33[#33], {poc-repo}/pull/44[#44]. UI in {poc-repo}/pull/49[#49].
 
 ==== Evaluation
 
@@ -287,6 +301,8 @@ CONs:
 
 Proposed option is *Option 1*. It is the same in the three implementations. Manual requests (UI, API, AI assistant tools) use the same request function, which refuses an execution inside the exception window with a `422`. The UI disables "Start Execution" with a tooltip and shows the time of the next execution. The backend computes both, so the rules live in one place.
 
+Proof of concept: {poc-repo}/pull/22[#22] (Quantum), {poc-repo}/pull/34[#34] (Oban), {poc-repo}/pull/45[#45] (event sourced).
+
 ==== Overlapping executions
 
 The worry that executions pile up when an execution lasts longer than the frequency does not apply to Wanda: it refuses a second execution for a running group, and its execution timeout is 5 minutes, which is the shortest frequency. What does grow is the dead letter queue, with one rejected message per overlap. With the evaluator, Web records the last periodic request and never sends two requests within one interval, so overlaps only happen at the shortest frequency. Cleaning the dead letter queues (TTL or max length) is a separate, existing issue.
@@ -309,15 +325,19 @@ A schedule holds: the target type and id, the operation and its arguments, the s
 * *run an occurrence*: see below. Then a one-time schedule is deleted. A periodic schedule moves to its next occurrence, or is deleted after the last one.
 * *target removed*: the schedules of a deregistered target are deleted. Each deletion logs "operation schedule cancelled", correlated with the clean up.
 
+Proof of concept, create, read, change and cancel: {poc-repo}/pull/13[#13], {poc-repo}/pull/14[#14], {poc-repo}/pull/15[#15], {poc-repo}/pull/16[#16] (Quantum), {poc-repo}/pull/25[#25], {poc-repo}/pull/26[#26], {poc-repo}/pull/27[#27], {poc-repo}/pull/28[#28] (Oban), {poc-repo}/pull/36[#36], {poc-repo}/pull/37[#37], {poc-repo}/pull/38[#38], {poc-repo}/pull/39[#39] (event sourced).
+
 ==== Preconditions at fire time
 
-A scheduled request honors the same policies as a manual one. Today they run in `OperationsPolicyPlug`, tied to the HTTP connection. They move to a context function (`Trento.Operations.Requests`) that loads the target with the same data as the controllers, runs the policies and requests the operation. The plug keeps working by calling the same loader. Bulk operations need the same function.
+A scheduled request honors the same policies as a manual one. Today they run in `OperationsPolicyPlug`, tied to the HTTP connection. They move to a context function (`Trento.Operations.Requests`) that loads the target with the same data as the controllers, runs the policies and requests the operation. The plug keeps working by calling the same loader. Bulk operations need the same function. Proof of concept: {poc-repo}/pull/9[#9].
 
 At fire time:
 
 * *the policies*: agent heartbeat (stale target), saptune state, instances state and the other existing rules, on fresh data. A failure is recorded with the same messages the forbidden modal shows.
 * *the creator*: no permission check. The creator's ability is checked when the schedule is created or changed.
 * *Trento not available*: the grace period is 5 minutes after the scheduled time, the same as the expiration of operation requests. A request that cannot be sent is retried until the grace period ends. After it, the occurrence is recorded as failed with reason "Trento not available" and is not requested. Missed occurrences are not caught up: the next occurrence is computed after the current time.
+
+Proof of concept, run at the scheduled time: {poc-repo}/pull/18[#18] (Quantum), {poc-repo}/pull/30[#30] (Oban), {poc-repo}/pull/41[#41] (event sourced).
 
 ==== Another operation already running
 
@@ -331,7 +351,7 @@ PROs:
 
 * no duplicate state, Wanda stays the only source of truth
 * no contract change for this case
-* the reply carries the `operation_id`, which the "scheduled operation requested" entry also carries. Web records the refusal of a scheduled request as "scheduled operation request failed", reason "another operation running", correlated to the schedule
+* the reply carries the `operation_id`, which the "scheduled operation requested" entry also carries. Web records the refusal of a scheduled request as "scheduled operation request failed", reason "another operation running", correlated to the schedule ({poc-repo}/pull/12[#12])
 
 CONs:
 
@@ -367,6 +387,8 @@ A bulk request creates one schedule per selected target, with the same operation
 * After creation, each schedule lives on its own: it is listed, changed, cancelled and run like an individual one. Its activity log entries carry the `bulk_id`. There is no summary entry for the bulk request.
 * Each occurrence is a request for one target, so bulk scheduling does not depend on bulk operations or on Option B. The UI reuses the target selection of bulk operations when it is available.
 
+Proof of concept: {poc-repo}/pull/19[#19] (Quantum), {poc-repo}/pull/31[#31] (Oban), {poc-repo}/pull/42[#42] (event sourced), {poc-repo}/pull/53[#53] (UI).
+
 === HTTP API
 
 The same API serves the three implementations. Times are ISO 8601 in UTC. Every schedule and window carries the IANA timezone used to compute its recurrence.
@@ -393,6 +415,8 @@ A schedule is `{id, target_type, target_id, operation, params, starts_at, timezo
 
 Errors: `403` without the ability of the operation, `404` for an unknown target or schedule, `422` for a past start, an operation that is not schedulable, or an invalid recurrence. A manual checks execution inside the exception window gets `422` on the existing request endpoints.
 
+Proof of concept: the OpenAPI schemas are in {poc-repo}/pull/11[#11]. The operation schedules endpoints are in {poc-repo}/pull/17[#17] (Quantum), {poc-repo}/pull/29[#29] (Oban), {poc-repo}/pull/40[#40] (event sourced). The checks schedule endpoints are in {poc-repo}/pull/21[#21], {poc-repo}/pull/33[#33], {poc-repo}/pull/44[#44]. The controllers are identical in the three implementations.
+
 === Activity log and alerts
 
 [width="100%",cols="<38%,<12%,<50%",options="header"]
@@ -412,14 +436,16 @@ Alert emails for failed scheduled requests and failed scheduled operations are a
 
 === User interface
 
-* *Settings view*: the global checks frequency, read-only when enforced from the environment.
-* *Check settings of a host or cluster*: the frequency override and the exception window. The checks overview of the target shows the time of the next execution. "Start Execution" is disabled during the window, with a tooltip.
-* *Operation modal*: a "Now / Schedule" choice with the start date and time (in the user timezone), repeat, every X, weekdays, and end condition. Schedulable operations show a "Premium" badge.
-* *Details views*: the schedules of the target, with change and cancel.
-* *Operations menu*: it opens even when an operation is running or the target is stale, so users can schedule. A spinner on the button shows the running operation. "Now" then relies on the forbidden modal (stale, policies) and on the running state already known to the frontend.
-* The frontend handles `operation_started` (today it only handles `operation_completed`), so an operation requested by the server shows as running.
-* *Bulk scheduling*: the hosts list gets a target selection and a "Schedule Reboot" action. The final selection comes from bulk operations.
+* *Settings view*: the global checks frequency, read-only when enforced from the environment. ({poc-repo}/pull/48[#48])
+* *Check settings of a host or cluster*: the frequency override and the exception window. The checks overview of the target shows the time of the next execution. "Start Execution" is disabled during the window, with a tooltip. ({poc-repo}/pull/49[#49])
+* *Operation modal*: a "Now / Schedule" choice with the start date and time (in the user timezone), repeat, every X, weekdays, and end condition. Schedulable operations show a "Premium" badge. ({poc-repo}/pull/50[#50])
+* *Details views*: the schedules of the target, with change and cancel. ({poc-repo}/pull/51[#51])
+* *Operations menu*: it opens even when an operation is running or the target is stale, so users can schedule. A spinner on the button shows the running operation. "Now" then relies on the forbidden modal (stale, policies) and on the running state already known to the frontend. ({poc-repo}/pull/52[#52])
+* The frontend handles `operation_started` (today it only handles `operation_completed`), so an operation requested by the server shows as running. ({poc-repo}/pull/54[#54])
+* *Bulk scheduling*: the hosts list gets a target selection and a "Schedule Reboot" action. The final selection comes from bulk operations. ({poc-repo}/pull/53[#53])
 * Overviews and dashboard do not show schedules yet.
+
+Proof of concept: {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20ui%22%20sort%3Acreated-asc[`scheduling: ui` pull requests]. {poc-repo}/pull/47[#47] to {poc-repo}/pull/54[#54] form the independent UI stack on `main`. {poc-repo}/pull/23[#23], {poc-repo}/pull/35[#35] and {poc-repo}/pull/46[#46] put the same commits on top of each backend.
 
 === Wanda changes
 
@@ -435,17 +461,18 @@ None. The agent has no notion of schedules.
 
 === Proofs of concept
 
-The proofs of concept are stacks of small branches in the web repository, one change per branch, so that each can become a pull request.
+The proofs of concept are stacks of small branches of the web repository, one change per branch.
+
+The pull requests are drafts in a fork, one per branch, labelled per stack. Each pull request lists its stack in merge order.
 
 [width="100%",cols="<26%,<74%",options="header"]
 |===
-|Branches |Content
-|`sched/base/01` to `05` |Shared part, on `main`: recurrence rules, operation requests without an HTTP connection, global checks frequency (environment, settings, API), API schemas, correlation of Wanda's replies to scheduled requests
-|`sched/quantum/01` to `10` |Option 1, on the shared part: create, read, change and cancel operation schedules, controllers and routes, the Quantum runner, bulk scheduling, checks settings per target, their controllers and routes, the checks evaluator
-|`sched/oban/01` to `11` |Option 2, on the shared part: the same steps, after a first branch that replaces Quantum with Oban
-|`sched/es/01` to `10` |Option 3, on the shared part: the same steps with commands, events, projectors and event handlers
-|`sched/ui/01` to `08` |The frontend, on `main`, assets only: API clients and models, global frequency in the Settings view, check settings of hosts and clusters, scheduling in the operation modals, list of schedules, operations menu always available, bulk scheduling in the hosts list, `operation_started` handling
-|https://github.com/trento-project/web/tree/sched/quantum/ui[`sched/quantum/ui`], https://github.com/trento-project/web/tree/sched/oban/ui[`sched/oban/ui`], https://github.com/trento-project/web/tree/sched/es/ui[`sched/es/ui`] |Each backend with the frontend on top. The frontend files are identical in the three
+|Pull requests |Content
+|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20shared%22%20sort%3Acreated-asc[`scheduling: shared` pull requests], branches `sched/base/01` to `05` |Shared part, on `main`: recurrence rules, operation requests without an HTTP connection, global checks frequency (environment, settings, API), API schemas, correlation of Wanda's replies to scheduled requests
+|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20quantum%22%20sort%3Acreated-asc[`scheduling: quantum` pull requests], branches `sched/quantum/*` |Option 1, on the shared part: create, read, change and cancel operation schedules, controllers and routes, the Quantum runner, bulk scheduling, checks settings per target, their controllers and routes, the checks evaluator. The last pull request puts the frontend on top
+|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20oban%22%20sort%3Acreated-asc[`scheduling: oban` pull requests], branches `sched/oban/*` |Option 2, on the shared part: the same steps, after a first pull request that replaces Quantum with Oban
+|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20event%20sourced%22%20sort%3Acreated-asc[`scheduling: event sourced` pull requests], branches `sched/es/*` |Option 3, on the shared part: the same steps with commands, events, projectors and event handlers
+|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20ui%22%20sort%3Acreated-asc[`scheduling: ui` pull requests], branches `sched/ui/*` |The frontend, on `main`, assets only: API clients and models, global frequency in the Settings view, check settings of hosts and clusters, scheduling in the operation modals, list of schedules, operations menu always available, bulk scheduling in the hosts list, `operation_started` handling. The frontend files are identical on the three backends
 |===
 
 The branches replace the first proofs of concept (`poc-oban-checks-scheduling` and `poc-operation-scheduling`).
