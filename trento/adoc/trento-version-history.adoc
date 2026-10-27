@@ -36,14 +36,12 @@ Version 3.2 (released on 2026/10/30)::
  Includes {helm} chart 3.2.0, {tr_web} component 3.2.0, orchestration engine ({wanda}) 2.2.0, compliance checks 1.4.0, {mcp} 1.2.0, {tragent} 3.2.0, and {trento} {ansible} 1.1.0 with the following highlights:
 
   * {liz}, an AI assistant built into {tr_web}
-  * Persistent filters across {tr_web} console views within a session
+  * Persistent filters and number of items per page settings across {tr_web} console views within a session
   * Detection of stale data for hosts, clusters, {sap} systems and databases
-  * Health of SBD devices included in the aggregated cluster health
+  * Cleaner representation of non-existing clusters in the Dashboard
+  * Health of SBD devices included in the aggregated health of clusters using file-based SBD fencing
   * Majority maker nodes excluded from {saptune} and {sap} Host Agent checks
-  * Email alert when a {tragent} stops reporting, and an option to send a test email
-  * Support for stateless connections in {mcp}
-  * Improved {tragent} support for {ppc64le}
-  * Automatic registration of required modules and port conflict checks in {trento} {ansible}
+  * Option to test SMTP configuration by sending a test email
   * All {trento} components re-licensed under GPL 3.0 or later
 
 Version 3.1 (released on 2026/05/27, last updated: 2026/09/18)::
