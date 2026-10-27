@@ -3,22 +3,22 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-@import "typeface-eos-icons.css";
-@import "typeface-roboto.css";
-@import "typeface-roboto-mono.css";
-@import "typeface-lato.css";
-@import "vars.css";
-@import "base.css";
-@import "body.css";
-@import "nav.css";
-@import "main.css";
-@import "toolbar.css";
-@import "breadcrumbs.css";
-@import "page-versions.css";
-@import "toc.css";
-@import "doc.css";
-@import "pagination.css";
-@import "header.css";
-@import "footer.css";
-@import "highlight.css";
-@import "print.css";
+@import url("typeface-eos-icons.css");
+@import url("typeface-roboto.css");
+@import url("typeface-roboto-mono.css");
+@import url("typeface-lato.css");
+@import url("vars.css");
+@import url("base.css");
+@import url("body.css");
+@import url("nav.css");
+@import url("main.css");
+@import url("toolbar.css");
+@import url("breadcrumbs.css");
+@import url("page-versions.css");
+@import url("toc.css");
+@import url("doc.css");
+@import url("pagination.css");
+@import url("header.css");
+@import url("footer.css");
+@import url("highlight.css");
+@import url("print.css");

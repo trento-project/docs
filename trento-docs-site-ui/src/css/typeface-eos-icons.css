@@ -4,7 +4,7 @@
  */
 
 @font-face {
-  font-family: "eos-icons";
+  font-family: eos-icons;
   font-weight: normal;
   font-style: normal;
   src:
@@ -16,7 +16,7 @@
 }
 
 .eos-icons {
-  font-family: "eos-icons", sans-serif;
+  font-family: eos-icons, sans-serif;
   font-weight: normal;
   font-style: normal;
   font-size: 24px;  /* Preferred icon size */
@@ -24,14 +24,14 @@
   line-height: 1;
   text-transform: none;
   letter-spacing: normal;
-  word-wrap: normal;
+  overflow-wrap: normal;
   white-space: nowrap;
   direction: ltr;
 
   /* Support for all WebKit browsers. */
   -webkit-font-smoothing: antialiased;
   /* Support for Safari and Chrome. */
-  text-rendering: optimizeLegibility;
+  text-rendering: optimizelegibility;
 
   /* Support for Firefox. */
   -moz-osx-font-smoothing: grayscale;

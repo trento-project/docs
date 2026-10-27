@@ -12,16 +12,6 @@ Examples of fetched component repositories include:
 
 * https://github.com/trento-project/web[web]
 * https://github.com/trento-project/agent[agent]
-* https://github.com/trento-project/helm-charts[helm-charts]
-* https://github.com/trento-project/ansible[ansible]
-* https://github.com/trento-project/checks[checks]
-* https://github.com/trento-project/contracts[contracts]
-* https://github.com/trento-project/tlint[tlint]
-* https://github.com/trento-project/wanda[wanda]
-* https://github.com/trento-project/photofinish[photofinish]
-* https://github.com/trento-project/support[support]
-* https://github.com/trento-project/continuous-delivery[continuous-delivery]
-* https://github.com/trento-project/werkzeugkoffer[werkzeugkoffer]
 * https://github.com/trento-project/mcp-server[mcp-server]
 
 For the full current list of fetched repositories, refer to `trento-docs-site/antora.yml`.

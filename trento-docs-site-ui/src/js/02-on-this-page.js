@@ -92,6 +92,7 @@
     headings.some(function (heading) {
       if (heading.getBoundingClientRect().top + getNumericStyleVal(heading, 'paddingTop') - buffer > ceil) return true
       activeFragment = '#' + heading.id
+      return false
     })
     if (activeFragment) {
       if (activeFragment === lastActiveFragment) return

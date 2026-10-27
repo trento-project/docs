@@ -38,3 +38,5 @@ asciidoc:
     page-pagination: ''
     site-gen-antora: ''
     imagesdir: _images
+    rust_version: ''
+    os_ver: ''

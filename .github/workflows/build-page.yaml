@@ -5,43 +5,61 @@ name: Publish Trento documentation on GitHub Pages
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'trento-docs-site/**'
+      - 'trento-docs-site-ui/build/ui-bundle.zip'
+      - '.github/workflows/build-page.yaml'
   workflow_dispatch:
   schedule:
     - cron: '0 13 * * 4' # Every Thursday at 1:00 PM UTC
 concurrency:
-  group: github-pages
-  cancel-in-progress: false
+  # Pull requests only build, so they get one queue each; every deploying event shares one queue
+  group: github-pages-${{ github.event.pull_request.number || 'deploy' }}
+  # Never interrupt a deployment, but let a new push to a pull request supersede the previous build
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 permissions:
   contents: read
-  pages: write
-  id-token: write
 jobs:
   build:
     runs-on: ubuntu-24.04
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    # openSUSE-based SUSE BCI image with Node.js 24 preinstalled
+    container:
+      image: registry.suse.com/bci/nodejs:24
     steps:
     - name: Checkout repository
-      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
     - name: Configure Pages
-      uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
-    - name: Install Node.js
-      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-      with:
-        node-version: '18'
-    - name: Install Antora with the Antora Lunr Extension
+      if: github.event_name != 'pull_request'
+      uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+    - name: Install dependencies
       working-directory: trento-docs-site
-      run: npm i antora @antora/lunr-extension
+      run: npm ci
     - name: Generate Site
       working-directory: trento-docs-site
       run: npx antora antora-playbook.yml
     - name: Upload Artifacts
-      uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+      if: github.event_name != 'pull_request'
+      uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
       with:
         path: trento-docs-site/build/trento-docs-site-public
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+      uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

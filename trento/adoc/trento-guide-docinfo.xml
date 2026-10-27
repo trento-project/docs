@@ -17,7 +17,7 @@
               <para>Resource refresh operation</para>
             </listitem>
             <listitem>
-              <para>Target hearbeat taken into consideration for the execution of an operation</para>
+              <para>Target heartbeat taken into consideration for the execution of an operation</para>
             </listitem>
             <listitem>
               <para>Stop/start of entire database layer in HANA HA setups</para>
@@ -26,7 +26,7 @@
               <para>Name change for cluster stop/start operations</para>
             </listitem>
             <listitem>
-              <para>Troubleshotting data in Activity Log when operation fails</para>
+              <para>Troubleshooting data in Activity Log when operation fails</para>
             </listitem>
           </itemizedlist>
         </listitem>

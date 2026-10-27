@@ -1,7 +1,8 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-what]]
-:revdate: 2026-01-08
+[revdate="2026-10-15"]
+[description="Explore how Trento provides SAP Basis administrators with automated discovery, configuration validation and AI assistance for SAP infrastructure"]
 == What is {trento}?
 
 {trento} is the official version of the Trento community project. It is a comprehensive monitoring solution consisting of two main components: the {trserver} and the {tragent}. {trento} provides the following functionality and features:
@@ -9,11 +10,11 @@ include::product-attributes.adoc[]
 * A user-friendly reactive Web interface for {sap} Basis administrators.
 * Automated discovery of {pace} clusters using SAPHanaSR classic or angi as well as different fencing mechanisms, including diskless SBD.
 * Automated discovery of {sap} systems running on ABAP or JAVA stacks and HANA databases.
-* Awareness of maintenance situations in a {pace} cluster at cluster, node, or resource level.
+* Visibility into {pace} maintenance status of clusters, nodes, or resources.
 * Configuration validation for {hana} Scale-Up Performance/Cost-optimized, {hana} Scale-out and ASCS/ERS clusters deployed on Azure, AWS, GCP or on-premises bare metal platforms, including KVM and Nutanix.
-* Useful information that offers insights about the execution of configuration checks.
+* Insights about the execution of configuration checks.
 * Delivery of configuration checks decoupled from core functionality.
-* Email alerting for critical events in the monitored landscape.
+* Email alerting for critical monitoring events.
 * Integration of saptune into the console and specific configuration checks at host and cluster levels.
 * Information about relevant patches and upgradable packages for registered hosts via integration with {smlm}.
 * Monitoring of CPU, memory, filesystem and swap usage at host level through basic integration with {prometheus}.
