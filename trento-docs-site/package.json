@@ -8,7 +8,7 @@
   "devDependencies": {
     "antora": "^3.2.1",
     "jest": "^30.5.2",
-    "prettier": "^3.9.9"
+    "prettier": "^3.9.10"
   },
   "dependencies": {
     "@antora/collector-extension": "^1.0.3",
