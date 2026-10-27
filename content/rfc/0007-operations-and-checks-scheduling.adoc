@@ -14,7 +14,7 @@
 
 Let users run operations and checks executions at a time of their choice, once or periodically, for one target or for a set of targets.
 
-Scheduling lives in Trento Web. Schedules are rows in the Web database. A job that runs every minute requests what is due. Three implementations of the same HTTP API were built to compare them: keep https://github.com/quantum-elixir/quantum-core[Quantum], replace it with https://github.com/oban-bg/oban[Oban], and event sourcing with Commanded. One frontend works on all three. The proposal is to keep Quantum.
+Scheduling lives in Trento Web. Three implementations of the same HTTP API were built to compare how schedules are stored and fired: keep https://github.com/quantum-elixir/quantum-core[Quantum], replace it with https://github.com/oban-bg/oban[Oban], and event sourcing with Commanded. One frontend works on all three. The choice between them is to be decided.
 
 == Motivation
 
@@ -194,10 +194,12 @@ PROs:
 * the audit trail and the activity log come from the events
 * the removal of schedules with their target is an event handler on the deregistration events
 * the checks settings of a target live next to its checks selection
+* a fit for future rules that span several operations on one target (Option B of link:#_another_operation_already_running[Another operation already running]), or for a permanent change history of schedules
 
 CONs:
 
 * most code: about 2200 lines of code and 2000 lines of tests on top of the shared part, with 30 new modules
+* schedules and frequencies are configuration with few rules. No current requirement asks for their event history
 * the API answers read their own writes, so every command is dispatched with strong consistency
 * a bulk request spans one aggregate per target, so it is not atomic. All the targets are validated first, then one command per target is dispatched
 * the roll-up of hosts and clusters must carry the new fields of their aggregate state
@@ -230,9 +232,9 @@ No other library fits:
 
 '''
 
-Proposed option is *Option 1: Keep Quantum*.
+Proposed option: *TBD*.
 
-The three implementations serve the same API and the same frontend, so the choice is internal and can change later. Option 1 is the smallest and keeps one source of truth. Its main risk, an unmaintained Quantum, is limited to two cron entries: Oban cron or a small GenServer can replace them without a change to the schedules. Oban adds retries and a dashboard, which the activity log and the next-minute retry cover here. Event sourcing gives an event history that no requirement asks for, at the highest cost: schedules and frequencies are configuration with few rules. It becomes worth its cost if a rule spans several operations on one target (Option B of link:#_another_operation_already_running[Another operation already running]), or if a permanent change history of schedules becomes a requirement.
+The three implementations serve the same API and the same frontend, so the choice does not change the API or the UI, and can change later.
 
 === Recurrence rules
 
@@ -482,7 +484,7 @@ Not covered by the proofs of concept: alert emails, overviews and dashboard, hel
 == Summary
 
 * Scheduling lives in Trento Web. Wanda and the agent keep their reactive role.
-* Schedules are rows in the Web database, fired by a job that runs every minute. Quantum stays (Option 1). Oban (Option 2) and event sourcing (Option 3) serve the same API and the same frontend, so the choice can change later.
+* How schedules are stored and fired is to be decided: keep Quantum (Option 1), Oban (Option 2) or event sourcing (Option 3). The three serve the same API and the same frontend.
 * One recurrence module serves operation schedules and exception windows.
 * Checks: a one minute evaluator applies the global or per target frequency and the exception window. `CHECKS_INTERVAL` takes the new values, stays compatible, and becomes documented and exposed in helm and ansible.
 * Operations: the policies move out of the HTTP plug into a shared context function. They run at creation as information, and at the scheduled time on fresh data. "Already running" is left to Wanda now (Option A). A synchronous check in Web (Option B) is planned with bulk operations.
@@ -491,7 +493,7 @@ Not covered by the proofs of concept: alert emails, overviews and dashboard, hel
 
 == Unresolved questions
 
-* Which implementation: the proposal is Option 1. Option 2 is the choice if retries and a dashboard matter more than a single source of truth.
+* Which implementation stores and fires the schedules: keep Quantum, Oban or event sourcing? TBD.
 * Schedules of a deleted or locked user: they keep running, because no permission check runs at fire time. Is that the expected behavior?
 * An operation that is no longer schedulable after an upgrade: delete its schedules, or let them fail at fire time?
 * What do overviews and dashboard show about schedules?
