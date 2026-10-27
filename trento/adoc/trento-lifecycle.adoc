@@ -1,9 +1,9 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-lifecycle]]
+[revdate="2026-10-15"]
+[description="Discover the lifecycle and supported deployment mechanisms for the Trento Server and Trento Agent on SUSE Linux Enterprise Server for SAP applications"]
 == Lifecycle
-:revdate: 2026-01-08
-
 
 {trento} is part of {sles4sap}. {trento}'s two main components have the following product lifecycles:
 

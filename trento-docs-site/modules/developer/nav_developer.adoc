@@ -49,19 +49,14 @@
 *** xref:rfc/0001-checks-customization.adoc[1. Check Customization]
 *** xref:rfc/0002-personal-access-tokens-management.adoc[2. Personal Access Tokens Management and Authentication]
 *** xref:rfc/0003-grafana-alloy-integration.adoc[3. Grafana Alloy Integration for SLES 16 System Monitoring]
+*** xref:rfc/0004-ai-agent-integration.adoc[4. AI Assistant]
+*** xref:rfc/0005-check-exclusion-predicates.adoc[5. Host-level Exclusion Predicates for Check Executions]
+*** xref:rfc/0006-migrate-to-internal-mcp-server.adoc[6. Migrate to Internal MCP Server]
 
 ** Internal Notes
 *** xref:internal-notes/pr-env-ssl-certificate-setup.adoc[SSL Certificate creation and setup Guide for Pull Request Environments]
 *** xref:internal-notes/release.adoc[Release Process]
 *** xref:internal-notes/trento-container-install.adoc[Containerized deployment]
 *** xref:internal-notes/analytics-setup.adoc[Analytics Google Tag Manager setup]
-
-** Trento Documentation Page
-*** xref:trento-docs-site/README.adoc[Documentation Page]
-*** xref:trento-docs-site/preview-docs-with-docker.adoc[Local Documentation Preview with Docker]
-*** xref:trento-docs-site/edit-url-extension-workflow.adoc[Edit URL Extension Workflow]
-*** xref:trento-docs-site/contribution-upstream/components-nav-guide.adoc[Component Documentation Navigation Guide]
-*** xref:trento-docs-site/collaboration-docs-team/docs-git-workflow.adoc[Git Workflow for Trento Documentation]
-*** xref:trento-docs-site-ui/README.adoc[Documentation Page UI]
 
 include::partial$nav_components.adoc[]
