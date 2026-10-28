@@ -58,6 +58,7 @@ Testing guidelines:
 Elixir].
 * Prefer https://github.com/thoughtbot/ex_machina[factories] over
 fixtures to create test data.
+* Read link:../architecture/cqrs-testing-strategy.adoc[CQRS & Event Sourcing Testing Strategy].
 * Hook to https://hexdocs.pm/telemetry/readme.html[Telemetry] events of
 3rd party packages to synchronize the test code. Find
 https://elixirforum.com/t/testing-and-telemetry-events-how-to-test-if-they-are-sent/28273/5[here]

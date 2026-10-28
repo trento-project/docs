@@ -1,0 +1,138 @@
+= Testing Strategy in Trento: Events as Contracts
+:toc: left
+:icons: font
+:source-highlighter: highlight.js
+
+== 1. The Core Idea: Events as Contracts
+
+In Trento, we separate the **Producer** (Aggregates) from **Consumers** (Projectors, Event Handlers, Process Managers).
+
+Testing both sides in isolation creates the risk of **Contract Drift**—where aggregate tests and consumer tests both pass on their own, but fail when run together because they expect different event structures.
+
+To solve this, we treat the **Event definition as the single source of truth (the contract)**.
+
+Because both the Producer and Consumers share the same event module, we can test each side independently with full confidence that they will integrate seamlessly in the running application.
+
+== 2. How the Testing Pieces Fit Together
+
+Instead of setting up full end-to-end integration pipelines, each test layer focuses on its own responsibility:
+
+1. **Producer Tests (Aggregates)**: Verify that incoming commands produce the expected events and attributes.
+2. **Consumer Tests (Projectors, Event Handlers, Process Managers)**: Verify that incoming events trigger the correct side effects (e.g. database updates, PubSub broadcasts, or outbound commands).
+3. **The Event Contract**: Protects against test data drifting from the actual event structure, preventing falsely passing consumer tests.
+
+=== Structural Compatibility vs. Semantic Variants
+
+The event contract guarantees that event data is **structurally valid**. However, it is the developer's responsibility to write consumer tests for all the different **semantic variants** emitted by the producer.
+
+For example, consider an event with a `:type` field (`:standard` vs. `:premium`):
+
+* Even though both variants share the exact same struct definition, the consumer might execute different logic depending on `:type`.
+* **Producer tests** must prove that commands can produce events for both `:standard` and `:premium`.
+* **Consumer tests** must run against both event variants to prove the consumer handles each case correctly.
+
+== 3. Structuring Event Factories (ExMachina + `new!/1`)
+
+To maintain the contract, **factories must always return validated structs using `EventModule.new!/1`** instead of raw `%EventModule{}` structs.
+
+To keep full compatibility with ExMachina's API (allowing overrides with `build(:some_event, field: override)`), use `merge_attributes/2` and `evaluate_lazy_attributes/1` before passing the data to `new!/1`:
+
+[source,elixir]
+----
+# test/support/factory.ex
+
+def some_event_factory(attrs \\ []) do
+  %{
+    id: Faker.UUID.v4(),
+    status: :online,
+    count: 2,
+    details: params_for(:some_details)
+  }
+  |> merge_attributes(attrs)
+  |> evaluate_lazy_attributes()
+  |> SomeEvent.new!()
+end
+----
+
+* `merge_attributes/2`: Merges explicit overrides passed in the test into the default factory map.
+* `evaluate_lazy_attributes/1`: Evaluates any anonymous functions defined in factory fields before struct construction.
+* `SomeEvent.new!/1`: Casts types, verifies enums, resolves embedded structures, and returns the final struct.
+
+== 4. What `new!/1` Handles vs. What Needs Extra Consideration
+
+=== Handled by `new!/1`
+Calling `EventModule.new!/1` wraps Ecto embedded schema casting and automatically handles:
+
+* **Type casting**: Converts strings to UUIDs, datetimes, integers, and booleans.
+* **Enum validation**: Enforces that values match declared `Ecto.Enum` atoms, rejecting invalid values.
+* **Nested structs**: Automatically casts lists of embedded schemas.
+* **Polymorphic embeds**: Resolves and instantiates the correct child structs based on parent discriminator fields.
+
+=== Not Handled by Default
+`new!/1` does not validate:
+
+* **Value constraints**: For example, verifying that an integer is positive (`count > 0`) or a string matches a specific regex.
+* **Interdependent fields**: For example, ensuring a count field matches the length of an embedded list, or that a specific child structure is present when an enum is set to a certain value.
+
+=== When Are Additional Validations Actually Needed?
+Only add extra validations if **Consumers have explicit logic or expectations that depend on those constraints**.
+
+* **No need for extra validation**: If consumers simply write the fields as-is into database columns, JSONB payloads, or relay them in broadcasts without branching on them. Adding constraints here is unnecessary maintenance burden.
+* **Add extra validation**: If consumers execute branching logic, calculations, or fail when fields are inconsistent (e.g. expecting a list length to match a count field, or matching specific child structs).
+
+== 5. Why Event Changesets Must NOT Validate in Production
+
+Event changesets in production should act strictly as **deserializers** (turning database maps into structs). Never run business rule validations in production event changesets:
+
+1. **Events are Historical Facts**: Events represent facts that already happened in the past and cannot be rejected. If an event validation fails during replay, it crashes the whole application.
+2. **Rehydration Performance**: Rebuilding aggregate and projector state involves replaying hundreds or thousands of events from PostgreSQL. Running validation logic on every event adds unnecessary CPU overhead.
+
+NOTE: **Commands are different from Events.** Commands are assembled from agent payloads and *should* have strict validations during production runs to reject invalid input before reaching the aggregate.
+
+== 6. Test-Only Changeset Template
+
+When you do need to validate interdependent fields or value constraints to prevent factory drift, protect those validations with `if Mix.env() == :test`:
+
+[source,elixir]
+----
+defmodule Trento.Domain.Events.SomeResourceRegistered do
+  use Trento.Support.Event
+
+  defevent version: 1 do
+    field :resource_id, Ecto.UUID
+    field :total_items, :integer
+    embeds_many :items, Item
+  end
+
+  def changeset(struct, params) do
+    changeset = super(struct, params)
+
+    if Mix.env() == :test do
+      validate_test_consistency(changeset)
+    else
+      changeset
+    end
+  end
+
+  # Runs ONLY during tests and factory instantiation.
+  # Completely skipped during production event rehydration.
+  defp validate_test_consistency(changeset) do
+    total_items = get_field(changeset, :total_items)
+    items = get_field(changeset, :items) || []
+
+    if is_integer(total_items) and length(items) != total_items do
+      add_error(changeset, :total_items, "must match the number of items in the list")
+    else
+      changeset
+    end
+  end
+end
+----
+
+== 7. Summary Rules of Thumb
+
+1. **Rely on Events as the Contract**: Test Aggregates and Consumers in isolation; let the shared event schema guarantee compatibility.
+2. **Cover Semantic Variants on Both Sides**: Ensure Producer tests cover all emitted event variants and Consumer tests cover handling each of those variants.
+3. **Build Factories with `new!/1`**: Always pipe through `merge_attributes/2 |> evaluate_lazy_attributes() |> Event.new!()`.
+4. **Keep Production Event Changesets Purely for Casting**: Never let event validation rules run in production.
+5. **Guard Complex Invariants with `:test`**: Only add constraint and correlation validations if consumers actively rely on them, and always wrap them in `Mix.env() == :test`.
