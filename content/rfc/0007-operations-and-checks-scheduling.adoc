@@ -94,7 +94,6 @@ Facts that matter for this design:
 * A checks execution request for a group that is already running is rejected by Wanda and dead-lettered to `trento.checks.executions_error`. Web gets no reply. Nothing consumes that queue.
 * Web encodes every message with a CloudEvent `expiration` of 5 minutes (`Trento.Contracts.to_event/2`). The agents check it. Wanda does not (`Contracts.from_event/1` with `validate_expiration: false`). If Wanda or RabbitMQ is down, a request waits in the queue and runs whenever Wanda comes back.
 * `CHECKS_INTERVAL` exists only in `runtime.exs`, as a number of minutes pasted into a cron expression. It cannot express hours or weeks and is not exposed by helm or ansible.
-* Web and Wanda run as a single replica. Web is not clustered.
 * Web stores hosts, clusters, SAP systems and databases with Commanded (event sourcing, CQRS). Settings, users and the activity log are plain Ecto tables.
 
 === Where the scheduling belongs
