@@ -46,18 +46,48 @@ This RFC answers:
 
 === Use Cases Outline
 
-* As a user, I want to schedule an operation for a target at a future date and time, so that it runs in a maintenance window without me being there.
-* As a user, I want to schedule an operation periodically (every X days, weeks on some weekdays, months, years) until a date or for a number of occurrences. A target can have several schedules of the same operation.
-* As a user, I want to schedule the same operation for several targets at once.
-* As a user, I want to see, change and cancel the schedules of a target in its details view.
-* As a user, I want the activity log to tell me when an operation was scheduled, when it was requested, and why a scheduled request failed (Trento not available, policies not met, another operation running).
-* As an administrator, I want to set the global check execution frequency from the environment, from helm, or from the Settings view.
-* As a user, I want a different check execution frequency for a specific host or cluster, or no periodic execution at all.
-* As a user, I want to schedule a maintenance window, one-time or periodic, for a host, cluster, HANA database or SAP system, which forbids checks executions, operations, or both.
-* As a user, I want a maintenance window to apply to the targets that depend on the one it is set on, and I want overlapping windows to add up.
-* As a user, I want to see the scheduled and ongoing maintenance windows of a target, also the ones that come from another target, and to change or delete them.
-* As a user, I want to schedule the same maintenance window for several targets at once.
-* As a user, I want manual and scheduled requests to be refused during a window that forbids them.
+==== Enhanced operations: scheduling
+
+* As a user I want to create a schedule for an operation
+* As a user I want to change the schedule for an operation
+* As a user I want to cancel the schedule for an operation
+* As a user I want an operation to run on a scheduled basis
+* As a user I want to access the operation request modal regardless of the runtime conditions of the target
+* As a user I want to see the scheduled operations of my targets
+* As a user I want to receive an alert email when a scheduled operation fails
+* As a user I want expired operation requests not to be executed
+* As a product owner I want scheduling to be distinguished as a premium feature in the UI
+* As a user I want to schedule an operation periodically
+* As a user I want a periodic operation to run on every occurrence
+* As a user I want Trento to refuse a request when another operation is running for the target
+* As a user I want to schedule a bulk operation
+
+==== Customization of check execution frequency
+
+* As an administrator I want to set the check execution frequency when deploying Trento
+* As a user I want to customize the check execution frequency in the settings view
+* As a user I want to see the next check execution in the host and cluster details views
+* As a user I want to set a different check execution frequency for a host or cluster
+* As a product owner I want target specific check settings to be distinguished as a premium feature in the UI
+
+Fallback, only if maintenance windows cannot be delivered (see link:#_plan_b_exception_window_per_target[Plan B: exception window per target]):
+
+* As a user I want to schedule a one time exception window for a host or cluster
+* As a user I want to schedule a periodic exception window for a host or cluster
+* As a user I want to change or remove the exception window of a host or cluster
+* As a user I want check executions to be blocked during an exception window
+
+==== Maintenance Windows
+
+* As a user I want to schedule a one time maintenance window for a target
+* As a user I want check executions to be blocked during a maintenance window
+* As a user I want operations to be blocked during a maintenance window
+* As a user I want a maintenance window to apply to the related targets
+* As a user I want to see the scheduled and ongoing maintenance windows of a target
+* As a user I want to change or delete a maintenance window
+* As a user I want to schedule a periodic maintenance window
+* As a user I want to schedule a maintenance window for a group of targets
+* As a product owner I want maintenance windows to be distinguished as a premium feature in the UI
 
 NOTE: Exact UI wording and the premium distinction are product decisions that do not change the architecture described here.
 
