@@ -1,8 +1,8 @@
-== 7. Scheduling of Operations and Checks Execution
+== 7. Scheduling of Operations and Checks Execution, and Maintenance Windows
 
 [width="100%",cols="<18%,<82%",]
 |===
-|Feature Name |Scheduling of operations and checks execution
+|Feature Name |Scheduling of operations and checks execution, maintenance windows
 |Start Date |Oct 14th, 2026
 |Category |Architecture, Operations, Checks
 |PR |To be opened from branch `rfc-operations-checks-scheduling`
@@ -12,17 +12,20 @@
 
 == Summary
 
-Let users run operations and checks executions at a time of their choice, once or periodically, for one target or for a set of targets.
+Let users run operations and checks executions at a time of their choice, once or periodically, for one target or for a set of targets, and let them define maintenance windows in which Trento does not act on a part of their landscape.
 
-Scheduling lives in Trento Web. Three implementations of the same HTTP API were built to compare how schedules are stored and fired: keep https://github.com/quantum-elixir/quantum-core[Quantum], replace it with https://github.com/oban-bg/oban[Oban], and event sourcing with Commanded. One frontend works on all three. The choice between them is to be decided.
+Scheduling and maintenance windows live in Trento Web. Three implementations of the same HTTP API were built to compare how schedules are stored and fired: keep https://github.com/quantum-elixir/quantum-core[Quantum], replace it with https://github.com/oban-bg/oban[Oban], and event sourcing with Commanded. One frontend works on all three. The choice between them is to be decided.
 
 == Motivation
 
-Three features ask Trento to act at a given time, without a user clicking a button:
+Four features ask Trento to act, or not to act, at a given time, without a user clicking a button:
 
 * *Operations scheduling*: request an operation (reboot a host, start a SAP system, put a cluster in maintenance, ...) for one target at a future date and time, once or periodically, with the same preconditions as a manual request.
 * *Bulk scheduling*: schedule the same operation for a set of targets in one step.
-* *Customization of check execution frequency*: today every registered host and cluster runs its checks every 5 minutes. Users want to change the global frequency (environment variable, helm flag, Settings view), override it per host or cluster, and define an exception window: a time window in which the checks of a target are not executed.
+* *Customization of check execution frequency*: today every registered host and cluster runs its checks every 5 minutes. Users want to change the global frequency (environment variable, helm flag, Settings view) and override it per host or cluster.
+* *Maintenance windows*: one-time or periodic time slots in which Trento does not execute checks, does not run operations, or both, on a target and on the targets that depend on it. A window on a SAP system covers its database, its clusters and all their hosts.
+
+An exception window per host or cluster, in which only the checks of that target are not executed, was the first answer to the last need. It is kept as a fallback (plan B, see link:#_plan_b_exception_window_per_target[Plan B: exception window per target]) in case maintenance windows cannot be delivered.
 
 A fourth feature, *mass/bulk operations*, is related: it requests the same operation for a set of targets now. It is designed and built separately. Bulk scheduling does not depend on it, but reuses its target selection in the UI.
 
@@ -31,6 +34,7 @@ The features share the same building blocks:
 * something that fires at a given time and survives restarts
 * recurrence rules: every X days, every X weeks on some weekdays, every X months, every X years, with an end condition
 * the evaluation of the operation preconditions outside of an HTTP request
+* the knowledge of which targets depend on which (the topology), for maintenance windows
 
 This RFC answers:
 
@@ -38,6 +42,7 @@ This RFC answers:
 * how schedules are stored and fired, and with which library
 * which HTTP API the frontend uses. The API stays the same whatever the implementation.
 * how scheduled requests interact with the existing messaging between Web, Wanda and the agents
+* how maintenance windows cover the targets that depend on the one they are set on, and where Trento enforces them
 
 === Use Cases Outline
 
@@ -48,7 +53,11 @@ This RFC answers:
 * As a user, I want the activity log to tell me when an operation was scheduled, when it was requested, and why a scheduled request failed (Trento not available, policies not met, another operation running).
 * As an administrator, I want to set the global check execution frequency from the environment, from helm, or from the Settings view.
 * As a user, I want a different check execution frequency for a specific host or cluster, or no periodic execution at all.
-* As a user, I want an exception window (one-time or recurring) in which the checks of a host or cluster are not executed, and I want manual executions to be refused during the window.
+* As a user, I want to schedule a maintenance window, one-time or periodic, for a host, cluster, HANA database or SAP system, which forbids checks executions, operations, or both.
+* As a user, I want a maintenance window to apply to the targets that depend on the one it is set on, and I want overlapping windows to add up.
+* As a user, I want to see the scheduled and ongoing maintenance windows of a target, also the ones that come from another target, and to change or delete them.
+* As a user, I want to schedule the same maintenance window for several targets at once.
+* As a user, I want manual and scheduled requests to be refused during a window that forbids them.
 
 NOTE: Exact UI wording and the premium distinction are product decisions that do not change the architecture described here.
 
@@ -129,12 +138,13 @@ Proposed option is *Option 1: Web only*. Wanda and the agent need no change to s
 The three implementations share everything except two things: where a schedule lives, and what fires it at its time. The shared part is:
 
 * the recurrence rules (`Trento.Scheduling.Recurrence`)
-* the operation preconditions without an HTTP connection (`Trento.Operations.Requests`)
+* the operation preconditions without an HTTP connection (`Trento.Operations.Requests`), on targets loaded the same way as the operation controllers load them (`Trento.Operations.Targets`)
 * the global checks frequency setting
 * the HTTP API, described in link:#_http_api[HTTP API]
-* the correlation of Wanda's replies to scheduled requests
+* the activities the application emits itself, through the activity log pipeline (see link:#_activity_log_and_alerts[Activity log and alerts])
+* the record of the runs of the schedules, which traces Wanda's replies back to their schedule
 
-Proof of concept: {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20shared%22%20sort%3Acreated-asc[`scheduling: shared` pull requests], one pull request per item of the list above ({poc-repo}/pull/8[#8], {poc-repo}/pull/9[#9], {poc-repo}/pull/10[#10], {poc-repo}/pull/11[#11], {poc-repo}/pull/12[#12]).
+Proof of concept: {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20shared%22%20sort%3Acreated-asc[`scheduling: shared` pull requests], one pull request per item of the list above ({poc-repo}/pull/8[#8], {poc-repo}/pull/9[#9], {poc-repo}/pull/10[#10], {poc-repo}/pull/11[#11], {poc-repo}/pull/55[#55], {poc-repo}/pull/56[#56]).
 
 Every implementation runs the same steps when a schedule is due: check the grace period, run the policies on fresh data, request the operation, log the outcome, then move the schedule to its next occurrence or delete it.
 
@@ -150,7 +160,7 @@ PROs:
 * one source of truth: the schedule row. Create, change and cancel are plain Ecto writes, in one transaction with their activity log entry
 * the UI sets start times to the minute, so a runner at the start of each minute runs schedules on time
 * the runner is one cron entry. Moving it to another library later changes one file, not the schedules
-* smallest code: about 1300 lines of code and 1300 lines of tests on top of the shared part
+* smallest code: about 1600 lines of code and 1700 lines of tests on top of the shared part, 15 new modules
 
 CONs:
 
@@ -176,15 +186,15 @@ CONs:
 * the grace period check is still necessary: without it, a job delayed by a downtime runs late
 * two new tables (`oban_jobs`, `oban_peers`) and a migration
 * requires PostgreSQL 14 or later. The oldest PostgreSQL version Trento documents is 14.10 (SLES for SAP 15 SP4)
-* about 1600 lines of code and 1460 lines of tests on top of the shared part
+* about 1950 lines of code and 1850 lines of tests on top of the shared part, 26 new modules
 
 NOTE: An intermediate path exists: the data model of Option 1, with an Oban cron entry as the runner. It removes Quantum without a second source of truth.
 
 ==== Option 3: Event sourcing
 
-An operation schedule is a Commanded aggregate (`Trento.Operations.Schedule`). Its commands are: schedule, change, cancel, start a run, complete a run. A projector writes the `operation_schedules` read model. The activity log entries come from the events, through the existing activity catalog. A Quantum job every minute dispatches "start a run" for the due schedules. An event handler runs the policies, requests the operation and dispatches the outcome. If the request cannot be sent, the handler retries every minute until the grace period ends.
+An operation schedule is a Commanded aggregate (`Trento.Operations.Schedule`). Its commands are: schedule, change, cancel, start a run, complete a run. Recurrence, params and policy errors are value objects in the events, which carry no user: the user travels in the event metadata, and the context logs the user actions as activities after a successful dispatch. A projector writes the `operation_schedules` read model, and the API waits for it (strong consistency) to read its own writes. A Quantum job every minute dispatches "start a run" for the due schedules. The aggregate derives the operation id of the occurrence from the schedule id and the occurrence, and keeps the run pending. The job then runs the policies, requests the operation with that id and dispatches the outcome. A pending run is started again after 30 seconds with the same id, and the aggregate fails it as "Trento not available" after the grace period. A replay of the events never requests an operation again.
 
-The checks settings of a target are events on the Host and Cluster aggregates, as the checks selection is. A projector writes them to their own read model. The time of the last periodic request stays in a plain table: an event every few minutes for every target adds no value to the event store.
+The checks interval of a target is an event on the Host and Cluster aggregates, as the checks selection is, carried by their roll-up. A projector writes it to its own read model. The time of the last periodic request stays in a plain table: an event every few minutes for every target adds no value to the event store. A maintenance window is an aggregate of its own, projected into a read model with the same columns as the table of the other options, so the coverage and the enforcement are the same code.
 
 Proof of concept: {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20event%20sourced%22%20sort%3Acreated-asc[`scheduling: event sourced` pull requests]. The aggregate is in {poc-repo}/pull/36[#36], the runs in {poc-repo}/pull/41[#41], the checks settings as host and cluster events in {poc-repo}/pull/43[#43].
 
@@ -198,9 +208,10 @@ PROs:
 
 CONs:
 
-* most code: about 2200 lines of code and 2000 lines of tests on top of the shared part, with 30 new modules
+* most code: about 3050 lines of code and 3650 lines of tests on top of the shared part, 41 new modules. Maintenance windows add about 2350 and 1900 lines, against 1700 and 1300 in the other options
 * schedules and frequencies are configuration with few rules. No current requirement asks for their event history
-* the API answers read their own writes, so every command is dispatched with strong consistency
+* the API answers read their own writes, so every command is dispatched with strong consistency. When the read model does not catch up in time, the change is saved but the API answers `202` without the resource
+* changes that span two aggregates or two commands are not atomic, for example a bulk request, or the frequency and the exception window of plan B in one request
 * a bulk request spans one aggregate per target, so it is not atomic. All the targets are validated first, then one command per target is dispatched
 * the roll-up of hosts and clusters must carry the new fields of their aggregate state
 * Commanded has no scheduler, so Quantum still fires the runs. The `commanded_scheduler` library does not compile with Commanded 1.x
@@ -221,13 +232,14 @@ No other library fits:
 [width="100%",cols="<28%,<24%,<24%,<24%",options="header"]
 |===
 | |Keep Quantum |Oban |Event sourcing
-|Code and tests on top of the shared part (lines) |1300 and 1300 |1600 and 1460 |2200 and 2000
-|New tables |`operation_schedules`, `checks_target_schedules` |the same, plus `oban_jobs` and `oban_peers` |`operation_schedules` and `checks_target_settings` (read models), `checks_execution_requests`
+|Code and tests on top of the shared part (lines) |1600 and 1700 |1950 and 1850 |3050 and 3650
+|Maintenance windows on top of that (lines) |1700 and 1300 |1700 and 1300 |2350 and 1900
+|New tables |`operation_schedules`, `checks_target_schedules`, `maintenance_windows` |the same, plus `oban_jobs` and `oban_peers` |`operation_schedules`, `target_checks_intervals` and `maintenance_windows` (read models), `checks_execution_requests`
 |New dependencies |none |`oban` (`oban_web` in development only) |none
 |Source of truth of a schedule |its row |its row and its job |its event stream
 |Precision |the minute |the second |the minute
 |Bulk creation |one transaction |one transaction |one command per target
-|Retries and history |next minute, activity log |Oban snooze, Oban jobs and activity log |event handler retry, events
+|Retries and history |next minute, activity log |Oban snooze, Oban jobs and activity log |pending run started again with the same operation id, events and activity log
 |===
 
 '''
@@ -238,7 +250,7 @@ The three implementations serve the same API and the same frontend, so the choic
 
 === Recurrence rules
 
-Both features need the same rules. They are implemented once, in `Trento.Scheduling.Recurrence`, and used by operation schedules and by recurring exception windows. Proof of concept: {poc-repo}/pull/8[#8].
+Operation schedules and maintenance windows need the same rules. They are implemented once, in `Trento.Scheduling.Recurrence`, and used by both, and by the exception windows of plan B. Proof of concept: {poc-repo}/pull/8[#8].
 
 Cron expressions are not enough: "every 2 weeks", "every 3 months on the 31st" or "for 5 occurrences" cannot be expressed. RRULE (RFC 5545) libraries exist for Elixir but are not well maintained and implement much more than we need.
 
@@ -255,20 +267,17 @@ A schedule is a start (UTC instant), a timezone (the user timezone at creation t
 
 ==== Global frequency
 
-* *Environment*: `CHECKS_INTERVAL` takes the new values: `5m`, `15m`, `30m`, `1h`, `6h`, `12h`, `24h`, `1w`, `2w`, `4w` or `disabled`. A number of minutes that matches one of them (`5`, `60`, ...) is still accepted, so existing installations keep working. Any other value is ignored with a warning in the log, and the saved setting applies. When the variable is set, the Settings view shows it read-only, as alerting settings already do (`enforced_from_env`), and the API answers `409` to a change. The variable gets documented, and exposed as a helm value and an ansible variable.
-* *Settings*: a new settings entry stores the global frequency. A new ability (`all:checks_execution_settings`) protects it.
+* *Environment*: `CHECKS_INTERVAL` takes the new values: `5m`, `15m`, `30m`, `1h`, `6h`, `12h`, `24h`, `1w`, `2w`, `4w` or `disabled`. A number of minutes that matches one of them (`5`, `60`, ...) is still accepted, so existing installations keep working. Any other value stops the boot with an error, as other invalid environment variables already do. When the variable is set, the Settings view shows it read-only, as alerting settings already do (`enforced_from_env`), and the API answers `409` to a change. The variable gets documented, and exposed as a helm value and an ansible variable.
+* *Settings*: a new settings entry stores the global frequency. A new ability (`all:checks_execution_settings`) protects it. The change is logged (`checks_execution_settings_updated`), and the setting is an AI assistant tool, like the other settings.
 * *Default*: 5 minutes.
 
 Proof of concept: {poc-repo}/pull/10[#10] (backend), {poc-repo}/pull/48[#48] (Settings view).
 
-==== Per target frequency and exception window
+==== Per target frequency
 
-Each host and cluster can have:
+Each host and cluster can have a frequency override. No override means the global frequency. `disabled` means no periodic execution.
 
-* a frequency override. No override means the global frequency. `disabled` means no periodic execution
-* one exception window: a start, a duration, a timezone and an optional recurrence. Windows have no end condition
-
-Changing them requires the same ability as changing the checks selection of the target (`all:host_checks_selection`, `all:cluster_checks_selection`).
+Changing it requires a new ability, `all:check_frequency`, and logs `host_checks_frequency_changed` or `cluster_checks_frequency_changed`. The settings of a deregistered target are removed with it.
 
 Proof of concept: storage in {poc-repo}/pull/20[#20] (Quantum), {poc-repo}/pull/32[#32] (Oban), {poc-repo}/pull/43[#43] (event sourced). API endpoints in {poc-repo}/pull/21[#21], {poc-repo}/pull/33[#33], {poc-repo}/pull/44[#44]. UI in {poc-repo}/pull/49[#49].
 
@@ -276,13 +285,13 @@ Proof of concept: storage in {poc-repo}/pull/20[#20] (Quantum), {poc-repo}/pull/
 
 ===== Option 1: one evaluator every minute
 
-A job runs every minute. For each registered host and checkable cluster with selected checks, it requests an execution when the frequency of the target elapsed since its last periodic request, unless the target is in its exception window.
+A job runs every minute. For each registered host and checkable cluster with selected checks, it requests an execution when the frequency of the target elapsed since its last periodic request, give or take half a minute so that the tick does not stretch the frequency, unless a maintenance window forbids checks executions on the target.
 
 PROs:
 
 * evolution of today's periodic job: same request function, one more filter
 * changing a frequency or a window, registering or deregistering a target needs no job management
-* a target leaving its exception window is executed at the next minute when due
+* a target leaving a maintenance window is executed at the next minute when due
 
 CONs:
 
@@ -301,7 +310,7 @@ CONs:
 
 '''
 
-Proposed option is *Option 1*. It is the same in the three implementations. Manual requests (UI, API, AI assistant tools) use the same request function, which refuses an execution inside the exception window with a `422`. The UI disables "Start Execution" with a tooltip and shows the time of the next execution. The backend computes both, so the rules live in one place.
+Proposed option is *Option 1*. It is the same in the three implementations. Manual requests (UI, API, AI assistant tools) are refused with a `422` during a maintenance window that forbids checks executions. The UI disables "Start Execution" with a tooltip and shows the time of the next execution, after the windows. The backend computes both, so the rules live in one place.
 
 Proof of concept: {poc-repo}/pull/22[#22] (Quantum), {poc-repo}/pull/34[#34] (Oban), {poc-repo}/pull/45[#45] (event sourced).
 
@@ -310,6 +319,14 @@ Proof of concept: {poc-repo}/pull/22[#22] (Quantum), {poc-repo}/pull/34[#34] (Ob
 The worry that executions pile up when an execution lasts longer than the frequency does not apply to Wanda: it refuses a second execution for a running group, and its execution timeout is 5 minutes, which is the shortest frequency. What does grow is the dead letter queue, with one rejected message per overlap. With the evaluator, Web records the last periodic request and never sends two requests within one interval, so overlaps only happen at the shortest frequency. Cleaning the dead letter queues (TTL or max length) is a separate, existing issue.
 
 A frequency per check or per group of checks is out of scope. Wanda executes all the selected checks of a group in one execution, and the health of a target is computed from that execution. Running subsets at different frequencies changes that model and needs its own design.
+
+==== Plan B: exception window per target
+
+If maintenance windows cannot be delivered, each host and cluster can have one exception window instead: a start, a duration, a timezone and an optional recurrence, without an end condition. During the window, no periodic checks execution runs against the target, the next execution falls after the window, and a manual execution gets `422` "Checks cannot be executed during exception window". Only checks executions are affected. The window is saved with the frequency of the target (`exception_window` in the checks settings).
+
+The proofs of concept keep it in separate branches on top of the frequency, so that it can be picked up as it is.
+
+Proof of concept: {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20plan%20b%22%20sort%3Acreated-asc[`scheduling: plan b` pull requests], per implementation: {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20plan%20b%22%20label%3A%22scheduling%3A%20quantum%22%20sort%3Acreated-asc[Quantum], {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20plan%20b%22%20label%3A%22scheduling%3A%20oban%22%20sort%3Acreated-asc[Oban], {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20plan%20b%22%20label%3A%22scheduling%3A%20event%20sourced%22%20sort%3Acreated-asc[event sourced], {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20plan%20b%22%20label%3A%22scheduling%3A%20ui%22%20sort%3Acreated-asc[UI].
 
 === Operations scheduling
 
@@ -331,13 +348,16 @@ Proof of concept, create, read, change and cancel: {poc-repo}/pull/13[#13], {poc
 
 ==== Preconditions at fire time
 
-A scheduled request honors the same policies as a manual one. Today they run in `OperationsPolicyPlug`, tied to the HTTP connection. They move to a context function (`Trento.Operations.Requests`) that loads the target with the same data as the controllers, runs the policies and requests the operation. The plug keeps working by calling the same loader. Bulk operations need the same function. Proof of concept: {poc-repo}/pull/9[#9].
+A scheduled request honors the same policies as a manual one. Today they run in `OperationsPolicyPlug`, tied to the HTTP connection. They move to a context function (`Trento.Operations.Requests`) that loads the target with the same data as the controllers, runs the policies and requests the operation. The loaders move out of the controllers (`Trento.Operations.Targets`), so the plug and the context load the same data. Bulk operations need the same function. Proof of concept: {poc-repo}/pull/9[#9].
 
 At fire time:
 
+* *the maintenance windows*: an ongoing window that forbids operations on the target refuses the request. The failure is recorded with the reason "maintenance window".
 * *the policies*: agent heartbeat (stale target), saptune state, instances state and the other existing rules, on fresh data. A failure is recorded with the same messages the forbidden modal shows.
 * *the creator*: no permission check. The creator's ability is checked when the schedule is created or changed.
-* *Trento not available*: the grace period is 5 minutes after the scheduled time, the same as the expiration of operation requests. A request that cannot be sent is retried until the grace period ends. After it, the occurrence is recorded as failed with reason "Trento not available" and is not requested. Missed occurrences are not caught up: the next occurrence is computed after the current time.
+* *Trento not available*: the grace period is 5 minutes after the scheduled time, the same as the expiration of operation requests. A request that cannot be sent is retried until the grace period ends. After it, the occurrence is recorded as failed with reason "Trento not available" and is not requested. Missed occurrences are not caught up: the next occurrence is computed after the current time, and the missed ones count as done.
+* *the run*: each requested occurrence is recorded with its operation id (`scheduled_operation_runs`, unique per schedule and occurrence). Wanda answers with the operation id only: the run traces the completion, or the refusal, back to the schedule, also after a one-time schedule is gone.
+* *robustness*: a schedule that cannot run is logged and does not stop the others. In the Oban implementation a crashed job is retried without requesting twice, and a cron job gives a job back to a schedule that lost its own.
 
 Proof of concept, run at the scheduled time: {poc-repo}/pull/18[#18] (Quantum), {poc-repo}/pull/30[#30] (Oban), {poc-repo}/pull/41[#41] (event sourced).
 
@@ -353,7 +373,7 @@ PROs:
 
 * no duplicate state, Wanda stays the only source of truth
 * no contract change for this case
-* the reply carries the `operation_id`, which the "scheduled operation requested" entry also carries. Web records the refusal of a scheduled request as "scheduled operation request failed", reason "another operation running", correlated to the schedule ({poc-repo}/pull/12[#12])
+* the reply carries the `operation_id`, which the "scheduled operation requested" entry also carries. Web records the refusal of a scheduled request as "scheduled operation request failed", reason "another operation running", correlated to the schedule ({poc-repo}/pull/56[#56])
 
 CONs:
 
@@ -391,33 +411,98 @@ A bulk request creates one schedule per selected target, with the same operation
 
 Proof of concept: {poc-repo}/pull/19[#19] (Quantum), {poc-repo}/pull/31[#31] (Oban), {poc-repo}/pull/42[#42] (event sourced), {poc-repo}/pull/53[#53] (UI).
 
+=== Maintenance windows
+
+==== Windows
+
+A maintenance window is set on a registered host, cluster, HANA database or SAP system. It has a start, a timezone, a duration of up to 31 days and an optional recurrence: every X days, weeks on some weekdays, months or years, until a date or forever. It forbids checks executions, operations, or both.
+
+* A target can have several windows. Windows of the same target, or of targets that depend on each other, can overlap: their restrictions add up.
+* A window can be changed at any time, also while it is ongoing: it can keep its start in the past. A change that leaves no occurrence ahead is refused. Such a window is deleted instead.
+* The windows of a deregistered target are deleted with it, logged by the system and correlated to the clean up.
+* Scheduling, changing and deleting windows requires a new ability, `all:maintenance_windows`. Every user sees them.
+* A bulk request sets the same window on up to 500 targets of one type, one window per target with a shared `bulk_id`, all or none.
+
+Proof of concept: create in {poc-repo}/pull/61[#61] (Quantum), {poc-repo}/pull/73[#73] (Oban), {poc-repo}/pull/85[#85] (event sourced), change in {poc-repo}/pull/63[#63] (Quantum), {poc-repo}/pull/75[#75] (Oban), {poc-repo}/pull/87[#87] (event sourced), delete in {poc-repo}/pull/64[#64] (Quantum), {poc-repo}/pull/76[#76] (Oban), {poc-repo}/pull/88[#88] (event sourced), bulk in {poc-repo}/pull/66[#66] (Quantum), {poc-repo}/pull/78[#78] (Oban), {poc-repo}/pull/90[#90] (event sourced).
+
+==== Coverage
+
+A window covers the target it is set on and the targets that depend on it:
+
+* a cluster covers its hosts
+* a HANA database covers the cluster that manages it, the hosts of that cluster and its own hosts, in the cluster or not
+* a SAP system covers its database (as above), the cluster that manages its ASCS/ERS instances, the hosts of that cluster and its own hosts
+
+A cluster manages a database or a SAP instance when its SAP resources name the SID and the instance number of an instance that runs on one of its hosts. This is how the operation policies already find "the cluster of" a database or an instance.
+
+A window on a host also forbids the operations that act on that host through another target: the cluster host operations (Pacemaker, cluster start and stop on a node) and the SAP instance operations on that host. This is the safest reading of "operations are forbidden on one particular host", and an open question.
+
+The coverage is resolved when it is needed, on the topology Trento knows at that moment:
+
+* from a target up to the targets whose windows cover it, to list the windows of a target and to check an operation
+* from the ongoing windows down to the hosts and clusters they cover, once per run of the checks job
+
+A host that joins a cluster during a cluster window is covered by it, an ASCS failover moves the coverage with the instance, and deregistered targets cover nothing. A projection of the covered targets of each window must react to every discovery event that changes the topology, so the proofs of concept do not keep one. Two indexes (`hosts.cluster_id`, `sap_systems.database_id`) support the queries.
+
+Proof of concept: from a target up in {poc-repo}/pull/62[#62] (Quantum), {poc-repo}/pull/74[#74] (Oban), {poc-repo}/pull/86[#86] (event sourced), from the windows down in {poc-repo}/pull/67[#67] (Quantum), {poc-repo}/pull/79[#79] (Oban), {poc-repo}/pull/91[#91] (event sourced).
+
+==== Where Trento enforces them
+
+* *Periodic checks executions*: the checks job skips the hosts and clusters covered by an ongoing window that forbids checks executions. The next execution of a target falls after the window, or after the last of a chain of overlapping windows.
+* *Manual checks executions*: `422` "Checks cannot be executed during a maintenance window", for the UI, the API and the AI assistant tools.
+* *Manual operations*: the operation policy check of the controllers adds the maintenance windows of the targets of the operation to the other policies. The forbidden modal names the target the window is set on and when it ends. The API answers `403`.
+* *Scheduled operations*: the same check runs at the scheduled time. A window that forbids operations makes the scheduled request fail with the reason "maintenance window". A schedule created or changed during such a window gets it among its warnings.
+
+An action that already runs when a window starts is not stopped. Whether to stop it is an open question.
+
+Proof of concept: checks executions in {poc-repo}/pull/67[#67] (Quantum), {poc-repo}/pull/79[#79] (Oban), {poc-repo}/pull/91[#91] (event sourced), operations in {poc-repo}/pull/68[#68] (Quantum), {poc-repo}/pull/80[#80] (Oban), {poc-repo}/pull/92[#92] (event sourced).
+
+==== Storage
+
+The windows are configuration, as schedules and frequencies: they are stored like schedules in each implementation, an Ecto table in the Quantum and Oban implementations and an aggregate per window in the event sourced one. No aggregate can hold the rule they enforce: it depends on the topology, which lives in the host, cluster, database and SAP system aggregates. The coverage and the enforcement are a query and a policy on the read side, shared by the three implementations.
+
+Plan B, the exception window per target (see link:#_plan_b_exception_window_per_target[Plan B: exception window per target]), is the fallback if maintenance windows cannot be delivered.
+
+Proof of concept: {poc-repo}/pulls?q=is%3Apr%20label%3A%22maintenance%20windows%22%20sort%3Acreated-asc[`maintenance windows` pull requests], per implementation: {poc-repo}/pulls?q=is%3Apr%20label%3A%22maintenance%20windows%22%20label%3A%22scheduling%3A%20quantum%22%20sort%3Acreated-asc[Quantum], {poc-repo}/pulls?q=is%3Apr%20label%3A%22maintenance%20windows%22%20label%3A%22scheduling%3A%20oban%22%20sort%3Acreated-asc[Oban], {poc-repo}/pulls?q=is%3Apr%20label%3A%22maintenance%20windows%22%20label%3A%22scheduling%3A%20event%20sourced%22%20sort%3Acreated-asc[event sourced], {poc-repo}/pulls?q=is%3Apr%20label%3A%22maintenance%20windows%22%20label%3A%22scheduling%3A%20ui%22%20sort%3Acreated-asc[UI]. The windows are stored in an Ecto table in {poc-repo}/pull/61[#61] (Quantum) and {poc-repo}/pull/73[#73] (Oban), and as an aggregate per window in {poc-repo}/pull/85[#85] (event sourced).
+
 === HTTP API
 
 The same API serves the three implementations. Times are ISO 8601 in UTC. Every schedule and window carries the IANA timezone used to compute its recurrence.
 
 * `interval`: `"5m"`, `"15m"`, `"30m"`, `"1h"`, `"6h"`, `"12h"`, `"24h"`, `"1w"`, `"2w"`, `"4w"` or `"disabled"`.
 * `recurrence`: `{frequency, interval, weekdays, ends_on, max_occurrences}`, or null for a one-time schedule. `frequency` is `daily`, `weekly`, `monthly` or `yearly`. `weekdays` uses ISO numbers, Monday is 1. `ends_on` is a date, excluded.
-* `exception_window`: `{starts_at, timezone, duration_minutes, recurrence}`, or null.
+* `forbids`: a non empty subset of `checks_execution` and `operations`.
 
 [width="100%",cols="<34%,<30%,<36%",options="header"]
 |===
 |Request |Body |Response
 |`GET /api/v1/settings/checks_execution` | |`{interval, enforced_from_env}`
 |`PUT /api/v1/settings/checks_execution` |`{interval}` |the same shape. `409` when enforced from the environment
-|`GET /api/v1/hosts/:id/checks/schedule`, `GET /api/v1/clusters/:id/checks/schedule` | |`{interval, effective_interval, global_interval, last_requested_at, next_execution_at, exception_window, in_exception_window}`
-|`PUT /api/v1/hosts/:id/checks/schedule`, `PUT /api/v1/clusters/:id/checks/schedule` |`{interval, exception_window}` |the same shape. `interval: null` means the global frequency
-|`GET /api/v1/operation_schedules?target_id=` | |the schedules, ordered by `next_run_at`
+|`GET /api/v1/hosts/:id/checks/schedule`, `GET /api/v1/clusters/:id/checks/schedule` | |`{interval, effective_interval, global_interval, last_requested_at, next_execution_at}`
+|`PUT /api/v1/hosts/:id/checks/schedule`, `PUT /api/v1/clusters/:id/checks/schedule` |`{interval}` |the same shape. `interval: null` means the global frequency
+|`GET /api/v1/operation_schedules?target_id=`, or `?target_ids=&operation=` | |the schedules, ordered by `next_run_at`. Several targets and an operation tell whether the operation is already scheduled on them
 |`POST /api/v1/operation_schedules` |`{target_type, target_id, operation, params, starts_at, timezone, recurrence}` |`201`, the schedule with its `warnings`
 |`PUT /api/v1/operation_schedules/:id` |`{params, starts_at, timezone, recurrence}` |the schedule with its `warnings`
 |`DELETE /api/v1/operation_schedules/:id` | |`204`
 |`POST /api/v1/operation_schedules/bulk` |`{target_type, target_ids, operation, params, starts_at, timezone, recurrence}` |`201`, `{bulk_id, schedules}`, each schedule with its `warnings`
+|`GET /api/v1/maintenance_windows?target_type=&target_id=` | |the windows that cover the target, own and inherited, with an ongoing or upcoming occurrence, active ones first
+|`POST /api/v1/maintenance_windows` |`{target_type, target_id, starts_at, timezone, duration_minutes, recurrence, forbids}` |`201`, the window
+|`PUT /api/v1/maintenance_windows/:id` |`{starts_at, timezone, duration_minutes, recurrence, forbids}` |the window
+|`DELETE /api/v1/maintenance_windows/:id` | |`204`
+|`POST /api/v1/maintenance_windows/bulk` |`{target_type, target_ids, starts_at, timezone, duration_minutes, recurrence, forbids}` |`201`, `{bulk_id, maintenance_windows}`
 |===
 
 A schedule is `{id, target_type, target_id, operation, params, starts_at, timezone, recurrence, next_run_at, occurrences, bulk_id, created_by, inserted_at, updated_at}`. `target_type` is `host`, `cluster`, `sap_system` or `database`. A warning is `{message, metadata}`: the message of a policy that does not pass now, and the resources it names.
 
-Errors: `403` without the ability of the operation, `404` for an unknown target or schedule, `422` for a past start, an operation that is not schedulable, or an invalid recurrence. A manual checks execution inside the exception window gets `422` on the existing request endpoints.
+A window is `{id, target_type, target_id, target_name, starts_at, timezone, duration_minutes, recurrence, forbids, bulk_id, created_by, inserted_at, updated_at, inherited, active, current_occurrence, next_occurrence}`. `target_type` is `host`, `cluster`, `database` or `sap_system`. `inherited` tells that the window is set on another target that covers the requested one, named by `target_name`. An occurrence is `{starts_at, ends_at}`.
 
-Proof of concept: the OpenAPI schemas are in {poc-repo}/pull/11[#11]. The operation schedules endpoints are in {poc-repo}/pull/17[#17] (Quantum), {poc-repo}/pull/29[#29] (Oban), {poc-repo}/pull/40[#40] (event sourced). The checks schedule endpoints are in {poc-repo}/pull/21[#21], {poc-repo}/pull/33[#33], {poc-repo}/pull/44[#44]. The controllers are identical in the three implementations.
+Errors: `403` without the ability of the operation, or of the maintenance windows, `404` for an unknown target, schedule or window, `422` for a past start, an operation that is not schedulable, params that the immediate request refuses, or an invalid recurrence or window. A manual checks execution during a maintenance window that forbids it gets `422` on the existing request endpoints.
+
+Each target type has its own checks schedule actions, so every operation of the API has its own id. The read endpoints are also AI assistant tools.
+
+Live refresh: the topics `monitoring:operation_schedules` (`operation_schedules_changed`, with the target id) and `monitoring:maintenance_windows` (`maintenance_windows_changed`, with the target type and id) tell the UI to fetch the schedules or the windows of the target on display again.
+
+Proof of concept: the OpenAPI schemas are in {poc-repo}/pull/11[#11]. The operation schedules endpoints are in {poc-repo}/pull/17[#17] (Quantum), {poc-repo}/pull/29[#29] (Oban), {poc-repo}/pull/40[#40] (event sourced). The checks schedule endpoints are in {poc-repo}/pull/21[#21], {poc-repo}/pull/33[#33], {poc-repo}/pull/44[#44]. The maintenance windows schemas are in {poc-repo}/pull/60[#60] (Quantum), {poc-repo}/pull/72[#72] (Oban), {poc-repo}/pull/84[#84] (event sourced), their endpoints in {poc-repo}/pull/65[#65] (Quantum), {poc-repo}/pull/77[#77] (Oban), {poc-repo}/pull/89[#89] (event sourced). The controllers are identical in the three implementations.
 
 === Activity log and alerts
 
@@ -425,29 +510,41 @@ Proof of concept: the OpenAPI schemas are in {poc-repo}/pull/11[#11]. The operat
 |===
 |Type |Severity |When
 |`checks_execution_settings_updated` |info |change of the global frequency
+|`host_checks_frequency_changed`, `cluster_checks_frequency_changed` |info |change of the frequency of a target
 |`operation_scheduled` |info |create, also once per target of a bulk request
 |`operation_schedule_changed` |info |change
 |`operation_schedule_cancelled` |info |cancel, or removal of the target
 |`scheduled_operation_requested` |info |request sent at the scheduled time. It carries the `operation_id`, so the existing "operation completed" entry correlates to it
-|`scheduled_operation_request_failed` |warning |reason: Trento not available, policies not met (with the messages), another operation running (from Wanda's reply), target not found
+|`scheduled_operation_request_failed` |warning |reason: Trento not available, policies not met (with the messages), maintenance window, another operation running (from Wanda's reply), target not found
+|`maintenance_window_scheduled`, `maintenance_window_changed`, `maintenance_window_deleted` |info |create (once per target of a bulk request), change, delete, or removal of the target
 |===
 
-All the entries of a schedule carry its id as correlation id. The entries of a bulk request also carry the `bulk_id`. The proofs of concept log no entry for a change of the checks settings of a host or cluster.
+All the entries of a schedule carry its id as correlation id, and those of a window carry the window id. The entries of a bulk request also carry the `bulk_id`. The entries name the target with `host_id`, `cluster_id`, `database_id` or `sap_system_id`, so the activity log adds the host name, cluster name or SID.
+
+The activity log pipeline gets a fourth category, next to HTTP requests, domain events and queue messages: activities the application emits itself, such as one schedule entry per target of a bulk request, or the outcome of a scheduled run. They go through the same catalog, metadata enrichment and severity, and logging them never stops the work that emits them.
 
 Alert emails for failed scheduled requests and failed scheduled operations are added to the existing alerting.
 
 === User interface
 
 * *Settings view*: the global checks frequency, read-only when enforced from the environment. ({poc-repo}/pull/48[#48])
-* *Check settings of a host or cluster*: the frequency override and the exception window. The checks overview of the target shows the time of the next execution. "Start Execution" is disabled during the window, with a tooltip. ({poc-repo}/pull/49[#49])
-* *Operation modal*: a "Now / Schedule" choice with the start date and time (in the user timezone), repeat, every X, weekdays, and end condition. Schedulable operations show a "Premium" badge. ({poc-repo}/pull/50[#50])
-* *Details views*: the schedules of the target, with change and cancel. ({poc-repo}/pull/51[#51])
+* *Check settings of a host or cluster*: the frequency override, for users with the `all:check_frequency` ability. The checks overview of the target shows the time of the next execution. ({poc-repo}/pull/49[#49])
+* *Operation modal*: a "Now / Schedule" choice with the start date and time (in the user timezone, the next full hour by default), repeat, every X, weekdays, and end condition. The modal asks for a confirmation when the operation is already scheduled on the target. Schedulable operations show a "Premium" badge. ({poc-repo}/pull/50[#50])
+* *Details views*: the schedules of the target, with change and cancel, for the users who have the ability of the operation. The list refreshes when a schedule changes. ({poc-repo}/pull/51[#51])
 * *Operations menu*: it opens even when an operation is running or the target is stale, so users can schedule. A spinner on the button shows the running operation. "Now" then relies on the forbidden modal (stale, policies) and on the running state already known to the frontend. ({poc-repo}/pull/52[#52])
+* *Bulk scheduling*: the hosts list gets a selection of the visible rows and a "Schedule" action, with the same confirmation when some hosts already have the operation scheduled. The final selection comes from bulk operations. ({poc-repo}/pull/53[#53])
 * The frontend handles `operation_started` (today it only handles `operation_completed`), so an operation requested by the server shows as running. ({poc-repo}/pull/54[#54])
-* *Bulk scheduling*: the hosts list gets a target selection and a "Schedule Reboot" action. The final selection comes from bulk operations. ({poc-repo}/pull/53[#53])
-* Overviews and dashboard do not show schedules yet.
+* *Maintenance windows*:
+** the details views of hosts, clusters, SAP systems and HANA databases get a "Maintenance Windows" section: the windows set on the target, with change and delete, and the windows that come from another target, read only, with a link to it. While a window is ongoing, a banner tells what it forbids, until when, and from which target. ({poc-repo}/pull/98[#98])
+** a "Schedule Maintenance" button, with a "Premium" badge, opens a modal: what the window forbids (checks execution, operations, at least one), date, start time and duration in the user timezone, repeat (none, every X days, weeks on some weekdays, months or years) and end (never, or on a date). ({poc-repo}/pull/97[#97])
+** "Start Execution" is disabled during a window that forbids checks executions, with the tooltip "Checks cannot be executed during a maintenance window", and the next execution falls after the window. ({poc-repo}/pull/99[#99])
+** the hosts list selection gets a "Schedule Maintenance" action. ({poc-repo}/pull/100[#100])
+** a manual operation during a window that forbids operations opens the existing forbidden modal, with the message of the backend: the target the window is set on, with a link, and the end of the window. ({poc-repo}/pull/101[#101])
+** the activity log shows the window entries, and "maintenance window" as the reason of a failed scheduled request. ({poc-repo}/pull/96[#96])
+* *Plan B*: the exception window in the check settings of hosts and clusters, and "Start Execution" disabled during it, with the tooltip "Checks cannot be executed during exception window". ({poc-repo}/pull/93[#93] to {poc-repo}/pull/95[#95])
+* Overviews and dashboard show neither schedules nor windows yet.
 
-Proof of concept: {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20ui%22%20sort%3Acreated-asc[`scheduling: ui` pull requests]. {poc-repo}/pull/47[#47] to {poc-repo}/pull/54[#54] form the independent UI stack on `main`. {poc-repo}/pull/23[#23], {poc-repo}/pull/35[#35] and {poc-repo}/pull/46[#46] put the same commits on top of each backend.
+Proof of concept: {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20ui%22%20sort%3Acreated-asc[`scheduling: ui` pull requests]. {poc-repo}/pull/47[#47] to {poc-repo}/pull/54[#54] form the independent UI stack on `main`. {poc-repo}/pull/96[#96] to {poc-repo}/pull/101[#101] add maintenance windows on top of it, and {poc-repo}/pull/93[#93] to {poc-repo}/pull/95[#95] plan B. {poc-repo}/pull/23[#23], {poc-repo}/pull/35[#35] and {poc-repo}/pull/46[#46] put the UI on top of each backend, {poc-repo}/pull/103[#103] (Quantum), {poc-repo}/pull/105[#105] (Oban) and {poc-repo}/pull/107[#107] (event sourced) with maintenance windows, {poc-repo}/pull/102[#102], {poc-repo}/pull/104[#104] and {poc-repo}/pull/106[#106] with plan B.
 
 === Wanda changes
 
@@ -463,19 +560,21 @@ None. The agent has no notion of schedules.
 
 === Proofs of concept
 
-The proofs of concept are stacks of small branches of the web repository, one change per branch.
+The proofs of concept are stacks of small branches of the web repository, one change per branch, on `main`. The pull requests are drafts in a fork, one per branch, labelled per stack. Each pull request lists its stack in merge order.
 
-The pull requests are drafts in a fork, one per branch, labelled per stack. Each pull request lists its stack in merge order.
-
-[width="100%",cols="<26%,<74%",options="header"]
+[width="100%",cols="<28%,<72%",options="header"]
 |===
 |Pull requests |Content
-|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20shared%22%20sort%3Acreated-asc[`scheduling: shared` pull requests], branches `sched/base/01` to `05` |Shared part, on `main`: recurrence rules, operation requests without an HTTP connection, global checks frequency (environment, settings, API), API schemas, correlation of Wanda's replies to scheduled requests
-|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20quantum%22%20sort%3Acreated-asc[`scheduling: quantum` pull requests], branches `sched/quantum/*` |Option 1, on the shared part: create, read, change and cancel operation schedules, controllers and routes, the Quantum runner, bulk scheduling, checks settings per target, their controllers and routes, the checks evaluator. The last pull request puts the frontend on top
-|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20oban%22%20sort%3Acreated-asc[`scheduling: oban` pull requests], branches `sched/oban/*` |Option 2, on the shared part: the same steps, after a first pull request that replaces Quantum with Oban
-|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20event%20sourced%22%20sort%3Acreated-asc[`scheduling: event sourced` pull requests], branches `sched/es/*` |Option 3, on the shared part: the same steps with commands, events, projectors and event handlers
-|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20ui%22%20sort%3Acreated-asc[`scheduling: ui` pull requests], branches `sched/ui/*` |The frontend, on `main`, assets only: API clients and models, global frequency in the Settings view, check settings of hosts and clusters, scheduling in the operation modals, list of schedules, operations menu always available, bulk scheduling in the hosts list, `operation_started` handling. The frontend files are identical on the three backends
+|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20shared%22%20sort%3Acreated-asc[`scheduling: shared`], branches `sched/base/01` to `06` |Shared part: recurrence rules, operation targets and requests without an HTTP connection, global checks frequency (environment, settings, API), API schemas, activities the application emits in the activity log, record of the scheduled runs and correlation of Wanda's replies
+|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20quantum%22%20sort%3Acreated-asc[`scheduling: quantum`], branches `sched/quantum/01` to `10` |Option 1, on the shared part: create, read, change and cancel operation schedules, their API, the Quantum runner, bulk scheduling, the checks frequency of hosts and clusters, its API, the checks evaluator
+|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20oban%22%20sort%3Acreated-asc[`scheduling: oban`], branches `sched/oban/01` to `11` |Option 2, on the shared part: the same steps, after a first branch that replaces Quantum with Oban
+|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20event%20sourced%22%20sort%3Acreated-asc[`scheduling: event sourced`], branches `sched/es/01` to `10` |Option 3, on the shared part: the same steps with aggregates, commands, events and projectors
+|{poc-repo}/pulls?q=is%3Apr%20label%3A%22maintenance%20windows%22%20sort%3Acreated-asc[`maintenance windows`], branches `sched/<option>/mw/01` to `09` |Maintenance windows, on each option: API schemas, create, read with the coverage, change, delete, API, bulk, enforcement on checks executions, enforcement on operations
+|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20plan%20b%22%20sort%3Acreated-asc[`scheduling: plan b`], branches `sched/<option>/planb/01` to `03` |The exception window per host and cluster, on each option: storage, API, enforcement on checks executions
+|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20ui%22%20sort%3Acreated-asc[`scheduling: ui`], branches `sched/ui/01` to `08`, `sched/ui/mw/01` to `06`, `sched/ui/planb/01` to `03` |The frontend, `assets` only: API clients and models, global frequency in the Settings view, frequency of hosts and clusters, scheduling in the operation modals, list of schedules, operations menu always available, bulk scheduling in the hosts list, `operation_started` handling. Then the maintenance windows and the plan B screens on top of it
 |===
+
+The branches `sched/<option>/ui`, `sched/<option>/mw/ui` and `sched/<option>/planb/ui` put the frontend commits on top of each backend stack, so each combination can run. The frontend files are identical on the three options.
 
 The branches replace the first proofs of concept (`poc-oban-checks-scheduling` and `poc-operation-scheduling`).
 
@@ -483,12 +582,14 @@ Not covered by the proofs of concept: alert emails, overviews and dashboard, hel
 
 == Summary
 
-* Scheduling lives in Trento Web. Wanda and the agent keep their reactive role.
+* Scheduling and maintenance windows live in Trento Web. Wanda and the agent keep their reactive role.
 * How schedules are stored and fired is to be decided: keep Quantum (Option 1), Oban (Option 2) or event sourcing (Option 3). The three serve the same API and the same frontend.
-* One recurrence module serves operation schedules and exception windows.
-* Checks: a one minute evaluator applies the global or per target frequency and the exception window. `CHECKS_INTERVAL` takes the new values, stays compatible, and becomes documented and exposed in helm and ansible.
+* One recurrence module serves operation schedules and maintenance windows.
+* Checks: a one minute evaluator applies the global or per target frequency and skips the targets covered by a maintenance window. `CHECKS_INTERVAL` takes the new values, stays compatible, and becomes documented and exposed in helm and ansible.
 * Operations: the policies move out of the HTTP plug into a shared context function. They run at creation as information, and at the scheduled time on fresh data. "Already running" is left to Wanda now (Option A). A synchronous check in Web (Option B) is planned with bulk operations.
-* Bulk scheduling creates one independent schedule per target.
+* Maintenance windows are configuration. The targets they cover are resolved on the read side when needed, and one policy enforces them on manual and scheduled requests, for checks and for operations.
+* Bulk scheduling creates one independent schedule per target, and a bulk maintenance window one window per target.
+* The exception window per host and cluster stays available as plan B.
 * Wanda validates request expiration, so late requests fail cleanly.
 
 == Unresolved questions
@@ -496,13 +597,19 @@ Not covered by the proofs of concept: alert emails, overviews and dashboard, hel
 * Which implementation stores and fires the schedules: keep Quantum, Oban or event sourcing? TBD.
 * Schedules of a deleted or locked user: they keep running, because no permission check runs at fire time. Is that the expected behavior?
 * An operation that is no longer schedulable after an upgrade: delete its schedules, or let them fail at fire time?
-* What do overviews and dashboard show about schedules?
-* Does a change of the checks settings of a host or cluster need an activity log entry?
+* What do overviews and dashboard show about schedules and maintenance windows?
+* Does a window on a host also forbid the cluster and SAP instance operations that act on that host? The proofs of concept forbid them.
+* What happens to a checks execution or an operation that already runs when a window starts? The proofs of concept do not stop it.
+* Is the user warned when a new schedule falls in a future window? The proofs of concept warn only about a window that is ongoing when the schedule is saved.
+* Does a window have a name or a description? The proofs of concept have none.
 * How is the "premium" distinction enforced? The proofs of concept only show a badge.
 * The proofs of concept take the simplest alternative for these product questions, to confirm:
 ** a schedule is saved even when its policies fail at creation
 ** the grace period is 5 minutes
 ** a change restarts the count of occurrences, and a missed occurrence counts
-** the end date is excluded, for individual and bulk schedules
+** the end date is excluded, for individual and bulk schedules and for windows
 ** no summary entry for a bulk request
-** an exception window has no end condition
+** a window lasts at most 31 days and ends on a date or never, not after a number of occurrences
+** windows that ended are not listed
+** in the UI, bulk maintenance windows start from the hosts list only. The API accepts every target type
+** plan B: an exception window has no end condition
