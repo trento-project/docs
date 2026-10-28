@@ -144,7 +144,7 @@ The three implementations share everything except two things: where a schedule l
 * the activities the application emits itself, through the activity log pipeline (see link:#_activity_log_and_alerts[Activity log and alerts])
 * the record of the runs of the schedules, which traces Wanda's replies back to their schedule
 
-Proof of concept: {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20shared%22%20sort%3Acreated-asc[`scheduling: shared` pull requests], one pull request per item of the list above ({poc-repo}/pull/8[#8], {poc-repo}/pull/9[#9], {poc-repo}/pull/10[#10], {poc-repo}/pull/11[#11], {poc-repo}/pull/55[#55], {poc-repo}/pull/56[#56]).
+Proof of concept: {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling%3A%20shared%22%20sort%3Acreated-asc[`scheduling: shared` pull requests], one pull request per item of the list above ({poc-repo}/pull/8[#8], {poc-repo}/pull/9[#9], {poc-repo}/pull/10[#10], {poc-repo}/pull/11[#11], {poc-repo}/pull/55[#55], {poc-repo}/pull/56[#56]).
 
 Every implementation runs the same steps when a schedule is due: check the grace period, run the policies on fresh data, request the operation, log the outcome, then move the schedule to its next occurrence or delete it.
 
@@ -152,7 +152,7 @@ Every implementation runs the same steps when a schedule is due: check the grace
 
 Schedules are rows in Ecto tables, with their `next_run_at`. One Quantum job runs every minute. It selects the due rows with `FOR UPDATE SKIP LOCKED`, runs them, and moves each to its next occurrence. A second Quantum job, also every minute, evaluates the checks executions (see link:#_checks_execution_frequency[Checks execution frequency]).
 
-Proof of concept: {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20quantum%22%20sort%3Acreated-asc[`scheduling: quantum` pull requests]. The runner is in {poc-repo}/pull/18[#18].
+Proof of concept: {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling%3A%20quantum%22%20sort%3Acreated-asc[`scheduling: quantum` pull requests]. The runner is in {poc-repo}/pull/18[#18].
 
 PROs:
 
@@ -172,7 +172,7 @@ CONs:
 
 Oban replaces Quantum for every periodic job, with its built-in cron. Jobs that run more often than once a minute (the heartbeat check, and the heartbeat faker of the demo) move to a small supervised process with `Process.send_after`. Each schedule row has one pending Oban job at `next_run_at`. The job is inserted, replaced or cancelled in the same transaction as the row. When the job runs, it checks that it is still the pending occurrence, requests the operation, and inserts the job of the next occurrence. A request that cannot be sent snoozes the job for one minute. The checks evaluator is an Oban cron entry.
 
-Proof of concept: {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20oban%22%20sort%3Acreated-asc[`scheduling: oban` pull requests]. Oban replaces Quantum in {poc-repo}/pull/24[#24]. The job per occurrence is in {poc-repo}/pull/30[#30].
+Proof of concept: {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling%3A%20oban%22%20sort%3Acreated-asc[`scheduling: oban` pull requests]. Oban replaces Quantum in {poc-repo}/pull/24[#24]. The job per occurrence is in {poc-repo}/pull/30[#30].
 
 PROs:
 
@@ -196,7 +196,7 @@ An operation schedule is a Commanded aggregate (`Trento.Operations.Schedule`). I
 
 The checks interval of a target is an event on the Host and Cluster aggregates, as the checks selection is, carried by their roll-up. A projector writes it to its own read model. The time of the last periodic request stays in a plain table: an event every few minutes for every target adds no value to the event store. A maintenance window is an aggregate of its own, projected into a read model with the same columns as the table of the other options, so the coverage and the enforcement are the same code.
 
-Proof of concept: {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20event%20sourced%22%20sort%3Acreated-asc[`scheduling: event sourced` pull requests]. The aggregate is in {poc-repo}/pull/36[#36], the runs in {poc-repo}/pull/41[#41], the checks settings as host and cluster events in {poc-repo}/pull/43[#43].
+Proof of concept: {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling%3A%20event%20sourced%22%20sort%3Acreated-asc[`scheduling: event sourced` pull requests]. The aggregate is in {poc-repo}/pull/36[#36], the runs in {poc-repo}/pull/41[#41], the checks settings as host and cluster events in {poc-repo}/pull/43[#43].
 
 PROs:
 
@@ -326,7 +326,7 @@ If maintenance windows cannot be delivered, each host and cluster can have one e
 
 The proofs of concept keep it in separate branches on top of the frequency, so that it can be picked up as it is.
 
-Proof of concept: {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20plan%20b%22%20sort%3Acreated-asc[`scheduling: plan b` pull requests], per implementation: {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20plan%20b%22%20label%3A%22scheduling%3A%20quantum%22%20sort%3Acreated-asc[Quantum], {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20plan%20b%22%20label%3A%22scheduling%3A%20oban%22%20sort%3Acreated-asc[Oban], {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20plan%20b%22%20label%3A%22scheduling%3A%20event%20sourced%22%20sort%3Acreated-asc[event sourced], {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20plan%20b%22%20label%3A%22scheduling%3A%20ui%22%20sort%3Acreated-asc[UI].
+Proof of concept: {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling%3A%20plan%20b%22%20sort%3Acreated-asc[`scheduling: plan b` pull requests], per implementation: {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling%3A%20plan%20b%22%20label%3A%22scheduling%3A%20quantum%22%20sort%3Acreated-asc[Quantum], {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling%3A%20plan%20b%22%20label%3A%22scheduling%3A%20oban%22%20sort%3Acreated-asc[Oban], {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling%3A%20plan%20b%22%20label%3A%22scheduling%3A%20event%20sourced%22%20sort%3Acreated-asc[event sourced], {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling%3A%20plan%20b%22%20label%3A%22scheduling%3A%20ui%22%20sort%3Acreated-asc[UI].
 
 === Operations scheduling
 
@@ -463,7 +463,7 @@ The windows are configuration, as schedules and frequencies: they are stored lik
 
 Plan B, the exception window per target (see link:#_plan_b_exception_window_per_target[Plan B: exception window per target]), is the fallback if maintenance windows cannot be delivered.
 
-Proof of concept: {poc-repo}/pulls?q=is%3Apr%20label%3A%22maintenance%20windows%22%20sort%3Acreated-asc[`maintenance windows` pull requests], per implementation: {poc-repo}/pulls?q=is%3Apr%20label%3A%22maintenance%20windows%22%20label%3A%22scheduling%3A%20quantum%22%20sort%3Acreated-asc[Quantum], {poc-repo}/pulls?q=is%3Apr%20label%3A%22maintenance%20windows%22%20label%3A%22scheduling%3A%20oban%22%20sort%3Acreated-asc[Oban], {poc-repo}/pulls?q=is%3Apr%20label%3A%22maintenance%20windows%22%20label%3A%22scheduling%3A%20event%20sourced%22%20sort%3Acreated-asc[event sourced], {poc-repo}/pulls?q=is%3Apr%20label%3A%22maintenance%20windows%22%20label%3A%22scheduling%3A%20ui%22%20sort%3Acreated-asc[UI]. The windows are stored in an Ecto table in {poc-repo}/pull/61[#61] (Quantum) and {poc-repo}/pull/73[#73] (Oban), and as an aggregate per window in {poc-repo}/pull/85[#85] (event sourced).
+Proof of concept: {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22maintenance%20windows%22%20sort%3Acreated-asc[`maintenance windows` pull requests], per implementation: {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22maintenance%20windows%22%20label%3A%22scheduling%3A%20quantum%22%20sort%3Acreated-asc[Quantum], {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22maintenance%20windows%22%20label%3A%22scheduling%3A%20oban%22%20sort%3Acreated-asc[Oban], {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22maintenance%20windows%22%20label%3A%22scheduling%3A%20event%20sourced%22%20sort%3Acreated-asc[event sourced], {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22maintenance%20windows%22%20label%3A%22scheduling%3A%20ui%22%20sort%3Acreated-asc[UI]. The windows are stored in an Ecto table in {poc-repo}/pull/61[#61] (Quantum) and {poc-repo}/pull/73[#73] (Oban), and as an aggregate per window in {poc-repo}/pull/85[#85] (event sourced).
 
 === HTTP API
 
@@ -544,7 +544,7 @@ Alert emails for failed scheduled requests and failed scheduled operations are a
 * *Plan B*: the exception window in the check settings of hosts and clusters, and "Start Execution" disabled during it, with the tooltip "Checks cannot be executed during exception window". ({poc-repo}/pull/93[#93] to {poc-repo}/pull/95[#95])
 * Overviews and dashboard show neither schedules nor windows yet.
 
-Proof of concept: {poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20ui%22%20sort%3Acreated-asc[`scheduling: ui` pull requests]. {poc-repo}/pull/47[#47] to {poc-repo}/pull/54[#54] form the independent UI stack on `main`. {poc-repo}/pull/96[#96] to {poc-repo}/pull/101[#101] add maintenance windows on top of it, and {poc-repo}/pull/93[#93] to {poc-repo}/pull/95[#95] plan B. {poc-repo}/pull/23[#23], {poc-repo}/pull/35[#35] and {poc-repo}/pull/46[#46] put the UI on top of each backend, {poc-repo}/pull/103[#103] (Quantum), {poc-repo}/pull/105[#105] (Oban) and {poc-repo}/pull/107[#107] (event sourced) with maintenance windows, {poc-repo}/pull/102[#102], {poc-repo}/pull/104[#104] and {poc-repo}/pull/106[#106] with plan B.
+Proof of concept: {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling%3A%20ui%22%20sort%3Acreated-asc[`scheduling: ui` pull requests]. {poc-repo}/pull/47[#47] to {poc-repo}/pull/54[#54] form the independent UI stack on `main`. {poc-repo}/pull/96[#96] to {poc-repo}/pull/101[#101] add maintenance windows on top of it, and {poc-repo}/pull/93[#93] to {poc-repo}/pull/95[#95] plan B. {poc-repo}/pull/23[#23], {poc-repo}/pull/35[#35] and {poc-repo}/pull/46[#46] put the UI on top of each backend, {poc-repo}/pull/103[#103] (Quantum), {poc-repo}/pull/105[#105] (Oban) and {poc-repo}/pull/107[#107] (event sourced) with maintenance windows, {poc-repo}/pull/102[#102], {poc-repo}/pull/104[#104] and {poc-repo}/pull/106[#106] with plan B.
 
 === Wanda changes
 
@@ -565,13 +565,13 @@ The proofs of concept are stacks of small branches of the web repository, one ch
 [width="100%",cols="<28%,<72%",options="header"]
 |===
 |Pull requests |Content
-|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20shared%22%20sort%3Acreated-asc[`scheduling: shared`], branches `sched/base/01` to `06` |Shared part: recurrence rules, operation targets and requests without an HTTP connection, global checks frequency (environment, settings, API), API schemas, activities the application emits in the activity log, record of the scheduled runs and correlation of Wanda's replies
-|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20quantum%22%20sort%3Acreated-asc[`scheduling: quantum`], branches `sched/quantum/01` to `10` |Option 1, on the shared part: create, read, change and cancel operation schedules, their API, the Quantum runner, bulk scheduling, the checks frequency of hosts and clusters, its API, the checks evaluator
-|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20oban%22%20sort%3Acreated-asc[`scheduling: oban`], branches `sched/oban/01` to `11` |Option 2, on the shared part: the same steps, after a first branch that replaces Quantum with Oban
-|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20event%20sourced%22%20sort%3Acreated-asc[`scheduling: event sourced`], branches `sched/es/01` to `10` |Option 3, on the shared part: the same steps with aggregates, commands, events and projectors
-|{poc-repo}/pulls?q=is%3Apr%20label%3A%22maintenance%20windows%22%20sort%3Acreated-asc[`maintenance windows`], branches `sched/<option>/mw/01` to `09` |Maintenance windows, on each option: API schemas, create, read with the coverage, change, delete, API, bulk, enforcement on checks executions, enforcement on operations
-|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20plan%20b%22%20sort%3Acreated-asc[`scheduling: plan b`], branches `sched/<option>/planb/01` to `03` |The exception window per host and cluster, on each option: storage, API, enforcement on checks executions
-|{poc-repo}/pulls?q=is%3Apr%20label%3A%22scheduling%3A%20ui%22%20sort%3Acreated-asc[`scheduling: ui`], branches `sched/ui/01` to `08`, `sched/ui/mw/01` to `06`, `sched/ui/planb/01` to `03` |The frontend, `assets` only: API clients and models, global frequency in the Settings view, frequency of hosts and clusters, scheduling in the operation modals, list of schedules, operations menu always available, bulk scheduling in the hosts list, `operation_started` handling. Then the maintenance windows and the plan B screens on top of it
+|{poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling%3A%20shared%22%20sort%3Acreated-asc[`scheduling: shared`], branches `sched/base/01` to `06` |Shared part: recurrence rules, operation targets and requests without an HTTP connection, global checks frequency (environment, settings, API), API schemas, activities the application emits in the activity log, record of the scheduled runs and correlation of Wanda's replies
+|{poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling%3A%20quantum%22%20sort%3Acreated-asc[`scheduling: quantum`], branches `sched/quantum/01` to `10` |Option 1, on the shared part: create, read, change and cancel operation schedules, their API, the Quantum runner, bulk scheduling, the checks frequency of hosts and clusters, its API, the checks evaluator
+|{poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling%3A%20oban%22%20sort%3Acreated-asc[`scheduling: oban`], branches `sched/oban/01` to `11` |Option 2, on the shared part: the same steps, after a first branch that replaces Quantum with Oban
+|{poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling%3A%20event%20sourced%22%20sort%3Acreated-asc[`scheduling: event sourced`], branches `sched/es/01` to `10` |Option 3, on the shared part: the same steps with aggregates, commands, events and projectors
+|{poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22maintenance%20windows%22%20sort%3Acreated-asc[`maintenance windows`], branches `sched/<option>/mw/01` to `09` |Maintenance windows, on each option: API schemas, create, read with the coverage, change, delete, API, bulk, enforcement on checks executions, enforcement on operations
+|{poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling%3A%20plan%20b%22%20sort%3Acreated-asc[`scheduling: plan b`], branches `sched/<option>/planb/01` to `03` |The exception window per host and cluster, on each option: storage, API, enforcement on checks executions
+|{poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling%3A%20ui%22%20sort%3Acreated-asc[`scheduling: ui`], branches `sched/ui/01` to `08`, `sched/ui/mw/01` to `06`, `sched/ui/planb/01` to `03` |The frontend, `assets` only: API clients and models, global frequency in the Settings view, frequency of hosts and clusters, scheduling in the operation modals, list of schedules, operations menu always available, bulk scheduling in the hosts list, `operation_started` handling. Then the maintenance windows and the plan B screens on top of it
 |===
 
 The branches `sched/<option>/ui`, `sched/<option>/mw/ui` and `sched/<option>/planb/ui` put the frontend commits on top of each backend stack, so each combination can run. The frontend files are identical on the three options.
