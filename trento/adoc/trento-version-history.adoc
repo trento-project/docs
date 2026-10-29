@@ -32,6 +32,18 @@ https://github.com/trento-project/ansible/releases.
 
 [indent=-1]
 
+Version 3.2 (released on 2026/10/30)::
+ Includes {helm} chart 3.2.0, {tr_web} component 3.2.0, orchestration engine ({wanda}) 2.2.0, compliance checks 1.4.0, {mcp} 1.2.0, {tragent} 3.2.0, and {trento} {ansible} 1.1.0 with the following highlights:
+
+  * {liz}, an AI assistant built into {tr_web}
+  * Persistent filters and number of items per page settings across {tr_web} console views within a session
+  * Detection of stale data for hosts, clusters, {sap} systems and databases
+  * Cleaner representation of non-existing clusters in the Dashboard
+  * Health of SBD devices included in the aggregated health of clusters using file-based SBD fencing
+  * Majority maker nodes excluded from {saptune} and {sap} Host Agent checks
+  * Option to test SMTP configuration by sending a test email
+  * All {trento} components re-licensed under GPL 3.0 or later
+
 Version 3.1 (released on 2026/05/27, last updated: 2026/09/18)::
  Includes {helm} chart 3.1.5, {tr_web} component 3.1.6, orchestration engine ({wanda}) 2.1.1, compliance checks 1.3.2, {mcp} 1.1.2, {tragent} 3.1.3, and {trento} {ansible} 1.0.1 with the following highlights:
 

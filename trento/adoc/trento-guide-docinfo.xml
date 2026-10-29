@@ -4,6 +4,55 @@
 <!-- History -->
 <revhistory xml:id="rh-article-trento">
   <revision>
+    <date>2026-10-30</date>
+    <revdescription>
+      <itemizedlist>
+        <listitem>
+          <para>
+            Rework of the Trento Web console chapter, now called "Monitoring SAP health in the Trento Web console":
+          </para>
+          <itemizedlist>
+            <listitem>
+              <para>
+                Explanation of aggregated health
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                Information about stale data
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                Information about how to identify health issues and common troubleshooting questions
+              </para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para>
+            New documentation for the Liz AI assistant in Trento Web, consolidated with the existing MCP integration under the new "Trento AI integrations" chapter
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            New "Enabling email alerts" section that centralizes information about email alerts, alongside the new test email feature
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Improvements to the "User management" section and documented missing user permissions
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Improvements to the "Requirements" chapter
+          </para>
+        </listitem>
+      </itemizedlist>
+    </revdescription>
+  </revision>
+  <revision>
     <date>2026-05-27</date>
     <revdescription>
       <itemizedlist>
