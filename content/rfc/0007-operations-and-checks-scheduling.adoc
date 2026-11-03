@@ -27,7 +27,7 @@ We want Trento to do something, or to refrain from doing something, at a given t
 
 The first answer to the last need was an exception window per host or cluster, during which only the checks of that target are not executed. We keep it as a fallback (plan B, see link:#_plan_b_exception_window_per_target[Plan B: exception window per target]) in case maintenance windows cannot be delivered.
 
-A related feature, *mass/bulk operations*, requests the same operation for a set of targets right away. It is designed and built separately: bulk scheduling does not depend on it and only reuses its target selection in the UI.
+A related feature, *mass/bulk operations*, requests the same operation for a set of targets right away. It is designed and built separately: bulk scheduling does not depend on it and only reuses its target selection and its request modal in the UI.
 
 All of these features need:
 
