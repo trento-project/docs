@@ -30,9 +30,9 @@ Contains the code from `main` that is ready for release, plus potential small cu
 Trento supports two types of releases:
 
 Full releases::
-Created by merging `release` into `main` with the tree of `main`, and tagging the result.
-If `release` has commits that `main` does not have, the merge creates a merge commit.
-Otherwise, the tag goes on the latest commit of `main`.
+Created by tagging `main`, with the files of `main` as they are.
+If `release` has commits that `main` does not have, the release first adds a merge commit that records them as merged.
+This commit has the files of `main`, so the changes of those commits are not in the release.
 After the release, both branches point to the tagged commit.
 Full releases contain all new features developed on `main` since the last full release.
 
