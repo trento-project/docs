@@ -432,12 +432,12 @@ A scheduled request does not need a synchronous answer, whereas bulk operations 
 
 ==== Bulk scheduling
 
-A bulk request creates one schedule per selected target, with the same operation, arguments and timing, and a shared `bulk_id`.
+A bulk request creates one individual schedule for each selected target, with the same operation, arguments and timing, and a shared `bulk_id`. A target can already have schedules of the same operation, as for individual requests. A single schedule over all the targets, fired as one bulk operation, would let one stale or busy target block the others at fire time, because a bulk operation is refused as a whole.
 
 * The policies run per target. Each schedule comes back with its own `warnings`.
 * Option 1 and Option 2 insert all the schedules in one transaction: all or nothing. Option 3 validates all the targets, then dispatches one command per target.
 * After creation, each schedule lives on its own: it is listed, changed, cancelled and run like an individual one. Its activity log entries carry the `bulk_id`. There is no summary entry for the bulk request.
-* Each occurrence is a request for one target, so bulk scheduling does not depend on bulk operations or on Option B. The UI reuses the target selection of bulk operations when it is available.
+* Each occurrence is a request for one target, so bulk scheduling does not depend on bulk operations or on Option B. The UI reuses the selectable tables and the request modal of bulk operations, with the same "Now / Schedule" choice as the individual modals.
 
 Proof of concept: {poc-repo}/pull/19[#19] (Quantum), {poc-repo}/pull/31[#31] (Oban), {poc-repo}/pull/42[#42] (event sourced), {poc-repo}/pull/53[#53] (UI).
 
