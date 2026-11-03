@@ -30,8 +30,10 @@ Contains the code from `main` that is ready for release, plus potential small cu
 Trento supports two types of releases:
 
 Full releases::
-Created by cross-merging the `main` and `release` branches and tagging the resulting merge commit.
-This merge commit is shared by both branches because when one branch is merged into the other, the reverse operation is a fast-forward merge.
+Created by tagging `main`, with the files of `main` as they are.
+If `release` has commits that `main` does not have, the release first adds a merge commit that records them as merged.
+This commit has the files of `main`, so the changes of those commits are not in the release.
+After the release, both branches point to the tagged commit.
 Full releases contain all new features developed on `main` since the last full release.
 
 Hotfix releases::
@@ -48,7 +50,14 @@ This implies that Trento does not support releasing version 2.0.1 if release 3.0
 The next possible release must be monotonically increasing (for example, 3.0.1, 3.1.0, or 4.0.0).
 ====
 
-In all merges between the long-running branches, `main` is taken as the source of truth, and all merge conflicts are auto-resolved in its favor.
+In all merges between the long-running branches, `main` is the source of truth:
+
+* A full release takes the tree of `main` as it is.
+Changes that exist only on `release` are not in the full release, and the release job shows a warning for each such commit.
+* A hotfix release merges `release` into `main`, and resolves the merge conflicts in favor of `main`.
+This includes a file that one branch changed and the other branch deleted.
+A rename conflict or a file/directory conflict stops the job before it pushes anything.
+In that case, merge `release` into `main` by hand, and run the release job again.
 
 [WARNING]
 ====
@@ -74,7 +83,7 @@ Successfully merging the `VERSION` file change on the respective branch triggers
 * The system creates the necessary version tags on the correct branch.
 * It publishes a GitHub release.
 * It builds container images hosted on ghcr.io.
-* It updates SUSE distribution packages in OBS.
+* It updates SUSE distribution packages in OBS: the RPM package, and the container image package for components that have one.
 
 [NOTE]
 ====
@@ -173,6 +182,13 @@ To make a custom fix, follow this procedure:
 ====
 Ideally, adding the `released-as-hotfix` label should not be necessary.
 However, this is currently required due to a limitation in the changelog generator.
+====
+
+[WARNING]
+====
+After a custom fix on `release`, trigger the hotfix release before the next full release.
+Only a hotfix release brings the changes of `release` into `main`.
+A full release keeps the tree of `main`, so it leaves out a fix that exists only on `release`.
 ====
 
 ==== Trigger the Hotfix Release
