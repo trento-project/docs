@@ -186,8 +186,8 @@ However, this is currently required due to a limitation in the changelog generat
 
 [WARNING]
 ====
-Trigger the hotfix release before the next full release.
-Only a hotfix release merges `release` into `main`.
+After a custom fix on `release`, trigger the hotfix release before the next full release.
+Only a hotfix release brings the changes of `release` into `main`.
 A full release keeps the tree of `main`, so it leaves out a fix that exists only on `release`.
 ====
 
