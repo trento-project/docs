@@ -382,7 +382,7 @@ A scheduled request must honor the same policies as a manual one. Currently they
 
 At fire time we consider:
 
-* *the maintenance windows*: an ongoing window that forbids operations on the target refuses the request. The failure is recorded with the reason "maintenance window".
+* *the maintenance windows*: an ongoing window that forbids operations on the target refuses the request. The failure is recorded with the reason "maintenance window", together with the messages of any other rule that does not pass.
 * *the policies*: agent heartbeat (stale target), saptune state, instances state and the other existing rules, on fresh data. A failure is recorded with the same messages the forbidden modal shows.
 * *the creator*: no permission check. The creator's ability is checked when the schedule is created or changed.
 * *Trento not available*: the grace period is 5 minutes after the scheduled time, the same as the expiration of operation requests. A request that cannot be sent is retried until the grace period ends. After it, the occurrence is recorded as failed with reason "Trento not available" and is not requested. Missed occurrences are not caught up: the next occurrence is computed after the current time, and the missed ones count as done.
@@ -390,6 +390,74 @@ At fire time we consider:
 * *robustness*: a schedule that cannot run is logged and does not stop the others. In the Oban implementation a crashed job is retried without requesting twice, and a cron job gives a job back to a schedule that lost its own.
 
 Proof of concept, run at the scheduled time: {poc-repo}/pull/18[#18] (Quantum), {poc-repo}/pull/30[#30] (Oban), {poc-repo}/pull/41[#41] (event sourced).
+
+[[operations-authorization]]
+==== Authorization rules in one place
+
+Three code paths decide whether an operation is allowed:
+
+* `OperationsPolicyPlug`, for an immediate request on one target
+* the same plug, for a bulk request on a list of targets
+* the context function of scheduled requests, without an HTTP connection
+
+Every rule must reach all of them, and maintenance windows and Option B of link:#_another_operation_already_running[Another operation already running] add new rules. A rule added to one path only is skipped by the others. For example, if the maintenance windows are checked in the single target path only, a bulk request on two clusters is allowed while one of them is in a window that refuses the same request on that single cluster.
+
+We want a single context function that combines every rule, called by the plug and by the context function of scheduled requests:
+
+[source,elixir]
+----
+defmodule Trento.Operations.Authorization do
+  # A list of resources (bulk request): authorize each one and tag its errors with the resource
+  def authorize(policy, operation, resources, params) when is_list(resources) do
+    resources
+    |> Enum.flat_map(fn resource ->
+      case authorize(policy, operation, resource, params) do
+        :ok -> []
+        {:error, errors} -> Enum.map(errors, &tag(&1, policy.metadata(resource)))
+      end
+    end)
+    |> case do
+      [] -> :ok
+      errors -> {:error, errors}
+    end
+  end
+
+  # One resource: every rule, every reason
+  def authorize(policy, operation, resource, params) do
+    OperationsHelper.reduce_operation_authorizations([
+      policy.authorize_operation(operation, resource, params),
+      MaintenanceWindowsPolicy.authorize(resource, params),
+      RunningOperationsPolicy.authorize(policy, operation, resource, params)
+    ])
+  end
+end
+----
+
+The plug and the scheduler only adapt the result to their caller:
+
+[source,elixir]
+----
+# TrentoWeb.Plugs.OperationsPolicyPlug: one clause for one or many resources
+defp handle_permission(policy, operation, resource_or_resources, params) do
+  case Authorization.authorize(policy, operation, resource_or_resources, params) do
+    :ok -> :ok
+    {:error, errors} -> {:error, :forbidden, errors}
+  end
+end
+
+# Trento.Operations.Requests: the same rules at creation (warnings) and at fire time
+def authorize(target_type, target_id, operation, params) do
+  with {:ok, policy, resource} <- load(target_type, target_id, operation, params) do
+    Authorization.authorize(policy, operation, resource, params)
+  end
+end
+----
+
+This way every rule applies to immediate, bulk and scheduled requests, and to the warnings of new schedules. A bulk schedule gets its warnings grouped per target, in the same shape as the forbidden modal of bulk operations. Maintenance windows and Option B are one line each in `authorize/4`.
+
+All the reasons are collected, not only the first one, so that the forbidden modal and the activity log show every rule that does not pass. The scheduler still needs to know whether a maintenance window refused a run, because the activity log reason depends on it: each error carries the rule that produced it (for example `source: :maintenance_window`).
+
+Bulk operations introduce the list of resources in the plug first. Moving the plug logic into this function does not change any behavior, and it comes as a follow-up once bulk operations are merged. The proofs of concept still check the maintenance windows in the plug and in the context function separately.
 
 ==== Another operation already running
 
@@ -428,7 +496,7 @@ CONs:
 
 Proposed approach: *Option A now, Option B together with bulk operations*.
 
-A scheduled request does not need a synchronous answer, whereas bulk operations do: the whole bulk request must be refused, through the UI and the API, when one of the targets has an operation running. That's why Option B is planned together with bulk operations, once, as one more policy rule that both the plug (immediate and bulk requests) and the context function (scheduled requests) apply. For manual requests the frontend shows "already running" based on the running operations it already knows about.
+A scheduled request does not need a synchronous answer, whereas bulk operations do: the whole bulk request must be refused, through the UI and the API, when one of the targets has an operation running. That's why Option B is planned together with bulk operations, once, as one more policy rule that both the plug (immediate and bulk requests) and the context function (scheduled requests) apply (see link:#operations-authorization[Authorization rules in one place]). For manual requests the frontend shows "already running" based on the running operations it already knows about.
 
 ==== Bulk scheduling
 
@@ -480,7 +548,7 @@ Proof of concept: from a target up in {poc-repo}/pull/62[#62] (Quantum), {poc-re
 
 * *Periodic checks executions*: the checks job skips the hosts and clusters covered by an ongoing window that forbids checks executions. The next execution of a target falls after the window, or after the last of a chain of overlapping windows.
 * *Manual checks executions*: `422` "Checks cannot be executed during a maintenance window", for the UI, the API and the AI assistant tools.
-* *Manual operations*: the operation policy check of the controllers adds the maintenance windows of the targets of the operation to the other policies, also for every target of a bulk request: a window on one of them forbids the whole bulk request, as any other policy does. The forbidden modal names the target the window is set on and when it ends. The API answers `403`.
+* *Manual operations*: the operation policy check of the controllers adds the maintenance windows of the targets of the operation to the other policies, also for every target of a bulk request: a window on one of them forbids the whole bulk request, as any other policy does (see link:#operations-authorization[Authorization rules in one place]). The forbidden modal names the target the window is set on and when it ends. The API answers `403`.
 * *Scheduled operations*: the same check runs at the scheduled time. A window that forbids operations makes the scheduled request fail with the reason "maintenance window". A schedule created or changed during such a window gets it among its warnings.
 
 An action already running when a window starts is not stopped, whether it should be is an open question.
