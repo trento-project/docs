@@ -378,7 +378,7 @@ Proof of concept, create, read, change and cancel: {poc-repo}/pull/13[#13], {poc
 
 ==== Preconditions at fire time
 
-A scheduled request must honor the same policies as a manual one. Currently they run in `OperationsPolicyPlug`, tied to the HTTP connection, so we move them to a context function (`Trento.Operations.Requests`) that loads the target with the same data as the controllers, runs the policies and requests the operation. The loaders move out of the controllers (`Trento.Operations.Targets`), so that the plug and the context load the same data. Bulk operations need the same function. Proof of concept: {poc-repo}/pull/9[#9].
+A scheduled request must honor the same policies as a manual one. Currently they run in `OperationsPolicyPlug`, tied to the HTTP connection, so we move them to a context function (`Trento.Operations.Requests`) that loads the target with the same data as the controllers, runs the policies and requests the operation. The loaders move out of the controllers (`Trento.Operations.Targets`), so that the plug and the context load the same data. Bulk operations authorize all their targets in the same plug, and request each target through the same request functions the context function calls. Proof of concept: {poc-repo}/pull/9[#9].
 
 At fire time we consider:
 
@@ -428,7 +428,7 @@ CONs:
 
 Proposed approach: *Option A now, Option B together with bulk operations*.
 
-A scheduled request does not need a synchronous answer, whereas bulk operations do: the whole bulk request must be refused, through the UI and the API, when one of the targets has an operation running. That's why Option B is planned together with bulk operations, once, as one more policy rule in the context function introduced here. For manual requests the frontend shows "already running" based on the running operations it already knows about.
+A scheduled request does not need a synchronous answer, whereas bulk operations do: the whole bulk request must be refused, through the UI and the API, when one of the targets has an operation running. That's why Option B is planned together with bulk operations, once, as one more policy rule that both the plug (immediate and bulk requests) and the context function (scheduled requests) apply. For manual requests the frontend shows "already running" based on the running operations it already knows about.
 
 ==== Bulk scheduling
 
@@ -480,7 +480,7 @@ Proof of concept: from a target up in {poc-repo}/pull/62[#62] (Quantum), {poc-re
 
 * *Periodic checks executions*: the checks job skips the hosts and clusters covered by an ongoing window that forbids checks executions. The next execution of a target falls after the window, or after the last of a chain of overlapping windows.
 * *Manual checks executions*: `422` "Checks cannot be executed during a maintenance window", for the UI, the API and the AI assistant tools.
-* *Manual operations*: the operation policy check of the controllers adds the maintenance windows of the targets of the operation to the other policies. The forbidden modal names the target the window is set on and when it ends. The API answers `403`.
+* *Manual operations*: the operation policy check of the controllers adds the maintenance windows of the targets of the operation to the other policies, also for every target of a bulk request: a window on one of them forbids the whole bulk request, as any other policy does. The forbidden modal names the target the window is set on and when it ends. The API answers `403`.
 * *Scheduled operations*: the same check runs at the scheduled time. A window that forbids operations makes the scheduled request fail with the reason "maintenance window". A schedule created or changed during such a window gets it among its warnings.
 
 An action already running when a window starts is not stopped, whether it should be is an open question.
