@@ -639,7 +639,7 @@ Not covered by the proofs of concept: alert emails, overviews and dashboard, hel
 ** the grace period is 5 minutes
 ** a change restarts the count of occurrences, and a missed occurrence counts
 ** the end date is excluded, for individual and bulk schedules and for windows
-** no summary entry for a bulk request
+** no summary entry for a bulk request, while a bulk operation logs one entry for the whole request, with the operation of each target
 ** a window lasts at most 31 days and ends on a date or never, not after a number of occurrences
 ** windows that ended are not listed
 ** in the UI, bulk maintenance windows start from the hosts list only. The API accepts every target type
