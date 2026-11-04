@@ -321,7 +321,13 @@ Proof of concept: storage in {poc-repo}/pull/20[#20] (Quantum), {poc-repo}/pull/
 
 ===== Option 1: one evaluator every minute
 
-A job runs every minute and, for each registered host and checkable cluster with selected checks, it requests an execution when the frequency of the target has elapsed since its last periodic request, unless a maintenance window forbids checks executions on the target. A tolerance of half a minute prevents the tick from stretching the frequency. The job runs about once a minute, so a target requested at 10:00:02 has 4 minutes and 59 seconds elapsed at the 10:05:01 run. Without the tolerance it would wait for the 10:06 run, and a frequency of 5 minutes would become 6 minutes. With it, the target is requested at 10:05.
+A job runs every minute. For each registered host and checkable cluster with selected checks, it takes the frequency of the target (its own, or the global one) and requests an execution when:
+
+* no maintenance window forbids checks executions on the target
+* the frequency is not `disabled`
+* the target was never requested, or the frequency has elapsed since its last periodic request, with half a minute of tolerance
+
+The job runs on every minute of the clock, so its first run after a start is at the next full minute, and targets with the same frequency are requested together, as today. The time of the last request is stored, so a restart does not change the cadence. The tolerance is needed because the job never runs at exactly the same instant of the minute: with a frequency of 5 minutes, a target requested at 10:00:00.312 has only 299.993 seconds elapsed at the 10:05:00.305 run, and without the tolerance it would wait for the 10:06 run, turning 5 minutes into 6. Half a minute absorbs that, and it is short enough to never request a target one run too early.
 
 PROs:
 
