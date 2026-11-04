@@ -281,7 +281,14 @@ Since the three implementations serve the same API and the same frontend, the ch
 
 Operation schedules and maintenance windows need the same recurrence rules, so we implement them once in `Trento.Scheduling.Recurrence` and use them for both (and for the exception windows of plan B). Proof of concept: {poc-repo}/pull/8[#8].
 
-Cron expressions are not enough: "every 2 weeks", "every 3 months on the 31st" or "for 5 occurrences" cannot be expressed. RRULE (RFC 5545) libraries exist for Elixir but are not well maintained and implement much more than we need.
+Cron expressions are not enough. A cron expression matches the minute, hour, day of month, month and day of week of the current time, so:
+
+* no field counts weeks, so "every 2 weeks" cannot be expressed
+* a step counts from the start of the field, not from the start of the schedule: `*/3` in the month field means January, April, July and October, whatever the month of the start
+* day 31 matches only the months that have it, while our rule moves the occurrence to the last day of shorter months
+* there is no end condition, neither an end date nor a number of occurrences
+
+The recurrences of https://www.rfc-editor.org/rfc/rfc5545[RFC 5545] (`RRULE`) describe much more than we need: secondly, minutely and hourly frequencies, `BYHOUR` and `BYMINUTE`, lists of days of the month or of the year (`BYMONTHDAY`, `BYYEARDAY`), week numbers (`BYWEEKNO`), positions in a set (`BYSETPOS`), and dates added or excluded (`RDATE`, `EXDATE`). We need a frequency, an interval, weekdays and an end condition. RFC 5545 also ignores an occurrence on a day the month does not have, or on a local time that does not exist, while our rules move it. Elixir libraries exist, for example https://hex.pm/packages/cocktail[cocktail] (last release in January 2024), https://hex.pm/packages/rrule[rrule] (a wrapper of a Rust library, last release in April 2025), https://hex.pm/packages/ex_cycle[ex_cycle] (May 2025) and https://hex.pm/packages/ical[ical] (released since February 2026).
 
 A schedule is a start (UTC instant), a timezone (the user timezone at creation time) and an optional recurrence: a frequency (daily, weekly, monthly, yearly), an interval (every X), weekdays (weekly only), and an end condition (an end date, a number of occurrences, or none). The rules are:
 
