@@ -221,9 +221,9 @@ NOTE: There is also a middle ground: the data model of Option 1 with an Oban cro
 
 ==== Option 3: Event sourcing
 
-An operation schedule is a Commanded aggregate (`Trento.Operations.Schedule`) with the following commands: schedule, change, cancel, start a run, complete a run. Recurrence, params and policy errors are value objects in the events. Events carry no user: the user travels in the event metadata, and the context logs the user actions as activities after a successful dispatch. A projector writes the `operation_schedules` read model, and the API waits for it (strong consistency) in order to read its own writes.
+An operation schedule is a Commanded aggregate (`Trento.Operations.Schedule`) with five commands: schedule, change, cancel, start a run and complete a run. Events carry no user: the user travels in the event metadata, and the context logs the user actions as activities after a successful dispatch. A projector writes the `operation_schedules` read model, and the API waits for it (strong consistency), so that it can return what it just saved.
 
-A Quantum job runs every minute and dispatches "start a run" for the due schedules. The aggregate derives the operation id of the occurrence from the schedule id and the occurrence, and keeps the run pending. The job then runs the policies, requests the operation with that id and dispatches the outcome. A pending run is started again after 30 seconds with the same id, and the aggregate fails it as "Trento not available" once the grace period is over. Replaying the events never requests an operation again.
+A Quantum job still fires the runs. Every minute it starts a run for each due schedule, runs the policies, requests the operation and sends the outcome back to the aggregate. The aggregate lets only one run at a time work on an occurrence, and every attempt of the same occurrence requests the same operation id. A request that cannot be sent leaves the run open: the job starts it again at the next minute, until the grace period is over and the aggregate records the occurrence as failed with "Trento not available". The requests come from the job, not from the events, so replaying the events never requests an operation again.
 
 The checks interval of a target is an event of the Host and Cluster aggregates, just like the checks selection, and it is carried by their roll-up. A projector writes it to its own read model. The time of the last periodic request stays in a plain table, because an event every few minutes for every target adds no value to the event store. A maintenance window is an aggregate of its own, projected into a read model with the same columns as the table of the other options, so that coverage and enforcement are the same code.
 
@@ -232,7 +232,6 @@ Proof of concept: {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling
 PROs:
 
 * follows the architecture of hosts, clusters and SAP systems
-* the audit trail and the activity log come from the events
 * the removal of schedules with their target is an event handler on the deregistration events
 * the checks settings of a target live next to its checks selection
 * it would fit future rules spanning several operations on one target (Option B of link:#_another_operation_already_running[Another operation already running]), or a permanent change history of schedules
@@ -240,11 +239,11 @@ PROs:
 CONs:
 
 * most code: about 3050 lines of code and 3650 lines of tests on top of the shared part, 41 new modules. Maintenance windows add about 2350 and 1900 lines, against 1700 and 1300 in the other options
-* schedules and frequencies are configuration with few rules, and no current requirement asks for their event history
-* the API reads its own writes, so every command is dispatched with strong consistency, and when the read model does not catch up in time the change is saved but the API answers `202` without the resource
+* the audit trail exists in the three options: the activity log records every change of a schedule or of a frequency, and every run (see link:#_activity_log_and_alerts[Activity log and alerts]). What event sourcing adds on top is a history that can be replayed, and no current requirement asks for it
+* the API returns the schedule it just saved, so every command is dispatched with strong consistency and waits for the projector. When the projector does not update the read model within the consistency timeout, the command and its events are stored, but the controller cannot read the schedule yet and answers `202` with an empty body
 * changes that span several aggregates or commands are not atomic, for example a bulk request (all the targets are validated first, then one command per target is dispatched), or the frequency and the exception window of plan B in one request
 * the roll-up of hosts and clusters must carry the new fields of their aggregate state
-* Commanded has no scheduler, so Quantum still fires the runs (`commanded_scheduler` does not compile with Commanded 1.x)
+* Commanded has no scheduler, so Quantum still fires the runs. https://github.com/commanded/commanded-scheduler[commanded_scheduler] was last released in 2019 and does not compile with Commanded 1.x (https://github.com/commanded/commanded-scheduler/issues/13[issue #13])
 
 ==== Other libraries
 
