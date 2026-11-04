@@ -1,0 +1,153 @@
+== 8. Database Size Control
+
+[width="100%",cols="<18%,<82%",]
+|===
+|Feature Name |Database Size Control
+|Start Date |Nov 4th, 2026
+|Category |Architecture
+|PR |TBD
+|===
+
+== Summary
+
+The disk space used by the Trento and Wanda databases grows faster than expected because of tables that are continuously appended to. This causes operational issues, such as the storage disks getting full.
+
+== Motivation
+
+Several tables in the Trento and Wanda databases follow an append logic: new rows are added continuously and nothing replaces them. Over time, these tables consume more disk space than expected.
+
+Some of these tables already have a pruning mechanism, such as the discovery events or the activity log. However, even with the pruning in place, some of them still grow too much. Other tables don't have any pruning mechanism at all, so they grow indefinitely.
+
+The goal of this RFC is to study different alternatives to avoid this issue and keep the database size under control.
+
+== Detailed Design
+
+=== Current state
+
+The database size problem has two issues of a different nature, which need to be treated separately:
+
+* *The event store.* It is the foundation of Trento's event sourcing architecture: the state of every aggregate is rebuilt from its events, and the read models are built by projecting them. This makes it an especially sensitive component. Any strategy that removes or modifies events can affect the integrity of the whole system, so it must be handled with extreme care.
+* *The append only tables.* The rest of the tables, which keep adding new rows and are not part of the event store.
+
+The following tables follow an append logic and are affected by the issue.
+
+[width="100%",cols="<10%,<22%,<30%,<38%",options="header"]
+|===
+|Project |Affected table |Growth |Current pruning mechanism
+
+|Web
+|`events`, `streams`, `snapshots`, `subscriptions` (event store)
+|Every domain event is appended.
+|None. The roll-up mechanism archives the old streams, but the archived events are not deleted.
+
+|Web
+|`discovery_events`
+|One row per discovery payload sent by the agents.
+|Scheduled `prune_discovery_events` job. Runs daily and deletes the rows older than 10 days (configurable with `PRUNE_EVENTS_INTERVAL` and `PRUNE_EVENTS_OLDER_THAN`).
+
+|Web
+|`discarded_discovery_events`
+|One row per discovery payload that could not be processed.
+|Same `prune_discovery_events` job as `discovery_events`.
+
+|Web
+|`activity_logs`
+|One row per user or system action.
+|Scheduled `activity_log_cleaning` job. Runs daily and deletes the rows older than the retention time defined in the activity log settings.
+
+|Wanda
+|`executions`
+|One row per checks execution, including the full result.
+|None.
+
+|Wanda
+|`operations`
+|One row per operation, including the agent reports.
+|None.
+|===
+
+NOTE: The `activity_logs` table is outside the scope of this RFC. Its retention is a product feature configurable by the user, so it will stay as it is.
+
+== Potential solutions
+
+The following chapters discuss different potential solutions for each of the issues, with their pros and cons. Keep in mind that a solution can be better for some tables than for others, so a mix of them is also possible.
+
+=== Append only tables
+
+==== Current pruning mechanism
+
+Keep the existing pruning mechanism: the scheduled `prune_discovery_events` job, which deletes the rows older than the configured number of days, and extend the same approach to the tables that don't have it yet.
+
+*Pros*
+
+* There is already something in place.
+* It gives the user some freedom of choice, as the retention period and the schedule are configurable.
+* It is implemented as a mix task (`mix prune_events`), so the user can run it at any given time.
+
+*Cons*
+
+* The tables can still grow too much if there are too many new rows that are not pruned, for different reasons: a lot of agents sending information, a pruning scheduled to retain too many days, etc.
+* The pruning is time-based only. There is no limit on the size or the number of rows of the tables.
+* `discovery_events` and `discarded_discovery_events` are troubleshooting tables, so we probably don't need to keep that much information in them. Pruning only removes the old rows, but it doesn't reduce the amount of data stored in the first place.
+* Deleting rows in PostgreSQL doesn't return the disk space to the operating system. The space is only reused by the same table, unless a `VACUUM FULL` or a table rewrite is done.
+
+==== Row number cap
+
+Limit the number of rows of some tables, so the new entries automatically replace the oldest ones. The cap is applied per key (for example, per agent or per execution group), so a single noisy source cannot evict the history of the others.
+
+*Pros*
+
+* There is no need for a separate scheduled job like the pruning, so there are fewer failure points.
+* The table size is bounded and sized for each key, so there is no growing bloat.
+* Replacing rows reuses the space of the same table, so the file doesn't keep growing.
+
+*Cons*
+
+* There is no real control over what is stored or not. The only knob is a limited, user-configurable row number value.
+* The time dimension is lost. If the rate of new rows is high, the history window shrinks without notice. "The last N rows" is less predictable than "the last N days".
+* The replacement logic still needs to live somewhere (a DB trigger, a delete on every insert or a fixed-slot ring buffer), so the work moves to the write path of the tables.
+* It is probably only ideal for tables whose information is not of interest to the user, like the discovery events.
+
+=== Event store
+
+The event store is an append only store: every domain event is appended and nothing deletes it. There is no pruning mechanism for it.
+
+To keep the streams of the aggregates short, Trento has a roll-up mechanism. When an aggregate is rolled up, in a single transaction:
+
+* The stream is renamed to an archived one (`<id>-archived-<timestamp>`).
+* A roll-up event, containing a snapshot of the aggregate, is appended to the original stream.
+
+The roll-up keeps the aggregates fast to restore, but it doesn't free any disk space: the archived events remain in the event store.
+
+The straightforward solution would be removing the archived streams, but this has an important implication: it removes the history of the events, so replaying it, for example to rebuild the read models, would no longer be possible.
+
+The roll-up events could potentially be projected, but this would mean the aggregate needs to store in its state all the information that goes into the read model, which doesn't happen now. This would couple the aggregate state to the shape of the read models, so it is not a good design decision.
+
+So far, this requires dedicated research.
+
+== Proposed solution
+
+As the nature of each table is different, we can apply different techniques for each of them:
+
+- `activity_logs`: This is a product feature, so leave it as it is.
+- `discovery_events`: This is the table that grows the most. It is only used for troubleshooting to dump current state scenarios. Depending on the number of agents, it grows quickly. Add a row number cap for this table, applied per agent and discovery type, so its size stays under control. With this, we could remove the pruning mechanism for this table.
+- `discarded_discovery_events`: The same as `discovery_events`. Store a capped number of rows for each agent.
+- `executions`: This still needs to be a product decision. Even though we only use the last execution data, we could eventually use more. Keep in mind that this information is available through the API and can be consumed by AI clients. This table doesn't grow as much as the `discovery_events` table, but it grows regularly, as the checks are executed periodically. A time-based pruning mechanism, like the existing one for the discovery events or the activity log, would make sense.
+- `operations`: Similar to `executions`, this must be a product decision. In this case, operations don't grow as often, as they are user requested actions. A periodic time-based pruning looks appropriate here again.
+
+== Document maintenance operations
+
+Complementary to the solutions above, users can always run basic PostgreSQL operations to recover disk space, such as truncating the tables that hold troubleshooting or historical data. This possibility should be documented in the user documentation, linking to the existing PostgreSQL configuration chapter for how to access the database.
+
+The following is a sample cheatsheet:
+
+[source,sql]
+----
+-- Trento Web database (discovery events, used for troubleshooting)
+\c trento
+TRUNCATE TABLE discovery_events, discarded_discovery_events RESTART IDENTITY;
+
+-- Wanda database (checks executions and operations history)
+\c wanda
+TRUNCATE TABLE executions, operations RESTART IDENTITY;
+----
