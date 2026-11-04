@@ -179,7 +179,7 @@ When a schedule is due, every implementation goes through the same steps: check 
 
 ==== Option 1: Keep Quantum
 
-Schedules are rows in an Ecto table with their `next_run_at`. A Quantum job runs every minute, selects the due rows with `FOR UPDATE SKIP LOCKED`, runs them and moves each of them to its next occurrence. Another Quantum job, also running every minute, evaluates the checks executions (see link:#_checks_execution_frequency[Checks execution frequency]).
+Schedules are rows in an Ecto table with their `next_run_at`. A Quantum job runs every minute, selects the due rows with `FOR UPDATE SKIP LOCKED` (if Web runs more than one replica, each of them runs the job, and the lock makes sure that a schedule is handled by one replica only), runs them and moves each of them to its next occurrence. Another Quantum job, also running every minute, evaluates the checks executions (see link:#_checks_execution_frequency[Checks execution frequency]).
 
 Proof of concept: {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling%3A%20quantum%22%20sort%3Acreated-asc[`scheduling: quantum` pull requests]. The runner is in {poc-repo}/pull/18[#18].
 
@@ -193,7 +193,7 @@ PROs:
 
 CONs:
 
-* Quantum is not maintained: its last release dates back to February 2024, and its repository receives only automated dependency updates since July 2025
+* Quantum is not a very active project: its last release dates back to February 2024, and since July 2025 its repository receives almost only automated dependency updates
 * retries and history are up to us: a request that cannot be sent is retried at the next minute until the grace period ends, and the activity log is the history
 * Quantum, as Trento configures it, keeps no state across restarts, so Web detects a missed occurrence from `next_run_at` and the grace period. Quantum can persist its jobs and the time of its last execution with a storage adapter (https://hex.pm/packages/quantum_storage_persistent_ets[PersistentEts] or https://hex.pm/packages/quantum_storage_mnesia[Mnesia], both last released in 2020), but that would not help here: after a restart it runs every execution it missed, while we don't want missed occurrences to be caught up, and the schedules live in our table anyway
 
@@ -255,7 +255,7 @@ We looked at other libraries as well, none of them fits:
 * in-memory schedulers (Periodic, sched_ex) keep nothing across restarts, just like Quantum without a storage adapter
 * https://github.com/dashbitco/broadway[Broadway] is a pipeline that consumes messages from a queue (RabbitMQ, SQS, Kafka), with no notion of time
 * RabbitMQ delayed messages need a plugin that is archived. A delayed message cannot be listed, changed or cancelled
-* a GenServer of our own in place of the Quantum job would be Option 1 without Quantum, we did not build it
+* a GenServer of our own in place of the Quantum job would be Option 1 with a hand-written runner, so we did not build a proof of concept for it
 
 ==== Comparison
 
