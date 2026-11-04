@@ -501,7 +501,7 @@ Putting the resource in `metadata`, with a flag to recognize it, would mix group
 
 ==== Another operation already running
 
-Web does not know which operations are running, only Wanda does. We have two options:
+Web does not know which operations are running, only Wanda does. We have three options:
 
 ===== Option A: let Wanda decide
 
@@ -532,11 +532,29 @@ CONs:
 * a copy of Wanda's state that can drift: a Wanda crash leaves no `OperationCompleted`, so Web needs timeouts, and the step timeouts live in Wanda (a database start can last up to 36 hours). `OperationStarted` needs to carry a `timeout_at`
 * check-then-publish races remain, so Option A handling is necessary anyway
 
+===== Option C: Web asks Wanda
+
+Before requesting an operation, Web asks Wanda whether an operation is running for the group of the target, and refuses the request when there is one. Wanda already serves this query (`GET /api/v1/operations/executions?group_id=...&status=running`), and the frontend uses the same endpoint to show the running operations.
+
+PROs:
+
+* no duplicate state, Wanda stays the only source of truth, and Web keeps no state of its own
+* a synchronous answer for manual, scheduled, bulk and API requests, shown in the forbidden modal
+* no contract change
+
+CONs:
+
+* one HTTP call to Wanda for every request, and for every target of a bulk request
+* Web has to decide what to do when Wanda does not answer: refuse the request, or send it and rely on Option A
+* the backend of Web needs an address and a token of its own to call Wanda. Today it calls Wanda only while serving a user, with the browser address and the token of the user, and `CHECKS_SERVICE_BASE_URL` can be a path relative to the browser address (`/wanda` behind the proxy of the ansible installation)
+* check-then-publish races remain, so Option A handling is necessary anyway
+* Wanda's scope stays the `group_id`, as in Option A
+
 '''
 
 Proposed approach: *Option A now, Option B together with bulk operations*.
 
-A scheduled request does not need a synchronous answer, whereas bulk operations do: the whole bulk request must be refused, through the UI and the API, when one of the targets has an operation running. That's why Option B is planned together with bulk operations, once, as one more policy rule that both the plug (immediate and bulk requests) and the context function (scheduled requests) apply (see link:#operations-authorization[Authorization rules in one place]). For manual requests the frontend shows "already running" based on the running operations it already knows about.
+A scheduled request does not need a synchronous answer, whereas bulk operations do: the whole bulk request must be refused, through the UI and the API, when one of the targets has an operation running. That's why Option B is planned together with bulk operations, once, as one more policy rule that both the plug (immediate and bulk requests) and the context function (scheduled requests) apply (see link:#operations-authorization[Authorization rules in one place]). Option C is an alternative to Option B for bulk operations: the same synchronous answer and the same place in the policy rules, without a copy of Wanda's state, at the cost of one call to Wanda per target. For manual requests the frontend shows "already running" based on the running operations it already knows about.
 
 ==== Bulk scheduling
 
