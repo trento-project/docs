@@ -321,7 +321,7 @@ Proof of concept: storage in {poc-repo}/pull/20[#20] (Quantum), {poc-repo}/pull/
 
 ===== Option 1: one evaluator every minute
 
-A job runs every minute and, for each registered host and checkable cluster with selected checks, it requests an execution when the frequency of the target has elapsed since its last periodic request, unless a maintenance window forbids checks executions on the target. A tolerance of half a minute prevents the tick from stretching the frequency.
+A job runs every minute and, for each registered host and checkable cluster with selected checks, it requests an execution when the frequency of the target has elapsed since its last periodic request, unless a maintenance window forbids checks executions on the target. A tolerance of half a minute prevents the tick from stretching the frequency. The job runs about once a minute, so a target requested at 10:00:02 has 4 minutes and 59 seconds elapsed at the 10:05:01 run. Without the tolerance it would wait for the 10:06 run, and a frequency of 5 minutes would become 6 minutes. With it, the target is requested at 10:05.
 
 PROs:
 
@@ -352,7 +352,7 @@ Proof of concept: {poc-repo}/pull/22[#22] (Quantum), {poc-repo}/pull/34[#34] (Ob
 
 ==== Overlapping executions
 
-One concern is that executions pile up when an execution lasts longer than the frequency. That does not happen in Wanda, because it refuses a second execution for a running group and its execution timeout is 5 minutes, the shortest frequency. The dead letter queue grows instead, with one rejected message per overlap. With the evaluator Web records the last periodic request and never sends two requests within one interval, so overlaps can only happen at the shortest frequency. Cleaning up the dead letter queues (TTL or max length) is a separate, already existing issue.
+One concern is that executions pile up when an execution lasts longer than the frequency. That does not happen in Wanda, because it refuses a second execution for a running group and its execution timeout is 5 minutes, the shortest frequency. The dead letter queue grows instead, with one rejected message per overlap. With the one minute evaluator proposed in link:#_option_1_one_evaluator_every_minute[Evaluation], Web records the last periodic request and never sends two requests within one interval, so overlaps can only happen at the shortest frequency. Cleaning up the dead letter queues (TTL or max length) is a separate, already existing issue.
 
 A frequency per check or per group of checks is out of scope. Wanda executes all the selected checks of a group in one execution, and the health of a target is computed from that execution. Running subsets at different frequencies would change that model and needs its own design.
 
