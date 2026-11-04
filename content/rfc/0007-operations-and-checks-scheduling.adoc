@@ -205,7 +205,7 @@ Proof of concept: {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling
 
 PROs:
 
-* persistent jobs, active project (v2.24.2 released in October 2026), Apache-2.0 license, and we don't need the paid Pro edition
+* persistent jobs, active project (v2.24.2 released in October 2026), Apache-2.0 license, and we don't need the paid https://oban.pro/docs/pro/overview.html[Pro edition]. We insert one job per occurrence and use static cron entries, retries, snooze, pruning and the rescue of orphaned jobs, which are all in the open source edition. Pro adds cron entries that can be changed at runtime, workflows, batches, global concurrency and rate limits, which our design does not use
 * precision to the second, retries, pruning, telemetry, and a dashboard (https://github.com/oban-bg/oban_web[Oban Web], Apache-2.0)
 * removes the dependency on Quantum
 
@@ -217,7 +217,7 @@ CONs:
 * requires PostgreSQL 14 or later. The oldest PostgreSQL version Trento documents is 14.10 (SLES for SAP 15 SP4)
 * about 1950 lines of code and 1850 lines of tests on top of the shared part, 26 new modules
 
-NOTE: There is also a middle ground: the data model of Option 1 with an Oban cron entry as the runner, which removes Quantum without introducing a second source of truth.
+NOTE: There is also a middle ground: the data model of Option 1 with an Oban cron entry as the runner, which removes Quantum without introducing a second source of truth. The schedule rows and their `next_run_at` stay the only source of truth, and the runner of Option 1 becomes an Oban cron entry that runs every minute. Oban inserts cron jobs from one node only, the leader it elects through the `oban_peers` table. The other Quantum jobs move to Oban cron too, and the jobs that run more often than once a minute move to a small process with `Process.send_after`, as in Option 2. The grace period and the missed occurrences work as in Option 1. However, there is no job per occurrence, so an occurrence gets neither Oban retries nor Oban history: they stay as in Option 1. The dependency, the tables and the PostgreSQL requirement of Option 2 come along.
 
 ==== Option 3: Event sourcing
 
