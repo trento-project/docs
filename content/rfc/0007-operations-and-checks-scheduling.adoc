@@ -194,18 +194,18 @@ PROs:
 CONs:
 
 * Quantum is not a very active project: its last release dates back to February 2024, and since July 2025 its repository receives almost only automated dependency updates
-* retries and history are up to us: a request that cannot be sent is retried at the next minute until the grace period ends, and the activity log is the history
+* the history of the runs is up to us: the activity log is the history
 * Quantum, as Trento configures it, keeps no state across restarts, so Web detects a missed occurrence from `next_run_at` and the grace period. Quantum can persist its jobs and the time of its last execution with a storage adapter (https://hex.pm/packages/quantum_storage_persistent_ets[PersistentEts] or https://hex.pm/packages/quantum_storage_mnesia[Mnesia], both last released in 2020), but that would not help here: after a restart it runs every execution it missed, while we don't want missed occurrences to be caught up, and the schedules live in our table anyway
 
 ==== Option 2: Oban
 
-Oban replaces Quantum for every periodic job by means of its built-in cron. Jobs that run more often than once a minute (the heartbeat check, and the heartbeat faker of the demo) move to a small supervised process with `Process.send_after`. Each schedule row has one pending Oban job at `next_run_at`. The job is inserted, replaced or cancelled in the same transaction as the row. When the job runs, it checks that it is still the pending occurrence, requests the operation, and inserts the job of the next occurrence. A request that cannot be sent snoozes the job for one minute. The checks evaluator is an Oban cron entry.
+Oban replaces Quantum for every periodic job by means of its built-in cron. Jobs that run more often than once a minute (the heartbeat check, and the heartbeat faker of the demo) move to a small supervised process with `Process.send_after`. Each schedule row has one pending Oban job at `next_run_at`. The job is inserted, replaced or cancelled in the same transaction as the row. When the job runs, it checks that it is still the pending occurrence, requests the operation, and inserts the job of the next occurrence. A request that cannot be sent fails the occurrence at once, as in the other options. The checks evaluator is an Oban cron entry.
 
 Proof of concept: {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling%3A%20oban%22%20sort%3Acreated-asc[`scheduling: oban` pull requests]. Oban replaces Quantum in {poc-repo}/pull/24[#24]. The job per occurrence is in {poc-repo}/pull/30[#30].
 
 PROs:
 
-* persistent jobs, active project (v2.24.2 released in October 2026), Apache-2.0 license, and we don't need the paid https://oban.pro/docs/pro/overview.html[Pro edition]. We insert one job per occurrence and use static cron entries, retries, snooze, pruning and the rescue of orphaned jobs, which are all in the open source edition. Pro adds cron entries that can be changed at runtime, workflows, batches, global concurrency and rate limits, which our design does not use
+* persistent jobs, active project (v2.24.2 released in October 2026), Apache-2.0 license, and we don't need the paid https://oban.pro/docs/pro/overview.html[Pro edition]. We insert one job per occurrence and use static cron entries, retries, pruning and the rescue of orphaned jobs, which are all in the open source edition. Pro adds cron entries that can be changed at runtime, workflows, batches, global concurrency and rate limits, which our design does not use
 * precision to the second, retries, pruning, telemetry, and a dashboard (https://github.com/oban-bg/oban_web[Oban Web], Apache-2.0)
 * removes the dependency on Quantum
 
@@ -223,7 +223,7 @@ NOTE: There is also a middle ground: the data model of Option 1 with an Oban cro
 
 An operation schedule is a Commanded aggregate (`Trento.Operations.Schedule`) with five commands: schedule, change, cancel, start a run and complete a run. Events carry no user: the user travels in the event metadata, and the context logs the user actions as activities after a successful dispatch. A projector writes the `operation_schedules` read model, and the API waits for it (strong consistency), so that it can return what it just saved.
 
-A Quantum job still fires the runs. Every minute it starts a run for each due schedule, runs the policies, requests the operation and sends the outcome back to the aggregate. The aggregate lets only one run at a time work on an occurrence, and every attempt of the same occurrence requests the same operation id. A request that cannot be sent leaves the run open: the job starts it again at the next minute, until the grace period is over and the aggregate records the occurrence as failed with "Trento not available". The requests come from the job, not from the events, so replaying the events never requests an operation again.
+A Quantum job still fires the runs. Every minute it starts a run for each due schedule, runs the policies, requests the operation and sends the outcome back to the aggregate. The aggregate lets only one run at a time work on an occurrence. A request that cannot be sent ends the run, and the aggregate records the occurrence as failed with "Trento not available". A run whose outcome never comes back, because the job crashed, is closed as failed by the aggregate once the grace period is over. The requests come from the job, not from the events, so replaying the events never requests an operation again.
 
 The checks interval of a target is an event of the Host and Cluster aggregates, just like the checks selection, and it is carried by their roll-up. A projector writes it to its own read model. The time of the last periodic request stays in a plain table, because an event every few minutes for every target adds no value to the event store. A maintenance window is an aggregate of its own, projected into a read model with the same columns as the table of the other options, so that coverage and enforcement are the same code.
 
@@ -268,7 +268,7 @@ We looked at other libraries as well, none of them fits:
 |Source of truth of a schedule |its row |its row and its job |its event stream
 |Precision |the minute |the second |the minute
 |Bulk creation |one transaction |one transaction |one command per target
-|Retries and history |next minute, activity log |Oban snooze, Oban jobs and activity log |pending run started again with the same operation id, events and activity log
+|Failed requests and history |failed at once, activity log |failed at once, Oban jobs and activity log |failed at once, events and activity log
 |===
 
 '''
@@ -391,7 +391,7 @@ At fire time we consider:
 * *the maintenance windows*: an ongoing window that forbids operations on the target refuses the request. The failure is recorded with the reason "maintenance window", together with the messages of any other rule that does not pass.
 * *the policies*: agent heartbeat (stale target), saptune state, instances state and the other existing rules, on fresh data. A failure is recorded with the same messages the forbidden modal shows.
 * *the creator*: no permission check. The creator's ability is checked when the schedule is created or changed.
-* *Trento not available*: the grace period is 5 minutes after the scheduled time, the same as the expiration of operation requests. A request that cannot be sent is retried until the grace period ends. After it, the occurrence is recorded as failed with reason "Trento not available" and is not requested. Missed occurrences are not caught up: the next occurrence is computed after the current time, and the missed ones count as done.
+* *Trento not available*: a request that cannot be sent at the scheduled time is not retried, and the occurrence is recorded as failed with reason "Trento not available". An occurrence that the runner reaches late, for example after a downtime, is requested only within a grace period after the scheduled time (5 minutes in the proofs of concept, the same as the expiration of operation requests). After it, the occurrence is recorded as failed with the same reason and is not requested. Missed occurrences are not caught up: the next occurrence is computed after the current time, and the missed ones count as done.
 * *the run*: each requested occurrence is recorded with its operation id (`scheduled_operation_runs`, unique per schedule and occurrence). Wanda answers with the operation id only: the run traces the completion, or the refusal, back to the schedule, also after a one-time schedule is gone.
 * *robustness*: each schedule is handled on its own. A schedule that fails is logged, and the runner goes on with the others. In the Oban implementation, where each schedule has its own job, Oban retries a job that crashed. The retried job first checks, with the schedule row locked, that its occurrence is still the next one of the schedule. If the occurrence was already handled, the schedule has moved on and the job does nothing, so a job that crashed after saving its outcome does not request the operation again. A crash between sending the request and saving its outcome can still request it twice, in all three implementations. Saving the run with its operation id before sending the request would close that gap. A cron job, every 10 minutes in the proof of concept, also gives a new job to any schedule that has none, for example after its job was discarded.
 
@@ -754,7 +754,8 @@ Not covered by the proofs of concept: alert emails, overviews and dashboard, hel
 * Schedules of a deleted or locked user: they keep running, because no permission check runs at fire time. Is that the expected behavior?
 * An operation that is no longer schedulable after an upgrade: delete its schedules, or let them fail at fire time?
 * A deregistered host or cluster can be restored when its agents report again. Its schedules and maintenance windows are deleted at deregistration, so they do not come back. Should they be kept, ignored while the target is deregistered, and active again after the restore?
-* A request that cannot be sent at the scheduled time: is it retried until the grace period ends, or does it fail at once with "Trento not available"? The proofs of concept retry it every minute.
+* Within how many seconds after the scheduled time is an occurrence still accepted, when the runner reaches it late? The proofs of concept accept 5 minutes, the expiration of operation requests.
+* What happens on ephemeral failures, for example a short RabbitMQ outage right at the scheduled time? Without retries the occurrence fails with "Trento not available".
 * What do overviews and dashboard show about schedules and maintenance windows?
 * Does a window on a host also forbid the cluster and SAP instance operations that act on that host? The proofs of concept forbid them.
 * What happens to a checks execution or an operation that already runs when a window starts? The proofs of concept do not stop it.
@@ -763,7 +764,6 @@ Not covered by the proofs of concept: alert emails, overviews and dashboard, hel
 * How is the "premium" distinction enforced? The proofs of concept only show a badge.
 * The proofs of concept take the simplest alternative for these product questions, to confirm:
 ** a schedule is saved even when its policies fail at creation
-** the grace period is 5 minutes
 ** a change restarts the count of occurrences, and a missed occurrence counts
 ** the end date is excluded, for individual and bulk schedules and for windows
 ** no summary entry for a bulk request, while a bulk operation logs one entry for the whole request, with the operation of each target
