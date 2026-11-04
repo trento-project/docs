@@ -407,13 +407,13 @@ We want a single context function that combines every rule, called by the plug a
 [source,elixir]
 ----
 defmodule Trento.Operations.Authorization do
-  # A list of resources (bulk request): authorize each one and tag its errors with the resource
+  # A list of resources (bulk request): authorize each one and collect the errors
   def authorize(policy, operation, resources, params) when is_list(resources) do
     resources
     |> Enum.flat_map(fn resource ->
       case authorize(policy, operation, resource, params) do
         :ok -> []
-        {:error, errors} -> Enum.map(errors, &tag(&1, policy.metadata(resource)))
+        {:error, errors} -> errors
       end
     end)
     |> case do
@@ -422,16 +422,19 @@ defmodule Trento.Operations.Authorization do
     end
   end
 
-  # One resource: every rule, every reason
+  # One resource: every rule, every reason, each error tagged with the resource
   def authorize(policy, operation, resource, params) do
-    OperationsHelper.reduce_operation_authorizations([
+    [
       policy.authorize_operation(operation, resource, params),
       MaintenanceWindowsPolicy.authorize(resource, params),
       RunningOperationsPolicy.authorize(policy, operation, resource, params)
-    ])
+    ]
+    |> OperationsHelper.reduce_operation_authorizations()
+    |> tag(policy.metadata(resource))
   end
 
-  defp tag(error, resource), do: Map.put(error, :resource, resource)
+  defp tag(:ok, _resource), do: :ok
+  defp tag({:error, errors}, resource), do: {:error, Enum.map(errors, &Map.put(&1, :resource, resource))}
 end
 ----
 
@@ -468,7 +471,7 @@ Every rule returns the same kind of error, which the forbidden modal, the `403` 
 
 * `message`: the reason, with `{n}` placeholders
 * `metadata`: the values for the placeholders, by position, ie links to hosts, clusters, databases or SAP systems
-* `resource`: the target the error belongs to, only when a request covers several targets, as bulk operations do
+* `resource`: the target the error belongs to, on every operation error, single or bulk
 * `source`: the rule that produced it, for example `maintenance_window`. The scheduler reads it to record the right reason, the HTTP responses do not need it
 
 The resource has its own field and does not go in `metadata`, because the target linked in the message and the target that is refused can differ. A maintenance window on a SAP system covers its cluster, so in a bulk request on two clusters the error of the covered one links the SAP system, where the window is set, while it belongs to the cluster:
@@ -486,7 +489,7 @@ The resource has its own field and does not go in `metadata`, because the target
 Putting the resource in `metadata`, with a flag to recognize it, would mix grouping data with the values of the placeholders, and every client would have to skip an entry it does not know. With a dedicated field:
 
 * `metadata` keeps one meaning, and the placeholders resolve exactly
-* the forbidden modal groups the errors by `resource`, and lists the errors without one as they are
+* the forbidden modal of a bulk request groups the errors by `resource` (the caller knows it is a bulk request), and lists the errors without one as they are
 * maintenance windows, the running operation rule and the warnings of bulk schedules reuse the same shape, and the error can grow (`source`) without overloading `metadata`
 * `ForbiddenV1` documents `resource`, so API clients can rely on it
 
