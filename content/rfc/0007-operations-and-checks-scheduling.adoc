@@ -736,6 +736,7 @@ Not covered by the proofs of concept: alert emails, overviews and dashboard, hel
 * Schedules of a deleted or locked user: they keep running, because no permission check runs at fire time. Is that the expected behavior?
 * An operation that is no longer schedulable after an upgrade: delete its schedules, or let them fail at fire time?
 * A deregistered host or cluster can be restored when its agents report again. Its schedules and maintenance windows are deleted at deregistration, so they do not come back. Should they be kept, ignored while the target is deregistered, and active again after the restore?
+* A request that cannot be sent at the scheduled time: is it retried until the grace period ends, or does it fail at once with "Trento not available"? The proofs of concept retry it every minute.
 * What do overviews and dashboard show about schedules and maintenance windows?
 * Does a window on a host also forbid the cluster and SAP instance operations that act on that host? The proofs of concept forbid them.
 * What happens to a checks execution or an operation that already runs when a window starts? The proofs of concept do not stop it.
