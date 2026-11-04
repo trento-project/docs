@@ -1,3 +1,9 @@
+ifdef::env-github[]
+:toc: macro
+:toc-title: Contents
+:toclevels: 2
+endif::[]
+
 == 7. Scheduling of Operations and Checks Execution, and Maintenance Windows
 
 [width="100%",cols="<18%,<82%",]
@@ -9,6 +15,10 @@
 |===
 
 :poc-repo: https://github.com/nelsonkopliku/web
+
+ifdef::env-github[]
+toc::[]
+endif::[]
 
 == Summary
 
