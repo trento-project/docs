@@ -1,8 +1,9 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-analytics]]
+[revdate="2026-10-15"]
+[description="Discover how Trento collects anonymous installation and feature usage data to improve the product without sharing sensitive information with third parties"]
 == Analytics
-:revdate: 2026-04-09
 
 === What is Analytics?
 Analytics is the collection of information related to the installation of {trento} and feature usage of the product. This information is used by the {trento} team to help improve the product and it is not shared with third-parties.

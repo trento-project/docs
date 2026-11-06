@@ -24,6 +24,7 @@
 :tr_mcp_health_port:   8080
 :tr_mcp_health_api_path: /api/healthz
 :mcp_host:            MCPHost
+:liz:                 Liz
 
 // PROJECT REPOSITORY URL
 :repo-url:          https://github.com/SUSE/doc-[PRODUCT]

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-@media screen and (min-width: 1024px) {
+@media screen and (width >= 1024px) {
   .body {
     display: flex;
   }

@@ -19,6 +19,7 @@ footer.footer.hidden-footer {
   padding: 0 !important;
   margin: 0 !important;
   border: 0 !important;
+  /* stylelint-disable-next-line property-no-deprecated -- legacy fallback for clip-path below */
   clip: rect(0 0 0 0);
   clip-path: inset(50%);
   white-space: nowrap;

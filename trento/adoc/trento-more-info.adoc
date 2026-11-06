@@ -1,9 +1,9 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-more-information]]
+[revdate="2026-10-15"]
+[description="Access the official Trento project website and GitHub repositories to explore advanced documentation, source code and community updates for Trento"]
 == More information
-:revdate: 2025-06-10
-
 
 * Official project website: https://www.trento-project.io/
-* Trento project: https://github.com/trento-project/web
+* Trento project: https://github.com/trento-project

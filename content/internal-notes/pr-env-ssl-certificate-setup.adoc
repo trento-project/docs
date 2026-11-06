@@ -13,30 +13,61 @@ Run the following command to start the certificate generation process:
 
 [source,bash]
 ----
-certbot certonly --manual --preferred-challenges dns -d "*.<the-domain>"
+certbot certonly --manual --preferred-challenges dns \
+  --cert-name <the-domain> \
+  -d "*.<the-domain>" \
+  -d "<the-domain>"
 ----
+
+Both `+-d+` flags are required. A wildcard matches exactly one label and
+does not cover the bare domain it is derived from, so a certificate
+issued only for `+*.<the-domain>+` is valid for `+1234.<the-domain>+`
+but *not* for `+<the-domain>+` itself. Browsers reject the latter with
+`+ERR_CERT_COMMON_NAME_INVALID+`.
+
+`+--cert-name+` keeps the certificate lineage at a stable path across
+renewals. Without it, certbot may create a new `+<the-domain>-0001+`
+directory and the paths further down this guide stop matching.
 
 The command prompts to create a DNS TXT record for domain verification
 and it waits for action to proceed:
 
 ....
 Please deploy a DNS TXT record under the name
-_acme-challenge.<the-domain> with the following value:
+
+_acme-challenge.<the-domain>.
+
+with the following value:
 
 <very_long_and_random_string>
 
-Before continuing, verify the record is deployed.
+Before continuing, verify the TXT record has been deployed.
 ....
+
+The two names are validated separately, but both challenges use the
+*same* record name, `+_acme-challenge.<the-domain>+`, with different
+values. Certbot prints them one at a time:
+
+* If it prompts *twice*, the second value must be *added alongside* the
+first, not replace it. Certbot says so explicitly: "do not remove,
+replace, or undo the previous challenge tasks yet". A TXT record set
+holds multiple values, and Let’s Encrypt looks for the one it expects
+among them. Overwriting the first value is the most common way this
+run fails.
+* If it prompts *once*, that is also correct. Let’s Encrypt caches
+successful authorizations for 30 days, so a name validated by a recent
+run is not challenged again.
 
 === Updating DNS Records in AWS Route 53
 
 [arabic]
 . Log in to the AWS Management Console
 . Navigate to the Route 53 service
-. Select the hosted zone matching `+<the-domain>+`
+. Select the hosted zone containing `+<the-domain>+`
 . Find the TXT record for `+_acme-challenge.<the-domain>+`
-. Update its value with the `+<very_long_and_random_string>+` provided
-by certbot
+. Set its value to the `+<very_long_and_random_string>+` provided by
+certbot, quoted. When certbot prompts a second time, add that value as
+an additional line in the same record set - keep both.
 . Wait a few moments for DNS propagation to complete
 . Return to the terminal and press Enter to continue the certificate
 generation process
@@ -49,6 +80,26 @@ available at:
 ....
 /etc/letsencrypt/live/<the-domain>/
 ....
+
+=== Verifying the Certificate
+
+Before deploying, confirm the certificate actually covers both names:
+
+[source,bash]
+----
+openssl x509 -in /etc/letsencrypt/live/<the-domain>/fullchain.pem \
+  -noout -ext subjectAltName -dates
+----
+
+The output must list both entries:
+
+....
+X509v3 Subject Alternative Name:
+    DNS:*.<the-domain>, DNS:<the-domain>
+....
+
+If only the wildcard is present, the bare domain was not included in the
+order and the certificate needs to be reissued.
 
 === Updating GitHub Action Secrets
 

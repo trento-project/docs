@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 x-node-base: &node-base
-  image: node:20-bullseye
+  image: registry.suse.com/bci/nodejs:24-base
 
 x-http-health: &http-health
   interval: 5s
@@ -15,10 +15,11 @@ services:
     working_dir: /workspace/trento-docs-site
     volumes:
       - .:/workspace:z
-      - ./trento-docs-site/node_modules:/workspace/trento-docs-site/node_modules
+      # Keep the container's Linux install separate from the host's node_modules
+      - trento-docs-node-modules:/workspace/trento-docs-site/node_modules
     command: >
       bash -lc "
-        npm install --no-save antora &&
+        npm ci &&
         npx antora antora-playbook.yml
       "
     restart: "no"
@@ -84,3 +85,6 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/3002'"]
       <<: *http-health
+
+volumes:
+  trento-docs-node-modules:

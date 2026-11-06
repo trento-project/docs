@@ -1,6 +1,10 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-update]]
+[revdate="2026-10-15"]
+[description="Discover how to update the Trento Server, Checks and Agent using Helm or Zypper to ensure compatibility and secure SAP infrastructure monitoring"]
 == Update
 
 include::trento-update-trento-server.adoc[]
 include::trento-update-trento-checks.adoc[]
 include::trento-update-trento-agent.adoc[]
-

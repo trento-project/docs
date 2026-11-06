@@ -1,6 +1,9 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-compliance-features]]
+[revdate="2026-10-15"]
+[description="Learn how to use Trento compliance features to run configuration checks and customize target-specific expected values for SAP infrastructure"]
 == Compliance Features
 
 include::trento-checks.adoc[]
 include::trento-checks-customization.adoc[]
-
-

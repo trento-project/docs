@@ -3,5 +3,7 @@
   "rules": {
     "comment-empty-line-before": null,
     "no-descending-specificity": null,
+    "custom-property-pattern": null,
+    "selector-class-pattern": null
   }
 }

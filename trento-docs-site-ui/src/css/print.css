@@ -31,7 +31,7 @@
   img,
   object,
   svg {
-    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   thead {
@@ -73,7 +73,7 @@
   }
 
   .doc .admonitionblock td.icon {
-    color-adjust: exact;
+    print-color-adjust: exact;
   }
 
   .doc .listingblock code[data-lang]::before {

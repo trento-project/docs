@@ -6,13 +6,21 @@
     "test": "jest --config jest.config.cjs"
   },
   "devDependencies": {
-    "antora": "3.1.10",
-    "jest": "^30.0.0",
-    "prettier": "^3.0.0"
+    "antora": "^3.2.1",
+    "jest": "^30.5.2",
+    "prettier": "^3.9.9"
   },
   "dependencies": {
-    "@antora/collector-extension": "^1.0.1",
-    "@antora/lunr-extension": "^1.0.0-alpha.10",
-    "@sntke/antora-mermaid-extension": "^0.0.8"
+    "@antora/collector-extension": "^1.0.3",
+    "@antora/lunr-extension": "^1.0.0-alpha.13",
+    "@sntke/antora-mermaid-extension": "^0.0.13"
+  },
+  "overrides": {
+    "@antora/collector-extension": {
+      "js-yaml": "^4.3.2"
+    },
+    "test-exclude": {
+      "glob": "^13.0.6"
+    }
   }
 }
