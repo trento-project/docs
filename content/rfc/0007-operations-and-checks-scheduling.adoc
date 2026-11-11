@@ -679,6 +679,14 @@ Each target type has its own checks schedule actions, so that every operation of
 
 Live refresh: the topics `monitoring:operation_schedules` (`operation_schedules_changed`, with the target id) and `monitoring:maintenance_windows` (`maintenance_windows_changed`, with the target type and id) tell the UI to fetch the schedules or the windows of the target on display again.
 
+The checks frequency is pushed instead, because its payloads are small and several views derive the next execution from it:
+
+* `monitoring:settings` (`checks_frequency_settings_updated`, with the global settings as the API returns them), after a change of the global settings
+* `monitoring:hosts` and `monitoring:clusters` (`host_checks_frequency_updated` and `cluster_checks_frequency_updated`, with the target id and its settings), after a change of the settings of a target
+* `monitoring:hosts` and `monitoring:clusters` (`host_checks_execution_requested` and `cluster_checks_execution_requested`, with the target id and the time of the request), after each periodic request. `execution_started` is not enough, because manual executions send it too and do not move the periodic cadence
+
+The UI keeps them in its state and derives the next execution of a target from the time of its last periodic request and its effective frequency. A change of the global frequency then moves the next execution of every target that follows it, without further events.
+
 Proof of concept: the OpenAPI schemas are in {poc-repo}/pull/11[#11]. The operation schedules endpoints are in {poc-repo}/pull/17[#17] (Quantum), {poc-repo}/pull/29[#29] (Oban), {poc-repo}/pull/40[#40] (event sourced). The checks schedule endpoints are in {poc-repo}/pull/21[#21], {poc-repo}/pull/33[#33], {poc-repo}/pull/44[#44]. The maintenance windows schemas are in {poc-repo}/pull/60[#60] (Quantum), {poc-repo}/pull/72[#72] (Oban), {poc-repo}/pull/84[#84] (event sourced), their endpoints in {poc-repo}/pull/65[#65] (Quantum), {poc-repo}/pull/77[#77] (Oban), {poc-repo}/pull/89[#89] (event sourced). The controllers are identical in the three implementations.
 
 === Activity log and alerts
@@ -705,7 +713,7 @@ We also add alert emails for failed scheduled requests and failed scheduled oper
 === User interface
 
 * *Settings view*: a Check Executions section with the global checks frequency, read-only when enforced from the environment. ({poc-repo}/pull/48[#48])
-* *Check settings of a host or cluster*: the override, for users with the `all:check_frequency` ability. A "Use system setting" switch, on by default, shows the global settings. When it is off, the same switch and selects as in the Settings view set the settings of the target. Turning it on again removes the override. The checks overview of the target shows the time of the next execution. ({poc-repo}/pull/49[#49])
+* *Check settings of a host or cluster*: the override, for users with the `all:check_frequency` ability. A "Use system setting" switch, on by default, shows the global settings. When it is off, the same switch and selects as in the Settings view set the settings of the target. Turning it on again removes the override. The checks overview of the target shows the time of the next execution, kept current by the events of the live refresh. ({poc-repo}/pull/49[#49])
 * *Operation modal*: a "Now / Schedule" choice with the start date and time (in the user timezone, the next full hour by default), repeat, every X, weekdays, and end condition. The modal asks for a confirmation when the operation is already scheduled on the target. Schedulable operations show a "Premium" badge. ({poc-repo}/pull/50[#50])
 * *Details views*: the schedules of the target, with change and cancel, for the users who have the ability of the operation. The list refreshes when a schedule changes. ({poc-repo}/pull/51[#51])
 * *Operations menu*: it opens even when an operation is running or the target is stale, so users can schedule. A spinner on the button shows the running operation. "Now" then relies on the forbidden modal (stale, policies) and on the running state already known to the frontend. ({poc-repo}/pull/52[#52])
