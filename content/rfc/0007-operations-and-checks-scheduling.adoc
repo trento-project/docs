@@ -235,7 +235,7 @@ An operation schedule is a Commanded aggregate (`Trento.Operations.Schedule`) wi
 
 A Quantum job still fires the runs. Every minute it starts a run for each due schedule, runs the policies, requests the operation and sends the outcome back to the aggregate. The aggregate lets only one run at a time work on an occurrence. A request that cannot be sent ends the run, and the aggregate records the occurrence as failed with "Trento not available". A run whose outcome never comes back, because the job crashed, is closed as failed by the aggregate once the grace period is over. The requests come from the job, not from the events, so replaying the events never requests an operation again.
 
-The checks interval of a target is an event of the Host and Cluster aggregates, just like the checks selection, and it is carried by their roll-up. A projector writes it to its own read model. The time of the last periodic request stays in a plain table, because an event every few minutes for every target adds no value to the event store. A maintenance window is an aggregate of its own, projected into a read model with the same columns as the table of the other options, so that coverage and enforcement are the same code.
+A change of the checks frequency settings of a target is an event of the Host and Cluster aggregates, just like the checks selection, and it is carried by their roll-up. A projector writes it to its own read model. The time of the last periodic request stays in a plain table, because an event every few minutes for every target adds no value to the event store. A maintenance window is an aggregate of its own, projected into a read model with the same columns as the table of the other options, so that coverage and enforcement are the same code.
 
 Proof of concept: {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22scheduling%3A%20event%20sourced%22%20sort%3Acreated-asc[`scheduling: event sourced` pull requests]. The aggregate is in {poc-repo}/pull/36[#36], the runs in {poc-repo}/pull/41[#41], the checks settings as host and cluster events in {poc-repo}/pull/43[#43].
 
@@ -314,14 +314,14 @@ A schedule is a start (UTC instant), a timezone (the user timezone at creation t
 ==== Global frequency
 
 * *Environment*: `CHECKS_INTERVAL` takes the new values: `5m`, `15m`, `30m`, `1h`, `6h`, `12h`, `24h`, `1w`, `2w`, `4w` or `disabled`. A number of minutes that matches one of them (`5`, `60`, ...) is still accepted, so existing installations keep working. Any other value stops the boot with an error, as other invalid environment variables already do. When the variable is set, the Settings view shows it read-only, as alerting settings already do (`enforced_from_env`), and the API answers `409` to a change. The variable will be documented and exposed as a helm value and as an ansible variable.
-* *Settings*: a new settings entry stores the global frequency as a value and a unit, or null when the periodic checks are disabled. Changing it needs a new ability (`all:checks_frequency_settings`). Changes are logged (`changing_checks_frequency_settings`) and, like the other settings, it is exposed as an AI assistant tool.
+* *Settings*: a new settings entry stores whether the checks run periodically, and the global frequency as a value and a unit. Disabling the periodic checks keeps the frequency, so enabling them again restores it. Changing the settings needs a new ability (`all:checks_frequency_settings`). Changes are logged (`changing_checks_frequency_settings`) and, like the other settings, it is exposed as an AI assistant tool.
 * *Default*: 5 minutes.
 
 Proof of concept: {poc-repo}/pull/10[#10] (backend), {poc-repo}/pull/48[#48] (Settings view).
 
 ==== Per target frequency
 
-Each host and cluster can override the global frequency, or disable periodic executions altogether (`disabled`).
+Each host and cluster can override the global settings with its own, of the same shape: whether the checks run periodically, and how often. Going back to the system setting removes the override, so the target follows the later changes of the global settings again.
 
 Changing it requires a new ability, `all:check_frequency`, and logs `host_checks_frequency_changed` or `cluster_checks_frequency_changed`. When a target is deregistered its settings are removed as well.
 
@@ -331,10 +331,10 @@ Proof of concept: storage in {poc-repo}/pull/20[#20] (Quantum), {poc-repo}/pull/
 
 ===== Option 1: one evaluator every minute
 
-A job runs every minute. For each registered host and checkable cluster with selected checks, it takes the frequency of the target (its own, or the global one) and requests an execution when:
+A job runs every minute. For each registered host and checkable cluster with selected checks, it takes the settings of the target (its own, or the global ones) and requests an execution when:
 
 * no maintenance window forbids checks executions on the target
-* the frequency is not `disabled`
+* the periodic checks are enabled in those settings
 * the target was never requested, or the frequency has elapsed since its last periodic request, with half a minute of tolerance
 
 The job runs on every minute of the clock, so its first run after a start is at the next full minute, and targets with the same frequency are requested together, as today. The time of the last request is stored, so a restart does not change the cadence. The tolerance is needed because the job never runs at exactly the same instant of the minute: with a frequency of 5 minutes, a target requested at 10:00:00.312 has only 299.993 seconds elapsed at the 10:05:00.305 run, and without the tolerance it would wait for the 10:06 run, turning 5 minutes into 6. Half a minute absorbs that, and it is short enough to never request a target one run too early.
@@ -646,17 +646,17 @@ Proof of concept: {poc-repo}/pulls?q=is%3Apr%20is%3Aopen%20label%3A%22maintenanc
 
 The same API serves the three implementations. Times are ISO 8601 in UTC. Every schedule and window carries the IANA timezone used to compute its recurrence.
 
-* `interval`: `"5m"`, `"15m"`, `"30m"`, `"1h"`, `"6h"`, `"12h"`, `"24h"`, `"1w"`, `"2w"`, `"4w"` or `"disabled"`.
+* `frequency`: `{value, unit}`, where `unit` is `minute` (5, 15 or 30), `hour` (1, 6, 12 or 24) or `week` (1, 2 or 4).
 * `recurrence`: `{frequency, interval, weekdays, ends_on, max_occurrences}`, or null for a one-time schedule. `frequency` is `daily`, `weekly`, `monthly` or `yearly`. `weekdays` uses ISO numbers, Monday is 1. `ends_on` is a date, excluded.
 * `forbids`: a non empty subset of `checks_execution` and `operations`.
 
 [width="100%",cols="<34%,<30%,<36%",options="header"]
 |===
 |Request |Body |Response
-|`GET /api/v1/settings/checks_frequency` | |`{frequency, enforced_from_env}`. `frequency` is `{value, unit}`, or null when the periodic checks are disabled
-|`PUT /api/v1/settings/checks_frequency` |`{frequency}` |the same shape. `422` for a value that is not allowed for the unit, `409` when enforced from the environment
-|`GET /api/v1/hosts/:id/checks/schedule`, `GET /api/v1/clusters/:id/checks/schedule` | |`{interval, effective_interval, global_interval, last_requested_at, next_execution_at}`
-|`PUT /api/v1/hosts/:id/checks/schedule`, `PUT /api/v1/clusters/:id/checks/schedule` |`{interval}` |the same shape. `interval: null` means the global frequency
+|`GET /api/v1/settings/checks_frequency` | |`{enabled, frequency, enforced_from_env}`. The frequency is kept when `enabled` is false
+|`PUT /api/v1/settings/checks_frequency` |`{enabled, frequency}` |the same shape. `422` for a missing field or a value that is not allowed for the unit, `409` when enforced from the environment
+|`GET /api/v1/hosts/:id/checks/schedule`, `GET /api/v1/clusters/:id/checks/schedule` | |`{override, effective, global, last_requested_at, next_execution_at}`. `override` is `{enabled, frequency}`, or null when the target follows the global settings. `effective` and `global` are `{enabled, frequency}`
+|`PUT /api/v1/hosts/:id/checks/schedule`, `PUT /api/v1/clusters/:id/checks/schedule` |`{override}` |the same shape. `override: null` goes back to the global settings
 |`GET /api/v1/operation_schedules?target_id=`, or `?target_ids=&operation=` | |the schedules, ordered by `next_run_at`. Several targets and an operation tell whether the operation is already scheduled on them
 |`POST /api/v1/operation_schedules` |`{target_type, target_id, operation, params, starts_at, timezone, recurrence}` |`201`, the schedule with its `warnings`
 |`PUT /api/v1/operation_schedules/:id` |`{params, starts_at, timezone, recurrence}` |the schedule with its `warnings`
@@ -705,7 +705,7 @@ We also add alert emails for failed scheduled requests and failed scheduled oper
 === User interface
 
 * *Settings view*: a Check Executions section with the global checks frequency, read-only when enforced from the environment. ({poc-repo}/pull/48[#48])
-* *Check settings of a host or cluster*: the frequency override, for users with the `all:check_frequency` ability. The checks overview of the target shows the time of the next execution. ({poc-repo}/pull/49[#49])
+* *Check settings of a host or cluster*: the override, for users with the `all:check_frequency` ability. A "Use system setting" switch, on by default, shows the global settings. When it is off, the same switch and selects as in the Settings view set the settings of the target. Turning it on again removes the override. The checks overview of the target shows the time of the next execution. ({poc-repo}/pull/49[#49])
 * *Operation modal*: a "Now / Schedule" choice with the start date and time (in the user timezone, the next full hour by default), repeat, every X, weekdays, and end condition. The modal asks for a confirmation when the operation is already scheduled on the target. Schedulable operations show a "Premium" badge. ({poc-repo}/pull/50[#50])
 * *Details views*: the schedules of the target, with change and cancel, for the users who have the ability of the operation. The list refreshes when a schedule changes. ({poc-repo}/pull/51[#51])
 * *Operations menu*: it opens even when an operation is running or the target is stale, so users can schedule. A spinner on the button shows the running operation. "Now" then relies on the forbidden modal (stale, policies) and on the running state already known to the frontend. ({poc-repo}/pull/52[#52])
