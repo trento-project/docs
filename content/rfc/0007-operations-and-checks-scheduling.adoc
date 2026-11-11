@@ -654,7 +654,7 @@ The same API serves the three implementations. Times are ISO 8601 in UTC. Every 
 |===
 |Request |Body |Response
 |`GET /api/v1/settings/checks_frequency` | |`{enabled, frequency, enforced_from_env}`. The frequency is kept when `enabled` is false
-|`PUT /api/v1/settings/checks_frequency` |`{enabled, frequency}` |the same shape. `422` for a missing field or a value that is not allowed for the unit, `409` when enforced from the environment
+|`PATCH /api/v1/settings/checks_frequency` |`{enabled, frequency}`, at least one of them |the same shape. A field that is not sent keeps its value. `422` for an empty body or a value that is not allowed for the unit, `409` when enforced from the environment
 |`GET /api/v1/hosts/:id/checks/schedule`, `GET /api/v1/clusters/:id/checks/schedule` | |`{override, effective, global, last_requested_at, next_execution_at}`. `override` is `{enabled, frequency}`, or null when the target follows the global settings. `effective` and `global` are `{enabled, frequency}`
 |`PUT /api/v1/hosts/:id/checks/schedule`, `PUT /api/v1/clusters/:id/checks/schedule` |`{override}` |the same shape. `override: null` goes back to the global settings
 |`GET /api/v1/operation_schedules?target_id=`, or `?target_ids=&operation=` | |the schedules, ordered by `next_run_at`. Several targets and an operation tell whether the operation is already scheduled on them
