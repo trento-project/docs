@@ -13,6 +13,7 @@
  ** xref:trento-uninstall.adoc[Uninstallation]
  *** xref:trento-uninstall-trento-server.adoc[Uninstalling Trento Server]
  *** xref:trento-uninstall-trento-agent.adoc[Uninstalling a Trento Agent]
+ ** xref:trento-initial-config.adoc[Initial configuration]
  ** xref:trento-integration-prometheus.adoc[Prometheus integration]
  ** xref:trento-ai-integrations.adoc[Trento AI integrations]
  *** xref:trento-liz-ai-assistant.adoc[Liz AI assistant in Trento Web]

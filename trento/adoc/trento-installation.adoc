@@ -1,9 +1,17 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-installation]]
-[revdate="2026-10-15"]
+[revdate="2026-11-13"]
 [description="Learn how to install the Trento Server and Trento Agent using Kubernetes, systemd or Ansible playbooks to effectively monitor your SAP infrastructure"]
 == Installation
+
+// [NOTE] --> THIS WILL BE UNCOMMENTED AFTER THE CLEAN-UP OF INSTALLATION CHAPTER
+// .Advanced deployment configuration
+// ====
+// These installation instructions guide you through configuring only the required options.
+
+// You can also configure additional features during or after the installation. To configure these features during your initial installation rather than adjusting them later, review the relevant sections in <<sec-trento-initial-config>> and <<sec-trento-core-features>>.
+// ====
 
 include::trento-install-server.adoc[]
 include::trento-install-agents.adoc[]

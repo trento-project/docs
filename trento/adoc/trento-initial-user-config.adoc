@@ -1,0 +1,20 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-initial-user-config]]
+=== Initial user configuration
+:revdate: 2026-11-13
+
+The installation process creates a default admin user, defined by the `ADMIN_USER` variable, which defaults to `admin`. This user has unrestricted access to the entire system (the `all:all` permission) and cannot be modified or deleted.
+
+The default admin user is intended only for the initial configuration of user access:
+
+* Use it only to create the first user manager, that is, a user with the `all:users` permission. The user manager then creates all other required users. For full instructions on creating user accounts, assigning roles, and managing passwords, see <<sec-trento-user-management>>.
+
+* Treat the admin user as a fallback account. Use it only if all other access to the console is lost.
+
+[IMPORTANT]
+====
+You cannot enable Multi-factor authentication for the default admin user. The password provides the only security. You must keep this password safe.
+
+If the password is lost or compromised, reset it immediately through Helm or Web component configuration, depending on which deployment method was used to install {trserver}.
+====

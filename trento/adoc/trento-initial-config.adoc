@@ -1,0 +1,14 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-initial-config]]
+[revdate="2026-11-13"]
+[description="Set up the initial configuration of Trento Server by establishing administrative access and defining essential global settings for active monitoring"]
+== Initial configuration
+
+After the installation of {trento}, administrators must perform the initial system configuration to make the web console secure and fully operational. This initial setup involves securing access and enabling necessary operational features.
+
+include::trento-initial-user-config.adoc[]
+include::trento-sso-integration.adoc[]
+include::trento-settings-webconsole.adoc[]
+include::trento-enabling-email-alerts.adoc[]
+
