@@ -62,7 +62,7 @@ custom values, you must use them.
 (`+http://TRENTO_SERVER_HOSTNAME+`)
 ** `+api-key+`: the API key retrieved from the Web console
 ** `+prometheus-mode+`: Determines how metrics are collected. Valid values are `pull` (default) for `node_exporter`-based collection, or `push` for {grafana} Alloy-based collection. See <<prometheus-metrics-configuration>> for details.
-. If SSL termination has been enabled on the server side, you can
+. [[agent-enabling-ssl]]If SSL termination has been enabled on the server side, you can
 encrypt the communication from the agent to the server as follows:
 .. Provide an HTTPS URL instead of an HTTP one.
 .. Import the certificate from the Certificate Authority that has issued
