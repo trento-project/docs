@@ -20,7 +20,6 @@
  *** xref:trento-mcp-integration.adoc[MCP Integration]
  ** xref:trento-core-features.adoc[Core Features]
  *** xref:trento-user-manage.adoc[User management]
- *** xref:trento-sso-integration.adoc[Single Sign-On integration]
  *** xref:trento-activity-log.adoc[Activity Log]
  *** xref:trento-housekeeping.adoc[Housekeeping]
  *** xref:trento-manage-tags.adoc[Managing tags]

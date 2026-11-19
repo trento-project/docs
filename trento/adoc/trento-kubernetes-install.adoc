@@ -209,6 +209,9 @@ If you installed the {trserver} in a dedicated namespace, add `--namespace NAMES
 
 * An SSL certificate and private key issued for `TRENTO_SERVER_HOSTNAME`, in PEM format.
 
+To configure SSL termination:
+
+[.procedure]
 . Create a {k8s} TLS secret from the certificate and key:
 +
 [source,bash]

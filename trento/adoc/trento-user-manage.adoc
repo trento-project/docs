@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-user-management]]
 === User management and access permissions
-:revdate: 2026-11-13
+:revdate: 2026-11-19
 
 {trento} provides local, permission-based user management to secure your console. With this feature, you can create accounts, enforce strict password policies, and assign role-based permissions. This ensures only authorized users perform protected actions such as running checks or managing {sap} systems.
 
