@@ -8,17 +8,17 @@ include::product-attributes.adoc[]
 {trento} can be integrated for Single Sign-On (SSO) with a third-party identity
 provider (IDP).
 
-[NOTE]
-====
-{trento} cannot start with multiple SSO options together, so only one can
-be chosen.
-====
-
 The following protocols are supported:
 
 * OpenID Connect (OIDC)
 * Open Authorization 2.0 (OAuth 2)
 * Security Assertion Markup Language (SAML)
+
+[NOTE]
+====
+{trento} cannot start with multiple SSO options together, so only one can
+be chosen.
+====
 
 ==== User roles and authentication
 
@@ -26,15 +26,12 @@ User authentication is entirely managed by the IDP, which is responsible
 for maintaining user accounts. A user, who does not exist on the IDP, is
 unable to access the {trento} web console.
 
-During the installation process, a default admin user is defined using
-the `+ADMIN_USER+` variable, which defaults to `+admin+`. If the
-authenticated user's IDP username matches this admin user's username,
-that user is automatically granted `+all:all+` permissions within
+If the authenticated user's IDP username matches the default admin username configured during installation, that user is automatically granted `all:all` permissions within
 {trento}.
 
 User permissions are entirely managed by {trento}, they are not imported
-from the IDP. The permissions must be granted by some user with
-`+all:all+` or `+all:users+` rights (admin user initially). This
+from the IDP. The permissions must be granted by a user with
+`all:all` or `all:users` rights (admin user initially). This
 means that only basic user information is retrieved from the external
 IDP.
 

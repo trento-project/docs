@@ -1,7 +1,7 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-use-webconsole]]
-[revdate="2026-10-15"]
+[revdate="2026-11-19"]
 [description="Learn how the Trento Web console aggregates health data across hosts, clusters and SAP systems to help administrators monitor system reliability"]
 == Monitoring {sap} health in the {tr_web} console
 
@@ -372,20 +372,6 @@ A non-passing aggregated health value indicates that something needs attention. 
 
 . Check whether a stale banner is displayed. If it is, investigate the reporting problem first. For more information, see <<sec-trento-stale-data>>.
 . Identify the factor that caused the value and investigate, using the information in <<sec-trento-health-calculation>>.
-
-[[sec-trento-settings-webconsole]]
-=== Configuring {tr_web} settings
-
-Users with the `all:settings` permission can use the *Settings* view of {tr_web} to modify the following:
-
-* API key. See <<sec-trento-rotating-apikeys>>.
-* Connection data for SUSE Multi-Linux Manager. See <<sec-integration-with-suse-multi-linux-manager>>.
-* Retention time for Activity Log entries. See <<sec-activity-log-retention>>.
-* Settings required for sending alerts via email.
-
-If any of the email settings are specified through environment variables, the
-web-based email configuration is disabled. For more information, see
-<<sec-enabling-email-alerts>>.
 
 [[sec-trento-webconsole-troubleshooting]]
 === Troubleshooting

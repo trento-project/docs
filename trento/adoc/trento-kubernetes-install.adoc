@@ -196,11 +196,45 @@ Replace `LABEL` and `VALUE` with the actual label key and value of your target n
 [[sec-trento-enabling-ssl]]
 ===== Enabling SSL
 
-Ingress may be used to provide SSL termination for the Web component of {trserver}. This would allow to encrypt the communication from the agent to the server, which is already secured by the corresponding API key. It would also allow HTTPS access to the Web console with trusted certificates.
+You can configure the Ingress to provide SSL termination for the {tr_web} component.
+This enables HTTPS access to the {tr_web} console with trusted certificates and encrypts
+the communication between the {tragent} and the {trserver}, which is already secured by the corresponding API key.
 
-Configuration must be done in the tls section of the `values.yaml` file of the chart of the {trserver} Web component.
+[IMPORTANT]
+====
+If you installed the {trserver} in a dedicated namespace, add `--namespace NAMESPACE` to both commands. The TLS secret must be in the same namespace as the {trserver}.
+====
 
-For details on the required Ingress setup and configuration, refer to: https://kubernetes.io/docs/concepts/services-networking/ingress/. Particularly, refer to section https://kubernetes.io/docs/concepts/services-networking/ingress/#tls for details on the secret format in the YAML configuration file.
+*Requirements:*
 
-Additional steps are required on the Agent side.
-// toms 2022-09-14: which steps?
+* An SSL certificate and private key issued for `TRENTO_SERVER_HOSTNAME`, in PEM format.
+
+To configure SSL termination:
+
+[.procedure]
+. Create a {k8s} TLS secret from the certificate and key:
++
+[source,bash]
+----
+kubectl create secret tls trento-tls \
+   --cert=trento.crt \
+   --key=trento.key
+----
+
+. Run `helm upgrade` with the TLS settings for the {tr_web} Ingress:
++
+[source,bash]
+----
+helm upgrade \
+   --install trento-server oci://registry.suse.com/trento/trento-server \
+   --set global.trentoWeb.origin=TRENTO_SERVER_HOSTNAME \
+   --set trento-web.adminUser.password=ADMIN_PASSWORD \
+   --set 'trento-web.ingress.tls[0].secretName=trento-tls' \
+   --set 'trento-web.ingress.tls[0].hosts[0]=TRENTO_SERVER_HOSTNAME'
+   ...
+----
+
+. Additional steps are required on the Agent side. See <<agent-enabling-ssl,the {tragent} SSL configuration step>>.
+
+For more information about TLS in Ingress, see https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
+
