@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-settings-webconsole]]
 === Configuring {tr_web} settings
-:revdate: 2026-11-19
+:revdate: 2026-11-23
 
 Users with the `all:settings` permission can use the *Settings* view of {tr_web} to modify the following:
 

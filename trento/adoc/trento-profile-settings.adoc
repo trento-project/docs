@@ -2,9 +2,9 @@ include::product-attributes.adoc[]
 
 [[sec-trento-profile-settings]]
 ==== Managing personal profile settings
-:revdate: 2026-11-19
+:revdate: 2026-11-23
 
-Every user can manage their own profile settings. You do not need additional permissions for these actions.
+Every user can manage their own profile settings.
 
 . In the {tr_web} console, click your user icon and select *Profile*. In the profile view, users can edit the following options:
 
