@@ -1,0 +1,23 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-profile-settings]]
+==== Managing personal profile settings
+:revdate: 2026-11-19
+
+Every user can manage their own profile settings. You do not need additional permissions for these actions.
+
+. In the {tr_web} console, click your user icon and select *Profile*. In the profile view, users can edit the following options:
+
+** Update name and email address.
+** Change password.
+** Enable multi-factor authentication.
+** Set preferred timezone. This adjusts how dates and times are displayed for your user in the console. Backend storage, API payloads, logs and scheduled tasks always use UTC.
+. Click *Save*.
+
+Additionally, the *Profile* view also provides settings for the following features:
+
+* Personal access tokens for API access. For more information, see <<sec-trento-personal-access-tokens>>.
+* Analytics collection. For more information, see <<sec-trento-analytics>>.
+* The {liz} AI assistant. For more information, see <<sec-trento-liz-ai-assistant>>.
+
+
