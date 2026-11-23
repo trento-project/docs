@@ -9,6 +9,3 @@ Unlike system administration tasks, profile settings are managed on a per-user b
 include::trento-profile-settings.adoc[]
 include::trento-personal-access-tokens.adoc[]
 include::trento-analytics.adoc[]
-
-
-

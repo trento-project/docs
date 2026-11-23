@@ -1,7 +1,7 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-initial-config]]
-[revdate="2026-11-23"]
+[revdate="2026-11-19"]
 [description="Set up the initial configuration of Trento Server by establishing administrative access and defining essential global settings for active monitoring"]
 == Initial configuration
 

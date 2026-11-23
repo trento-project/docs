@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-initial-user-config]]
 === Initial user configuration
-:revdate: 2026-11-23
+:revdate: 2026-11-19
 
 The installation process creates a default admin user, defined by the `ADMIN_USER` variable, which defaults to `admin`. This user has unrestricted access to the entire system (the `all:all` permission) and cannot be modified or deleted.
 

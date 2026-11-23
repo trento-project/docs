@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-personal-access-tokens]]
 ==== Personal access tokens
-:revdate: 2026-04-30
+:revdate: 2026-11-23
 
 {trento} allows users to create personal access tokens (PATs) for authentication and authorization purposes in third-party integrations with the APIs exposed by its components:
 

@@ -19,5 +19,3 @@ Additionally, the *Profile* view also provides settings for the following featur
 * Personal access tokens for API access. For more information, see <<sec-trento-personal-access-tokens>>.
 * Analytics collection. For more information, see <<sec-trento-analytics>>.
 * The {liz} AI assistant. For more information, see <<sec-trento-liz-ai-assistant>>.
-
-
