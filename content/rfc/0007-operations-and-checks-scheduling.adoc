@@ -331,17 +331,17 @@ Proof of concept: storage in {poc-repo}/pull/20[#20] (Quantum), {poc-repo}/pull/
 
 ===== Option 1: one evaluator every minute
 
-A job runs every minute. For each registered host and checkable cluster with selected checks, it takes the settings of the target (its own, or the global ones) and requests an execution when:
+Two jobs run every minute, one for the hosts and one for the clusters, as today. For each registered host and checkable cluster with selected checks, they take the settings of the target (its own, or the global ones) and requests an execution when:
 
 * no maintenance window forbids checks executions on the target
 * the periodic checks are enabled in those settings
 * the target was never requested, or the frequency has elapsed since its last periodic request, with half a minute of tolerance
 
-The job runs on every minute of the clock, so its first run after a start is at the next full minute, and targets with the same frequency are requested together, as today. The time of the last request is stored, so a restart does not change the cadence. The tolerance is needed because the job never runs at exactly the same instant of the minute: with a frequency of 5 minutes, a target requested at 10:00:00.312 has only 299.993 seconds elapsed at the 10:05:00.305 run, and without the tolerance it would wait for the 10:06 run, turning 5 minutes into 6. Half a minute absorbs that, and it is short enough to never request a target one run too early.
+The jobs run on every minute of the clock, so their first run after a start is at the next full minute, and targets with the same frequency are requested together, as today. The time of the last request is stored, so a restart does not change the cadence. A failed request is logged and retried at the next run. The tolerance is needed because a job never runs at exactly the same instant of the minute: with a frequency of 5 minutes, a target requested at 10:00:00.312 has only 299.993 seconds elapsed at the 10:05:00.305 run, and without the tolerance it would wait for the 10:06 run, turning 5 minutes into 6. Half a minute absorbs that, and it is short enough to never request a target one run too early.
 
 PROs:
 
-* it evolves the current periodic job: same request function, one more filter
+* it evolves the current periodic jobs: same request function, one more filter
 * changing a frequency or a window, registering or deregistering a target needs no job management
 * a target leaving a maintenance window is executed at the next minute when due
 
