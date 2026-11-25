@@ -11,7 +11,7 @@ Accepted
 Trento users can already leverage AI capabilities via the https://github.com/trento-project/mcp-server[Trento MCP server]. However, this requires an external MCP client (VSCode, Claude Desktop, etc.), its setup and a Personal Access Token.
 
 We want an AI assistant that is part of the product experience, available in the UI without external tools or extra installation. +
-See related xref:rfc/0004-ai-agent-integration.adoc[RFC 0004] for the evaluated frameworks, the PoCs and the full reasoning.
+See related xref:../../rfc/0004-ai-agent-integration.adoc[RFC 0004] for the evaluated frameworks, the PoCs and the full reasoning.
 
 The agentic landscape is evolving very fast, so the decision has to balance standards adoption with maturity, accidental complexity and team capacity.
 
@@ -43,7 +43,7 @@ We will build the AI assistant natively in Trento Web, without introducing a new
 
  * the agent is built on https://github.com/brainlid/langchain[LangChain] and https://github.com/sagents-ai/sagents[Sagents] and lives in web's codebase
  * each conversation thread runs in its own Sagents agent server, started on demand under a dynamic supervisor
- * conversations are not stored. The history lives only in the agent server, which stops after a period of inactivity or shortly after the last connected client goes away (closing the chat launcher keeps the client connected)
+ * conversations are not stored. The conversation context lives only in the agent server, which stops after a period of inactivity or shortly after the last connected client goes away (closing the chat launcher keeps the client connected). An open page keeps showing the transcript, read-only
  * web calls Sagents through `Trento.AI.Agent` and thin adapters, so tests can replace it. The channel still reacts to Sagents agent events
  * extracting a library remains possible once the boundaries are clear
 
@@ -83,7 +83,7 @@ The depicted decision has the following effects:
  * *Wanda tools still cost network calls:* each call goes through HTTP and token introspection. Fewer calls than going through the MCP server, but not zero
  * *Less mature ecosystem:* the Elixir LangChain implementation is catching up with the Python/JS ones. We contribute fixes upstream and pin a fork while they land (ie streamed Gemini tool call status)
  * *Standard protocol on the UI side:* the UI is AG-UI compliant, so changes in the backend AG-UI library or in the agentic framework do not ripple to the frontend
- * *Short-lived conversations:* a conversation is lost when its agent server stops (inactivity, no connected client, restart) and the user has to start a new chat
+ * *Short-lived conversations:* the conversation context is lost when its agent server stops (inactivity, no connected client, restart). The transcript stays visible, read-only, and the user has to start a new chat to continue
  * *Data leaves the installation:* web needs outbound access to the selected LLM provider, and prompts and tool results, which can carry infrastructure data, are sent to it. This matters for firewalled deployments and for data handling policies
  * *More sensitive data in the database:* user provided LLM API keys are now stored, encrypted, alongside the rest of Trento data
 
@@ -91,4 +91,4 @@ Out of scope and deferred to dedicated discussions:
 
  * RAG integration (https://github.com/georgeguimaraes/arcana[arcana] has been explored)
  * UI context awareness
- * replacing the Go MCP server with an internal one, see xref:rfc/0006-migrate-to-internal-mcp-server.adoc[RFC 0006]
+ * replacing the Go MCP server with an internal one, see xref:../../rfc/0006-migrate-to-internal-mcp-server.adoc[RFC 0006]
