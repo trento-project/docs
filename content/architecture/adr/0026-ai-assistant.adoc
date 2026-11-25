@@ -43,7 +43,7 @@ We will build the AI assistant natively in Trento Web, without introducing a new
 
  * the agent is built on https://github.com/brainlid/langchain[LangChain] and https://github.com/sagents-ai/sagents[Sagents] and lives in web's codebase
  * each conversation thread runs in its own Sagents agent server, started on demand under a dynamic supervisor
- * conversations are not stored. The history lives only in the agent server, which stops after a period of inactivity or once nobody has the conversation open
+ * conversations are not stored. The history lives only in the agent server, which stops after a period of inactivity or shortly after the last connected client goes away (closing the chat launcher keeps the client connected)
  * web calls Sagents through `Trento.AI.Agent` and thin adapters, so tests can replace it. The channel still reacts to Sagents agent events
  * extracting a library remains possible once the boundaries are clear
 
@@ -77,13 +77,14 @@ Tools are collected from a configurable list of tool sources:
 
 The depicted decision has the following effects:
 
- * *No new artifact:* installation, release and operations stay as they are. Users only add their provider, model and API key in the UI
+ * *No new artifact:* installation, release and operations stay as they are. Each user adds their provider, model and API key in the UI
  * *Reused authnz and activity logging:* tool calls run through the same pipeline as API requests, so the assistant cannot do more than the user can, and its actions are logged as the user's
  * *Single tool definition:* tagging an endpoint `MCP` makes it available to both the assistant and the MCP server, with no duplicated wiring between controllers and tools
  * *Wanda tools still cost network calls:* each call goes through HTTP and token introspection. Fewer calls than going through the MCP server, but not zero
  * *Less mature ecosystem:* the Elixir LangChain implementation is catching up with the Python/JS ones. We contribute fixes upstream and pin a fork while they land (ie streamed Gemini tool call status)
  * *Standard protocol on the UI side:* the UI is AG-UI compliant, so changes in the backend AG-UI library or in the agentic framework do not ripple to the frontend
- * *Short-lived conversations:* a conversation is lost when its agent server stops (inactivity, closed chat, restart) and the user has to start a new chat
+ * *Short-lived conversations:* a conversation is lost when its agent server stops (inactivity, no connected client, restart) and the user has to start a new chat
+ * *Data leaves the installation:* web needs outbound access to the selected LLM provider, and prompts and tool results, which can carry infrastructure data, are sent to it. This matters for firewalled deployments and for data handling policies
  * *More sensitive data in the database:* user provided LLM API keys are now stored, encrypted, alongside the rest of Trento data
 
 Out of scope and deferred to dedicated discussions:
