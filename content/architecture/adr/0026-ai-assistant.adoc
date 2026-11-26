@@ -8,7 +8,7 @@ Accepted
 
 === Context
 
-Trento users can already leverage AI capabilities via the https://github.com/trento-project/mcp-server[Trento MCP server]. However, this requires an external MCP client (VSCode, Claude Desktop, etc.), its setup and a Personal Access Token.
+Trento users can already leverage AI capabilities via the https://github.com/trento-project/mcp-server[Trento MCP server]. However, this requires an external MCP client (VS Code, Claude Desktop, etc.), its setup and a Personal Access Token.
 
 We want an AI assistant that is part of the product experience, available in the UI without external tools or extra installation. +
 See related xref:../../rfc/0004-ai-agent-integration.adoc[RFC 0004] for the evaluated frameworks, the PoCs and the full reasoning.
@@ -18,22 +18,22 @@ The agentic landscape is evolving very fast, so the decision has to balance stan
 Therefore, we need to introduce an AI agent in Trento's architecture so that:
 
  * users can configure and use the assistant directly from the UI
- * the assistant acts on behalf of the logged in user, with the same authorization and activity logging as any other action
+ * the assistant acts on behalf of the logged-in user, with the same authorization and activity logging as any other action
  * the assistant can use Trento capabilities as tools
  * the operational overhead for customers stays low
 
 === Considered Options
 
- * *Separate artifact with Python/JS LangChain:* most mature ecosystem and fastest to prototype. It adds a new deployable with its own authnz, data storage, inter-service communication, logging and monitoring, and Python would be a new stack for the team
- * *Golang LangChain in the MCP server:* familiar stack and no new deployable. It would mix non-MCP features into the MCP server, and it still adds operational burden to install the extra component to have AI capabilities
- * *Elixir LangChain and Sagents in web:* no new deployable, familiar stack and direct access to web internals. The ecosystem is less mature than the others
+ * *Separate artifact with Python/JS LangChain:* most mature ecosystem and fastest to prototype. It adds a new deployable with its own authnz, data storage, inter-service communication, logging and monitoring, and Python would be a new stack for the team.
+ * *Golang LangChain in the MCP server:* familiar stack and no new deployable. It would mix non-MCP features into the MCP server, and it still adds operational burden to install the extra component to have AI capabilities.
+ * *Elixir LangChain and Sagents in web:* no new deployable, familiar stack and direct access to web internals. The ecosystem is less mature than the others.
 
 The comparative analysis of the PoCs (same dataset, model, system prompt and user prompts) showed feature parity between the implementations, so the architectural implications became the main decision factor.
 
 For the Elixir option we also considered where the agentic core lives:
 
- * *In-web integration:* simple setup, the code evolves with Trento's needs. Higher risk of mixing agentic and web concerns
- * *Library integration (https://github.com/trento-project/agentic_runtime[agentic_runtime]):* clear separation of concerns. More friction, and the right boundaries are hard to get from the start (ie is the Channel or the AG-UI implementation part of the library or of web?)
+ * *In-web integration:* simple setup, the code evolves with Trento's needs. Higher risk of mixing agentic and web concerns.
+ * *Library integration (https://github.com/trento-project/agentic_runtime[agentic_runtime]):* clear separation of concerns. More friction, and the right boundaries are hard to get from the start (i.e. is the Channel or the AG-UI implementation part of the library or of web?).
 
 === Decision
 
@@ -41,51 +41,53 @@ We will build the AI assistant natively in Trento Web, without introducing a new
 
 ==== Agentic core
 
- * the agent is built on https://github.com/brainlid/langchain[LangChain] and https://github.com/sagents-ai/sagents[Sagents] and lives in web's codebase
- * each conversation thread gets its own Sagents agent server, under a dynamic supervisor. A prompt starts it, or reuses the one already running for the thread
- * conversations are not stored. The conversation context lives only in the agent server, which stops after a period of inactivity or shortly after the last connected client goes away
- * web calls Sagents through `Trento.AI.Agent` and thin adapters, so tests can replace it
- * extracting a library remains possible once the boundaries are clear
+ * The agent is built on https://github.com/brainlid/langchain[LangChain] and https://github.com/sagents-ai/sagents[Sagents] and lives in web's codebase.
+ * Each conversation thread gets its own Sagents agent server, under a dynamic supervisor. A prompt starts it, or reuses the one already running for the thread.
+ * Conversations are not stored. The conversation context lives only in the agent server, which stops after a period of inactivity or shortly after the last connected client goes away.
+ * Web calls Sagents through `Trento.AI.Agent` and thin adapters, so tests can replace it.
+ * Extracting a library remains possible once the boundaries are clear.
 
 ==== UI to Agent communication
 
- * the transport is WebSocket, via a dedicated Phoenix Channel on the already existing socket
- * the channel streams https://docs.ag-ui.com/introduction[AG-UI] events to the UI, limited to the events we need: run lifecycle, text message streaming and tool calls. Everything else is a plain channel message: the client's requests (prompt, stop, new chat) and the server's notices (conversation expired, AI configuration changes). AG-UI events flow from the agent to the UI within a run, while the client's requests go the other way and the server's notices are not about a run
- * events are built and encoded with the https://hex.pm/packages/ag_ui_ex[ag_ui_ex] library instead of a bespoke implementation
+ * The transport is WebSocket, via a dedicated Phoenix Channel on the already existing socket.
+ * The channel streams https://docs.ag-ui.com/introduction[AG-UI] events to the UI, limited to the events we need: run lifecycle, text message streaming and tool calls. Everything else is a plain channel message: the client's requests (prompt, stop, new chat) and the server's notices (conversation expired, AI configuration changes). AG-UI events flow from the agent to the UI within a run, while the client's requests go the other way and the server's notices are not about a run.
+ * Events are built and encoded with the https://hex.pm/packages/ag_ui_ex[ag_ui_ex] library instead of a bespoke implementation.
 
 ==== UI components
 
- * the chat UI is built with https://www.assistant-ui.com/[Assistant-UI] components and its AG-UI runtime
- * a custom AG-UI agent (`WebSocketAIAgent`) connects that runtime to the channel
- * CopilotKit was discarded because of vendor lock-in, licensing and branding concerns
+ * The chat UI is built with https://www.assistant-ui.com/[Assistant-UI] components and its AG-UI runtime.
+ * A custom AG-UI agent (`WebSocketAIAgent`) connects that runtime to the channel.
+ * CopilotKit was discarded because of vendor lock-in, licensing and branding concerns.
 
 ==== Tools
 
 Tools are collected from a configurable list of tool sources:
 
- * web endpoints whose OpenAPI operation is tagged `MCP` become tools automatically. A tool call is dispatched in process through web's endpoint, so authorization, activity logging, parameter casting and error handling behave exactly as for an HTTP request (the channel already authenticated the user)
- * Wanda endpoints tagged `MCP` become tools from Wanda's OpenAPI specification and are called over HTTP with the user's token
- * the MCP server keeps serving external MCP clients. Since it relies on the same `MCP` tag, the assistant and the MCP server expose the same capabilities
+* Web endpoints whose OpenAPI operation is tagged `MCP` become tools automatically. A tool call is dispatched in process through web's endpoint, so authorization, activity logging, parameter casting and error handling behave exactly as for an HTTP request (the channel already authenticated the user).
+ * Wanda endpoints tagged `MCP` become tools from Wanda's OpenAPI specification and are called over HTTP with the user's token.
+
+The MCP server keeps serving external MCP clients. Since it relies on the same `MCP` tag, the assistant and the MCP server expose the same capabilities.
 
 ==== LLM configuration
 
- * each user configures their own provider, model and API key from the UI
- * supported providers are OpenAI, Google and Anthropic, limited to models supporting chat, reasoning, tools and streaming tool calls
- * API keys are encrypted at rest with the same vault used for the other stored secrets (ie SUSE Multi-Linux Manager credentials, SMTP password)
- * SUSE AI integration not in the scope of this decision and is not considered for the current implementation
+ * Each user configures their own provider, model and API key from the UI.
+ * Supported providers are OpenAI, Google and Anthropic, limited to models supporting chat, reasoning, tools and streaming tool calls.
+ * API keys are encrypted at rest with the same vault used for the other stored secrets (i.e. SUSE Multi-Linux Manager credentials, SMTP password).
 
 === Consequences
 
 The depicted decision has the following effects:
 
- * *No new artifact:* installation, release and operations stay as they are. Each user adds their provider, model and API key in the UI
- * *Reused authnz and activity logging:* tool calls run through the same pipeline as API requests, so the assistant cannot do more than the user can, and its actions are logged as the user's
- * *Single tool definition:* tagging an endpoint `MCP` makes it available to both the assistant and the MCP server, with no duplicated wiring between controllers and tools
- * *Wanda tools still cost network calls:* each call goes through HTTP and token introspection. Fewer calls than going through the MCP server, but not zero
- * *Less mature ecosystem:* the Elixir LangChain implementation is catching up with the Python/JS ones. We contribute fixes upstream and pin a fork, if necessary, while they land
- * *Standard protocol on the UI side:* the UI is AG-UI compliant, so changes in the backend AG-UI library or in the agentic framework do not ripple to the frontend
- * *Short-lived conversations:* the conversation context is lost when its agent server stops (inactivity, no connected client, restart). The current conversation stays visible, read-only, and the user has to start a new chat to continue
- * *Data leaves the installation:* web needs outbound access to the selected LLM provider, and prompts and tool results, which can carry infrastructure data, are sent to it. This matters for firewalled deployments and for data handling policies
+ * *No new artifact:* installation, release and operations stay as they are. Each user adds their provider, model and API key in the UI.
+ * *Reused authnz and activity logging:* tool calls run through the same pipeline as API requests, so the assistant cannot do more than the user can, and its actions are logged as the user's.
+ * *Single tool definition:* tagging an endpoint `MCP` makes it available to both the assistant and the MCP server, with no duplicated wiring between controllers and tools.
+ * *Wanda tools still cost network calls:* each call goes through HTTP and token introspection. Fewer calls than going through the MCP server, but not zero.
+ * *Less mature ecosystem:* the Elixir LangChain implementation is catching up with the Python/JS ones. We contribute fixes upstream and, if necessary, pin a fork while they land.
+ * *Standard protocol on the UI side:* the UI is AG-UI compliant, so changes in the backend AG-UI library or in the agentic framework do not ripple to the frontend.
+ * *Short-lived conversations:* the conversation context is lost when its agent server stops (inactivity, no connected client, restart). The current conversation stays visible, read-only, and the user has to start a new chat to continue.
+ * *Data leaves the installation:* web needs outbound access to the selected LLM provider, and prompts and tool results, which can carry infrastructure data, are sent to it. This matters for firewalled deployments and for data handling policies.
+
+=== Out of Scope
 
 Out of scope and deferred to dedicated discussions:
 
