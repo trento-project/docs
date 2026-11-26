@@ -1,16 +1,16 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-version-history]]
-[revdate="2026-10-15"]
+[revdate="2026-11-26"]
 [description="Explore the key features, architectural enhancements and component updates introduced across different releases of Trento"]
-== Highlights of {trento} versions
+== What is new in {trento}
 
 Below is a list of the most important user-facing features in the
-different versions of {trento}. For a more detailed information about
+different versions of {trento}. For more detailed information about
 the changes included in each new version, visit
 https://github.com/trento-project.
 
-**Software Components**
+**Software components**
 
 * For changes in the {trserver} {web} component, visit
 https://github.com/trento-project/web/releases.
@@ -23,7 +23,7 @@ https://github.com/trento-project/mcp-server/releases.
 * For changes in the {tragent}, visit
 https://github.com/trento-project/agent/releases.
 
-**Packaging & Deployment**
+**Packaging and deployment**
 
 * For changes in the {trento} Helm Chart, visit
 https://github.com/trento-project/helm-charts/releases.
