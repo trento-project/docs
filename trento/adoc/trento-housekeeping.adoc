@@ -2,8 +2,9 @@ include::product-attributes.adoc[]
 
 [[sec-housekeeping]]
 === Housekeeping
-:revdate: 2025-06-10
+:revdate: 2026-11-26
 
+Hosts that stop reporting and instances that {trento} no longer discovers remain in the {tr_web} console with their last known data. Over time, they could clutter the overviews and make it harder to see the actual state of your landscape. Housekeeping removes them from the console. Performing housekeeping actions requires the `cleanup:all` permission.
 
 When the heartbeat of an agent fails, an option to clean-up the
 corresponding host is displayed in the *Hosts* overview and the
