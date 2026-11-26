@@ -1,8 +1,9 @@
 include::product-attributes.adoc[]
 
 [[sec-activity-log]]
-=== Tracking events and user actions with the Activity Log
-:revdate: 2026-08-21
+[revdate="2026-11-23"]
+[description="Use the Trento Activity Log to track system events, filter entries, trace correlated workflows and manage log retention across your SAP landscape"]
+== Tracking events with the Activity Log
 
 {trento} collects system events and user actions in the Activity Log. It records what
 happened in the monitored landscape and who triggered the event. With the Activity Log, you can discover health and heartbeat changes, host de-registrations, login attempts, user updates and more.
@@ -10,7 +11,7 @@ happened in the monitored landscape and who triggered the event. With the Activi
 The Activity Log can be accessed from the left-hand side panel of the {trento} console.
 
 [[sec-activity-log-entries]]
-==== Understanding an Activity Log entry
+=== Understanding an Activity Log entry
 
 Entries are listed from newest to oldest. Each entry in the Activity Log includes the following information:
 
@@ -29,7 +30,7 @@ The list view is a summary. To see the full context of an entry, such as the aff
 resource and the values involved, click the chevron icon (`>`) on the entry. This opens the *Activity Details* window with the activity metadata.
 
 [[sec-activity-log-filtering]]
-==== Filtering for relevant log entries
+=== Filtering for relevant log entries
 
 You can use filters to isolate the entries you are interested in. For more specific queries, use the search field to find exact terms from the activity metadata, such as a specific host name or setting value.
 
@@ -53,7 +54,7 @@ applied by default. For example, the query `term1 term2 term3` is treated as
 To remove all the filters, click *Reset Filters*.
 
 [[sec-activity-log-correlation]]
-==== Following a chain of related events
+=== Following a chain of related events
 
 Certain user actions and system events trigger a multi-step workflow that produces
 several log entries. {trento} correlates those entries, so that you can review the
@@ -84,13 +85,13 @@ Not every entry must belong to a chain. If an entry is not part of a larger work
 ====
 
 [[sec-activity-log-refreshing]]
-==== Refreshing the Activity Log
+=== Refreshing the Activity Log
 
 New entries are not automatically added to an open view. Click *Refresh* to load any new entries generated since the view was opened or last refreshed.
 If you are monitoring an ongoing operation, select an auto-refresh interval instead and let the view update itself.
 
 [[sec-activity-log-user-data]]
-==== Getting access to user data
+=== Getting access to user data
 
 Not every user sees the same Activity Log. Permissions govern which entries are listed, and whether the user names in them are readable.
 
@@ -112,7 +113,7 @@ users without this permission, only their own user name and the user `system` is
 For more information about permissions, see <<sec-trento-user-management>>.
 
 [[sec-activity-log-retention]]
-==== Modifying log retention time
+=== Modifying log retention time
 
 Entries are retained for one month by default. Increase the retention time if you need a longer audit history, or reduce it to limit database growth. Changing it requires the `all:settings` permission.
 

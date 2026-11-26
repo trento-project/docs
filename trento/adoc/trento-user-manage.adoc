@@ -2,7 +2,7 @@ include::product-attributes.adoc[]
 
 [[sec-trento-user-management]]
 === User management and access permissions
-:revdate: 2026-11-19
+:revdate: 2026-11-23
 
 {trento} provides local, permission-based user management to secure your console. With this feature, you can create accounts, enforce strict password policies, and assign role-based permissions. This ensures only authorized users perform protected actions such as running checks or managing {sap} systems.
 
@@ -120,22 +120,3 @@ Turn off the MFA setting if the user loses access to their authenticator app. Th
 
 Delete the user::
 From the main *Users* view, remove unnecessary accounts entirely by clicking *Delete* (except for the default admin user, which cannot be deleted).
-
-[[sec-trento-user-profile]]
-==== Managing personal profile settings
-
-Every user can manage their own profile settings. You do not need additional permissions for these actions.
-
-. In the {tr_web} console, click your user icon and select *Profile*. In the profile view, users can edit the following options:
-
-** Update name and email address.
-** Change password.
-** Enable multi-factor authentication.
-** Set preferred timezone. This adjusts how dates and times are displayed for your user in the console. Backend storage, API payloads, logs and scheduled tasks always use UTC.
-. Click *Save*.
-
-Additionally, the *Profile* view also provides settings for the following features:
-
-* Personal access tokens for API access. For more information, see <<sec-trento-personal-access-tokens>>.
-* Analytics collection. For more information, see <<sec-trento-analytics>>.
-* The {liz} AI assistant. For more information, see <<sec-trento-liz-ai-assistant>>.

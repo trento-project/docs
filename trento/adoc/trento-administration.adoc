@@ -1,0 +1,16 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-administration]]
+[revdate="2026-11-23"]
+[description="Configure Trento administration and personal settings to manage user access, optimize server resources and customize individual user profiles"]
+== Administration and personal settings
+
+{trento} administration and personal settings keep your monitoring environment secure and efficient. Administrators can control access and optimize server performance through ongoing tasks such as managing permissions or adjusting storage. Individual users can customize their account preferences, including authentication options and API access, without requiring administrative permissions.
+
+include::trento-user-manage.adoc[]
+include::trento-user-profile.adoc[]
+include::trento-managing-trento-server-storage.adoc[]
+include::trento-configuring-log-levels.adoc[]
+include::trento-rotate-api-keys.adoc[]
+include::trento-manage-tags.adoc[]
+include::trento-housekeeping.adoc[]

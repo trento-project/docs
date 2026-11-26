@@ -1,0 +1,11 @@
+include::product-attributes.adoc[]
+
+[[sec-trento-user-profile]]
+=== Managing the user profile
+:revdate: 2026-11-23
+
+Unlike system administration tasks, profile settings are managed on a per-user basis. Every user can access their own *Profile* view to generate personal access tokens, edit their account details, and manage analytics preferences. You do not need administrative permissions for these actions.
+
+include::trento-profile-settings.adoc[]
+include::trento-personal-access-tokens.adoc[]
+include::trento-analytics.adoc[]
