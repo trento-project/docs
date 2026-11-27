@@ -1,15 +1,13 @@
 include::product-attributes.adoc[]
 
 [[sec-trento-use-webconsole]]
-[revdate="2026-11-19"]
-[description="Learn how the Trento Web console aggregates health data across hosts, clusters and SAP systems to help administrators monitor system reliability"]
-== Monitoring {sap} health in the {tr_web} console
+[revdate="2026-11-27"]
+[description="Use the Trento Web console to monitor your SAP landscape, investigate issues and keep the displayed information accurate and organized"]
+== Monitoring the {sap} landscape
 
-{tr_web} combines the individual values of your {sap} landscape into one aggregated health value per host, cluster, {hana} database and {sap} system. You can therefore use the {tr_web} console to identify which parts of your {sap} landscape need attention.
+{tr_web} combines the individual values of your {sap} landscape into one aggregated health value per host, cluster, {hana} database and {sap} system. You can therefore use the {tr_web} console to identify which parts of your {sap} landscape need attention. You can also keep the displayed landscape information accurate and organized as your environment evolves, with features such as housekeeping or tagging.
 
-This document explains what the health values mean, which factors {trento} combines to calculate them, how to recognize outdated data, and how to trace a warning or a critical value back to its source.
-
-To access this data, use the left sidebar in the {tr_web} console. It contains the following entries:
+The left sidebar of the {tr_web} console provides access to the following views and options:
 
 Dashboard::
 Identify at a glance which {sap} systems need attention, and filter systems by health value.
@@ -33,7 +31,7 @@ Users::
 Create and edit users, assign user permissions and configure other user settings. This entry is only visible to users with the required administrative permissions.
 
 Activity Log::
-Review system events and user actions, with the timestamp, message, user, and severity of each entry.
+Review system events and user actions, with the timestamp, message, user and severity of each entry.
 
 Settings::
 Modify user-defined settings, including API keys, the SUSE Multi-Linux Manager connection, Activity Log retention, and email alerts.
@@ -356,6 +354,8 @@ When you find a stale value, verify the reporting path before you investigate th
 
 Once the agent reports again, {tr_web} replaces the stale value with the current one and removes the clock marker.
 
+If the agent does not report again, for example, because the host was decommissioned, you can remove the host and its components from the console. For more information, see <<sec-housekeeping>>.
+
 [[sec-trento-finding-health-issue]]
 === Finding the cause of a health issue
 
@@ -372,6 +372,9 @@ A non-passing aggregated health value indicates that something needs attention. 
 
 . Check whether a stale banner is displayed. If it is, investigate the reporting problem first. For more information, see <<sec-trento-stale-data>>.
 . Identify the factor that caused the value and investigate, using the information in <<sec-trento-health-calculation>>.
+
+include::trento-housekeeping.adoc[]
+include::trento-manage-tags.adoc[]
 
 [[sec-trento-webconsole-troubleshooting]]
 === Troubleshooting
@@ -407,6 +410,9 @@ While {tr_web} shows when updates are missing and flags the health as a _warning
 
 Why is the host name of a registered host rotating among different names?::
 This behavior happens when different hosts with the same machine ID are registered with {trento}. Machine IDs must be unique across the {trento} landscape. For more information, see <<sec-trento-agent-requirements>>.
+
+A decommissioned host, {sap} system or {hana} database still appears in the console. How can I remove it?::
+{tr_web} displays components with their last known data until you clean them up. Use the *Clean up* button in the overview or details view of the affected host, {sap} system or {hana} database. For more information, see <<sec-housekeeping>>.
 
 Which data should be collected before reporting an issue with {trento} itself?::
 For information on which data to collect for support, see <<trento-report-issue>>.
