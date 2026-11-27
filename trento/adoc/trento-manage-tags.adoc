@@ -2,14 +2,14 @@ include::product-attributes.adoc[]
 
 [[sec-trento-manage-tags]]
 === Filtering overviews with tags
-:revdate: 2026-11-26
+:revdate: 2026-11-27
 
 In a large landscape, overviews can list many hosts, clusters, {hana} databases and {sap} systems. Tags let you label these components with information that matters to your organization, such as location or owner, and then filter the overviews to show only the components you need.
 
 You can use any text you like to create your tags except blank spaces and special characters other than + - = . , _ : and @.
 
 [[sec-trento-add-tags]]
-==== Adding tags to hosts, clusters, databases, and {sap} systems
+==== Adding tags to hosts, clusters, databases and {sap} systems
 
 Adding tags requires the `all:tags` permission.
 To add one or more tags to your objects, proceed as follows:

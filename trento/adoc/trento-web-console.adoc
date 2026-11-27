@@ -1,13 +1,13 @@
 include::product-attributes.adoc[]
 
-[[sec-trento-web-console]]
-[revdate="2026-11-26"]
+[[sec-trento-use-webconsole]]
+[revdate="2026-11-27"]
 [description="Use the Trento Web console to monitor your SAP landscape, investigate issues and keep the displayed information accurate and organized"]
 == Monitoring the {sap} landscape
 
-The {tr_web} console gives you a central view of your {sap} landscape. Use it to find out which hosts, clusters, {hana} databases and {sap} systems need attention, and to keep the displayed information accurate and organized as your landscape changes.
+{tr_web} combines the individual values of your {sap} landscape into one aggregated health value per host, cluster, {hana} database and {sap} system. You can therefore use the {tr_web} console to identify which parts of your {sap} landscape need attention. You can also keep the displayed landscape information accurate and organized as your environment evolves, with features such as housekeeping or tagging.
 
-Every overview and setting in the {tr_web} console is accessible from the left sidebar of the {tr_web} console:
+The left sidebar of the {tr_web} console provides access to the following views and options:
 
 Dashboard::
 Identify at a glance which {sap} systems need attention, and filter systems by health value.
@@ -31,7 +31,7 @@ Users::
 Create and edit users, assign user permissions and configure other user settings. This entry is only visible to users with the required administrative permissions.
 
 Activity Log::
-Review system events and user actions, with the timestamp, message, user, and severity of each entry.
+Review system events and user actions, with the timestamp, message, user and severity of each entry.
 
 Settings::
 Modify user-defined settings, including API keys, the SUSE Multi-Linux Manager connection, Activity Log retention, and email alerts.
@@ -412,7 +412,7 @@ Why is the host name of a registered host rotating among different names?::
 This behavior happens when different hosts with the same machine ID are registered with {trento}. Machine IDs must be unique across the {trento} landscape. For more information, see <<sec-trento-agent-requirements>>.
 
 A decommissioned host, {sap} system or {hana} database still appears in the console. How can I remove it?::
-{tr_web} keeps displaying a component with its last known data until you clean it up. How you remove it depends on what was decommissioned. For more information, see <<sec-housekeeping>>.
+{tr_web} displays components with their last known data until you clean them up. Use the *Clean up* button in the overview or details view of the affected host, {sap} system or {hana} database. For more information, see <<sec-housekeeping>>.
 
 Which data should be collected before reporting an issue with {trento} itself?::
 For information on which data to collect for support, see <<trento-report-issue>>.
